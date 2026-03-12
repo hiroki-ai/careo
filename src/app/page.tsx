@@ -1,13 +1,27 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCompanies } from "@/hooks/useCompanies";
 import { useEs } from "@/hooks/useEs";
 import { useInterviews } from "@/hooks/useInterviews";
 import { StatusBadge, Badge } from "@/components/ui/Badge";
-import { generateAdvice } from "@/lib/ai";
+import { Button } from "@/components/ui/Button";
+import { createClient } from "@/lib/supabase/client";
 import { daysUntil } from "@/lib/utils";
 import { COMPANY_STATUS_ORDER } from "@/types";
+
+interface ActionItem {
+  priority: "high" | "medium" | "low";
+  action: string;
+  reason: string;
+}
+
+interface NextActionResult {
+  summary: string;
+  weeklyActions: ActionItem[];
+}
 
 const priorityColors = {
   high: "border-l-red-500 bg-red-50",
@@ -15,24 +29,18 @@ const priorityColors = {
   low: "border-l-blue-500 bg-blue-50",
 };
 
-const priorityLabels = {
-  high: "緊急",
-  medium: "推奨",
-  low: "情報",
-};
-
+const priorityLabels = { high: "緊急", medium: "推奨", low: "情報" };
 const priorityBadgeVariants: Record<string, "danger" | "warning" | "default"> = {
-  high: "danger",
-  medium: "warning",
-  low: "default",
+  high: "danger", medium: "warning", low: "default",
 };
 
 export default function DashboardPage() {
   const { companies } = useCompanies();
   const { esList } = useEs();
   const { interviews } = useInterviews();
-
-  const advices = generateAdvice(companies, esList, interviews);
+  const router = useRouter();
+  const [aiResult, setAiResult] = useState<NextActionResult | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
 
   const statusCounts = COMPANY_STATUS_ORDER.reduce((acc, s) => {
     acc[s] = companies.filter((c) => c.status === s).length;
@@ -43,39 +51,57 @@ export default function DashboardPage() {
     ...esList
       .filter((e) => e.deadline && e.status === "DRAFT")
       .map((e) => ({
-        id: e.id,
-        type: "ES" as const,
-        title: e.title,
+        id: e.id, type: "ES" as const, title: e.title,
         company: companies.find((c) => c.id === e.companyId)?.name ?? "",
-        date: e.deadline!,
-        link: `/es/${e.id}`,
-        days: daysUntil(e.deadline!),
+        link: `/es/${e.id}`, days: daysUntil(e.deadline!),
       })),
     ...interviews
       .filter((i) => i.result === "PENDING" && daysUntil(i.scheduledAt) >= 0)
       .map((i) => ({
-        id: i.id,
-        type: "面接" as const,
-        title: `${i.round}次面接`,
+        id: i.id, type: "面接" as const, title: `${i.round}次面接`,
         company: companies.find((c) => c.id === i.companyId)?.name ?? "",
-        date: i.scheduledAt,
-        link: `/interviews/${i.id}`,
-        days: daysUntil(i.scheduledAt),
+        link: `/interviews/${i.id}`, days: daysUntil(i.scheduledAt),
       })),
-  ]
-    .filter((d) => d.days <= 7)
-    .sort((a, b) => a.days - b.days)
-    .slice(0, 5);
+  ].filter((d) => d.days <= 7).sort((a, b) => a.days - b.days).slice(0, 5);
 
   const recentCompanies = [...companies]
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
     .slice(0, 5);
 
+  const fetchAiAdvice = async () => {
+    setAiLoading(true);
+    try {
+      const res = await fetch("/api/ai/next-action", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ companies, esList, interviews }),
+      });
+      const data = await res.json();
+      if (!data.error) setAiResult(data);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  // データ読み込み後に自動でAIアドバイスを取得
+  useEffect(() => {
+    if (companies.length > 0 && !aiResult) fetchAiAdvice();
+  }, [companies.length]);
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
+
   return (
     <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">ダッシュボード</h1>
-        <p className="text-sm text-gray-500 mt-1">就活状況のサマリー</p>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">ダッシュボード</h1>
+          <p className="text-sm text-gray-500 mt-1">就活状況のサマリー</p>
+        </div>
+        <Button variant="ghost" size="sm" onClick={handleLogout}>ログアウト</Button>
       </div>
 
       {/* ステータスサマリー */}
@@ -94,42 +120,55 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-3 gap-6">
-        {/* AIアドバイス */}
+        {/* Next Action AI */}
         <div className="col-span-2">
-          <h2 className="font-semibold text-gray-900 mb-3">AIアドバイス</h2>
-          <div className="space-y-3">
-            {advices.map((advice, i) => (
-              <div
-                key={i}
-                className={`border-l-4 rounded-r-xl p-4 ${priorityColors[advice.priority]}`}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Badge variant={priorityBadgeVariants[advice.priority]}>
-                        {priorityLabels[advice.priority]}
-                      </Badge>
-                      <span className="text-xs text-gray-500">{advice.category}</span>
-                    </div>
-                    <p className="text-sm text-gray-800">{advice.message}</p>
-                  </div>
-                  {advice.link && (
-                    <Link
-                      href={advice.link}
-                      className="text-xs text-blue-600 hover:underline whitespace-nowrap shrink-0"
-                    >
-                      確認 →
-                    </Link>
-                  )}
-                </div>
-              </div>
-            ))}
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-semibold text-gray-900">🤖 Next Action AI</h2>
+            <Button variant="ghost" size="sm" onClick={fetchAiAdvice} disabled={aiLoading}>
+              {aiLoading ? "分析中..." : "再分析"}
+            </Button>
           </div>
+
+          {aiResult?.summary && (
+            <p className="text-sm text-gray-500 mb-3 px-1">{aiResult.summary}</p>
+          )}
+
+          {aiLoading && (
+            <div className="space-y-3">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-16 bg-gray-100 rounded-xl animate-pulse" />
+              ))}
+            </div>
+          )}
+
+          {!aiLoading && aiResult && (
+            <div className="space-y-3">
+              {aiResult.weeklyActions.map((action, i) => (
+                <div key={i} className={`border-l-4 rounded-r-xl p-4 ${priorityColors[action.priority]}`}>
+                  <div className="flex items-start gap-3">
+                    <Badge variant={priorityBadgeVariants[action.priority]}>
+                      {priorityLabels[action.priority]}
+                    </Badge>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{action.action}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">{action.reason}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {!aiLoading && !aiResult && (
+            <div className="text-center py-8 text-gray-400">
+              <p className="text-sm mb-3">企業・ES・面接を登録するとAIがアドバイスします</p>
+              <Button size="sm" onClick={fetchAiAdvice}>AIアドバイスを取得</Button>
+            </div>
+          )}
         </div>
 
         {/* サイドパネル */}
         <div className="space-y-6">
-          {/* 直近の締切 */}
           <div>
             <div className="flex items-center justify-between mb-3">
               <h2 className="font-semibold text-gray-900">直近の締切・面接</h2>
@@ -159,7 +198,6 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* 最近更新した企業 */}
           <div>
             <div className="flex items-center justify-between mb-3">
               <h2 className="font-semibold text-gray-900">最近の企業</h2>

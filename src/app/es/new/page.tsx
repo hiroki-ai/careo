@@ -24,8 +24,8 @@ function NewEsContent() {
         <EsForm
           companies={companies}
           initialCompanyId={companyId}
-          onSubmit={(data) => {
-            const es = addEs(data);
+          onSubmit={async (data) => {
+            const es = await addEs(data);
             router.push(`/es/${es.id}`);
           }}
           onCancel={() => router.back()}

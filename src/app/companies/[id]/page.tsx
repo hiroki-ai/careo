@@ -7,6 +7,7 @@ import { useCompanies } from "@/hooks/useCompanies";
 import { useEs } from "@/hooks/useEs";
 import { useInterviews } from "@/hooks/useInterviews";
 import { CompanyForm } from "@/components/companies/CompanyForm";
+import { CompanyResearch } from "@/components/companies/CompanyResearch";
 import { StatusBadge, Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
@@ -151,6 +152,9 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
           </div>
         )}
       </div>
+
+      {/* AI企業研究 */}
+      <CompanyResearch companyName={company.name} />
 
       {/* 面接ログ */}
       <div className="bg-white rounded-xl border border-gray-100 p-6">

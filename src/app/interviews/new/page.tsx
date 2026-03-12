@@ -24,8 +24,8 @@ function NewInterviewContent() {
         <InterviewForm
           companies={companies}
           initialCompanyId={companyId}
-          onSubmit={(data) => {
-            const interview = addInterview(data);
+          onSubmit={async (data) => {
+            const interview = await addInterview(data);
             router.push(`/interviews/${interview.id}`);
           }}
           onCancel={() => router.back()}

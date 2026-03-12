@@ -2,71 +2,55 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Company, CompanyStatus } from "@/types";
-import { getCompanies, saveCompanies } from "@/lib/storage";
-import { generateId } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 
 export function useCompanies() {
   const [companies, setCompanies] = useState<Company[]>([]);
+  const [loading, setLoading] = useState(true);
+  const supabase = createClient();
 
-  useEffect(() => {
-    setCompanies(getCompanies());
+  const fetch = useCallback(async () => {
+    const { data } = await supabase
+      .from("companies")
+      .select("*")
+      .order("updated_at", { ascending: false });
+    if (data) setCompanies(data as Company[]);
+    setLoading(false);
   }, []);
 
-  const addCompany = useCallback(
-    (data: Omit<Company, "id" | "createdAt" | "updatedAt">) => {
-      const now = new Date().toISOString();
-      const newCompany: Company = {
-        ...data,
-        id: generateId(),
-        createdAt: now,
-        updatedAt: now,
-      };
-      const updated = [...companies, newCompany];
-      setCompanies(updated);
-      saveCompanies(updated);
-      return newCompany;
-    },
-    [companies]
-  );
+  useEffect(() => { fetch(); }, [fetch]);
 
-  const updateCompany = useCallback(
-    (id: string, data: Partial<Omit<Company, "id" | "createdAt">>) => {
-      const updated = companies.map((c) =>
-        c.id === id ? { ...c, ...data, updatedAt: new Date().toISOString() } : c
-      );
-      setCompanies(updated);
-      saveCompanies(updated);
-    },
-    [companies]
-  );
+  const addCompany = useCallback(async (data: Omit<Company, "id" | "createdAt" | "updatedAt">) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    const { data: inserted } = await supabase
+      .from("companies")
+      .insert({ ...data, user_id: user!.id })
+      .select()
+      .single();
+    if (inserted) setCompanies((prev) => [inserted as Company, ...prev]);
+    return inserted as Company;
+  }, []);
 
-  const deleteCompany = useCallback(
-    (id: string) => {
-      const updated = companies.filter((c) => c.id !== id);
-      setCompanies(updated);
-      saveCompanies(updated);
-    },
-    [companies]
-  );
+  const updateCompany = useCallback(async (id: string, data: Partial<Company>) => {
+    const { data: updated } = await supabase
+      .from("companies")
+      .update(data)
+      .eq("id", id)
+      .select()
+      .single();
+    if (updated) setCompanies((prev) => prev.map((c) => c.id === id ? updated as Company : c));
+  }, []);
 
-  const updateStatus = useCallback(
-    (id: string, status: CompanyStatus) => {
-      updateCompany(id, { status });
-    },
-    [updateCompany]
-  );
+  const deleteCompany = useCallback(async (id: string) => {
+    await supabase.from("companies").delete().eq("id", id);
+    setCompanies((prev) => prev.filter((c) => c.id !== id));
+  }, []);
 
-  const getCompanyById = useCallback(
-    (id: string) => companies.find((c) => c.id === id),
-    [companies]
-  );
+  const updateStatus = useCallback((id: string, status: CompanyStatus) => {
+    updateCompany(id, { status });
+  }, [updateCompany]);
 
-  return {
-    companies,
-    addCompany,
-    updateCompany,
-    deleteCompany,
-    updateStatus,
-    getCompanyById,
-  };
+  const getCompanyById = useCallback((id: string) => companies.find((c) => c.id === id), [companies]);
+
+  return { companies, loading, addCompany, updateCompany, deleteCompany, updateStatus, getCompanyById };
 }

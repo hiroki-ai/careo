@@ -2,72 +2,92 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Interview } from "@/types";
-import { getInterviews, saveInterviews } from "@/lib/storage";
-import { generateId } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
+
+function rowToInterview(row: Record<string, unknown>, questions: Record<string, unknown>[] = []): Interview {
+  return {
+    id: row.id as string,
+    companyId: row.company_id as string,
+    round: row.round as number,
+    scheduledAt: row.scheduled_at as string,
+    interviewers: row.interviewers as string | undefined,
+    notes: row.notes as string | undefined,
+    result: row.result as Interview["result"],
+    createdAt: row.created_at as string,
+    updatedAt: row.updated_at as string,
+    questions: questions.map((q) => ({
+      id: q.id as string,
+      question: q.question as string,
+      answer: q.answer as string,
+    })),
+  };
+}
 
 export function useInterviews() {
   const [interviews, setInterviews] = useState<Interview[]>([]);
+  const [loading, setLoading] = useState(true);
+  const supabase = createClient();
 
-  useEffect(() => {
-    setInterviews(getInterviews());
+  const fetch = useCallback(async () => {
+    const { data } = await supabase
+      .from("interviews")
+      .select("*, interview_questions(id, question, answer, order_index)")
+      .order("scheduled_at", { ascending: false });
+    if (data) {
+      setInterviews(data.map((i) => rowToInterview(i, (i.interview_questions as Record<string, unknown>[]).sort((a, b) => (a.order_index as number) - (b.order_index as number)))));
+    }
+    setLoading(false);
   }, []);
 
-  const addInterview = useCallback(
-    (data: Omit<Interview, "id" | "createdAt" | "updatedAt">) => {
-      const now = new Date().toISOString();
-      const newInterview: Interview = {
-        ...data,
-        id: generateId(),
-        createdAt: now,
-        updatedAt: now,
-      };
-      const updated = [...interviews, newInterview];
-      setInterviews(updated);
-      saveInterviews(updated);
-      return newInterview;
-    },
-    [interviews]
-  );
+  useEffect(() => { fetch(); }, [fetch]);
 
-  const updateInterview = useCallback(
-    (id: string, data: Partial<Omit<Interview, "id" | "createdAt">>) => {
-      const updated = interviews.map((i) =>
-        i.id === id ? { ...i, ...data, updatedAt: new Date().toISOString() } : i
+  const addInterview = useCallback(async (data: Omit<Interview, "id" | "createdAt" | "updatedAt">) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    const { data: row } = await supabase
+      .from("interviews")
+      .insert({ company_id: data.companyId, round: data.round, scheduled_at: data.scheduledAt, interviewers: data.interviewers || null, notes: data.notes || null, result: data.result, user_id: user!.id })
+      .select()
+      .single();
+    if (!row) throw new Error("Failed to create interview");
+
+    if (data.questions.length > 0) {
+      await supabase.from("interview_questions").insert(
+        data.questions.map((q, i) => ({ interview_id: row.id, question: q.question, answer: q.answer, order_index: i }))
       );
-      setInterviews(updated);
-      saveInterviews(updated);
-    },
-    [interviews]
-  );
+    }
+    const newInterview = rowToInterview(row, data.questions.map((q, i) => ({ ...q, order_index: i })));
+    setInterviews((prev) => [newInterview, ...prev]);
+    return newInterview;
+  }, []);
 
-  const deleteInterview = useCallback(
-    (id: string) => {
-      const updated = interviews.filter((i) => i.id !== id);
-      setInterviews(updated);
-      saveInterviews(updated);
-    },
-    [interviews]
-  );
+  const updateInterview = useCallback(async (id: string, data: Partial<Interview>) => {
+    await supabase.from("interviews").update({
+      company_id: data.companyId,
+      round: data.round,
+      scheduled_at: data.scheduledAt,
+      interviewers: data.interviewers || null,
+      notes: data.notes || null,
+      result: data.result,
+    }).eq("id", id);
 
-  const getInterviewById = useCallback(
-    (id: string) => interviews.find((i) => i.id === id),
-    [interviews]
-  );
+    if (data.questions) {
+      await supabase.from("interview_questions").delete().eq("interview_id", id);
+      if (data.questions.length > 0) {
+        await supabase.from("interview_questions").insert(
+          data.questions.map((q, i) => ({ interview_id: id, question: q.question, answer: q.answer, order_index: i }))
+        );
+      }
+    }
+    await fetch();
+  }, [fetch]);
 
-  const getInterviewsByCompany = useCallback(
-    (companyId: string) =>
-      interviews
-        .filter((i) => i.companyId === companyId)
-        .sort((a, b) => a.round - b.round),
-    [interviews]
-  );
+  const deleteInterview = useCallback(async (id: string) => {
+    await supabase.from("interviews").delete().eq("id", id);
+    setInterviews((prev) => prev.filter((i) => i.id !== id));
+  }, []);
 
-  return {
-    interviews,
-    addInterview,
-    updateInterview,
-    deleteInterview,
-    getInterviewById,
-    getInterviewsByCompany,
-  };
+  const getInterviewById = useCallback((id: string) => interviews.find((i) => i.id === id), [interviews]);
+  const getInterviewsByCompany = useCallback((companyId: string) => interviews.filter((i) => i.companyId === companyId).sort((a, b) => a.round - b.round), [interviews]);
+
+  return { interviews, loading, addInterview, updateInterview, deleteInterview, getInterviewById, getInterviewsByCompany };
 }
