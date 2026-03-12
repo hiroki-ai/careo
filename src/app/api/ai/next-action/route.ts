@@ -42,6 +42,8 @@ export async function POST(req: NextRequest) {
 
   const profileSummary = profile
     ? `ユーザープロフィール:
+- 大学: ${profile.university || "未設定"}
+- 学部・研究科: ${profile.faculty || "未設定"}
 - 学年: ${profile.grade}
 - 卒業予定: ${profile.graduationYear}年
 - 就活の進み具合: ${profile.jobSearchStage === "not_started" ? "まだ始めていない" : profile.jobSearchStage === "just_started" ? "始めたばかり" : "本格的に進めている"}
@@ -82,6 +84,7 @@ ${aggregateSummary}
 
 weeklyActionsは3〜5個。priority は "high" / "medium" / "low"。
 就活未開始の場合は「就活用Gmailの作成」「自己分析ノートを作る」「マイナビ・リクナビに登録する」「SPIの参考書を購入する」などの初歩的なアドバイスを含めること。
+学部・研究科の情報がある場合は、その専攻を活かせる企業・職種・アピールポイントを具体的にアドバイスすること（例: 情報工学→エンジニア職でのOB訪問推奨、経済学部→金融・コンサルのSPI数学対策など）。
 集合知がある場合は「Careoユーザーの平均では〜」という形で根拠を示すこと。`,
     }],
   });

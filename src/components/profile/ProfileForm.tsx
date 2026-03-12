@@ -17,6 +17,8 @@ const graduationYears = [currentYear, currentYear + 1, currentYear + 2, currentY
 
 export function ProfileForm({ initialData, onSubmit, submitLabel = "保存" }: ProfileFormProps) {
   const [form, setForm] = useState<FormData>({
+    university: initialData?.university ?? "",
+    faculty: initialData?.faculty ?? "",
     grade: initialData?.grade ?? "",
     graduationYear: initialData?.graduationYear ?? currentYear + 1,
     targetIndustries: initialData?.targetIndustries ?? [],
@@ -41,6 +43,28 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存" }: P
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">大学名</label>
+          <input
+            type="text"
+            value={form.university}
+            onChange={(e) => setForm({ ...form, university: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="例: 東京大学"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">学部・研究科</label>
+          <input
+            type="text"
+            value={form.faculty}
+            onChange={(e) => setForm({ ...form, faculty: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="例: 工学部情報工学科"
+          />
+        </div>
+      </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">

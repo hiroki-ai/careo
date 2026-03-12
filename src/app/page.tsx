@@ -115,7 +115,7 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-bold text-gray-900">ダッシュボード</h1>
           {profile && (
             <p className="text-sm text-gray-500 mt-0.5">
-              {profile.grade}・{profile.graduationYear}年卒 ／ {JOB_SEARCH_STAGE_LABELS[profile.jobSearchStage]}
+              {[profile.university, profile.faculty, profile.grade].filter(Boolean).join(" · ")} ／ {profile.graduationYear}年卒 ／ {JOB_SEARCH_STAGE_LABELS[profile.jobSearchStage]}
             </p>
           )}
         </div>

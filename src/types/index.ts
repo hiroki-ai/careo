@@ -125,6 +125,8 @@ export const GRADES = [
 
 export interface UserProfile {
   id: string;
+  university: string;
+  faculty: string;
   grade: string;
   graduationYear: number;
   targetIndustries: string[];

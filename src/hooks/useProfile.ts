@@ -7,6 +7,8 @@ import { createClient } from "@/lib/supabase/client";
 function rowToProfile(row: Record<string, unknown>): UserProfile {
   return {
     id: row.id as string,
+    university: (row.university as string) ?? "",
+    faculty: (row.faculty as string) ?? "",
     grade: row.grade as string,
     graduationYear: row.graduation_year as number,
     targetIndustries: (row.target_industries as string[]) ?? [],
@@ -37,6 +39,8 @@ export function useProfile() {
     if (!user) return;
     const row = {
       id: user.id,
+      university: data.university,
+      faculty: data.faculty,
       grade: data.grade,
       graduation_year: data.graduationYear,
       target_industries: data.targetIndustries,

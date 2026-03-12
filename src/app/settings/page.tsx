@@ -48,7 +48,9 @@ export default function SettingsPage() {
         {!isEditingProfile && profile && (
           <div className="space-y-3">
             {[
-              { label: "学年", value: profile.grade },
+              { label: "大学", value: profile.university || "未設定" },
+            { label: "学部・研究科", value: profile.faculty || "未設定" },
+            { label: "学年", value: profile.grade },
               { label: "卒業予定", value: `${profile.graduationYear}年卒` },
               { label: "就活の進み具合", value: JOB_SEARCH_STAGE_LABELS[profile.jobSearchStage] },
               {
