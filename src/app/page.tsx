@@ -90,8 +90,13 @@ export default function DashboardPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ companies, esList, interviews, profile }),
       });
-      const data = await res.json();
+      const text = await res.text();
+      if (!text) throw new Error("Empty response");
+      const data = JSON.parse(text);
       if (!data.error) setAiResult(data);
+      else console.error("[AI] error:", data.error, data.raw);
+    } catch (err) {
+      console.error("[fetchAiAdvice]", err);
     } finally {
       setAiLoading(false);
     }

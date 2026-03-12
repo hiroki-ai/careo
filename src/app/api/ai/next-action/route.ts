@@ -11,6 +11,7 @@ const supabase = createClient(
 );
 
 export async function POST(req: NextRequest) {
+  try {
   const { companies, esList, interviews, profile }: {
     companies: Company[];
     esList: ES[];
@@ -90,9 +91,15 @@ weeklyActionsは3〜5個。priority は "high" / "medium" / "low"。
   });
 
   const text = message.content[0].type === "text" ? message.content[0].text : "";
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) return NextResponse.json({ error: "No JSON in response", raw: text }, { status: 500 });
   try {
-    return NextResponse.json(JSON.parse(text));
+    return NextResponse.json(JSON.parse(jsonMatch[0]));
   } catch {
     return NextResponse.json({ error: "Parse error", raw: text }, { status: 500 });
+  }
+  } catch (err) {
+    console.error("[next-action] error:", err);
+    return NextResponse.json({ error: String(err) }, { status: 500 });
   }
 }
