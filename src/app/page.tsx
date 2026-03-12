@@ -6,11 +6,14 @@ import { useRouter } from "next/navigation";
 import { useCompanies } from "@/hooks/useCompanies";
 import { useEs } from "@/hooks/useEs";
 import { useInterviews } from "@/hooks/useInterviews";
+import { useProfile } from "@/hooks/useProfile";
 import { StatusBadge, Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { Modal } from "@/components/ui/Modal";
+import { ProfileForm } from "@/components/profile/ProfileForm";
 import { createClient } from "@/lib/supabase/client";
 import { daysUntil } from "@/lib/utils";
-import { COMPANY_STATUS_ORDER } from "@/types";
+import { COMPANY_STATUS_ORDER, JOB_SEARCH_STAGE_LABELS } from "@/types";
 
 interface ActionItem {
   priority: "high" | "medium" | "low";
@@ -38,9 +41,11 @@ export default function DashboardPage() {
   const { companies } = useCompanies();
   const { esList } = useEs();
   const { interviews } = useInterviews();
+  const { profile, saveProfile } = useProfile();
   const router = useRouter();
   const [aiResult, setAiResult] = useState<NextActionResult | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const statusCounts = COMPANY_STATUS_ORDER.reduce((acc, s) => {
     acc[s] = companies.filter((c) => c.status === s).length;
@@ -74,7 +79,7 @@ export default function DashboardPage() {
       const res = await fetch("/api/ai/next-action", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ companies, esList, interviews }),
+        body: JSON.stringify({ companies, esList, interviews, profile }),
       });
       const data = await res.json();
       if (!data.error) setAiResult(data);
@@ -101,8 +106,26 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-bold text-gray-900">ダッシュボード</h1>
           <p className="text-sm text-gray-500 mt-1">就活状況のサマリー</p>
         </div>
-        <Button variant="ghost" size="sm" onClick={handleLogout}>ログアウト</Button>
+        <div className="flex gap-2">
+          <Button variant="secondary" size="sm" onClick={() => setIsProfileOpen(true)}>プロフィール編集</Button>
+          <Button variant="ghost" size="sm" onClick={handleLogout}>ログアウト</Button>
+        </div>
       </div>
+
+      {/* プロフィール概要 */}
+      {profile && (
+        <div className="bg-blue-50 rounded-xl px-5 py-3 mb-6 flex items-center gap-4 flex-wrap">
+          <span className="text-sm text-blue-700 font-medium">{profile.grade}・{profile.graduationYear}年卒</span>
+          <span className="text-blue-300">|</span>
+          <span className="text-sm text-blue-700">{JOB_SEARCH_STAGE_LABELS[profile.jobSearchStage]}</span>
+          {profile.targetIndustries.length > 0 && (
+            <>
+              <span className="text-blue-300">|</span>
+              <span className="text-sm text-blue-700">志望: {profile.targetIndustries.slice(0, 2).join("・")}{profile.targetIndustries.length > 2 ? " 他" : ""}</span>
+            </>
+          )}
+        </div>
+      )}
 
       {/* ステータスサマリー */}
       <div className="grid grid-cols-4 gap-4 mb-8">
@@ -218,6 +241,18 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* プロフィール編集モーダル */}
+      <Modal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} title="プロフィール編集" size="lg">
+        <ProfileForm
+          initialData={profile ?? undefined}
+          onSubmit={async (data) => {
+            await saveProfile(data);
+            setIsProfileOpen(false);
+            fetchAiAdvice();
+          }}
+        />
+      </Modal>
     </div>
   );
 }

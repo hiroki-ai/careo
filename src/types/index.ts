@@ -75,6 +75,65 @@ export const COMPANY_STATUS_ORDER: CompanyStatus[] = [
   "REJECTED",
 ];
 
+export type JobSearchStage =
+  | "not_started"
+  | "just_started"
+  | "in_progress";
+
+export const JOB_SEARCH_STAGE_LABELS: Record<JobSearchStage, string> = {
+  not_started: "まだ始めていない",
+  just_started: "始めたばかり",
+  in_progress: "本格的に進めている",
+};
+
+export const INDUSTRIES = [
+  "IT・ソフトウェア",
+  "コンサルティング",
+  "金融・銀行・証券",
+  "メーカー・製造",
+  "商社",
+  "メディア・広告",
+  "不動産・建設",
+  "小売・流通",
+  "医療・製薬",
+  "エネルギー",
+  "教育",
+  "官公庁・非営利",
+  "その他",
+];
+
+export const JOB_TYPES = [
+  "エンジニア・開発",
+  "コンサルタント",
+  "営業",
+  "マーケティング",
+  "企画・経営",
+  "データサイエンス・AI",
+  "デザイン・クリエイティブ",
+  "人事・総務",
+  "財務・経理",
+  "研究・開発",
+  "その他",
+];
+
+export const GRADES = [
+  "学部1年", "学部2年", "学部3年", "学部4年",
+  "修士1年", "修士2年",
+  "博士課程",
+  "その他",
+];
+
+export interface UserProfile {
+  id: string;
+  grade: string;
+  graduationYear: number;
+  targetIndustries: string[];
+  targetJobs: string[];
+  jobSearchStage: JobSearchStage;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export const COMPANY_STATUS_COLORS: Record<CompanyStatus, string> = {
   WISHLIST: "bg-gray-100 text-gray-700",
   APPLIED: "bg-blue-100 text-blue-700",
