@@ -31,9 +31,9 @@ interface PdcaResult {
 }
 
 const priorityColors = {
-  high: "border-l-red-500 bg-red-50",
-  medium: "border-l-yellow-500 bg-yellow-50",
-  low: "border-l-blue-500 bg-blue-50",
+  high: "border-l-red-500 bg-red-50 dark:bg-red-900/20",
+  medium: "border-l-yellow-500 bg-yellow-50 dark:bg-yellow-900/20",
+  low: "border-l-blue-500 bg-blue-50 dark:bg-blue-900/20",
 };
 const priorityLabels = { high: "緊急", medium: "推奨", low: "情報" };
 const priorityBadgeVariants: Record<string, "danger" | "warning" | "default"> = {
@@ -177,9 +177,9 @@ export default function DashboardPage() {
       {/* ページヘッダー */}
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">ダッシュボード</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">ダッシュボード</h1>
           {profile && (
-            <p className="text-sm text-gray-500 mt-0.5">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
               {[profile.university, profile.faculty, profile.grade].filter(Boolean).join(" · ")} ／ {profile.graduationYear}年卒 ／ {JOB_SEARCH_STAGE_LABELS[profile.jobSearchStage]}
             </p>
           )}
@@ -195,13 +195,13 @@ export default function DashboardPage() {
       {/* ステータスサマリー */}
       <div className="grid grid-cols-4 gap-3 mb-5">
         {[
-          { label: "選考中", count: companies.filter(c => !["OFFERED","REJECTED","WISHLIST"].includes(c.status)).length, color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-100" },
-          { label: "内定", count: statusCounts["OFFERED"] ?? 0, color: "text-green-600", bg: "bg-green-50", border: "border-green-100" },
-          { label: "ES提出待ち", count: esList.filter(e => e.status === "DRAFT").length, color: "text-amber-600", bg: "bg-amber-50", border: "border-amber-100" },
-          { label: "気になる", count: statusCounts["WISHLIST"] ?? 0, color: "text-gray-600", bg: "bg-gray-50", border: "border-gray-100" },
+          { label: "選考中", count: companies.filter(c => !["OFFERED","REJECTED","WISHLIST"].includes(c.status)).length, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-50 dark:bg-blue-900/30", border: "border-blue-100 dark:border-blue-800" },
+          { label: "内定", count: statusCounts["OFFERED"] ?? 0, color: "text-green-600 dark:text-green-400", bg: "bg-green-50 dark:bg-green-900/30", border: "border-green-100 dark:border-green-800" },
+          { label: "ES提出待ち", count: esList.filter(e => e.status === "DRAFT").length, color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50 dark:bg-amber-900/30", border: "border-amber-100 dark:border-amber-800" },
+          { label: "気になる", count: statusCounts["WISHLIST"] ?? 0, color: "text-gray-600 dark:text-gray-400", bg: "bg-gray-50 dark:bg-gray-800", border: "border-gray-100 dark:border-gray-700" },
         ].map((item) => (
           <div key={item.label} className={`${item.bg} border ${item.border} rounded-xl p-4`}>
-            <p className="text-xs font-medium text-gray-500 mb-1">{item.label}</p>
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{item.label}</p>
             <p className={`text-3xl font-bold ${item.color}`}>{item.count}</p>
           </div>
         ))}
@@ -213,19 +213,19 @@ export default function DashboardPage() {
         {/* 左: Next Action チェックリスト */}
         <div className="col-span-4">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-semibold text-gray-900 text-sm">🎯 Next Action</h2>
+            <h2 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">🎯 Next Action</h2>
             <Button variant="ghost" size="sm" onClick={() => fetchAiAdvice()} disabled={aiLoading}>
               {aiLoading ? "分析中..." : "再分析"}
             </Button>
           </div>
           {aiSummary && (
-            <p className="text-xs text-gray-400 mb-3 px-1">{aiSummary}</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mb-3 px-1">{aiSummary}</p>
           )}
 
           {(aiLoading || itemsLoading) && (
             <div className="space-y-2">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-14 bg-gray-100 rounded-xl animate-pulse" />
+                <div key={i} className="h-14 bg-gray-100 dark:bg-gray-700 rounded-xl animate-pulse" />
               ))}
             </div>
           )}
@@ -248,9 +248,9 @@ export default function DashboardPage() {
                       <Badge variant={priorityBadgeVariants[item.priority]}>
                         {priorityLabels[item.priority]}
                       </Badge>
-                      <p className="text-xs font-medium text-gray-900">{item.action}</p>
+                      <p className="text-xs font-medium text-gray-900 dark:text-gray-100">{item.action}</p>
                     </div>
-                    <p className="text-[11px] text-gray-500">{item.reason}</p>
+                    <p className="text-[11px] text-gray-500 dark:text-gray-400">{item.reason}</p>
                   </div>
                 </label>
               ))}
@@ -260,7 +260,7 @@ export default function DashboardPage() {
                   {completedItems.map((item) => (
                     <label
                       key={item.id}
-                      className="flex items-center gap-2.5 border-l-4 border-l-gray-200 bg-gray-50 rounded-r-xl p-2.5 mb-1.5 cursor-pointer opacity-60"
+                      className="flex items-center gap-2.5 border-l-4 border-l-gray-200 bg-gray-50 dark:bg-gray-800 rounded-r-xl p-2.5 mb-1.5 cursor-pointer opacity-60"
                     >
                       <input
                         type="checkbox"
@@ -268,7 +268,7 @@ export default function DashboardPage() {
                         onChange={() => toggleItem(item.id, false)}
                         className="w-4 h-4 rounded border-gray-400 accent-blue-600 cursor-pointer shrink-0"
                       />
-                      <p className="text-xs text-gray-500 line-through">{item.action}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 line-through">{item.action}</p>
                     </label>
                   ))}
                 </div>
@@ -286,7 +286,7 @@ export default function DashboardPage() {
 
         {/* 中: カレンダー + 締切 */}
         <div className="col-span-4">
-          <h2 className="font-semibold text-gray-900 text-sm mb-3">📅 カレンダー</h2>
+          <h2 className="font-semibold text-gray-900 dark:text-gray-100 text-sm mb-3">📅 カレンダー</h2>
           <MiniCalendar events={calendarEvents} />
 
           {upcomingDeadlines.length > 0 && (
@@ -298,12 +298,12 @@ export default function DashboardPage() {
               <div className="space-y-1.5">
                 {upcomingDeadlines.map((d) => (
                   <Link key={`${d.type}-${d.id}`} href={d.link}>
-                    <div className={`flex items-center justify-between bg-white rounded-lg border p-2 hover:bg-gray-50 transition-colors ${d.days <= 3 ? "border-red-200" : "border-gray-100"}`}>
+                    <div className={`flex items-center justify-between bg-white dark:bg-gray-800 rounded-lg border p-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${d.days <= 3 ? "border-red-200 dark:border-red-800" : "border-gray-100 dark:border-gray-700"}`}>
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded shrink-0 ${d.type === "ES" ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700"}`}>
+                        <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded shrink-0 ${d.type === "ES" ? "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400" : "bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-400"}`}>
                           {d.type}
                         </span>
-                        <p className="text-xs font-medium text-gray-900 truncate">{d.title}</p>
+                        <p className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">{d.title}</p>
                       </div>
                       <span className={`text-[10px] font-semibold shrink-0 ml-2 ${d.days === 0 ? "text-red-600" : d.days <= 3 ? "text-orange-600" : "text-gray-400"}`}>
                         {d.days === 0 ? "今日" : `あと${d.days}日`}
@@ -326,8 +326,8 @@ export default function DashboardPage() {
       <div>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <h2 className="font-semibold text-gray-900">📊 PDCA 週次レポート</h2>
-            <span className="text-xs text-gray-400">チャット・選考状況からAIが自動分析</span>
+            <h2 className="font-semibold text-gray-900 dark:text-gray-100">📊 PDCA 週次レポート</h2>
+            <span className="text-xs text-gray-400 dark:text-gray-500">チャット・選考状況からAIが自動分析</span>
           </div>
           <Button variant="ghost" size="sm" onClick={fetchPdca} disabled={pdcaLoading}>
             {pdcaLoading ? "分析中..." : "再分析"}
@@ -335,11 +335,11 @@ export default function DashboardPage() {
         </div>
 
         {pdcaLoading && (
-          <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
-            <div className="h-2 bg-gray-100 rounded-full animate-pulse w-full" />
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-5 space-y-3">
+            <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full animate-pulse w-full" />
             <div className="grid grid-cols-4 gap-3">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-28 bg-gray-100 rounded-lg animate-pulse" />
+                <div key={i} className="h-28 bg-gray-100 dark:bg-gray-700 rounded-lg animate-pulse" />
               ))}
             </div>
           </div>
@@ -348,7 +348,7 @@ export default function DashboardPage() {
         {!pdcaLoading && pdcaResult && <PdcaPanel result={pdcaResult} />}
 
         {!pdcaLoading && !pdcaResult && (
-          <div className="bg-white rounded-xl border border-gray-100 p-6 text-center text-gray-400">
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6 text-center text-gray-400 dark:text-gray-500">
             <p className="text-sm mb-3">就活データが揃うとPDCA分析が実行されます</p>
             <Button size="sm" onClick={fetchPdca}>PDCAを分析する</Button>
           </div>

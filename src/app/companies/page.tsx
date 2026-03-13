@@ -26,8 +26,8 @@ export default function CompaniesPage() {
     <div className="p-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">企業管理</h1>
-          <p className="text-sm text-gray-500 mt-1">{companies.length}社を管理中</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">企業管理</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{companies.length}社を管理中</p>
         </div>
         <Button onClick={() => setIsModalOpen(true)}>+ 企業を追加</Button>
       </div>
@@ -37,7 +37,7 @@ export default function CompaniesPage() {
         <button
           onClick={() => setFilterStatus("ALL")}
           className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors cursor-pointer ${
-            filterStatus === "ALL" ? "bg-blue-600 text-white" : "bg-white text-gray-600 border border-gray-300 hover:bg-gray-50"
+            filterStatus === "ALL" ? "bg-blue-600 text-white" : "bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
           }`}
         >
           すべて ({companies.length})
@@ -50,7 +50,7 @@ export default function CompaniesPage() {
               key={s}
               onClick={() => setFilterStatus(s)}
               className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors cursor-pointer ${
-                filterStatus === s ? "bg-blue-600 text-white" : "bg-white text-gray-600 border border-gray-300 hover:bg-gray-50"
+                filterStatus === s ? "bg-blue-600 text-white" : "bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
               }`}
             >
               {COMPANY_STATUS_LABELS[s]} ({count})
@@ -61,23 +61,23 @@ export default function CompaniesPage() {
 
       {/* 企業一覧 */}
       {sorted.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
+        <div className="text-center py-16 text-gray-400 dark:text-gray-500">
           <p>企業が登録されていません</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {sorted.map((company) => (
             <Link key={company.id} href={`/companies/${company.id}`}>
-              <div className="bg-white rounded-xl border border-gray-100 p-5 hover:shadow-md transition-shadow cursor-pointer">
+              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-5 hover:shadow-md transition-shadow cursor-pointer">
                 <div className="flex items-start justify-between mb-2">
-                  <h3 className="font-semibold text-gray-900 leading-tight">{company.name}</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-100 leading-tight">{company.name}</h3>
                   <StatusBadge status={company.status} className="ml-2 shrink-0" />
                 </div>
                 {company.industry && (
-                  <p className="text-sm text-gray-500 mb-2">{company.industry}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">{company.industry}</p>
                 )}
                 {company.notes && (
-                  <p className="text-sm text-gray-600 line-clamp-2">{company.notes}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{company.notes}</p>
                 )}
               </div>
             </Link>

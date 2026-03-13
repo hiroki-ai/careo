@@ -28,8 +28,8 @@ export default function EsPage() {
     <div className="p-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">ES管理</h1>
-          <p className="text-sm text-gray-500 mt-1">{esList.length}件</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">ES管理</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{esList.length}件</p>
         </div>
         <Link href="/es/new">
           <Button>+ ES追加</Button>
@@ -42,7 +42,7 @@ export default function EsPage() {
             key={f}
             onClick={() => setFilter(f)}
             className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors cursor-pointer ${
-              filter === f ? "bg-blue-600 text-white" : "bg-white text-gray-600 border border-gray-300 hover:bg-gray-50"
+              filter === f ? "bg-blue-600 text-white" : "bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
             }`}
           >
             {f === "ALL" ? "すべて" : f === "DRAFT" ? "下書き" : "提出済み"}
@@ -52,7 +52,7 @@ export default function EsPage() {
       </div>
 
       {sorted.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">ESが登録されていません</div>
+        <div className="text-center py-16 text-gray-400 dark:text-gray-500">ESが登録されていません</div>
       ) : (
         <div className="space-y-3">
           {sorted.map((es) => {
@@ -60,12 +60,12 @@ export default function EsPage() {
             const isUrgent = days !== null && days <= 3 && es.status === "DRAFT";
             return (
               <Link key={es.id} href={`/es/${es.id}`}>
-                <div className={`bg-white rounded-xl border p-5 hover:shadow-md transition-shadow cursor-pointer ${isUrgent ? "border-red-200" : "border-gray-100"}`}>
+                <div className={`bg-white dark:bg-gray-800 rounded-xl border p-5 hover:shadow-md transition-shadow cursor-pointer ${isUrgent ? "border-red-200 dark:border-red-800" : "border-gray-100 dark:border-gray-700"}`}>
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="text-xs text-gray-400 mb-1">{getCompanyName(es.companyId)}</p>
-                      <h3 className="font-semibold text-gray-900">{es.title}</h3>
-                      <p className="text-sm text-gray-500 mt-1">{es.questions.length}問</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">{getCompanyName(es.companyId)}</p>
+                      <h3 className="font-semibold text-gray-900 dark:text-gray-100">{es.title}</h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{es.questions.length}問</p>
                     </div>
                     <div className="flex flex-col items-end gap-2">
                       <Badge variant={es.status === "SUBMITTED" ? "success" : "warning"}>

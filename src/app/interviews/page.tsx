@@ -22,8 +22,8 @@ export default function InterviewsPage() {
     <div className="p-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">面接ログ</h1>
-          <p className="text-sm text-gray-500 mt-1">{interviews.length}件</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">面接ログ</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{interviews.length}件</p>
         </div>
         <Link href="/interviews/new">
           <Button>+ 面接追加</Button>
@@ -31,19 +31,19 @@ export default function InterviewsPage() {
       </div>
 
       {sorted.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">面接が登録されていません</div>
+        <div className="text-center py-16 text-gray-400 dark:text-gray-500">面接が登録されていません</div>
       ) : (
         <div className="space-y-3">
           {sorted.map((interview) => (
             <Link key={interview.id} href={`/interviews/${interview.id}`}>
-              <div className="bg-white rounded-xl border border-gray-100 p-5 hover:shadow-md transition-shadow cursor-pointer">
+              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-5 hover:shadow-md transition-shadow cursor-pointer">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-xs text-gray-400 mb-1">{getCompanyName(interview.companyId)}</p>
-                    <h3 className="font-semibold text-gray-900">{interview.round}次面接</h3>
-                    <p className="text-sm text-gray-500 mt-1">{formatDateTime(interview.scheduledAt)}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">{getCompanyName(interview.companyId)}</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-100">{interview.round}次面接</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{formatDateTime(interview.scheduledAt)}</p>
                     {interview.interviewers && (
-                      <p className="text-xs text-gray-400 mt-1">面接官: {interview.interviewers}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">面接官: {interview.interviewers}</p>
                     )}
                   </div>
                   <Badge
@@ -56,7 +56,7 @@ export default function InterviewsPage() {
                   </Badge>
                 </div>
                 {interview.notes && (
-                  <p className="text-sm text-gray-600 mt-3 line-clamp-2">{interview.notes}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-3 line-clamp-2">{interview.notes}</p>
                 )}
               </div>
             </Link>
