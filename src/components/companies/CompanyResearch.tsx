@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 
 interface ResearchResult {
@@ -12,11 +12,19 @@ interface ResearchResult {
 }
 
 interface CompanyResearchProps {
+  companyId: string;
   companyName: string;
+  cachedResearch?: string | null;
+  onSave: (json: string) => void;
 }
 
-export function CompanyResearch({ companyName }: CompanyResearchProps) {
-  const [result, setResult] = useState<ResearchResult | null>(null);
+export function CompanyResearch({ companyId: _companyId, companyName, cachedResearch, onSave }: CompanyResearchProps) {
+  const [result, setResult] = useState<ResearchResult | null>(() => {
+    if (cachedResearch) {
+      try { return JSON.parse(cachedResearch); } catch { return null; }
+    }
+    return null;
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -32,6 +40,7 @@ export function CompanyResearch({ companyName }: CompanyResearchProps) {
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setResult(data);
+      onSave(JSON.stringify(data));
     } catch {
       setError("企業研究の取得に失敗しました");
     } finally {
@@ -39,8 +48,16 @@ export function CompanyResearch({ companyName }: CompanyResearchProps) {
     }
   };
 
+  // キャッシュがなければマウント時に自動取得
+  useEffect(() => {
+    if (!cachedResearch && !result) {
+      handleResearch();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-6">
+    <div className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <span className="text-lg">🤖</span>
@@ -53,16 +70,16 @@ export function CompanyResearch({ companyName }: CompanyResearchProps) {
 
       {error && <p className="text-sm text-red-500 mb-3">{error}</p>}
 
-      {!result && !loading && (
-        <p className="text-sm text-gray-400">ボタンを押すとAIが事業内容・競合・志望動機の切り口を整理します</p>
-      )}
-
       {loading && (
         <div className="space-y-2">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="h-4 bg-gray-100 rounded animate-pulse" />
           ))}
         </div>
+      )}
+
+      {!result && !loading && !error && (
+        <p className="text-sm text-gray-400">ボタンを押すとAIが事業内容・競合・志望動機の切り口を整理します</p>
       )}
 
       {result && (

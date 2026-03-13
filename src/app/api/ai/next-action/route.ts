@@ -12,11 +12,13 @@ const supabase = createClient(
 
 export async function POST(req: NextRequest) {
   try {
-  const { companies, esList, interviews, profile }: {
+  const { companies, esList, interviews, profile, completedActions, recentChatMessages }: {
     companies: Company[];
     esList: ES[];
     interviews: Interview[];
     profile: UserProfile | null;
+    completedActions: string[];
+    recentChatMessages?: string[];
   } = await req.json();
 
   // 集合知を取得
@@ -52,6 +54,14 @@ export async function POST(req: NextRequest) {
 - 志望職種: ${profile.targetJobs.length > 0 ? profile.targetJobs.join("、") : "未設定"}`
     : "プロフィール: 未設定";
 
+  const completedSummary = completedActions.length > 0
+    ? `\n完了済みタスク（これらはすでに達成済みなので提案しないこと）:\n${completedActions.map(a => `- ${a}`).join("\n")}`
+    : "";
+
+  const chatSummary = recentChatMessages && recentChatMessages.length > 0
+    ? `\nユーザーの最近の相談・悩み（チャット履歴より）:\n${recentChatMessages.map(m => `- 「${m.slice(0, 80)}」`).join("\n")}\n→ これらの悩みや関心事を踏まえてアドバイスすること。`
+    : "";
+
   const activitySummary = `就活実績:
 - 企業数: ${companies.length}社（内定: ${companies.filter(c => c.status === "OFFERED").length}社、選考中: ${companies.filter(c => !["OFFERED","REJECTED","WISHLIST"].includes(c.status)).length}社）
 - ES: ${esList.length}件（下書き: ${esList.filter(e => e.status === "DRAFT").length}件）
@@ -68,6 +78,8 @@ export async function POST(req: NextRequest) {
 ${profileSummary}
 
 ${activitySummary}
+${completedSummary}
+${chatSummary}
 ${aggregateSummary}
 
 以下のJSON形式のみで返してください。他のテキストは一切含めないでください。

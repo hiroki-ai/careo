@@ -5,17 +5,160 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useEs } from "@/hooks/useEs";
 import { useCompanies } from "@/hooks/useCompanies";
+import { useProfile } from "@/hooks/useProfile";
 import { EsForm } from "@/components/es/EsForm";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { formatDate } from "@/lib/utils";
+import { QAPair } from "@/types";
+
+interface AiGenResult {
+  answer: string;
+  advice: string;
+  keywords: string[];
+}
+
+function EsQuestionCard({
+  qa,
+  index,
+  companyName,
+  companyIndustry,
+  profile,
+  otherAnswers,
+  onUseAnswer,
+}: {
+  qa: QAPair;
+  index: number;
+  companyName: string;
+  companyIndustry?: string;
+  profile: ReturnType<typeof useProfile>["profile"];
+  otherAnswers: { question: string; answer: string }[];
+  onUseAnswer: (questionId: string, answer: string) => void;
+}) {
+  const [aiResult, setAiResult] = useState<AiGenResult | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [showAi, setShowAi] = useState(false);
+
+  const handleGenerate = async () => {
+    setLoading(true);
+    setShowAi(true);
+    try {
+      const res = await fetch("/api/ai/es-generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question: qa.question,
+          companyName,
+          companyIndustry,
+          careerAxis: profile?.careerAxis,
+          gakuchika: profile?.gakuchika,
+          selfPr: profile?.selfPr,
+          strengths: profile?.strengths,
+          otherAnswers,
+        }),
+      });
+      const data = await res.json();
+      if (!data.error) setAiResult(data);
+    } catch (err) {
+      console.error("[es-generate]", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-100 p-6">
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex-1">
+          <p className="text-xs text-gray-400 mb-1">設問 {index + 1}</p>
+          <p className="font-medium text-gray-900">{qa.question || "(設問未入力)"}</p>
+        </div>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={handleGenerate}
+          disabled={loading || !qa.question}
+        >
+          {loading ? "生成中..." : showAi && aiResult ? "再生成" : "✨ AI生成"}
+        </Button>
+      </div>
+
+      <div className="bg-gray-50 rounded-lg p-4 mb-2">
+        <p className="text-sm text-gray-700 whitespace-pre-wrap">
+          {qa.answer || "(回答未入力)"}
+        </p>
+      </div>
+      {qa.answer && (
+        <p className="text-xs text-gray-400 text-right mb-3">{qa.answer.length}字</p>
+      )}
+
+      {/* AI生成結果パネル */}
+      {showAi && (
+        <div className="mt-3 border border-blue-200 bg-blue-50 rounded-xl p-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold text-blue-700">✨ AI生成回答</span>
+            <button
+              onClick={() => setShowAi(false)}
+              className="text-xs text-gray-400 hover:text-gray-600"
+            >
+              閉じる
+            </button>
+          </div>
+
+          {loading && (
+            <div className="space-y-2">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-3 bg-blue-100 rounded animate-pulse" />
+              ))}
+            </div>
+          )}
+
+          {!loading && aiResult && (
+            <>
+              <div className="bg-white rounded-lg p-3 mb-3 text-sm text-gray-800 whitespace-pre-wrap leading-relaxed border border-blue-100">
+                {aiResult.answer}
+              </div>
+              <p className="text-xs text-blue-600 text-right mb-3">{aiResult.answer.length}字</p>
+
+              {aiResult.keywords.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {aiResult.keywords.map((kw, i) => (
+                    <span key={i} className="text-[11px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                      {kw}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {aiResult.advice && (
+                <div className="bg-amber-50 rounded-lg p-3 mb-3 border border-amber-100">
+                  <p className="text-xs font-semibold text-amber-700 mb-1">アドバイス</p>
+                  <p className="text-xs text-gray-700 whitespace-pre-wrap">{aiResult.advice}</p>
+                </div>
+              )}
+
+              <Button
+                size="sm"
+                onClick={() => onUseAnswer(qa.id, aiResult.answer)}
+                className="w-full"
+              >
+                この回答を使う
+              </Button>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function EsDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
   const { esList, updateEs, deleteEs } = useEs();
   const { companies } = useCompanies();
+  const { profile } = useProfile();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
 
@@ -30,6 +173,13 @@ export default function EsDetailPage({ params }: { params: Promise<{ id: string 
       </div>
     );
   }
+
+  const handleUseAnswer = (questionId: string, answer: string) => {
+    const updatedQuestions = es.questions.map((q) =>
+      q.id === questionId ? { ...q, answer } : q
+    );
+    updateEs(id, { questions: updatedQuestions });
+  };
 
   return (
     <div className="p-8 max-w-3xl">
@@ -58,21 +208,29 @@ export default function EsDetailPage({ params }: { params: Promise<{ id: string 
         </div>
       </div>
 
+      {!profile?.gakuchika && !profile?.selfPr && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-5">
+          <p className="text-sm text-amber-800">
+            💡 <Link href="/career" className="font-semibold underline">自己分析</Link>を登録するとAI生成の精度が大幅に上がります
+          </p>
+        </div>
+      )}
+
       {/* 設問・回答 */}
       <div className="space-y-4">
         {es.questions.map((q, i) => (
-          <div key={q.id} className="bg-white rounded-xl border border-gray-100 p-6">
-            <p className="text-xs text-gray-400 mb-1">設問 {i + 1}</p>
-            <p className="font-medium text-gray-900 mb-3">{q.question || "(設問未入力)"}</p>
-            <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-sm text-gray-700 whitespace-pre-wrap">
-                {q.answer || "(回答未入力)"}
-              </p>
-            </div>
-            {q.answer && (
-              <p className="text-xs text-gray-400 mt-2 text-right">{q.answer.length}字</p>
-            )}
-          </div>
+          <EsQuestionCard
+            key={q.id}
+            qa={q}
+            index={i}
+            companyName={company?.name ?? ""}
+            companyIndustry={company?.industry}
+            profile={profile}
+            otherAnswers={es.questions
+              .filter((other) => other.id !== q.id && other.answer)
+              .map((other) => ({ question: other.question, answer: other.answer }))}
+            onUseAnswer={handleUseAnswer}
+          />
         ))}
       </div>
 

@@ -25,6 +25,7 @@ export interface Company {
   url?: string;
   status: CompanyStatus;
   notes?: string;
+  ai_research?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -132,6 +133,12 @@ export interface UserProfile {
   targetIndustries: string[];
   targetJobs: string[];
   jobSearchStage: JobSearchStage;
+  // 自己分析
+  careerAxis?: string;
+  gakuchika?: string;
+  selfPr?: string;
+  strengths?: string;
+  weaknesses?: string;
   createdAt: string;
   updatedAt: string;
 }

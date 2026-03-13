@@ -154,7 +154,12 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
       </div>
 
       {/* AI企業研究 */}
-      <CompanyResearch companyName={company.name} />
+      <CompanyResearch
+        companyId={id}
+        companyName={company.name}
+        cachedResearch={company.ai_research}
+        onSave={(json) => updateCompany(id, { ai_research: json })}
+      />
 
       {/* 面接ログ */}
       <div className="bg-white rounded-xl border border-gray-100 p-6">

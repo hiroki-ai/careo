@@ -14,6 +14,11 @@ function rowToProfile(row: Record<string, unknown>): UserProfile {
     targetIndustries: (row.target_industries as string[]) ?? [],
     targetJobs: (row.target_jobs as string[]) ?? [],
     jobSearchStage: row.job_search_stage as JobSearchStage,
+    careerAxis: (row.career_axis as string) ?? "",
+    gakuchika: (row.gakuchika as string) ?? "",
+    selfPr: (row.self_pr as string) ?? "",
+    strengths: (row.strengths as string) ?? "",
+    weaknesses: (row.weaknesses as string) ?? "",
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
   };
@@ -46,6 +51,11 @@ export function useProfile() {
       target_industries: data.targetIndustries,
       target_jobs: data.targetJobs,
       job_search_stage: data.jobSearchStage,
+      career_axis: data.careerAxis ?? "",
+      gakuchika: data.gakuchika ?? "",
+      self_pr: data.selfPr ?? "",
+      strengths: data.strengths ?? "",
+      weaknesses: data.weaknesses ?? "",
     };
     const { data: saved } = await supabase
       .from("user_profiles")
