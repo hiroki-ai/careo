@@ -51,13 +51,13 @@ export function EsForm({ companies, initialCompanyId, initialData, onSubmit, onC
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           企業 <span className="text-red-500">*</span>
         </label>
         <select
           value={form.companyId}
           onChange={(e) => setForm({ ...form, companyId: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           required
         >
           <option value="">企業を選択</option>
@@ -67,34 +67,34 @@ export function EsForm({ companies, initialCompanyId, initialData, onSubmit, onC
         </select>
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           タイトル <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
           value={form.title}
           onChange={(e) => setForm({ ...form, title: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           placeholder="例: 2026年新卒ES"
           required
         />
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">提出締切</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">提出締切</label>
           <input
             type="datetime-local"
             value={form.deadline ? form.deadline.slice(0, 16) : ""}
             onChange={(e) => setForm({ ...form, deadline: e.target.value ? new Date(e.target.value).toISOString() : "" })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">ステータス</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ステータス</label>
           <select
             value={form.status}
             onChange={(e) => setForm({ ...form, status: e.target.value as EsStatus })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           >
             <option value="DRAFT">下書き</option>
             <option value="SUBMITTED">提出済み</option>
@@ -110,9 +110,9 @@ export function EsForm({ companies, initialCompanyId, initialData, onSubmit, onC
         </div>
         <div className="space-y-4">
           {form.questions.map((q, i) => (
-            <div key={q.id} className="p-4 bg-gray-50 rounded-lg space-y-2">
+            <div key={q.id} className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-gray-500">設問 {i + 1}</span>
+                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">設問 {i + 1}</span>
                 {form.questions.length > 1 && (
                   <button
                     type="button"
@@ -127,7 +127,7 @@ export function EsForm({ companies, initialCompanyId, initialData, onSubmit, onC
                 type="text"
                 value={q.question}
                 onChange={(e) => updateQuestion(i, "question", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                 placeholder="設問内容"
               />
               <textarea

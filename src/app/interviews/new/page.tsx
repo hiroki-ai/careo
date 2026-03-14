@@ -19,8 +19,8 @@ function NewInterviewContent() {
       <Link href="/interviews" className="text-sm text-gray-400 hover:text-gray-600 mb-3 inline-block">
         ← 面接一覧
       </Link>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">面接を追加</h1>
-      <div className="bg-white rounded-xl border border-gray-100 p-6">
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">面接を追加</h1>
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6">
         <InterviewForm
           companies={companies}
           initialCompanyId={companyId}

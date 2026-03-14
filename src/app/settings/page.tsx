@@ -7,12 +7,14 @@ import { ProfileForm } from "@/components/profile/ProfileForm";
 import { Button } from "@/components/ui/Button";
 import { createClient } from "@/lib/supabase/client";
 import { JOB_SEARCH_STAGE_LABELS } from "@/types";
+import { useTheme } from "@/components/providers/ThemeProvider";
 
 export default function SettingsPage() {
   const router = useRouter();
   const { profile, loading, saveProfile } = useProfile();
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [saved, setSaved] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   const handleLogout = async () => {
     const supabase = createClient();
@@ -25,16 +27,16 @@ export default function SettingsPage() {
   return (
     <div className="p-8 max-w-2xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">設定</h1>
-        <p className="text-sm text-gray-500 mt-1">プロフィールとアカウントを管理</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">設定</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">プロフィールとアカウントを管理</p>
       </div>
 
       {/* プロフィール */}
-      <section className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
+      <section className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6 mb-6">
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h2 className="font-semibold text-gray-900">プロフィール</h2>
-            <p className="text-xs text-gray-400 mt-0.5">AIアドバイスの精度に影響します</p>
+            <h2 className="font-semibold text-gray-900 dark:text-gray-100">プロフィール</h2>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">AIアドバイスの精度に影響します</p>
           </div>
           <Button
             variant="secondary"
@@ -62,16 +64,16 @@ export default function SettingsPage() {
                 value: profile.targetJobs.length > 0 ? profile.targetJobs.join("、") : "未設定",
               },
             ].map(({ label, value }) => (
-              <div key={label} className="flex items-start gap-4 py-2 border-b border-gray-50 last:border-0">
-                <span className="text-sm text-gray-400 w-28 shrink-0">{label}</span>
-                <span className="text-sm text-gray-800">{value}</span>
+              <div key={label} className="flex items-start gap-4 py-2 border-b border-gray-50 dark:border-gray-700 last:border-0">
+                <span className="text-sm text-gray-400 dark:text-gray-500 w-28 shrink-0">{label}</span>
+                <span className="text-sm text-gray-800 dark:text-gray-200">{value}</span>
               </div>
             ))}
           </div>
         )}
 
         {!isEditingProfile && !profile && (
-          <p className="text-sm text-gray-400">プロフィールが設定されていません</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500">プロフィールが設定されていません</p>
         )}
 
         {isEditingProfile && (
@@ -90,11 +92,36 @@ export default function SettingsPage() {
         )}
       </section>
 
+      {/* 表示設定 */}
+      <section className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6 mb-6">
+        <h2 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">表示設定</h2>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">画面の見た目をカスタマイズ</p>
+        <div className="flex items-center justify-between py-2">
+          <div>
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">ダークモード</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500">黒い画面に切り替えます</p>
+          </div>
+          <button
+            onClick={toggleTheme}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
+              theme === "dark" ? "bg-blue-600" : "bg-gray-200 dark:bg-gray-600"
+            }`}
+            aria-label="ダークモード切り替え"
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                theme === "dark" ? "translate-x-6" : "translate-x-1"
+              }`}
+            />
+          </button>
+        </div>
+      </section>
+
       {/* AIについて */}
-      <section className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
-        <h2 className="font-semibold text-gray-900 mb-1">AIアドバイスについて</h2>
-        <p className="text-xs text-gray-400 mb-4">Careoの集合知</p>
-        <div className="space-y-3 text-sm text-gray-600">
+      <section className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6 mb-6">
+        <h2 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">AIアドバイスについて</h2>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">Careoの集合知</p>
+        <div className="space-y-3 text-sm text-gray-600 dark:text-gray-300">
           <div className="flex gap-3 items-start">
             <span className="text-blue-500 mt-0.5 shrink-0">●</span>
             <p>あなたの就活データは匿名化された形でCareoの集合知に活用されます</p>
@@ -111,13 +138,13 @@ export default function SettingsPage() {
       </section>
 
       {/* アカウント */}
-      <section className="bg-white rounded-xl border border-gray-100 p-6">
-        <h2 className="font-semibold text-gray-900 mb-5">アカウント</h2>
+      <section className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6">
+        <h2 className="font-semibold text-gray-900 dark:text-gray-100 mb-5">アカウント</h2>
         <div className="space-y-3">
           <div className="flex items-center justify-between py-2">
             <div>
-              <p className="text-sm font-medium text-gray-700">ログアウト</p>
-              <p className="text-xs text-gray-400">このデバイスからサインアウトします</p>
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">ログアウト</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500">このデバイスからサインアウトします</p>
             </div>
             <Button variant="secondary" size="sm" onClick={handleLogout}>
               ログアウト
