@@ -140,7 +140,7 @@ export function KareoWidget() {
     : recentHistory.map((m) => ({ role: m.role, content: m.content }));
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-xl border border-gray-100 overflow-hidden">
+    <div className="flex flex-col h-full bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
       {/* カレオヘッダー */}
       <div className="bg-gradient-to-r from-indigo-600 to-blue-600 px-4 py-3 flex items-center gap-3">
         <KareoCharacter size={40} />
@@ -165,8 +165,8 @@ export function KareoWidget() {
         ) : displayMessages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full gap-3 py-4">
             <KareoCharacter size={48} />
-            <div className="bg-indigo-50 rounded-2xl rounded-tl-sm px-3 py-2 max-w-[90%]">
-              <p className="text-xs text-gray-700">{GREETING}</p>
+            <div className="bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl rounded-tl-sm px-3 py-2 max-w-[90%]">
+              <p className="text-xs text-gray-700 dark:text-gray-300">{GREETING}</p>
             </div>
             {/* クイックサジェスト */}
             <div className="w-full space-y-1.5 mt-1">
@@ -174,7 +174,7 @@ export function KareoWidget() {
                 <button
                   key={s}
                   onClick={() => sendMessage(s)}
-                  className="w-full text-left text-xs bg-gray-50 hover:bg-indigo-50 border border-gray-100 hover:border-indigo-200 rounded-lg px-3 py-1.5 text-gray-600 transition-colors"
+                  className="w-full text-left text-xs bg-gray-50 dark:bg-gray-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 border border-gray-100 dark:border-gray-600 hover:border-indigo-200 dark:hover:border-indigo-700 rounded-lg px-3 py-1.5 text-gray-600 dark:text-gray-300 transition-colors"
                 >
                   {s}
                 </button>
@@ -197,7 +197,7 @@ export function KareoWidget() {
                   className={`max-w-[80%] rounded-xl px-3 py-2 text-xs leading-relaxed ${
                     msg.role === "user"
                       ? "bg-blue-600 text-white rounded-tr-sm"
-                      : "bg-gray-100 text-gray-800 rounded-tl-sm"
+                      : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-tl-sm"
                   }`}
                 >
                   {msg.content}
@@ -218,15 +218,15 @@ export function KareoWidget() {
       </div>
 
       {/* 入力 */}
-      <div className="px-3 py-2 border-t border-gray-100">
-        <div className="flex items-center gap-2 bg-gray-50 rounded-xl border border-gray-200 px-3 py-1.5 focus-within:border-indigo-300 transition-colors">
+      <div className="px-3 py-2 border-t border-gray-100 dark:border-gray-700">
+        <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600 px-3 py-1.5 focus-within:border-indigo-300 transition-colors">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") sendMessage(input); }}
             placeholder="カレオに聞いてみよう..."
-            className="flex-1 bg-transparent text-xs outline-none text-gray-700 placeholder-gray-400"
+            className="flex-1 bg-transparent text-xs outline-none text-gray-700 dark:text-gray-300 placeholder-gray-400"
             disabled={isStreaming || historyLoading}
           />
           <button

@@ -45,35 +45,35 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存" }: P
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">大学名</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">大学名</label>
           <input
             type="text"
             value={form.university}
             onChange={(e) => setForm({ ...form, university: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             placeholder="例: 東京大学"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">学部・研究科</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">学部・研究科</label>
           <input
             type="text"
             value={form.faculty}
             onChange={(e) => setForm({ ...form, faculty: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             placeholder="例: 工学部情報工学科"
           />
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             学年 <span className="text-red-500">*</span>
           </label>
           <select
             value={form.grade}
             onChange={(e) => setForm({ ...form, grade: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             required
           >
             <option value="">選択してください</option>
@@ -81,11 +81,11 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存" }: P
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">卒業予定年度</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">卒業予定年度</label>
           <select
             value={form.graduationYear}
             onChange={(e) => setForm({ ...form, graduationYear: Number(e.target.value) })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           >
             {graduationYears.map((y) => <option key={y} value={y}>{y}年卒</option>)}
           </select>
@@ -93,7 +93,7 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存" }: P
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">就活の進み具合</label>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">就活の進み具合</label>
         <div className="grid grid-cols-3 gap-2">
           {(Object.entries(JOB_SEARCH_STAGE_LABELS) as [JobSearchStage, string][]).map(([value, label]) => (
             <button
@@ -103,7 +103,7 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存" }: P
               className={`px-3 py-2 rounded-lg text-sm font-medium border transition-colors cursor-pointer ${
                 form.jobSearchStage === value
                   ? "bg-blue-600 text-white border-blue-600"
-                  : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
+                  : "bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
               }`}
             >
               {label}
@@ -113,7 +113,7 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存" }: P
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           志望業界 <span className="text-gray-400 font-normal">（複数選択可）</span>
         </label>
         <div className="flex flex-wrap gap-2">
@@ -125,7 +125,7 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存" }: P
               className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors cursor-pointer ${
                 form.targetIndustries.includes(ind)
                   ? "bg-blue-600 text-white border-blue-600"
-                  : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
+                  : "bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
               }`}
             >
               {ind}
@@ -135,7 +135,7 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存" }: P
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           志望職種 <span className="text-gray-400 font-normal">（複数選択可）</span>
         </label>
         <div className="flex flex-wrap gap-2">
@@ -147,7 +147,7 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存" }: P
               className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors cursor-pointer ${
                 form.targetJobs.includes(job)
                   ? "bg-blue-600 text-white border-blue-600"
-                  : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
+                  : "bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
               }`}
             >
               {job}

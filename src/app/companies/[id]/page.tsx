@@ -54,7 +54,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
         </Link>
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{company.name}</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{company.name}</h1>
             {company.industry && <p className="text-gray-500 mt-1">{company.industry}</p>}
             {company.url && (
               <a href={company.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 text-sm hover:underline mt-1 inline-block">
@@ -70,8 +70,8 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
       </div>
 
       {/* 選考フロー */}
-      <div className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
-        <h2 className="font-semibold text-gray-900 mb-4">選考フロー</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6 mb-6">
+        <h2 className="font-semibold text-gray-900 dark:text-gray-100 mb-4">選考フロー</h2>
         <div className="flex items-center gap-1 flex-wrap">
           {COMPANY_STATUS_ORDER.filter(s => s !== "REJECTED").map((s, i, arr) => {
             const isCurrent = s === company.status;
@@ -85,7 +85,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
                       ? "bg-blue-600 text-white ring-2 ring-blue-300"
                       : isPast
                       ? "bg-blue-100 text-blue-600"
-                      : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                      : "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600"
                   }`}
                 >
                   {COMPANY_STATUS_LABELS[s]}
@@ -102,7 +102,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
               className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors cursor-pointer ${
                 company.status === "REJECTED"
                   ? "bg-red-600 text-white"
-                  : "bg-gray-100 text-gray-500 hover:bg-red-100 hover:text-red-600"
+                  : "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600"
               }`}
             >
               不採用
@@ -113,16 +113,16 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
 
       {/* メモ */}
       {company.notes && (
-        <div className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
-          <h2 className="font-semibold text-gray-900 mb-2">メモ</h2>
-          <p className="text-sm text-gray-700 whitespace-pre-wrap">{company.notes}</p>
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6 mb-6">
+          <h2 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">メモ</h2>
+          <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{company.notes}</p>
         </div>
       )}
 
       {/* ES一覧 */}
-      <div className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6 mb-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold text-gray-900">エントリーシート ({companyEs.length}件)</h2>
+          <h2 className="font-semibold text-gray-900 dark:text-gray-100">エントリーシート ({companyEs.length}件)</h2>
           <Link href={`/es/new?companyId=${id}`}>
             <Button size="sm">+ ES追加</Button>
           </Link>
@@ -133,10 +133,10 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
           <div className="space-y-3">
             {companyEs.map((es) => (
               <Link key={es.id} href={`/es/${es.id}`} className="block">
-                <div className="flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:bg-gray-50">
+                <div className="flex items-center justify-between p-3 rounded-lg border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                   <div>
-                    <p className="font-medium text-sm text-gray-900">{es.title}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{es.questions.length}問</p>
+                    <p className="font-medium text-sm text-gray-900 dark:text-gray-100">{es.title}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{es.questions.length}問</p>
                   </div>
                   <div className="flex items-center gap-2">
                     {es.deadline && (
@@ -162,9 +162,9 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
       />
 
       {/* 面接ログ */}
-      <div className="bg-white rounded-xl border border-gray-100 p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold text-gray-900">面接ログ ({companyInterviews.length}件)</h2>
+          <h2 className="font-semibold text-gray-900 dark:text-gray-100">面接ログ ({companyInterviews.length}件)</h2>
           <Link href={`/interviews/new?companyId=${id}`}>
             <Button size="sm">+ 面接追加</Button>
           </Link>
@@ -175,10 +175,10 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
           <div className="space-y-3">
             {companyInterviews.map((interview) => (
               <Link key={interview.id} href={`/interviews/${interview.id}`} className="block">
-                <div className="flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:bg-gray-50">
+                <div className="flex items-center justify-between p-3 rounded-lg border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                   <div>
-                    <p className="font-medium text-sm text-gray-900">{interview.round}次面接</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{formatDateTime(interview.scheduledAt)}</p>
+                    <p className="font-medium text-sm text-gray-900 dark:text-gray-100">{interview.round}次面接</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{formatDateTime(interview.scheduledAt)}</p>
                   </div>
                   <Badge
                     variant={
@@ -209,7 +209,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
 
       {/* 削除確認モーダル */}
       <Modal isOpen={isDeleteConfirm} onClose={() => setIsDeleteConfirm(false)} title="企業を削除" size="sm">
-        <p className="text-sm text-gray-600 mb-6">
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
           「{company.name}」を削除しますか？この操作は取り消せません。
         </p>
         <div className="flex justify-end gap-3">

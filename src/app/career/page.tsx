@@ -125,7 +125,7 @@ export default function CareerPage() {
   return (
     <div className="p-8 max-w-3xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">自己分析</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">自己分析</h1>
         <p className="text-sm text-gray-500 mt-1">就活の軸・ガクチカ・自己PRを整理してESや面接のAI支援に活かします</p>
       </div>
 
@@ -163,9 +163,9 @@ export default function CareerPage() {
 
       {/* AI下書き通知バナー */}
       {aiDraft && isEditing && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-5">
-          <p className="text-sm text-blue-800 font-medium">✨ AIが下書きを生成しました</p>
-          <p className="text-xs text-blue-600 mt-0.5">
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-5">
+          <p className="text-sm text-blue-800 dark:text-blue-300 font-medium">✨ AIが下書きを生成しました</p>
+          <p className="text-xs text-blue-600 dark:text-blue-400 mt-0.5">
             あなたのプロフィールをもとにしたたたき台です。実際の体験に書き換えて使ってください。
           </p>
         </div>
@@ -174,10 +174,10 @@ export default function CareerPage() {
       {/* セクション一覧 */}
       <div className="space-y-5">
         {SECTIONS.map((section) => (
-          <div key={section.key} className="bg-white rounded-xl border border-gray-100 p-6">
+          <div key={section.key} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6">
             <div className="flex items-start justify-between mb-3">
               <div>
-                <h2 className="font-semibold text-gray-900">{section.label}</h2>
+                <h2 className="font-semibold text-gray-900 dark:text-gray-100">{section.label}</h2>
                 <p className="text-xs text-gray-400 mt-0.5">{section.hint}</p>
               </div>
             </div>
@@ -190,12 +190,12 @@ export default function CareerPage() {
                 }
                 rows={section.rows}
                 placeholder={section.placeholder}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               />
             ) : (
               <div className="min-h-[60px]">
                 {current[section.key] ? (
-                  <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
+                  <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
                     {current[section.key]}
                   </p>
                 ) : (
@@ -215,8 +215,8 @@ export default function CareerPage() {
 
       {/* 使われ方の説明 */}
       {!isEditing && (
-        <div className="mt-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100">
-          <h3 className="text-sm font-semibold text-gray-800 mb-3">この情報の活用先</h3>
+        <div className="mt-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-5 border border-blue-100 dark:border-blue-800">
+          <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3">この情報の活用先</h3>
           <div className="space-y-2">
             {[
               { icon: "📝", label: "ES自動生成", desc: "設問に合わせてガクチカ・就活の軸から回答を自動作成" },
@@ -226,7 +226,7 @@ export default function CareerPage() {
               <div key={item.label} className="flex gap-3 items-start">
                 <span className="text-lg shrink-0">{item.icon}</span>
                 <div>
-                  <span className="text-sm font-medium text-gray-800">{item.label}</span>
+                  <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{item.label}</span>
                   <p className="text-xs text-gray-500">{item.desc}</p>
                 </div>
               </div>

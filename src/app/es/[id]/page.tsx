@@ -68,11 +68,11 @@ function EsQuestionCard({
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6">
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
           <p className="text-xs text-gray-400 mb-1">設問 {index + 1}</p>
-          <p className="font-medium text-gray-900">{qa.question || "(設問未入力)"}</p>
+          <p className="font-medium text-gray-900 dark:text-gray-100">{qa.question || "(設問未入力)"}</p>
         </div>
         <Button
           variant="secondary"
@@ -84,8 +84,8 @@ function EsQuestionCard({
         </Button>
       </div>
 
-      <div className="bg-gray-50 rounded-lg p-4 mb-2">
-        <p className="text-sm text-gray-700 whitespace-pre-wrap">
+      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-2">
+        <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
           {qa.answer || "(回答未入力)"}
         </p>
       </div>
@@ -95,12 +95,12 @@ function EsQuestionCard({
 
       {/* AI生成結果パネル */}
       {showAi && (
-        <div className="mt-3 border border-blue-200 bg-blue-50 rounded-xl p-4">
+        <div className="mt-3 border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-blue-700">✨ AI生成回答</span>
+            <span className="text-xs font-semibold text-blue-700 dark:text-blue-400">✨ AI生成回答</span>
             <button
               onClick={() => setShowAi(false)}
-              className="text-xs text-gray-400 hover:text-gray-600"
+              className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
             >
               閉じる
             </button>
@@ -116,7 +116,7 @@ function EsQuestionCard({
 
           {!loading && aiResult && (
             <>
-              <div className="bg-white rounded-lg p-3 mb-3 text-sm text-gray-800 whitespace-pre-wrap leading-relaxed border border-blue-100">
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 mb-3 text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap leading-relaxed border border-blue-100 dark:border-blue-800">
                 {aiResult.answer}
               </div>
               <p className="text-xs text-blue-600 text-right mb-3">{aiResult.answer.length}字</p>
@@ -132,9 +132,9 @@ function EsQuestionCard({
               )}
 
               {aiResult.advice && (
-                <div className="bg-amber-50 rounded-lg p-3 mb-3 border border-amber-100">
-                  <p className="text-xs font-semibold text-amber-700 mb-1">アドバイス</p>
-                  <p className="text-xs text-gray-700 whitespace-pre-wrap">{aiResult.advice}</p>
+                <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-3 mb-3 border border-amber-100 dark:border-amber-800">
+                  <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 mb-1">アドバイス</p>
+                  <p className="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{aiResult.advice}</p>
                 </div>
               )}
 
@@ -192,7 +192,7 @@ export default function EsDetailPage({ params }: { params: Promise<{ id: string 
               {company.name}
             </Link>
           )}
-          <h1 className="text-2xl font-bold text-gray-900">{es.title}</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{es.title}</h1>
           <div className="flex items-center gap-3 mt-2">
             <Badge variant={es.status === "SUBMITTED" ? "success" : "warning"}>
               {es.status === "SUBMITTED" ? "提出済み" : "下書き"}

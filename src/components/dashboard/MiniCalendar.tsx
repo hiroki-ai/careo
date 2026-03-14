@@ -61,17 +61,17 @@ export function MiniCalendar({ events }: MiniCalendarProps) {
     today.getFullYear() === year && today.getMonth() === month && today.getDate() === day;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-5">
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-5">
       {/* ヘッダー */}
       <div className="flex items-center justify-between mb-4">
-        <button onClick={prevMonth} className="p-1 rounded hover:bg-gray-100 cursor-pointer transition-colors">
-          <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button onClick={prevMonth} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+          <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <span className="text-sm font-semibold text-gray-900">{year}年{month + 1}月</span>
-        <button onClick={nextMonth} className="p-1 rounded hover:bg-gray-100 cursor-pointer transition-colors">
-          <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{year}年{month + 1}月</span>
+        <button onClick={nextMonth} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+          <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>
@@ -98,7 +98,7 @@ export function MiniCalendar({ events }: MiniCalendarProps) {
               key={day}
               onClick={() => setSelectedDay(isSelected ? null : day)}
               className={`relative flex flex-col items-center py-1 rounded-lg transition-colors cursor-pointer ${
-                isSelected ? "bg-blue-600" : isToday(day) ? "bg-blue-50" : "hover:bg-gray-50"
+                isSelected ? "bg-blue-600" : isToday(day) ? "bg-blue-50 dark:bg-blue-900/30" : "hover:bg-gray-50 dark:hover:bg-gray-700"
               }`}
             >
               <span className={`text-xs font-medium ${
@@ -106,7 +106,7 @@ export function MiniCalendar({ events }: MiniCalendarProps) {
                 isToday(day) ? "text-blue-600 font-bold" :
                 col === 0 ? "text-red-400" :
                 col === 6 ? "text-blue-400" :
-                "text-gray-700"
+                "text-gray-700 dark:text-gray-300"
               }`}>
                 {day}
               </span>
@@ -125,7 +125,7 @@ export function MiniCalendar({ events }: MiniCalendarProps) {
       </div>
 
       {/* 凡例 */}
-      <div className="flex gap-3 mt-3 pt-3 border-t border-gray-50">
+      <div className="flex gap-3 mt-3 pt-3 border-t border-gray-50 dark:border-gray-700">
         <div className="flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-blue-400" />
           <span className="text-[10px] text-gray-400">ES締切</span>
@@ -138,17 +138,17 @@ export function MiniCalendar({ events }: MiniCalendarProps) {
 
       {/* 選択日のイベント */}
       {selectedDay && (
-        <div className="mt-3 pt-3 border-t border-gray-100 space-y-2">
-          <p className="text-xs font-semibold text-gray-500">{month + 1}/{selectedDay} の予定</p>
+        <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 space-y-2">
+          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">{month + 1}/{selectedDay} の予定</p>
           {selectedEvents.length === 0 ? (
             <p className="text-xs text-gray-400">予定なし</p>
           ) : (
             selectedEvents.map((e) => (
               <Link key={e.id} href={e.link} className="flex items-center gap-2 hover:opacity-80">
                 <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${
-                  e.type === "ES" ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700"
+                  e.type === "ES" ? "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400" : "bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-400"
                 }`}>{e.type}</span>
-                <span className="text-xs text-gray-700 truncate">{e.title}</span>
+                <span className="text-xs text-gray-700 dark:text-gray-300 truncate">{e.title}</span>
               </Link>
             ))
           )}
