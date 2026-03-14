@@ -171,9 +171,44 @@ export default function DashboardPage() {
   };
 
   const hasItems = pendingItems.length > 0 || completedItems.length > 0;
+  const isFirstTime = companies.length === 0 && esList.length === 0 && interviews.length === 0;
 
   return (
     <div className="p-6">
+
+      {/* 🎉 初回ウェルカムバナー */}
+      {isFirstTime && profile && (
+        <div className="mb-5 bg-gradient-to-r from-indigo-600 to-blue-500 rounded-2xl p-5 text-white relative overflow-hidden">
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-10 text-[80px] select-none">🎓</div>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0v6" />
+              </svg>
+            </div>
+            <p className="font-bold text-lg">Careoへようこそ！まず最初のステップを踏もう</p>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { step: "1", label: "志望企業を追加", href: "/companies", icon: "🏢", desc: "まずここから" },
+              { step: "2", label: "ESを登録", href: "/es/new", icon: "📝", desc: "AI回答生成が使える" },
+              { step: "3", label: "カレオに相談", href: "/chat", icon: "💬", desc: "何でも聞いて" },
+            ].map((item) => (
+              <Link key={item.step} href={item.href}>
+                <div className="bg-white/15 hover:bg-white/25 rounded-xl p-3 transition-colors cursor-pointer">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="w-5 h-5 bg-white/30 rounded-full text-[10px] font-bold flex items-center justify-center">{item.step}</span>
+                    <span className="text-lg">{item.icon}</span>
+                  </div>
+                  <p className="text-sm font-semibold">{item.label}</p>
+                  <p className="text-[11px] text-white/70">{item.desc}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* ページヘッダー */}
       <div className="flex items-center justify-between mb-5">
         <div>
