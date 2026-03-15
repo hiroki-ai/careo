@@ -15,7 +15,7 @@ function NewEsContent() {
   const { companies } = useCompanies();
 
   return (
-    <div className="p-8 max-w-3xl">
+    <div className="p-4 md:p-8 max-w-3xl">
       <Link href="/es" className="text-sm text-gray-400 hover:text-gray-600 mb-3 inline-block">
         ← ES一覧
       </Link>

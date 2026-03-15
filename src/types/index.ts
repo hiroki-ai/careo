@@ -143,6 +143,51 @@ export interface UserProfile {
   updatedAt: string;
 }
 
+export interface ObVisit {
+  id: string;
+  companyName: string;
+  companyId?: string;
+  personName?: string;
+  visitedAt: string;
+  purpose: "ob_visit" | "info_session" | "internship";
+  insights?: string;
+  impression?: "positive" | "neutral" | "negative";
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const OB_VISIT_PURPOSE_LABELS: Record<ObVisit["purpose"], string> = {
+  ob_visit: "OB/OG訪問",
+  info_session: "会社説明会",
+  internship: "インターン",
+};
+
+export const OB_IMPRESSION_LABELS: Record<NonNullable<ObVisit["impression"]>, string> = {
+  positive: "好印象",
+  neutral: "普通",
+  negative: "懸念あり",
+};
+
+export interface AptitudeTest {
+  id: string;
+  companyName: string;
+  companyId?: string;
+  testType: "SPI" | "TG-WEB" | "玉手箱" | "CAB" | "GAB" | "SCOA" | "その他";
+  testDate?: string;
+  scoreVerbal?: number;
+  scoreNonverbal?: number;
+  scoreEnglish?: number;
+  result: "PASS" | "FAIL" | "PENDING";
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const APTITUDE_TEST_TYPES: AptitudeTest["testType"][] = [
+  "SPI", "TG-WEB", "玉手箱", "CAB", "GAB", "SCOA", "その他",
+];
+
 export const COMPANY_STATUS_COLORS: Record<CompanyStatus, string> = {
   WISHLIST: "bg-gray-100 text-gray-700",
   APPLIED: "bg-blue-100 text-blue-700",

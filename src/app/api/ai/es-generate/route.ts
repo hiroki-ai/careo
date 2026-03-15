@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const supabase = createClient(
@@ -9,6 +10,10 @@ const supabase = createClient(
 );
 
 export async function POST(req: NextRequest) {
+  const { allowed, retryAfter } = checkRateLimit(getClientIp(req), "es-generate");
+  if (!allowed) {
+    return NextResponse.json({ error: `リクエストが多すぎます。${retryAfter}秒後に再試行してください。` }, { status: 429 });
+  }
   try {
     const {
       question,

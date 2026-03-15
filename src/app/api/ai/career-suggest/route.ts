@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { UserProfile } from "@/types";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 export async function POST(req: NextRequest) {
+  const { allowed, retryAfter } = checkRateLimit(getClientIp(req), "career-suggest");
+  if (!allowed) {
+    return NextResponse.json({ error: `リクエストが多すぎます。${retryAfter}秒後に再試行してください。` }, { status: 429 });
+  }
   try {
     const { profile }: { profile: UserProfile } = await req.json();
 

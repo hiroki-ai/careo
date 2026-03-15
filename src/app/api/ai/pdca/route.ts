@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { Company, ES, Interview, UserProfile } from "@/types";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 export async function POST(req: NextRequest) {
+  const { allowed, retryAfter } = checkRateLimit(getClientIp(req), "pdca");
+  if (!allowed) {
+    return NextResponse.json({ error: `リクエストが多すぎます。${retryAfter}秒後に再試行してください。` }, { status: 429 });
+  }
   try {
     const { companies, esList, interviews, profile, pendingActions, completedActions, recentChatMessages }: {
       companies: Company[];

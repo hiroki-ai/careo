@@ -5,6 +5,11 @@ import Link from "next/link";
 import { useChat } from "@/hooks/useChat";
 import { useProfile } from "@/hooks/useProfile";
 import { useCompanies } from "@/hooks/useCompanies";
+import { useEs } from "@/hooks/useEs";
+import { useInterviews } from "@/hooks/useInterviews";
+import { useActionItems } from "@/hooks/useActionItems";
+import { useToast } from "@/components/ui/Toast";
+import { parseCompanySuggestions } from "@/lib/chatUtils";
 
 // カレオのキャラクターSVG
 export function KareoCharacter({ size = 56 }: { size?: number }) {
@@ -47,6 +52,7 @@ interface StreamingMessage {
   role: "user" | "assistant";
   content: string;
   streaming?: boolean;
+  suggestedCompanies?: string[];
 }
 
 const GREETING = "やあ！何か相談ある？";
@@ -54,18 +60,52 @@ const GREETING = "やあ！何か相談ある？";
 export function KareoWidget() {
   const { messages: savedMessages, loading: historyLoading, saveMessage } = useChat();
   const { profile } = useProfile();
-  const { companies } = useCompanies();
+  const { companies, addCompany } = useCompanies();
+  const { esList } = useEs();
+  const { interviews } = useInterviews();
+  const { pendingItems } = useActionItems();
+  const { showToast } = useToast();
   const [input, setInput] = useState("");
   const [localMessages, setLocalMessages] = useState<StreamingMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // 直近3件を表示
+  // 直近6件を表示
   const recentHistory = savedMessages.slice(-6);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [localMessages]);
+
+  const buildContext = () => ({
+    profile: profile ? {
+      university: profile.university,
+      faculty: profile.faculty,
+      grade: profile.grade,
+      graduationYear: profile.graduationYear,
+      targetIndustries: profile.targetIndustries,
+      targetJobs: profile.targetJobs,
+      jobSearchStage: profile.jobSearchStage,
+      careerAxis: profile.careerAxis,
+      gakuchika: profile.gakuchika,
+      selfPr: profile.selfPr,
+      strengths: profile.strengths,
+      weaknesses: profile.weaknesses,
+    } : undefined,
+    companies: companies.map(c => ({ name: c.name, status: c.status, industry: c.industry })),
+    esList: esList.map(e => ({
+      title: e.title,
+      status: e.status,
+      companyName: companies.find(c => c.id === e.companyId)?.name ?? "不明",
+      questionsCount: e.questions.length,
+    })),
+    interviews: interviews.map(i => ({
+      round: i.round,
+      result: i.result,
+      companyName: companies.find(c => c.id === i.companyId)?.name ?? "不明",
+    })),
+    pendingActions: pendingItems.map(i => i.action),
+  });
 
   const sendMessage = async (text: string) => {
     if (!text.trim() || isStreaming) return;
@@ -86,23 +126,7 @@ export function KareoWidget() {
       const res = await fetch("/api/ai/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: historyForApi,
-          context: {
-            profile: profile ? {
-              university: profile.university,
-              faculty: profile.faculty,
-              grade: profile.grade,
-              targetIndustries: profile.targetIndustries,
-              targetJobs: profile.targetJobs,
-              jobSearchStage: profile.jobSearchStage,
-              careerAxis: profile.careerAxis,
-              gakuchika: profile.gakuchika,
-            } : undefined,
-            companiesCount: companies.length,
-            offeredCount: companies.filter((c) => c.status === "OFFERED").length,
-          },
-        }),
+        body: JSON.stringify({ messages: historyForApi, context: buildContext() }),
       });
 
       if (!res.body) throw new Error();
@@ -122,19 +146,34 @@ export function KareoWidget() {
 
       if (accumulated) {
         await saveMessage("assistant", accumulated);
+        const { display, companies: suggested } = parseCompanySuggestions(accumulated);
         setLocalMessages((prev) => [
           ...prev.slice(0, -1),
-          { role: "assistant", content: accumulated },
+          { role: "assistant", content: display, suggestedCompanies: suggested.length ? suggested : undefined },
         ]);
       }
-    } catch {
+    } catch (err) {
       setLocalMessages((prev) => prev.slice(0, -1));
+      const msg = err instanceof Error && err.message.includes("多すぎ")
+        ? err.message
+        : "カレオとの通信に失敗しました";
+      showToast(msg, "error");
     } finally {
       setIsStreaming(false);
     }
   };
 
-  // ウィジェットに表示するメッセージ（履歴 or ローカル）
+  const handleAddCompany = async (name: string) => {
+    const already = companies.find(c => c.name === name);
+    if (already) {
+      showToast(`「${name}」はすでに登録されています`, "info");
+      return;
+    }
+    await addCompany({ name, status: "WISHLIST", industry: "", notes: "カレオとのチャットから追加" });
+    showToast(`「${name}」を企業管理に追加しました`, "success");
+  };
+
+  // ウィジェットに表示するメッセージ（ローカル or 履歴）
   const displayMessages: StreamingMessage[] = localMessages.length > 0
     ? localMessages
     : recentHistory.map((m) => ({ role: m.role, content: m.content }));
@@ -184,32 +223,45 @@ export function KareoWidget() {
         ) : (
           <>
             {displayMessages.slice(-6).map((msg, i) => (
-              <div
-                key={i}
-                className={`flex gap-2 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}
-              >
-                {msg.role === "assistant" && (
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shrink-0 mt-0.5">
-                    <span className="text-white text-[9px] font-bold">K</span>
+              <div key={i}>
+                <div className={`flex gap-2 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
+                  {msg.role === "assistant" && (
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="text-white text-[9px] font-bold">K</span>
+                    </div>
+                  )}
+                  <div
+                    className={`max-w-[80%] rounded-xl px-3 py-2 text-xs leading-relaxed ${
+                      msg.role === "user"
+                        ? "bg-blue-600 text-white rounded-tr-sm"
+                        : "bg-gray-100 text-gray-800 rounded-tl-sm"
+                    }`}
+                  >
+                    {msg.content}
+                    {msg.streaming && msg.content === "" && (
+                      <span className="inline-flex gap-0.5 ml-1">
+                        {[0,1,2].map((j) => (
+                          <span key={j} className="w-1 h-1 bg-gray-400 rounded-full animate-bounce"
+                            style={{ animationDelay: `${j * 0.15}s` }} />
+                        ))}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                {/* 企業追加候補ボタン */}
+                {msg.suggestedCompanies && msg.suggestedCompanies.length > 0 && (
+                  <div className="ml-8 mt-1.5 flex flex-wrap gap-1.5">
+                    {msg.suggestedCompanies.map((name) => (
+                      <button
+                        key={name}
+                        onClick={() => handleAddCompany(name)}
+                        className="text-[10px] bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 rounded-full px-2.5 py-1 transition-colors flex items-center gap-1"
+                      >
+                        <span>＋</span> {name}を追加
+                      </button>
+                    ))}
                   </div>
                 )}
-                <div
-                  className={`max-w-[80%] rounded-xl px-3 py-2 text-xs leading-relaxed ${
-                    msg.role === "user"
-                      ? "bg-blue-600 text-white rounded-tr-sm"
-                      : "bg-gray-100 text-gray-800 rounded-tl-sm"
-                  }`}
-                >
-                  {msg.content}
-                  {msg.streaming && msg.content === "" && (
-                    <span className="inline-flex gap-0.5 ml-1">
-                      {[0,1,2].map((j) => (
-                        <span key={j} className="w-1 h-1 bg-gray-400 rounded-full animate-bounce"
-                          style={{ animationDelay: `${j * 0.15}s` }} />
-                      ))}
-                    </span>
-                  )}
-                </div>
               </div>
             ))}
             <div ref={messagesEndRef} />

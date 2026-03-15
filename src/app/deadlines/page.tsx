@@ -74,7 +74,7 @@ export default function DeadlinesPage() {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">締切一覧</h1>
         <p className="text-sm text-gray-500 mt-1">未提出のES締切・予定面接を表示</p>

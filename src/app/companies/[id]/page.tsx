@@ -13,15 +13,17 @@ import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { COMPANY_STATUS_ORDER, COMPANY_STATUS_LABELS } from "@/types";
 import { formatDate, formatDateTime } from "@/lib/utils";
+import { useToast } from "@/components/ui/Toast";
 
 export default function CompanyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
-  const { companies, updateCompany, deleteCompany } = useCompanies();
+  const { companies, updateCompany, deleteCompany, addCompany } = useCompanies();
   const { esList } = useEs();
   const { interviews } = useInterviews();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
+  const { showToast } = useToast();
 
   const company = companies.find((c) => c.id === id);
   const companyEs = esList.filter((e) => e.companyId === id);
@@ -41,12 +43,29 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
   const currentStatusIndex = COMPANY_STATUS_ORDER.indexOf(company.status);
 
   const handleDelete = () => {
-    deleteCompany(id);
+    const snapshot = { ...company };
+    setIsDeleteConfirm(false);
     router.push("/companies");
+    // 即時削除 → UNDOトースト表示
+    deleteCompany(id);
+    showToast(
+      `「${snapshot.name}」を削除しました`,
+      "warning",
+      {
+        label: "元に戻す",
+        onClick: async () => {
+          // 削除後のrestore: addCompanyで再登録
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { id: _id, createdAt: _c, updatedAt: _u, ...rest } = snapshot;
+          await addCompany(rest as Parameters<typeof addCompany>[0]);
+        },
+      },
+      8000,
+    );
   };
 
   return (
-    <div className="p-8 max-w-4xl">
+    <div className="p-4 md:p-8 max-w-4xl">
       {/* ヘッダー */}
       <div className="mb-6">
         <Link href="/companies" className="text-sm text-gray-400 hover:text-gray-600 mb-3 inline-block">

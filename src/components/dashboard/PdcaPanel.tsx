@@ -103,7 +103,7 @@ export function PdcaPanel({ result }: PdcaPanelProps) {
       </div>
 
       {/* PDCA 4象限 */}
-      <div className="grid grid-cols-4 gap-3 mb-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
         {/* P */}
         <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
           <div className="flex items-center gap-1.5 mb-2">

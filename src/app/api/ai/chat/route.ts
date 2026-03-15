@@ -1,9 +1,17 @@
 import { NextRequest } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 export async function POST(req: NextRequest) {
+  const { allowed, retryAfter } = checkRateLimit(getClientIp(req), "chat");
+  if (!allowed) {
+    return new Response(JSON.stringify({ error: `リクエストが多すぎます。${retryAfter}秒後に再試行してください。` }), {
+      status: 429,
+      headers: { "Content-Type": "application/json", "Retry-After": String(retryAfter) },
+    });
+  }
   try {
     const { messages, context }: {
       messages: { role: "user" | "assistant"; content: string }[];
@@ -19,24 +27,92 @@ export async function POST(req: NextRequest) {
           careerAxis?: string;
           gakuchika?: string;
           selfPr?: string;
+          strengths?: string;
+          weaknesses?: string;
         };
-        companiesCount?: number;
-        offeredCount?: number;
-        pendingInterviews?: number;
+        companies?: { name: string; status: string; industry?: string }[];
+        esList?: { title: string; status: string; companyName: string; questionsCount: number }[];
+        interviews?: { round: number; result: string; companyName: string; notes?: string }[];
+        pendingActions?: string[];
       };
     } = await req.json();
 
-    const profileContext = context?.profile
-      ? `
-ユーザー情報:
-- ${context.profile.university || "大学未設定"}${context.profile.faculty ? " " + context.profile.faculty : ""} ${context.profile.grade || ""}
-- 卒業予定: ${context.profile.graduationYear}年
-- 志望業界: ${context.profile.targetIndustries?.join("・") || "未設定"}
-- 志望職種: ${context.profile.targetJobs?.join("・") || "未設定"}
-- 就活状況: 応募${context.companiesCount || 0}社、内定${context.offeredCount || 0}社
-${context.profile.careerAxis ? `- 就活の軸: ${context.profile.careerAxis.slice(0, 100)}...` : ""}
-${context.profile.gakuchika ? `- ガクチカ: ${context.profile.gakuchika.slice(0, 100)}...` : ""}`
-      : "ユーザー情報: 未設定";
+    // ── プロフィール ──
+    const profileLines: string[] = [];
+    if (context?.profile) {
+      const p = context.profile;
+      if (p.university || p.faculty) profileLines.push(`大学: ${[p.university, p.faculty].filter(Boolean).join(" ")}`);
+      if (p.grade) profileLines.push(`学年: ${p.grade}`);
+      if (p.graduationYear) profileLines.push(`卒業予定: ${p.graduationYear}年`);
+      if (p.jobSearchStage) {
+        const stageLabel: Record<string, string> = { not_started: "就活未開始", just_started: "始めたばかり", ongoing: "本格的に進行中" };
+        profileLines.push(`就活状況: ${stageLabel[p.jobSearchStage] ?? p.jobSearchStage}`);
+      }
+      if (p.targetIndustries?.length) profileLines.push(`志望業界: ${p.targetIndustries.join("・")}`);
+      if (p.targetJobs?.length) profileLines.push(`志望職種: ${p.targetJobs.join("・")}`);
+    }
+
+    // ── 自己分析 ──
+    const analysisLines: string[] = [];
+    if (context?.profile) {
+      const p = context.profile;
+      if (p.careerAxis) analysisLines.push(`就活の軸: ${p.careerAxis.slice(0, 200)}`);
+      if (p.gakuchika) analysisLines.push(`ガクチカ: ${p.gakuchika.slice(0, 200)}`);
+      if (p.selfPr) analysisLines.push(`自己PR: ${p.selfPr.slice(0, 200)}`);
+      if (p.strengths) analysisLines.push(`強み: ${p.strengths.slice(0, 150)}`);
+      if (p.weaknesses) analysisLines.push(`弱み: ${p.weaknesses.slice(0, 150)}`);
+    }
+
+    // ── 企業管理 ──
+    const companyLines: string[] = [];
+    if (context?.companies?.length) {
+      const statusLabel: Record<string, string> = {
+        WISHLIST: "気になる", APPLIED: "応募済み", DOCUMENT: "書類選考中",
+        INTERVIEW_1: "1次面接", INTERVIEW_2: "2次面接", FINAL: "最終面接",
+        OFFERED: "内定", REJECTED: "不採用",
+      };
+      companyLines.push(`登録企業 (${context.companies.length}社):`);
+      context.companies.slice(0, 20).forEach(c => {
+        companyLines.push(`  - ${c.name}${c.industry ? `（${c.industry}）` : ""}: ${statusLabel[c.status] ?? c.status}`);
+      });
+      if (context.companies.length > 20) companyLines.push(`  ...他${context.companies.length - 20}社`);
+    }
+
+    // ── ES ──
+    const esLines: string[] = [];
+    if (context?.esList?.length) {
+      const submitted = context.esList.filter(e => e.status === "SUBMITTED");
+      const draft = context.esList.filter(e => e.status === "DRAFT");
+      esLines.push(`ES: 計${context.esList.length}件（提出済み${submitted.length}件、下書き${draft.length}件）`);
+      context.esList.slice(0, 10).forEach(e => {
+        esLines.push(`  - ${e.companyName}「${e.title}」: ${e.status === "SUBMITTED" ? "提出済み" : "下書き"}`);
+      });
+    }
+
+    // ── 面接 ──
+    const interviewLines: string[] = [];
+    if (context?.interviews?.length) {
+      const resultLabel: Record<string, string> = { PASS: "通過", FAIL: "不通過", PENDING: "結果待ち" };
+      interviewLines.push(`面接履歴 (${context.interviews.length}件):`);
+      context.interviews.slice(0, 10).forEach(i => {
+        interviewLines.push(`  - ${i.companyName} ${i.round}次面接: ${resultLabel[i.result] ?? i.result}`);
+      });
+    }
+
+    // ── 今週のアクション ──
+    const actionLines: string[] = [];
+    if (context?.pendingActions?.length) {
+      actionLines.push(`今週のTODO: ${context.pendingActions.slice(0, 5).join("、")}`);
+    }
+
+    const contextSection = [
+      profileLines.length ? `【プロフィール】\n${profileLines.join("\n")}` : "",
+      analysisLines.length ? `【自己分析】\n${analysisLines.join("\n")}` : "",
+      companyLines.length ? `【企業管理】\n${companyLines.join("\n")}` : "",
+      esLines.length ? `【ES状況】\n${esLines.join("\n")}` : "",
+      interviewLines.length ? `【面接履歴】\n${interviewLines.join("\n")}` : "",
+      actionLines.length ? `【今週のTODO】\n${actionLines.join("\n")}` : "",
+    ].filter(Boolean).join("\n\n");
 
     const systemPrompt = `あなたはCareoの就活AIアシスタント「カレオ」です。
 
@@ -53,18 +129,24 @@ ${context.profile.gakuchika ? `- ガクチカ: ${context.profile.gakuchika.slice
 - 長文にならず、要点を絞る（200字以内を目安）
 - 質問には具体的かつ実践的に答える
 
-${profileContext}
+${contextSection ? `【ユーザーの現在の状況】\n${contextSection}\n\n上記の情報を把握した上で、ユーザーの状況に合わせた個別アドバイスをすること。` : ""}
+
+【重要ルール: 企業追加候補の出力】
+ユーザーが「〜に興味ある」「〜が気になる」「〜に応募したい」「〜に行きたい」など、特定の企業名への興味を示した場合は、返答の末尾に必ず以下の形式でタグを追加すること（企業名がすでに企業管理に登録済みの場合は不要）:
+[追加候補: 企業名1, 企業名2]
+このタグは画面上では企業追加ボタンに変換されるので、必ず正確な企業名を記載すること。
 
 注意事項:
 - 就活・キャリア・大学生活に関係する話題に集中する
-- ユーザーのデータを把握した上で個別のアドバイスをする
-- 一般論より「あなたの場合は〜」という個別対応を心がける`;
+- 「あなたの場合は〜」という個別対応を心がける
+- 自己分析データがあれば、それを活かして具体的にアドバイスする
+- 企業管理・ES・面接データがある場合は、それを踏まえて状況を理解した上で話す`;
 
     const stream = anthropic.messages.stream({
       model: "claude-haiku-4-5-20251001",
       max_tokens: 800,
       system: systemPrompt,
-      messages: messages.slice(-20), // 直近20メッセージのみ送信
+      messages: messages.slice(-20),
     });
 
     const readableStream = new ReadableStream({

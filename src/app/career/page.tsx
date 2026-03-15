@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useProfile } from "@/hooks/useProfile";
 import { Button } from "@/components/ui/Button";
 import { UserProfile } from "@/types";
+import { useToast } from "@/components/ui/Toast";
 
 type CareerFields = Pick<UserProfile, "careerAxis" | "gakuchika" | "selfPr" | "strengths" | "weaknesses">;
 
@@ -53,6 +54,7 @@ const SECTIONS: {
 
 export default function CareerPage() {
   const { profile, loading, saveProfile } = useProfile();
+  const { showToast } = useToast();
   const [editData, setEditData] = useState<CareerFields | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiDraft, setAiDraft] = useState<CareerFields | null>(null);
@@ -91,6 +93,7 @@ export default function CareerPage() {
     setEditData(null);
     setAiDraft(null);
     setSaved(true);
+    showToast("保存しました", "success");
     setTimeout(() => setSaved(false), 3000);
   };
 
@@ -117,13 +120,14 @@ export default function CareerPage() {
       }
     } catch (err) {
       console.error("[career-suggest]", err);
+      showToast("AI下書き生成に失敗しました", "error");
     } finally {
       setAiLoading(false);
     }
   };
 
   return (
-    <div className="p-8 max-w-3xl">
+    <div className="p-4 md:p-8 max-w-3xl">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">自己分析</h1>
         <p className="text-sm text-gray-500 mt-1">就活の軸・ガクチカ・自己PRを整理してESや面接のAI支援に活かします</p>

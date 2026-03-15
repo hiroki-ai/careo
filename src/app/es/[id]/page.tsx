@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { formatDate } from "@/lib/utils";
 import { QAPair } from "@/types";
+import { useToast } from "@/components/ui/Toast";
 
 interface AiGenResult {
   answer: string;
@@ -38,6 +39,7 @@ function EsQuestionCard({
 }) {
   const [aiResult, setAiResult] = useState<AiGenResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const { showToast } = useToast();
   const [showAi, setShowAi] = useState(false);
 
   const handleGenerate = async () => {
@@ -59,9 +61,14 @@ function EsQuestionCard({
         }),
       });
       const data = await res.json();
-      if (!data.error) setAiResult(data);
+      if (!data.error) {
+        setAiResult(data);
+      } else {
+        showToast(data.error.includes("多すぎ") ? data.error : "AI生成に失敗しました", "error");
+      }
     } catch (err) {
       console.error("[es-generate]", err);
+      showToast("AI生成に失敗しました", "error");
     } finally {
       setLoading(false);
     }
@@ -182,7 +189,7 @@ export default function EsDetailPage({ params }: { params: Promise<{ id: string 
   };
 
   return (
-    <div className="p-8 max-w-3xl">
+    <div className="p-4 md:p-8 max-w-3xl">
       <Link href="/es" className="text-sm text-gray-400 hover:text-gray-600 mb-3 inline-block">← ES一覧</Link>
 
       <div className="flex items-start justify-between mb-6">
