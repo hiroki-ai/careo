@@ -1,0 +1,17 @@
+{
+  "name": "Careo - 就活管理アプリ",
+  "short_name": "Careo",
+  "description": "企業・ES・面接を一元管理する就活支援アプリ",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f9fafb",
+  "theme_color": "#1a2f4e",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}
