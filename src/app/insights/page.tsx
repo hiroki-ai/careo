@@ -1,0 +1,276 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { useCompanies } from "@/hooks/useCompanies";
+import { useEs } from "@/hooks/useEs";
+import { useInterviews } from "@/hooks/useInterviews";
+import { useProfile } from "@/hooks/useProfile";
+
+interface AggregateInsights {
+  total_users: number;
+  avg_companies_per_user: number;
+  top_industries: { industry: string; count: number }[];
+  offer_rate: number;
+  avg_interviews_before_offer: number;
+}
+
+function StatCard({
+  label,
+  value,
+  sub,
+  color = "text-gray-900",
+}: {
+  label: string;
+  value: string | number;
+  sub?: string;
+  color?: string;
+}) {
+  return (
+    <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+      <p className="text-xs font-medium text-gray-500 mb-1">{label}</p>
+      <p className={`text-2xl font-bold ${color}`}>{value}</p>
+      {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
+    </div>
+  );
+}
+
+function SkeletonCard() {
+  return (
+    <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+      <div className="h-3 bg-gray-100 rounded-full animate-pulse w-1/2 mb-2" />
+      <div className="h-7 bg-gray-100 rounded-full animate-pulse w-1/3" />
+    </div>
+  );
+}
+
+export default function InsightsPage() {
+  const supabase = createClient();
+  const { companies, loading: companiesLoading } = useCompanies();
+  const { esList, loading: esLoading } = useEs();
+  const { interviews, loading: interviewsLoading } = useInterviews();
+  const { profile } = useProfile();
+
+  const [insights, setInsights] = useState<AggregateInsights | null>(null);
+  const [insightsLoading, setInsightsLoading] = useState(true);
+  const [insightsError, setInsightsError] = useState(false);
+
+  useEffect(() => {
+    async function fetchInsights() {
+      setInsightsLoading(true);
+      try {
+        const { data, error } = await supabase.rpc("get_careo_aggregate_insights");
+        if (error || !data) {
+          setInsightsError(true);
+        } else {
+          setInsights(data as AggregateInsights);
+        }
+      } catch {
+        setInsightsError(true);
+      } finally {
+        setInsightsLoading(false);
+      }
+    }
+    fetchInsights();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const myCompaniesCount = companies.length;
+  const myOfferedCount = companies.filter((c) => c.status === "OFFERED").length;
+  const myInterviewCount = interviews.length;
+  const myEsCount = esList.filter((e) => e.status === "SUBMITTED").length;
+  const myActiveCount = companies.filter(
+    (c) => !["WISHLIST", "REJECTED"].includes(c.status)
+  ).length;
+
+  const dataLoading = companiesLoading || esLoading || interviewsLoading;
+
+  return (
+    <div className="p-4 md:p-8">
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">就活データ インサイト</h1>
+        <p className="text-sm text-gray-500 mt-1">Careoユーザーの匿名統計データ</p>
+      </div>
+
+      {/* Aggregate Stats */}
+      <section className="mb-8">
+        <h2 className="font-semibold text-gray-800 mb-3 text-sm uppercase tracking-wide">全ユーザー統計</h2>
+        {insightsLoading ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[...Array(4)].map((_, i) => <SkeletonCard key={i} />)}
+          </div>
+        ) : insightsError || !insights ? (
+          <div className="bg-white rounded-xl border border-gray-100 p-8 text-center text-gray-400">
+            <p className="text-4xl mb-3">📊</p>
+            <p className="font-medium text-gray-500">データ収集中</p>
+            <p className="text-sm mt-1">まだ十分なデータが集まっていません。しばらくお待ちください。</p>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+              <StatCard
+                label="利用ユーザー数"
+                value={`${insights.total_users.toLocaleString()}人`}
+                color="text-blue-600"
+              />
+              <StatCard
+                label="平均登録企業数"
+                value={`${Math.round(insights.avg_companies_per_user)}社`}
+                sub="1ユーザーあたり"
+                color="text-indigo-600"
+              />
+              <StatCard
+                label="内定獲得率"
+                value={`${Math.round(insights.offer_rate * 100)}%`}
+                sub="選考企業のうち"
+                color="text-green-600"
+              />
+              <StatCard
+                label="内定までの平均面接数"
+                value={`${insights.avg_interviews_before_offer.toFixed(1)}回`}
+                color="text-purple-600"
+              />
+            </div>
+
+            {/* Top Industries */}
+            {insights.top_industries && insights.top_industries.length > 0 && (
+              <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+                <p className="text-xs font-semibold text-gray-500 mb-3">人気業界ランキング</p>
+                <div className="space-y-2">
+                  {insights.top_industries.slice(0, 5).map((ind, i) => {
+                    const max = insights.top_industries[0].count;
+                    const pct = Math.round((ind.count / max) * 100);
+                    return (
+                      <div key={ind.industry} className="flex items-center gap-3">
+                        <span className="text-xs font-bold text-gray-400 w-4 shrink-0">#{i + 1}</span>
+                        <span className="text-sm text-gray-700 w-32 shrink-0 truncate">{ind.industry}</span>
+                        <div className="flex-1 bg-gray-100 rounded-full h-2">
+                          <div
+                            className="h-2 rounded-full bg-blue-400"
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-gray-500 w-12 text-right shrink-0">{ind.count}社</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </section>
+
+      {/* My Stats vs Average */}
+      <section>
+        <h2 className="font-semibold text-gray-800 mb-3 text-sm uppercase tracking-wide">あなた vs 平均</h2>
+
+        {dataLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[...Array(4)].map((_, i) => <SkeletonCard key={i} />)}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Companies */}
+            <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+              <p className="text-xs font-semibold text-gray-500 mb-3">登録企業数</p>
+              <div className="flex items-end gap-6">
+                <div>
+                  <p className="text-xs text-gray-400 mb-0.5">あなた</p>
+                  <p className="text-3xl font-bold text-blue-600">{myCompaniesCount}<span className="text-sm font-normal text-gray-400 ml-1">社</span></p>
+                </div>
+                {insights && (
+                  <div>
+                    <p className="text-xs text-gray-400 mb-0.5">平均</p>
+                    <p className="text-2xl font-bold text-gray-300">{Math.round(insights.avg_companies_per_user)}<span className="text-sm font-normal text-gray-300 ml-1">社</span></p>
+                  </div>
+                )}
+              </div>
+              {insights && (
+                <p className={`text-xs mt-2 font-medium ${myCompaniesCount >= Math.round(insights.avg_companies_per_user) ? "text-green-600" : "text-orange-500"}`}>
+                  {myCompaniesCount >= Math.round(insights.avg_companies_per_user)
+                    ? `平均より${myCompaniesCount - Math.round(insights.avg_companies_per_user)}社多い`
+                    : `平均より${Math.round(insights.avg_companies_per_user) - myCompaniesCount}社少ない`}
+                </p>
+              )}
+            </div>
+
+            {/* Internal offers */}
+            <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+              <p className="text-xs font-semibold text-gray-500 mb-3">内定数</p>
+              <div className="flex items-end gap-6">
+                <div>
+                  <p className="text-xs text-gray-400 mb-0.5">あなた</p>
+                  <p className="text-3xl font-bold text-green-600">{myOfferedCount}<span className="text-sm font-normal text-gray-400 ml-1">社</span></p>
+                </div>
+              </div>
+              <p className="text-xs text-gray-400 mt-2">
+                選考中 {myActiveCount}社 / ES提出済み {myEsCount}件
+              </p>
+            </div>
+
+            {/* Interviews */}
+            <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+              <p className="text-xs font-semibold text-gray-500 mb-3">面接回数</p>
+              <div className="flex items-end gap-6">
+                <div>
+                  <p className="text-xs text-gray-400 mb-0.5">あなた</p>
+                  <p className="text-3xl font-bold text-purple-600">{myInterviewCount}<span className="text-sm font-normal text-gray-400 ml-1">回</span></p>
+                </div>
+                {insights && (
+                  <div>
+                    <p className="text-xs text-gray-400 mb-0.5">内定までの平均</p>
+                    <p className="text-2xl font-bold text-gray-300">{insights.avg_interviews_before_offer.toFixed(1)}<span className="text-sm font-normal text-gray-300 ml-1">回</span></p>
+                  </div>
+                )}
+              </div>
+              {interviews.length > 0 && (
+                <p className="text-xs text-gray-400 mt-2">
+                  通過率: {interviews.filter(i => i.result !== "PENDING").length > 0
+                    ? Math.round((interviews.filter(i => i.result === "PASS").length / interviews.filter(i => i.result !== "PENDING").length) * 100)
+                    : 0}%
+                </p>
+              )}
+            </div>
+
+            {/* Profile completeness */}
+            <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+              <p className="text-xs font-semibold text-gray-500 mb-3">プロフィール完成度</p>
+              {profile ? (() => {
+                const fields = [
+                  profile.university,
+                  profile.faculty,
+                  profile.grade,
+                  profile.careerAxis,
+                  profile.gakuchika,
+                  profile.selfPr,
+                  profile.strengths,
+                  profile.weaknesses,
+                ];
+                const filled = fields.filter(Boolean).length;
+                const pct = Math.round((filled / fields.length) * 100);
+                return (
+                  <>
+                    <div className="flex items-end gap-4">
+                      <p className="text-3xl font-bold text-indigo-600">{pct}<span className="text-sm font-normal text-gray-400 ml-0.5">%</span></p>
+                      <p className="text-xs text-gray-400 mb-1">{filled}/{fields.length} 項目入力済み</p>
+                    </div>
+                    <div className="w-full bg-gray-100 rounded-full h-2 mt-2">
+                      <div
+                        className={`h-2 rounded-full ${pct === 100 ? "bg-green-500" : pct >= 60 ? "bg-indigo-500" : "bg-orange-400"}`}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                  </>
+                );
+              })() : (
+                <p className="text-sm text-gray-400">プロフィール未設定</p>
+              )}
+            </div>
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
