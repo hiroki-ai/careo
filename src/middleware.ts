@@ -25,7 +25,7 @@ export async function middleware(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
     const { pathname } = request.nextUrl;
 
-    const authRoutes = ["/login", "/signup"];
+    const authRoutes = ["/login", "/signup", "/forgot-password", "/reset-password"];
     const isAuthRoute = authRoutes.includes(pathname);
     const isOnboarding = pathname === "/onboarding";
 
@@ -33,7 +33,8 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    if (user && isAuthRoute) {
+    const loginOnlyRoutes = ["/login", "/signup"];
+    if (user && loginOnlyRoutes.includes(pathname)) {
       return NextResponse.redirect(new URL("/", request.url));
     }
 
@@ -51,8 +52,11 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse;
   } catch (e) {
     console.error("[middleware error]", e);
-    // クラッシュしても404にならないようにリクエストを通す
-    return NextResponse.next();
+    // エラー時は安全のためログインページへリダイレクト
+    const { pathname } = request.nextUrl;
+    const authRoutes = ["/login", "/signup", "/forgot-password", "/reset-password"];
+    if (authRoutes.includes(pathname)) return NextResponse.next();
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 }
 
