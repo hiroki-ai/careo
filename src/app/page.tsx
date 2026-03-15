@@ -18,6 +18,7 @@ import { PdcaPanel } from "@/components/dashboard/PdcaPanel";
 import { KareoWidget } from "@/components/dashboard/KareoWidget";
 import { createClient } from "@/lib/supabase/client";
 import { LandingPage } from "@/components/landing/LandingPage";
+import { BoardMeetingCard } from "@/components/dashboard/BoardMeetingCard";
 import { daysUntil } from "@/lib/utils";
 import { COMPANY_STATUS_ORDER, JOB_SEARCH_STAGE_LABELS } from "@/types";
 
@@ -221,6 +222,9 @@ function DashboardContent() {
 
   return (
     <div className="p-4 md:p-6">
+      {/* 幹部会議通知 */}
+      <BoardMeetingCard />
+
       {/* ページヘッダー */}
       <div className="flex items-center justify-between mb-4 md:mb-5">
         <div>
