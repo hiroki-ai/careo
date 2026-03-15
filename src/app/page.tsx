@@ -373,6 +373,24 @@ function DashboardContent() {
         </div>
       </div>
 
+      {/* 内定シェア */}
+      {companies.filter(c => c.status === "OFFERED").length > 0 && (
+        <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-4 flex items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold text-green-800">🎉 内定おめでとう！</p>
+            <p className="text-xs text-green-600 mt-0.5">Careoを使った感想をシェアしてもらえると嬉しいです</p>
+          </div>
+          <a
+            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Careoを使って就活を進めています！AIが就活のPDCAを回してくれるのが便利すぎる🤖\n28卒の人はぜひ使ってみて→ https://careo-sigma.vercel.app\n#28卒 #就活 #Careo`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 bg-green-600 hover:bg-green-700 text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors"
+          >
+            Xでシェア
+          </a>
+        </div>
+      )}
+
       {/* モバイル: カレオCTA */}
       <div className="md:hidden mb-4">
         <Link href="/chat">

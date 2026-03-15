@@ -106,6 +106,20 @@ export function LandingPage() {
         </Link>
       </section>
 
+      {/* Support */}
+      <section className="px-6 py-10 text-center bg-amber-50 border-t border-amber-100">
+        <p className="text-sm text-amber-800 font-medium mb-1">☕ 開発を応援する</p>
+        <p className="text-xs text-amber-600 mb-4">28卒の学生が一人で作っています。コーヒー1杯分の支援が開発の励みになります。</p>
+        <a
+          href="https://buymeacoffee.com/careo"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-amber-900 font-bold px-6 py-2.5 rounded-xl transition-colors text-sm"
+        >
+          ☕ Buy me a coffee
+        </a>
+      </section>
+
       {/* Footer */}
       <footer className="px-6 py-6 text-center text-xs text-gray-400 border-t border-gray-100">
         © 2025 Careo — 就活管理AIアプリ
