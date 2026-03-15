@@ -151,24 +151,14 @@ export function Sidebar() {
         {!collapsed && (
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-0.5">
-              <div className="w-7 h-7 bg-blue-400 rounded-lg flex items-center justify-center shrink-0">
-                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 14l9-5-9-5-9 5 9 5z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 14l9-5-9-5-9 5 9 5zm0 0v6" />
-                </svg>
-              </div>
+              <img src="/icon-new.svg" alt="Careo" className="w-7 h-7 rounded-lg shrink-0" />
               <span className="text-white font-bold text-lg tracking-wide">Careo</span>
             </div>
             <p className="text-blue-200/60 text-[10px] tracking-widest uppercase pl-9">AI Career Center</p>
           </div>
         )}
         {collapsed && (
-          <div className="w-7 h-7 bg-blue-400 rounded-lg flex items-center justify-center">
-            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 14l9-5-9-5-9 5 9 5z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 14l9-5-9-5-9 5 9 5zm0 0v6" />
-            </svg>
-          </div>
+          <img src="/icon-new.svg" alt="Careo" className="w-7 h-7 rounded-lg" />
         )}
         <button
           onClick={toggle}

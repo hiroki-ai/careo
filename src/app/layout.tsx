@@ -11,6 +11,12 @@ export const metadata: Metadata = {
   title: "Careo - 28卒の就活は、AIと始める。",
   description: "ES締切・面接日程・企業研究・反省メモをAIが整理。就活のPDCAを自動で回す、28卒向け就活管理アプリ。Notionやスプレッドシートより簡単に、AIが次の一手まで教えてくれる。",
   manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/icon-new.svg", type: "image/svg+xml" },
+    ],
+    apple: "/icon-new.svg",
+  },
   verification: {
     google: "2kjrzj66CrgHoAlDoUYL7CzhahsRlfXmZSyK7v2QBVc",
   },

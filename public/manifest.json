@@ -4,10 +4,16 @@
   "description": "企業・ES・面接を一元管理する就活支援アプリ",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f9fafb",
+  "background_color": "#0d1b2e",
   "theme_color": "#1a2f4e",
   "orientation": "portrait",
   "icons": [
+    {
+      "src": "/icon-new.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
     {
       "src": "/favicon.ico",
       "sizes": "any",
