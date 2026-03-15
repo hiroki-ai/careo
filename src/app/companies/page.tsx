@@ -67,8 +67,14 @@ export default function CompaniesPage() {
           <p className="text-sm text-gray-500 mt-1">{companies.length}社を管理中</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="secondary" onClick={() => setIsImportOpen(true)}>一括インポート</Button>
-          <Button onClick={() => setIsModalOpen(true)}>+ 企業を追加</Button>
+          <Button variant="secondary" onClick={() => setIsImportOpen(true)}>
+            <span className="hidden sm:inline">一括インポート</span>
+            <span className="sm:hidden">インポート</span>
+          </Button>
+          <Button onClick={() => setIsModalOpen(true)}>
+            <span className="hidden sm:inline">+ 企業を追加</span>
+            <span className="sm:hidden">+ 追加</span>
+          </Button>
         </div>
       </div>
 

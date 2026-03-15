@@ -363,10 +363,26 @@ function DashboardContent() {
           )}
         </div>
 
-        {/* 右: カレオ ウィジェット */}
-        <div className="md:col-span-4" style={{ height: "480px" }}>
+        {/* 右: カレオ ウィジェット (PC のみ) */}
+        <div className="md:col-span-4 hidden md:block" style={{ height: "480px" }}>
           <KareoWidget />
         </div>
+      </div>
+
+      {/* モバイル: カレオCTA */}
+      <div className="md:hidden mb-4">
+        <Link href="/chat">
+          <div className="bg-gradient-to-r from-indigo-600 to-blue-600 rounded-xl p-4 flex items-center gap-3">
+            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+              <span className="text-white font-bold">K</span>
+            </div>
+            <div className="flex-1">
+              <p className="text-white font-semibold text-sm">カレオに相談する</p>
+              <p className="text-indigo-200 text-xs">就活AIアシスタント · タップして開く</p>
+            </div>
+            <span className="text-white text-xl">→</span>
+          </div>
+        </Link>
       </div>
 
       {/* PDCA 週次レポート */}
@@ -384,7 +400,7 @@ function DashboardContent() {
         {pdcaLoading && (
           <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
             <div className="h-2 bg-gray-100 rounded-full animate-pulse w-full" />
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="h-28 bg-gray-100 rounded-lg animate-pulse" />
               ))}

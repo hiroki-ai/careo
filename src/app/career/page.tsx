@@ -134,7 +134,7 @@ export default function CareerPage() {
       </div>
 
       {/* アクションバー */}
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex flex-wrap items-center gap-2 mb-6">
         {!isEditing && (
           <>
             <Button onClick={handleEdit}>

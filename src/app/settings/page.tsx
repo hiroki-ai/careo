@@ -62,9 +62,9 @@ export default function SettingsPage() {
                 value: profile.targetJobs.length > 0 ? profile.targetJobs.join("、") : "未設定",
               },
             ].map(({ label, value }) => (
-              <div key={label} className="flex items-start gap-4 py-2 border-b border-gray-50 last:border-0">
-                <span className="text-sm text-gray-400 w-28 shrink-0">{label}</span>
-                <span className="text-sm text-gray-800">{value}</span>
+              <div key={label} className="flex items-start gap-3 py-2 border-b border-gray-50 last:border-0">
+                <span className="text-sm text-gray-400 w-24 shrink-0">{label}</span>
+                <span className="text-sm text-gray-800 break-all">{value}</span>
               </div>
             ))}
           </div>

@@ -159,7 +159,7 @@ export function PdcaPanel({ result }: PdcaPanelProps) {
       </div>
 
       {/* 良い点 / 課題 */}
-      <div className="grid grid-cols-2 gap-3 mb-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
         <div>
           <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1.5">うまくいっている点</p>
           <ul className="space-y-1">
