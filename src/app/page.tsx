@@ -9,12 +9,15 @@ import { useInterviews } from "@/hooks/useInterviews";
 import { useProfile } from "@/hooks/useProfile";
 import { useActionItems } from "@/hooks/useActionItems";
 import { useChat } from "@/hooks/useChat";
+import { useToast } from "@/components/ui/Toast";
+import { useDeadlineNotifications } from "@/hooks/useDeadlineNotifications";
 import { StatusBadge, Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { MiniCalendar } from "@/components/dashboard/MiniCalendar";
 import { PdcaPanel } from "@/components/dashboard/PdcaPanel";
 import { KareoWidget } from "@/components/dashboard/KareoWidget";
 import { createClient } from "@/lib/supabase/client";
+import { LandingPage } from "@/components/landing/LandingPage";
 import { daysUntil } from "@/lib/utils";
 import { COMPANY_STATUS_ORDER, JOB_SEARCH_STAGE_LABELS } from "@/types";
 
@@ -40,19 +43,22 @@ const priorityBadgeVariants: Record<string, "danger" | "warning" | "default"> = 
   high: "danger", medium: "warning", low: "default",
 };
 
-export default function DashboardPage() {
+function DashboardContent() {
   const { companies } = useCompanies();
   const { esList } = useEs();
   const { interviews } = useInterviews();
   const { profile } = useProfile();
   const { pendingItems, completedItems, loading: itemsLoading, replaceItems, toggleItem } = useActionItems();
   const { recentUserMessages } = useChat();
+  const { showToast } = useToast();
   const router = useRouter();
   const [aiSummary, setAiSummary] = useState<string>("");
   const [aiLoading, setAiLoading] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
   const [pdcaResult, setPdcaResult] = useState<PdcaResult | null>(null);
   const [pdcaLoading, setPdcaLoading] = useState(false);
+  const [prediction, setPrediction] = useState<{ score: number; grade: string; summary: string; strengths: string[]; improvements: string[] } | null>(null);
+  const [predLoading, setPredLoading] = useState(false);
 
   const statusCounts = COMPANY_STATUS_ORDER.reduce((acc, s) => {
     acc[s] = companies.filter((c) => c.status === s).length;
@@ -88,6 +94,12 @@ export default function DashboardPage() {
     .sort((a, b) => a.days - b.days)
     .slice(0, 3);
 
+  // ブラウザ通知（締切3日以内）
+  useDeadlineNotifications(calendarEvents.filter(e => {
+    const d = daysUntil(e.date);
+    return d >= 0 && d <= 3;
+  }));
+
   const fetchAiAdvice = async (completed?: string[]) => {
     setAiLoading(true);
     try {
@@ -104,12 +116,40 @@ export default function DashboardPage() {
         setAiSummary(data.summary ?? "");
         await replaceItems(data.weeklyActions);
       } else {
-        console.error("[AI] error:", (data as { error: string }).error);
+        const errMsg = (data as { error: string }).error;
+        console.error("[AI] error:", errMsg);
+        showToast(errMsg.includes("多すぎ") ? errMsg : "AIアドバイスの取得に失敗しました", "error");
       }
     } catch (err) {
       console.error("[fetchAiAdvice]", err);
+      showToast("AIアドバイスの取得に失敗しました", "error");
     } finally {
       setAiLoading(false);
+    }
+  };
+
+  const fetchPrediction = async () => {
+    setPredLoading(true);
+    try {
+      const res = await fetch("/api/ai/offer-prediction", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ companies, esList, interviews, profile }),
+      });
+      const text = await res.text();
+      if (!text) return;
+      const data = JSON.parse(text);
+      if (!("error" in data)) {
+        setPrediction(data);
+      } else {
+        const errMsg = (data as { error: string }).error;
+        showToast(errMsg.includes("多すぎ") ? errMsg : "内定予測の取得に失敗しました", "error");
+      }
+    } catch (err) {
+      console.error("[fetchPrediction]", err);
+      showToast("内定予測の取得に失敗しました", "error");
+    } finally {
+      setPredLoading(false);
     }
   };
 
@@ -129,9 +169,15 @@ export default function DashboardPage() {
       const text = await res.text();
       if (!text) return;
       const data = JSON.parse(text);
-      if (!("error" in data)) setPdcaResult(data);
+      if (!("error" in data)) {
+        setPdcaResult(data);
+      } else {
+        const errMsg = (data as { error: string }).error;
+        showToast(errMsg.includes("多すぎ") ? errMsg : "PDCA分析に失敗しました", "error");
+      }
     } catch (err) {
       console.error("[fetchPdca]", err);
+      showToast("PDCA分析に失敗しました", "error");
     } finally {
       setPdcaLoading(false);
     }
@@ -149,6 +195,7 @@ export default function DashboardPage() {
   useEffect(() => {
     if (profile && !itemsLoading && hasLoaded && !pdcaResult && !pdcaLoading) {
       fetchPdca();
+      fetchPrediction();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasLoaded, itemsLoading]);
@@ -173,19 +220,19 @@ export default function DashboardPage() {
   const hasItems = pendingItems.length > 0 || completedItems.length > 0;
 
   return (
-    <div className="p-6">
+    <div className="p-4 md:p-6">
       {/* ページヘッダー */}
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between mb-4 md:mb-5">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">ダッシュボード</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">ダッシュボード</h1>
           {profile && (
-            <p className="text-sm text-gray-500 mt-0.5">
+            <p className="text-xs md:text-sm text-gray-500 mt-0.5 hidden sm:block">
               {[profile.university, profile.faculty, profile.grade].filter(Boolean).join(" · ")} ／ {profile.graduationYear}年卒 ／ {JOB_SEARCH_STAGE_LABELS[profile.jobSearchStage]}
             </p>
           )}
         </div>
         <div className="flex gap-2">
-          <Link href="/settings">
+          <Link href="/settings" className="hidden md:block">
             <Button variant="secondary" size="sm">設定</Button>
           </Link>
           <Button variant="ghost" size="sm" onClick={handleLogout}>ログアウト</Button>
@@ -193,7 +240,7 @@ export default function DashboardPage() {
       </div>
 
       {/* ステータスサマリー */}
-      <div className="grid grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 mb-4 md:mb-5">
         {[
           { label: "選考中", count: companies.filter(c => !["OFFERED","REJECTED","WISHLIST"].includes(c.status)).length, color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-100" },
           { label: "内定", count: statusCounts["OFFERED"] ?? 0, color: "text-green-600", bg: "bg-green-50", border: "border-green-100" },
@@ -208,10 +255,10 @@ export default function DashboardPage() {
       </div>
 
       {/* メインコンテンツ: 3列 */}
-      <div className="grid grid-cols-12 gap-4 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
 
         {/* 左: Next Action チェックリスト */}
-        <div className="col-span-4">
+        <div className="md:col-span-4">
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-semibold text-gray-900 text-sm">🎯 Next Action</h2>
             <Button variant="ghost" size="sm" onClick={() => fetchAiAdvice()} disabled={aiLoading}>
@@ -285,7 +332,7 @@ export default function DashboardPage() {
         </div>
 
         {/* 中: カレンダー + 締切 */}
-        <div className="col-span-4">
+        <div className="md:col-span-4">
           <h2 className="font-semibold text-gray-900 text-sm mb-3">📅 カレンダー</h2>
           <MiniCalendar events={calendarEvents} />
 
@@ -317,7 +364,7 @@ export default function DashboardPage() {
         </div>
 
         {/* 右: カレオ ウィジェット */}
-        <div className="col-span-4" style={{ height: "480px" }}>
+        <div className="md:col-span-4" style={{ height: "480px" }}>
           <KareoWidget />
         </div>
       </div>
@@ -354,6 +401,111 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+
+      {/* 内定予測AI */}
+      <div className="mt-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <h2 className="font-semibold text-gray-900">🎯 内定予測AI</h2>
+            <span className="text-xs text-gray-400">選考データからAIが内定確率を予測</span>
+          </div>
+          <Button variant="ghost" size="sm" onClick={fetchPrediction} disabled={predLoading}>
+            {predLoading ? "分析中..." : "再分析"}
+          </Button>
+        </div>
+
+        {predLoading && (
+          <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 bg-gray-100 rounded-full animate-pulse" />
+              <div className="flex-1 space-y-2">
+                <div className="h-3 bg-gray-100 rounded-full animate-pulse w-1/2" />
+                <div className="h-2 bg-gray-100 rounded-full animate-pulse w-full" />
+              </div>
+            </div>
+            <div className="h-3 bg-gray-100 rounded-full animate-pulse w-3/4" />
+            <div className="h-3 bg-gray-100 rounded-full animate-pulse w-2/3" />
+          </div>
+        )}
+
+        {!predLoading && prediction && (() => {
+          const gradeColor =
+            prediction.grade === "S" ? "bg-green-100 text-green-700 border-green-200" :
+            prediction.grade === "A" ? "bg-blue-100 text-blue-700 border-blue-200" :
+            prediction.grade === "B" ? "bg-yellow-100 text-yellow-700 border-yellow-200" :
+            "bg-red-100 text-red-700 border-red-200";
+          const barColor =
+            prediction.grade === "S" ? "bg-green-500" :
+            prediction.grade === "A" ? "bg-blue-500" :
+            prediction.grade === "B" ? "bg-yellow-400" :
+            "bg-red-400";
+          return (
+            <div className="bg-white rounded-xl border border-gray-100 p-5">
+              <div className="flex items-center gap-4 mb-4">
+                <div className={`w-14 h-14 rounded-full border-2 flex items-center justify-center font-bold text-xl shrink-0 ${gradeColor}`}>
+                  {prediction.grade}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm font-medium text-gray-700">内定予測スコア</span>
+                    <span className="text-lg font-bold text-gray-900">{prediction.score}<span className="text-xs font-normal text-gray-400">/100</span></span>
+                  </div>
+                  <div className="w-full bg-gray-100 rounded-full h-2">
+                    <div
+                      className={`h-2 rounded-full transition-all duration-700 ${barColor}`}
+                      style={{ width: `${prediction.score}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 mb-4">{prediction.summary}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs font-semibold text-green-700 mb-2">強み</p>
+                  <ul className="space-y-1">
+                    {prediction.strengths.map((s, i) => (
+                      <li key={i} className="flex items-start gap-1.5 text-xs text-gray-700">
+                        <span className="text-green-500 shrink-0 mt-0.5">✓</span>
+                        {s}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-orange-600 mb-2">改善ポイント</p>
+                  <ul className="space-y-1">
+                    {prediction.improvements.map((imp, i) => (
+                      <li key={i} className="flex items-start gap-1.5 text-xs text-gray-700">
+                        <span className="text-orange-400 shrink-0 mt-0.5">▲</span>
+                        {imp}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
+        {!predLoading && !prediction && (
+          <div className="bg-white rounded-xl border border-gray-100 p-6 text-center text-gray-400">
+            <p className="text-sm mb-3">就活データが揃うと内定予測が実行されます</p>
+            <Button size="sm" onClick={fetchPrediction}>予測を実行する</Button>
+          </div>
+        )}
+      </div>
     </div>
   );
+}
+
+export default function RootPage() {
+  const [isAuth, setIsAuth] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    createClient().auth.getUser().then(({ data }) => setIsAuth(!!data.user));
+  }, []);
+
+  if (isAuth === null) return null;
+  if (!isAuth) return <LandingPage />;
+  return <DashboardContent />;
 }

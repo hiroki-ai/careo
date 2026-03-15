@@ -29,7 +29,10 @@ export async function middleware(request: NextRequest) {
     const isAuthRoute = authRoutes.includes(pathname);
     const isOnboarding = pathname === "/onboarding";
 
-    if (!user && !isAuthRoute) {
+    const publicRoutes = ["/"];
+    const isPublicRoute = publicRoutes.includes(pathname);
+
+    if (!user && !isAuthRoute && !isPublicRoute) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
@@ -37,6 +40,7 @@ export async function middleware(request: NextRequest) {
     if (user && loginOnlyRoutes.includes(pathname)) {
       return NextResponse.redirect(new URL("/", request.url));
     }
+
 
     if (user && !isOnboarding && !isAuthRoute) {
       const { data: profile } = await supabase
