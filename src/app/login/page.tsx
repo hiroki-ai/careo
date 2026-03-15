@@ -62,13 +62,13 @@ export default function LoginPage() {
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "ログイン中..." : "ログイン"}
           </Button>
-          <p className="text-center text-sm">
-            <Link href="/forgot-password" className="text-blue-500 hover:text-blue-700 hover:underline">
-              パスワードを忘れた方はこちら
-            </Link>
-          </p>
         </form>
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <p className="text-center text-sm mt-3">
+          <Link href="/forgot-password" className="text-blue-500 hover:text-blue-700 hover:underline">
+            パスワードを忘れた方はこちら
+          </Link>
+        </p>
+        <p className="text-center text-sm text-gray-500 mt-3">
           アカウントがない方は{" "}
           <Link href="/signup" className="text-blue-600 hover:underline">新規登録</Link>
         </p>
