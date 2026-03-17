@@ -2,16 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { Company, ES, Interview, UserProfile } from "@/types";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+import { getShukatsuContext } from "@/lib/shukatsuSchedule";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-
-const SHUKATSU_SCHEDULE_28 = `【28卒就活 月別スケジュール】
-3月: メール作成・証明写真・就活サービス登録・説明会・サマーインターン応募・Webテスト練習
-4〜5月: ES作成・業界説明会・SPI勉強・面接練習・ベンチャー選考で場数
-6〜8月: 夏インターンエントリー（60〜100社）・OB/OG訪問・SPI本番対策
-9〜12月: 早期選考（年内内定も）・冬インターン（本選考直結）・業界絞り込み
-1〜3月: 本選考エントリー・企業分析・SPI（ラストチャンス）
-4月: 内定獲得・就活終了（就活生の6割以上）`;
 
 export async function POST(req: NextRequest) {
   const { allowed, retryAfter } = checkRateLimit(getClientIp(req), "pdca");
@@ -82,7 +75,7 @@ ${checkSummary}
 ${chatSummary}
 
 現在: ${new Date().getFullYear()}年${new Date().getMonth() + 1}月
-${SHUKATSU_SCHEDULE_28}
+${(() => { const ctx = getShukatsuContext(profile?.graduationYear ?? 2028); return `対象: ${ctx.nendoLabel} / 現在フェーズ: ${ctx.phase}\n${ctx.phaseDetail}\n${ctx.schedule}\n\n今やるべきこと: ${ctx.currentAdvice}`; })()}
 
 【分析の重要ルール】
 - 自己分析（就活の軸・ガクチカ・自己PR・強み・弱み）が入力されている場合、それをCheckとActの評価に必ず反映すること
