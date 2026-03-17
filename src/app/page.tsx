@@ -15,6 +15,7 @@ import { StatusBadge, Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { MiniCalendar } from "@/components/dashboard/MiniCalendar";
 import { PdcaPanel } from "@/components/dashboard/PdcaPanel";
+import { RecommendedServices } from "@/components/dashboard/RecommendedServices";
 import { KareoWidget } from "@/components/dashboard/KareoWidget";
 import { createClient } from "@/lib/supabase/client";
 import { LandingPage } from "@/components/landing/LandingPage";
@@ -532,6 +533,8 @@ function DashboardContent() {
           </div>
         )}
       </div>
+
+      <RecommendedServices companies={companies} profile={profile} />
     </div>
   );
 }

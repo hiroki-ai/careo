@@ -117,7 +117,17 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
           })}
           <div className="ml-2">
             <button
-              onClick={() => updateCompany(id, { status: "REJECTED" })}
+              onClick={() => {
+                updateCompany(id, { status: "REJECTED" });
+                if (company.status !== "REJECTED") {
+                  showToast(
+                    "スカウト型サービスも活用してみよう。企業からオファーが届くOfferBoxがおすすめ。",
+                    "info",
+                    { label: "OfferBoxを見る", onClick: () => window.open("https://offerbox.jp", "_blank") },
+                    8000,
+                  );
+                }
+              }}
               className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors cursor-pointer ${
                 company.status === "REJECTED"
                   ? "bg-red-600 text-white"
