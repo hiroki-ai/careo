@@ -169,45 +169,53 @@ export function LandingPage() {
             他のサービスと<span className="text-[#00c896]">何が違うの？</span>
           </h2>
           <p className="text-gray-500 text-center text-sm mb-12">全部使うのがベスト。Careoは「管理とコーチング」に特化しています。</p>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+          <div className="overflow-x-auto -mx-2">
+            <table className="w-full text-sm min-w-[560px]">
               <thead>
                 <tr>
-                  <th className="text-left pb-4 text-gray-400 font-medium w-1/3"></th>
+                  <th className="text-left pb-4 text-gray-400 font-medium w-[30%]"></th>
                   <th className="pb-4 text-center">
                     <span className="bg-[#00c896] text-white text-xs font-bold px-3 py-1.5 rounded-lg">Careo</span>
                   </th>
                   <th className="pb-4 text-center text-gray-400 font-medium text-xs">リクナビ<br/>マイナビ</th>
+                  <th className="pb-4 text-center text-gray-400 font-medium text-xs">すごい<br/>就活</th>
                   <th className="pb-4 text-center text-gray-400 font-medium text-xs">Notion<br/>スプレッド</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {[
-                  { label: "求人情報を探す", careo: false, riku: true, notion: false },
-                  { label: "選考進捗を一元管理", careo: true, riku: false, notion: "△" },
-                  { label: "ES下書きをAIが生成", careo: true, riku: false, notion: false },
-                  { label: "面接ログ・通過率分析", careo: true, riku: false, notion: "△" },
-                  { label: "週次PDCAをAIが自動分析", careo: true, riku: false, notion: false },
-                  { label: "あなたの状況を知るAIコーチ", careo: true, riku: false, notion: false },
-                  { label: "締切アラート通知", careo: true, riku: "△", notion: false },
-                ].map((row) => (
-                  <tr key={row.label}>
-                    <td className="py-3.5 text-gray-700 font-medium">{row.label}</td>
-                    <td className="py-3.5 text-center">
-                      {row.careo === true ? <span className="text-[#00c896] font-bold text-base">✓</span> : row.careo === false ? <span className="text-gray-200 text-base">✕</span> : <span className="text-gray-400 text-xs">{row.careo}</span>}
-                    </td>
-                    <td className="py-3.5 text-center">
-                      {row.riku === true ? <span className="text-gray-400 text-base">✓</span> : row.riku === false ? <span className="text-gray-200 text-base">✕</span> : <span className="text-gray-400 text-xs">{row.riku}</span>}
-                    </td>
-                    <td className="py-3.5 text-center">
-                      {row.notion === true ? <span className="text-gray-400 text-base">✓</span> : row.notion === false ? <span className="text-gray-200 text-base">✕</span> : <span className="text-gray-400 text-xs">{row.notion}</span>}
-                    </td>
-                  </tr>
-                ))}
+                  { label: "求人情報を探す",              careo: false, riku: true,  sugoshu: true,  notion: false },
+                  { label: "選考進捗を一元管理",          careo: true,  riku: false, sugoshu: false, notion: "△"  },
+                  { label: "ES下書きをAIが生成",          careo: true,  riku: false, sugoshu: true,  notion: false },
+                  { label: "企業研究をAIが自動生成",      careo: true,  riku: false, sugoshu: true,  notion: false },
+                  { label: "面接ログ・通過率分析",        careo: true,  riku: false, sugoshu: false, notion: "△"  },
+                  { label: "週次PDCAをAIが自動分析",      careo: true,  riku: false, sugoshu: false, notion: false },
+                  { label: "あなたの状況を知るAIコーチ", careo: true,  riku: false, sugoshu: false, notion: false },
+                  { label: "締切アラート通知",            careo: true,  riku: "△",  sugoshu: false, notion: false },
+                  { label: "SPI模擬試験",                 careo: false, riku: false, sugoshu: true,  notion: false },
+                ].map((row) => {
+                  const cell = (v: boolean | string) =>
+                    v === true  ? <span className="text-[#00c896] font-bold text-base">✓</span>
+                    : v === false ? <span className="text-gray-200 text-base">—</span>
+                    : <span className="text-gray-400 text-xs font-medium">{v}</span>;
+                  const careoCell = (v: boolean | string) =>
+                    v === true  ? <span className="text-[#00c896] font-bold text-base">✓</span>
+                    : v === false ? <span className="text-gray-200 text-base">—</span>
+                    : <span className="text-[#00c896] text-xs font-medium">{v}</span>;
+                  return (
+                    <tr key={row.label}>
+                      <td className="py-3.5 text-gray-700 font-medium text-xs md:text-sm pr-2">{row.label}</td>
+                      <td className="py-3.5 text-center bg-[#00c896]/3">{careoCell(row.careo)}</td>
+                      <td className="py-3.5 text-center">{cell(row.riku)}</td>
+                      <td className="py-3.5 text-center">{cell(row.sugoshu)}</td>
+                      <td className="py-3.5 text-center">{cell(row.notion)}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
-          <p className="text-center text-xs text-gray-400 mt-6">※ リクナビ・マイナビとCareoは競合ではなく補完関係です。併用を推奨しています。</p>
+          <p className="text-center text-xs text-gray-400 mt-6">※ 各サービスは競合ではなく目的が異なります。組み合わせて使うのがベストです。</p>
         </div>
       </section>
 
