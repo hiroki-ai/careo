@@ -1,5 +1,7 @@
 export type CompanyStatus =
   | "WISHLIST"
+  | "INTERN_APPLYING"
+  | "INTERN"
   | "APPLIED"
   | "DOCUMENT"
   | "INTERVIEW_1"
@@ -56,6 +58,8 @@ export interface Interview {
 
 export const COMPANY_STATUS_LABELS: Record<CompanyStatus, string> = {
   WISHLIST: "気になる",
+  INTERN_APPLYING: "インターン選考中",
+  INTERN: "インターン中",
   APPLIED: "応募済み",
   DOCUMENT: "書類選考中",
   INTERVIEW_1: "1次面接",
@@ -67,6 +71,8 @@ export const COMPANY_STATUS_LABELS: Record<CompanyStatus, string> = {
 
 export const COMPANY_STATUS_ORDER: CompanyStatus[] = [
   "WISHLIST",
+  "INTERN_APPLYING",
+  "INTERN",
   "APPLIED",
   "DOCUMENT",
   "INTERVIEW_1",
@@ -190,6 +196,8 @@ export const APTITUDE_TEST_TYPES: AptitudeTest["testType"][] = [
 
 export const COMPANY_STATUS_COLORS: Record<CompanyStatus, string> = {
   WISHLIST: "bg-gray-100 text-gray-700",
+  INTERN_APPLYING: "bg-teal-100 text-teal-700",
+  INTERN: "bg-teal-200 text-teal-800",
   APPLIED: "bg-blue-100 text-blue-700",
   DOCUMENT: "bg-yellow-100 text-yellow-700",
   INTERVIEW_1: "bg-orange-100 text-orange-700",
