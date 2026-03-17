@@ -247,8 +247,8 @@ function DashboardContent() {
       {/* ステータスサマリー */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 mb-4 md:mb-5">
         {[
-          { label: "選考中", count: companies.filter(c => !["OFFERED","REJECTED","WISHLIST"].includes(c.status)).length, gradient: "from-blue-500 to-indigo-600", bg: "bg-gradient-to-br from-blue-50 to-indigo-50", border: "border-blue-100", text: "text-blue-600" },
-          { label: "内定", count: statusCounts["OFFERED"] ?? 0, gradient: "from-emerald-500 to-green-600", bg: "bg-gradient-to-br from-emerald-50 to-green-50", border: "border-emerald-100", text: "text-emerald-600" },
+          { label: "選考中", count: companies.filter(c => !["OFFERED","REJECTED","WISHLIST"].includes(c.status)).length, gradient: "from-teal-500 to-emerald-500", bg: "bg-gradient-to-br from-teal-50/60 to-emerald-50/40", border: "border-teal-100", text: "text-teal-600" },
+          { label: "内定", count: statusCounts["OFFERED"] ?? 0, gradient: "from-emerald-500 to-green-500", bg: "bg-gradient-to-br from-emerald-50 to-green-50", border: "border-emerald-100", text: "text-emerald-600" },
           { label: "ES提出待ち", count: esList.filter(e => e.status === "DRAFT").length, gradient: "from-amber-500 to-orange-500", bg: "bg-gradient-to-br from-amber-50 to-orange-50", border: "border-amber-100", text: "text-amber-600" },
           { label: "気になる", count: statusCounts["WISHLIST"] ?? 0, gradient: "from-gray-400 to-slate-500", bg: "bg-gradient-to-br from-gray-50 to-slate-50", border: "border-gray-200", text: "text-gray-600" },
         ].map((item) => (
