@@ -7,6 +7,18 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
     {
+      "@type": "Organization",
+      "name": "Careo",
+      "url": "https://careo-sigma.vercel.app",
+      "logo": { "@type": "ImageObject", "url": "https://careo-sigma.vercel.app/icon-new.svg" },
+    },
+    {
+      "@type": "WebSite",
+      "name": "Careo",
+      "url": "https://careo-sigma.vercel.app",
+      "publisher": { "@type": "Organization", "name": "Careo" },
+    },
+    {
       "@type": "WebApplication",
       "name": "Careo",
       "url": "https://careo-sigma.vercel.app",
@@ -16,6 +28,8 @@ const jsonLd = {
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" },
       "audience": { "@type": "Audience", "audienceType": "大学生・就活生（28卒）" },
       "featureList": ["ES管理", "面接ログ", "企業管理", "AIチャット", "PDCA自動分析", "内定予測"],
+      "publisher": { "@type": "Organization", "name": "Careo" },
+      "author": { "@type": "Organization", "name": "Careo" },
     },
     {
       "@type": "FAQPage",
