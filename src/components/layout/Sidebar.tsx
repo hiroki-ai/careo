@@ -124,11 +124,16 @@ export function Sidebar() {
   const pathname = usePathname();
   const [isAuth, setIsAuth] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(true);
 
   useEffect(() => {
     createClient().auth.getUser().then(({ data }) => setIsAuth(!!data.user));
     const saved = localStorage.getItem("sidebar-collapsed");
     if (saved === "true") setCollapsed(true);
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
   }, []);
 
   const toggle = () => {
@@ -138,11 +143,11 @@ export function Sidebar() {
     });
   };
 
-  if (!isAuth) return null;
+  if (!isAuth || isMobile) return null;
 
   return (
     <aside
-      className={`max-md:hidden flex flex-col h-full bg-[#1a2f4e] transition-all duration-200 ${
+      className={`flex flex-col h-full bg-[#1a2f4e] transition-all duration-200 ${
         collapsed ? "w-14" : "w-56"
       }`}
     >
