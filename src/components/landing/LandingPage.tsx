@@ -1,10 +1,89 @@
 "use client";
 
 import Link from "next/link";
+import Script from "next/script";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Careo",
+      "url": "https://careo-sigma.vercel.app",
+      "description": "ES締切・面接日程・企業研究・反省メモをAIが整理。就活のPDCAを自動で回す、28卒向け就活管理アプリ。",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web, iOS, Android",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" },
+      "audience": { "@type": "Audience", "audienceType": "大学生・就活生（28卒）" },
+      "featureList": ["ES管理", "面接ログ", "企業管理", "AIチャット", "PDCA自動分析", "内定予測"],
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Careoとは何ですか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "CareoはAIを使った就活管理アプリです。ES締切・面接日程・企業研究・反省メモを一か所で管理でき、AIが就活のPDCAを自動で分析します。28卒向けに開発されています。",
+          },
+        },
+        {
+          "@type": "Question",
+          "name": "リクナビ・マイナビとの違いは何ですか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "リクナビ・マイナビは求人情報を探すサービスです。Careoはすでに応募している企業の選考状況・ES・面接をAIで管理するツールです。両方を併用することを推奨しています。",
+          },
+        },
+        {
+          "@type": "Question",
+          "name": "無料で使えますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "はい、Careoは完全無料で使えます。メールアドレスで登録するだけで、全機能をすぐに利用できます。",
+          },
+        },
+        {
+          "@type": "Question",
+          "name": "スマホでも使えますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "はい、iPhoneでもAndroidでも使えます。ホーム画面に追加するとアプリのように使えます。",
+          },
+        },
+      ],
+    },
+  ],
+};
+
+const faqs = [
+  {
+    q: "リクナビ・マイナビとの違いは？",
+    a: "リクナビ・マイナビは求人情報を探すサービス。Careoは応募後の選考管理とAI分析に特化しています。両方を使うのがベストです。",
+  },
+  {
+    q: "無料で使えますか？",
+    a: "完全無料です。メールアドレスだけで登録でき、すべての機能をすぐに使えます。",
+  },
+  {
+    q: "スマホでも使えますか？",
+    a: "iPhone・Android両対応です。ホーム画面に追加するとアプリのように使えます。",
+  },
+  {
+    q: "AIは何をしてくれるの？",
+    a: "ES生成・企業研究・週次PDCA分析・内定予測・就活チャット相談など、就活のあらゆる場面でAIがサポートします。",
+  },
+];
 
 export function LandingPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
+      <Script
+        id="json-ld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
         <div className="flex items-center gap-2">
@@ -92,8 +171,23 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* FAQ */}
+      <section className="px-6 py-16 bg-white border-t border-gray-100">
+        <div className="max-w-2xl mx-auto">
+          <h2 className="text-2xl font-bold text-gray-900 text-center mb-10">よくある質問</h2>
+          <div className="space-y-4">
+            {faqs.map((faq) => (
+              <div key={faq.q} className="border border-gray-100 rounded-xl p-5">
+                <p className="font-semibold text-gray-900 text-sm mb-2">Q. {faq.q}</p>
+                <p className="text-gray-500 text-sm leading-relaxed">A. {faq.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
-      <section className="px-6 py-16 text-center bg-white border-t border-gray-100">
+      <section className="px-6 py-16 text-center bg-gray-50 border-t border-gray-100">
         <h2 className="text-2xl font-bold text-gray-900 mb-3">就活、AIと一緒に始めよう</h2>
         <p className="text-gray-500 text-sm mb-8">無料で使えます。登録はメールアドレスだけ。</p>
         <Link href="/signup" className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-10 py-3 rounded-xl transition-colors">
