@@ -9,6 +9,9 @@ export interface ShukatsuContext {
   phaseDetail: string;      // フェーズの詳細説明
   schedule: string;         // 月別スケジュール全体
   currentAdvice: string;    // 今この時期にやるべきこと
+  isInternPhase: boolean;   // true = インターン活動期（本選考前）
+  offeredLabel: string;     // "インターン合格" or "内定"
+  monthsUntil: number;      // 卒業まで何ヶ月
 }
 
 /**
@@ -77,5 +80,9 @@ export function getShukatsuContext(graduationYear: number, now = new Date()): Sh
 内定・終了（${graduationYear - 1}年4月〜）: 内定獲得・就活終了（就活生の6割以上がこの時期）
 重要: 早期選考ルートを狙う・就活の軸を一貫させる・面接は場数が全て・OB/OG訪問は最強の情報源`;
 
-  return { nendoLabel, phase, phaseDetail, schedule, currentAdvice };
+  // 卒業まで12ヶ月以上 = インターン活動期（本選考前）
+  const isInternPhase = monthsUntil > 12;
+  const offeredLabel = isInternPhase ? "インターン合格" : "内定";
+
+  return { nendoLabel, phase, phaseDetail, schedule, currentAdvice, isInternPhase, offeredLabel, monthsUntil };
 }

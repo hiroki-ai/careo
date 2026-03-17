@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
       content: `あなたは就活のパーソナルAIアドバイザーです。以下の情報をもとに今週やるべきことを具体的に提案してください。
 
 現在: ${new Date().getFullYear()}年${new Date().getMonth() + 1}月
-${(() => { const ctx = getShukatsuContext(profile?.graduationYear ?? 2028); return `対象: ${ctx.nendoLabel} / 現在フェーズ: ${ctx.phase}\n${ctx.schedule}\n\n【今この時期にやるべきこと】\n${ctx.currentAdvice}`; })()}
+${(() => { const ctx = getShukatsuContext(profile?.graduationYear ?? 2028); return `対象: ${ctx.nendoLabel} / 現在フェーズ: ${ctx.phase}\n${ctx.isInternPhase ? "【重要】このユーザーはインターン活動期。「OFFERED」=インターン合格（本選考内定ではない）。アドバイスはインターン獲得・長期インターンでの実績作りを中心にすること。" : "【重要】このユーザーは本選考期。「OFFERED」=正式な内定。"}\n${ctx.schedule}\n\n【今この時期にやるべきこと】\n${ctx.currentAdvice}`; })()}
 → 上記スケジュールと現在フェーズを踏まえ、「本来やるべきこと」と「ユーザーの実際の進捗」のギャップを分析してアドバイスすること。
 
 ${profileSummary}

@@ -137,7 +137,7 @@ export async function POST(req: NextRequest) {
 
 【就活スケジュール知識】
 現在: ${new Date().getFullYear()}年${new Date().getMonth() + 1}月
-${(() => { const grad = context?.profile?.graduationYear ?? 2028; const ctx = getShukatsuContext(grad); return `対象: ${ctx.nendoLabel} / 現在フェーズ: ${ctx.phase}\n${ctx.phaseDetail}\n${ctx.schedule}\n\n今やるべきこと: ${ctx.currentAdvice}`; })()}
+${(() => { const grad = context?.profile?.graduationYear ?? 2028; const ctx = getShukatsuContext(grad); return `対象: ${ctx.nendoLabel} / 現在フェーズ: ${ctx.phase}\n${ctx.isInternPhase ? "【重要】このユーザーはインターン活動期。「OFFERED」=インターン合格（本選考内定ではない）。インターン獲得・実績作りを軸に会話すること。" : "【重要】本選考期。「OFFERED」=正式内定。"}\n${ctx.phaseDetail}\n${ctx.schedule}\n\n今やるべきこと: ${ctx.currentAdvice}`; })()}
 → ユーザーの状況と現在のフェーズを照らし合わせ、スケジュールに遅れがあれば優しく教えること。
 
 ${contextSection ? `【ユーザーの現在の状況】\n${contextSection}\n\n上記の情報を把握した上で、ユーザーの状況に合わせた個別アドバイスをすること。` : ""}

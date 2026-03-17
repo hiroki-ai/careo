@@ -75,7 +75,7 @@ ${checkSummary}
 ${chatSummary}
 
 現在: ${new Date().getFullYear()}年${new Date().getMonth() + 1}月
-${(() => { const ctx = getShukatsuContext(profile?.graduationYear ?? 2028); return `対象: ${ctx.nendoLabel} / 現在フェーズ: ${ctx.phase}\n${ctx.phaseDetail}\n${ctx.schedule}\n\n今やるべきこと: ${ctx.currentAdvice}`; })()}
+${(() => { const ctx = getShukatsuContext(profile?.graduationYear ?? 2028); return `対象: ${ctx.nendoLabel} / 現在フェーズ: ${ctx.phase}\n${ctx.isInternPhase ? "【重要】インターン活動期のため「OFFERED」=インターン合格（本選考内定ではない）。PDCA評価はインターン獲得数・質を軸に行うこと。" : "【重要】本選考期のため「OFFERED」=正式内定。"}\n${ctx.phaseDetail}\n${ctx.schedule}\n\n今やるべきこと: ${ctx.currentAdvice}`; })()}
 
 【分析の重要ルール】
 - 自己分析（就活の軸・ガクチカ・自己PR・強み・弱み）が入力されている場合、それをCheckとActの評価に必ず反映すること
