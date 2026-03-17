@@ -130,8 +130,52 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* Before / After */}
+      <section className="px-6 py-20 bg-gray-50/60">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">Before / After</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 tracking-tight">
+            Careoを使うと、<span className="text-[#00c896]">何が変わる？</span>
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white border border-gray-200 rounded-2xl p-6">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-5">😮‍💨 使う前</p>
+              <ul className="space-y-4">
+                {[
+                  "スプレッドシートで企業を管理。どこに何を書いたか分からなくなる",
+                  "締切を見落として焦る。カレンダーとNotionを行き来",
+                  "面接が終わっても何が悪かったか分からないまま",
+                  "「今週何をすればいいか」が毎週ゼロから考え直し",
+                  "ES下書きを何度も書き直す。自己PRを毎回コピペ修正",
+                ].map((t) => (
+                  <li key={t} className="flex gap-3 text-sm text-gray-500">
+                    <span className="text-red-400 shrink-0 mt-0.5">✕</span>{t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="bg-gradient-to-br from-[#00c896]/5 to-emerald-50 border border-[#00c896]/20 rounded-2xl p-6">
+              <p className="text-xs font-bold text-[#00a87e] uppercase tracking-wider mb-5">✨ Careoを使った後</p>
+              <ul className="space-y-4">
+                {[
+                  "企業・ES・面接・締切がすべて一か所。いつでも全体像が見える",
+                  "締切3日前に自動通知。見落としゼロ",
+                  "面接後にメモを残せば、AIが通過率と改善点を分析",
+                  "毎週「今週やること」をAIが自動提案。迷わず動ける",
+                  "自己分析を一度入力すればAIが毎回ES文章を生成",
+                ].map((t) => (
+                  <li key={t} className="flex gap-3 text-sm text-[#0a1628]">
+                    <span className="text-[#00c896] shrink-0 mt-0.5 font-bold">✓</span>{t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features */}
-      <section className="px-6 py-24 bg-gray-50/60">
+      <section className="px-6 py-24 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3">Features</p>
@@ -153,6 +197,56 @@ export function LandingPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Comparison */}
+      <section className="px-6 py-24 bg-gray-50/60">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">Why Careo</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 tracking-tight">
+            他のサービスと<span className="text-[#00c896]">何が違うの？</span>
+          </h2>
+          <p className="text-gray-500 text-center text-sm mb-12">全部使うのがベスト。Careoは「管理とコーチング」に特化しています。</p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr>
+                  <th className="text-left pb-4 text-gray-400 font-medium w-1/3"></th>
+                  <th className="pb-4 text-center">
+                    <span className="bg-[#00c896] text-white text-xs font-bold px-3 py-1.5 rounded-lg">Careo</span>
+                  </th>
+                  <th className="pb-4 text-center text-gray-400 font-medium text-xs">リクナビ<br/>マイナビ</th>
+                  <th className="pb-4 text-center text-gray-400 font-medium text-xs">Notion<br/>スプレッド</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {[
+                  { label: "求人情報を探す", careo: false, riku: true, notion: false },
+                  { label: "選考進捗を一元管理", careo: true, riku: false, notion: "△" },
+                  { label: "ES下書きをAIが生成", careo: true, riku: false, notion: false },
+                  { label: "面接ログ・通過率分析", careo: true, riku: false, notion: "△" },
+                  { label: "週次PDCAをAIが自動分析", careo: true, riku: false, notion: false },
+                  { label: "あなたの状況を知るAIコーチ", careo: true, riku: false, notion: false },
+                  { label: "締切アラート通知", careo: true, riku: "△", notion: false },
+                ].map((row) => (
+                  <tr key={row.label}>
+                    <td className="py-3.5 text-gray-700 font-medium">{row.label}</td>
+                    <td className="py-3.5 text-center">
+                      {row.careo === true ? <span className="text-[#00c896] font-bold text-base">✓</span> : row.careo === false ? <span className="text-gray-200 text-base">✕</span> : <span className="text-gray-400 text-xs">{row.careo}</span>}
+                    </td>
+                    <td className="py-3.5 text-center">
+                      {row.riku === true ? <span className="text-gray-400 text-base">✓</span> : row.riku === false ? <span className="text-gray-200 text-base">✕</span> : <span className="text-gray-400 text-xs">{row.riku}</span>}
+                    </td>
+                    <td className="py-3.5 text-center">
+                      {row.notion === true ? <span className="text-gray-400 text-base">✓</span> : row.notion === false ? <span className="text-gray-200 text-base">✕</span> : <span className="text-gray-400 text-xs">{row.notion}</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-center text-xs text-gray-400 mt-6">※ リクナビ・マイナビとCareoは競合ではなく補完関係です。併用を推奨しています。</p>
         </div>
       </section>
 
@@ -180,6 +274,41 @@ export function LandingPage() {
                 <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Story */}
+      <section className="px-6 py-24">
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-gradient-to-br from-[#0a1628] to-[#1a2f4e] rounded-3xl p-8 md:p-12 text-white relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[#00c896]/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative z-10">
+              <p className="text-[#00c896] text-xs font-bold tracking-widest uppercase mb-6">Our Story</p>
+              <blockquote className="text-xl md:text-2xl font-bold leading-relaxed mb-8">
+                「自分が就活を始めて、<br className="hidden md:block" />
+                <span className="text-[#00c896]">欲しいツールがなかった。</span><br className="hidden md:block" />
+                だから作った。」
+              </blockquote>
+              <p className="text-white/70 text-sm leading-relaxed mb-6">
+                Careoは、就活を始めた大学生が「自分のために」作った就活管理アプリです。
+                スプレッドシートで管理するのが嫌で、NotionもAIもうまく使えなくて、
+                「全部まとめてAIが動かしてくれるツール」を自分で開発しました。
+              </p>
+              <p className="text-white/70 text-sm leading-relaxed">
+                就活の当事者が、就活の当事者のために作っている。
+                だから「本当に必要な機能」しか入れていません。
+              </p>
+              <div className="mt-8 pt-6 border-t border-white/10 flex items-center gap-3">
+                <div className="w-8 h-8 bg-[#00c896]/20 rounded-full flex items-center justify-center">
+                  <span className="text-[#00c896] text-sm font-bold">C</span>
+                </div>
+                <div>
+                  <p className="text-white text-sm font-semibold">Careo 開発者</p>
+                  <p className="text-white/40 text-xs">就活中の大学生・一人で開発</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
