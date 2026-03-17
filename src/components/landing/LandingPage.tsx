@@ -201,7 +201,7 @@ export function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section className="px-6 py-24 relative overflow-hidden">
+      <section className="px-6 py-16 md:py-24 relative">
         <div className="absolute inset-0 bg-gradient-to-br from-white via-teal-50/40 to-emerald-50/60 pointer-events-none" />
         <div className="relative max-w-2xl mx-auto text-center">
           <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">
