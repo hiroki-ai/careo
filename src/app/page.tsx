@@ -23,6 +23,50 @@ import { BoardMeetingCard } from "@/components/dashboard/BoardMeetingCard";
 import { daysUntil } from "@/lib/utils";
 import { COMPANY_STATUS_ORDER, JOB_SEARCH_STAGE_LABELS } from "@/types";
 
+// 毎日のコーチCTA（チャット未実施の日は強調表示）
+function DailyCoachBanner({ profile }: { profile: { careerAxis?: string; gakuchika?: string } | null }) {
+  const [chatted, setChatted] = useState(true); // サーバーSSRで不一致しないようデフォルトtrue
+  const [pdcaIssue, setPdcaIssue] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const last = localStorage.getItem("careo_last_chat_date");
+      setChatted(last === new Date().toDateString());
+      const raw = localStorage.getItem("careo_last_pdca");
+      if (raw) {
+        const pdca = JSON.parse(raw);
+        const issue = pdca?.check?.issues?.[0] ?? pdca?.act?.nextWeekFocus ?? null;
+        setPdcaIssue(issue);
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  const topic = pdcaIssue
+    ? `「${pdcaIssue}」について一緒に考えよう`
+    : !profile?.gakuchika
+    ? "ガクチカをカレオコーチと一緒に整理しよう"
+    : !profile?.careerAxis
+    ? "就活の軸をカレオコーチと一緒に言語化しよう"
+    : "今日の就活の進捗をカレオコーチに報告しよう";
+
+  if (chatted) return null; // 今日すでに話していれば非表示
+
+  return (
+    <Link href="/chat">
+      <div className="mb-4 bg-gradient-to-r from-indigo-600 to-blue-600 rounded-xl px-4 py-3 flex items-center gap-3 hover:opacity-95 transition-opacity cursor-pointer shadow-sm">
+        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+          <span className="text-white font-bold text-sm">K</span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-white font-semibold text-sm">今日のカレオコーチ</p>
+          <p className="text-indigo-200 text-xs truncate">{topic}</p>
+        </div>
+        <span className="text-white text-lg shrink-0">→</span>
+      </div>
+    </Link>
+  );
+}
+
 interface NextActionResult {
   summary: string;
   weeklyActions: { priority: "high" | "medium" | "low"; action: string; reason: string }[];
@@ -104,6 +148,9 @@ function DashboardContent() {
 
   // ESの設問データを除いた軽量版（AI分析には件数だけ必要）
   const esListSlim = esList.map(({ questions: _q, ...rest }) => rest);
+  // AI送信用の軽量版（不要フィールドを除外してペイロードを削減）
+  const companiesSlim = companies.map(({ name, status, industry, is_intern_offer }) => ({ name, status, industry, is_intern_offer }));
+  const interviewsSlim = interviews.map(({ questions: _q, ...rest }) => rest);
 
   // リトライ付きfetch（失敗時に1回自動リトライ）
   const fetchAI = async (url: string, body: unknown, retries = 1): Promise<Record<string, unknown> | null> => {
@@ -130,7 +177,7 @@ function DashboardContent() {
     try {
       const completedActions = completed ?? completedItems.map(i => i.action);
       const data = await fetchAI("/api/ai/next-action", {
-        companies, esList: esListSlim, interviews, profile, completedActions,
+        companies: companiesSlim, esList: esListSlim, interviews: interviewsSlim, profile, completedActions,
         recentChatMessages: recentUserMessages,
       }) as NextActionResult | null;
       if (!data) { showToast("AIアドバイスの取得に失敗しました", "error"); return; }
@@ -150,14 +197,17 @@ function DashboardContent() {
     setPdcaLoading(true);
     try {
       const data = await fetchAI("/api/ai/pdca", {
-        companies, esList: esListSlim, interviews, profile,
+        companies: companiesSlim, esList: esListSlim, interviews: interviewsSlim, profile,
         pendingActions: pendingItems.map(i => ({ action: i.action, priority: i.priority })),
         completedActions: completedItems.map(i => ({ action: i.action })),
         recentChatMessages: recentUserMessages,
       });
       if (!data) { showToast("PDCA分析に失敗しました。再試行してください", "error"); return; }
       if (!("error" in data)) {
-        setPdcaResult(data as unknown as PdcaResult);
+        const result = data as unknown as PdcaResult;
+        setPdcaResult(result);
+        // チャットでカレオがPDCAを参照できるようにlocalStorageに保存
+        try { localStorage.setItem("careo_last_pdca", JSON.stringify(result)); } catch { /* ignore */ }
       } else {
         const errMsg = (data as { error: string }).error;
         showToast(errMsg.includes("多すぎ") ? errMsg : "PDCA分析に失敗しました", "error");
@@ -171,7 +221,7 @@ function DashboardContent() {
     setPredLoading(true);
     try {
       const data = await fetchAI("/api/ai/offer-prediction", {
-        companies, esList: esListSlim, interviews, profile,
+        companies: companiesSlim, esList: esListSlim, interviews: interviewsSlim, profile,
       });
       if (!data) return;
       if (!("error" in data)) {
@@ -258,6 +308,9 @@ function DashboardContent() {
           </div>
         ))}
       </div>
+
+      {/* 今日のカレオコーチ CTA */}
+      <DailyCoachBanner profile={profile} />
 
       {/* メインコンテンツ: 3列 */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
@@ -392,21 +445,6 @@ function DashboardContent() {
         </div>
       )}
 
-      {/* モバイル: カレオCTA */}
-      <div className="md:hidden mb-4">
-        <Link href="/chat">
-          <div className="bg-gradient-to-r from-indigo-600 to-blue-600 rounded-xl p-4 flex items-center gap-3">
-            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
-              <span className="text-white font-bold">K</span>
-            </div>
-            <div className="flex-1">
-              <p className="text-white font-semibold text-sm">カレオに相談する</p>
-              <p className="text-indigo-200 text-xs">就活AIアシスタント · タップして開く</p>
-            </div>
-            <span className="text-white text-xl">→</span>
-          </div>
-        </Link>
-      </div>
 
       {/* PDCA 週次レポート */}
       <div>
@@ -434,7 +472,17 @@ function DashboardContent() {
           </div>
         )}
 
-        {!pdcaLoading && pdcaResult && <PdcaPanel result={pdcaResult} />}
+        {!pdcaLoading && pdcaResult && (
+          <>
+            <PdcaPanel result={pdcaResult} />
+            <div className="mt-3 flex justify-end">
+              <Link href="/chat" className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1.5 hover:underline">
+                <span className="w-5 h-5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-[9px] font-bold">K</span>
+                カレオに課題について相談する →
+              </Link>
+            </div>
+          </>
+        )}
 
         {!pdcaLoading && !pdcaResult && (
           <div className="bg-white rounded-2xl border border-gray-200/60 shadow-sm p-8 text-center text-gray-400">

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useCompanies } from "@/hooks/useCompanies";
 import { useEs } from "@/hooks/useEs";
 import { useInterviews } from "@/hooks/useInterviews";
+import { useChat } from "@/hooks/useChat";
 import { CompanyForm } from "@/components/companies/CompanyForm";
 import { CompanyResearch } from "@/components/companies/CompanyResearch";
 import { StatusBadge, Badge } from "@/components/ui/Badge";
@@ -21,8 +22,12 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
   const { companies, updateCompany, deleteCompany, addCompany } = useCompanies();
   const { esList } = useEs();
   const { interviews } = useInterviews();
+  const { recentUserMessages } = useChat();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
+  const [isOfferedTypeOpen, setIsOfferedTypeOpen] = useState(false);
+  const [aiDetecting, setAiDetecting] = useState(false);
+  const [aiDetected, setAiDetected] = useState<{ isInternOffer: boolean | null; reason: string } | null>(null);
   const { showToast } = useToast();
 
   const company = companies.find((c) => c.id === id);
@@ -95,10 +100,42 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
           {COMPANY_STATUS_ORDER.filter(s => s !== "REJECTED").map((s, i, arr) => {
             const isCurrent = s === company.status;
             const isPast = COMPANY_STATUS_ORDER.indexOf(s) < currentStatusIndex && company.status !== "REJECTED";
+            const displayLabel = s === "OFFERED" && company.status === "OFFERED"
+              ? (company.is_intern_offer ? "インターン合格" : "内定")
+              : COMPANY_STATUS_LABELS[s];
             return (
               <div key={s} className="flex items-center">
                 <button
-                  onClick={() => updateCompany(id, { status: s })}
+                  onClick={async () => {
+                    if (s === "OFFERED") {
+                      updateCompany(id, { status: "OFFERED" });
+                      setAiDetected(null);
+                      setIsOfferedTypeOpen(true);
+                      // AI判定を非同期で実行
+                      setAiDetecting(true);
+                      try {
+                        const res = await fetch("/api/ai/detect-offer-type", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            companyName: company!.name,
+                            companyNotes: company!.notes,
+                            esList: companyEs.map(e => ({ title: e.title, questions: e.questions })),
+                            interviewNotes: companyInterviews.map(i => i.notes ?? "").filter(Boolean),
+                            recentChatMessages: recentUserMessages,
+                          }),
+                        });
+                        const data = await res.json();
+                        setAiDetected(data);
+                      } catch {
+                        // 判定失敗は無視
+                      } finally {
+                        setAiDetecting(false);
+                      }
+                    } else {
+                      updateCompany(id, { status: s });
+                    }
+                  }}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors cursor-pointer ${
                     isCurrent
                       ? "bg-blue-600 text-white ring-2 ring-blue-300"
@@ -107,7 +144,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
                       : "bg-gray-100 text-gray-500 hover:bg-gray-200"
                   }`}
                 >
-                  {COMPANY_STATUS_LABELS[s]}
+                  {displayLabel}
                 </button>
                 {i < arr.length - 1 && (
                   <span className="text-gray-300 mx-1">›</span>
@@ -234,6 +271,68 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
           }}
           onCancel={() => setIsEditOpen(false)}
         />
+      </Modal>
+
+      {/* OFFERED種別選択モーダル */}
+      <Modal isOpen={isOfferedTypeOpen} onClose={() => setIsOfferedTypeOpen(false)} title="おめでとうございます！🎉" size="sm">
+        <p className="text-sm text-gray-600 mb-3">
+          「{company.name}」の結果を教えてください。
+        </p>
+
+        {/* AI判定結果 */}
+        <div className="mb-4 px-3 py-2 rounded-lg bg-blue-50 border border-blue-100 text-xs text-blue-700 min-h-[32px] flex items-center gap-2">
+          {aiDetecting ? (
+            <>
+              <svg className="animate-spin w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+              </svg>
+              AIがESや面接データから判定中...
+            </>
+          ) : aiDetected ? (
+            <>
+              <span className="shrink-0">AI判定:</span>
+              <span className="font-medium">
+                {aiDetected.isInternOffer === true ? "インターン合格っぽい" : aiDetected.isInternOffer === false ? "本選考の内定っぽい" : "判定できませんでした"}
+              </span>
+              {aiDetected.reason && <span className="text-blue-500">（{aiDetected.reason}）</span>}
+            </>
+          ) : (
+            <span className="text-blue-400">AIがデータを確認します...</span>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <button
+            onClick={() => { updateCompany(id, { is_intern_offer: true }); setIsOfferedTypeOpen(false); showToast("インターン合格として記録しました！", "success"); }}
+            className={`w-full px-4 py-3 rounded-xl border-2 font-medium transition-colors text-left ${
+              aiDetected?.isInternOffer === true
+                ? "border-teal-400 bg-teal-100 text-teal-900 ring-2 ring-teal-200"
+                : "border-teal-300 bg-teal-50 text-teal-800 hover:bg-teal-100"
+            }`}
+          >
+            <span className="block text-base flex items-center gap-2">
+              インターン合格
+              {aiDetected?.isInternOffer === true && <span className="text-xs font-normal bg-teal-200 text-teal-700 px-1.5 py-0.5 rounded">AI判定</span>}
+            </span>
+            <span className="block text-xs text-teal-600 mt-0.5">インターンシップの選考に合格した</span>
+          </button>
+          <button
+            onClick={() => { updateCompany(id, { is_intern_offer: false }); setIsOfferedTypeOpen(false); showToast("内定おめでとうございます！🎉", "success"); }}
+            className={`w-full px-4 py-3 rounded-xl border-2 font-medium transition-colors text-left ${
+              aiDetected?.isInternOffer === false
+                ? "border-green-400 bg-green-100 text-green-900 ring-2 ring-green-200"
+                : "border-green-300 bg-green-50 text-green-800 hover:bg-green-100"
+            }`}
+          >
+            <span className="block text-base flex items-center gap-2">
+              内定（本選考）
+              {aiDetected?.isInternOffer === false && <span className="text-xs font-normal bg-green-200 text-green-700 px-1.5 py-0.5 rounded">AI判定</span>}
+            </span>
+            <span className="block text-xs text-green-600 mt-0.5">本選考で内定をもらった</span>
+          </button>
+        </div>
+        <p className="text-xs text-gray-400 mt-4 text-center">あとから変更できます</p>
       </Modal>
 
       {/* 削除確認モーダル */}

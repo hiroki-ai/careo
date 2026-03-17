@@ -85,8 +85,8 @@ export function LandingPage() {
           </h1>
 
           <p className="text-gray-500 text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed animate-fade-up delay-200">
-            CareoのAIはあなたの選考状況をすべて知っている。<br />
-            だから「今週何をすべきか」が、いつでも明確になる。
+            AIコーチ「カレオ」があなたの選考状況・自己分析・面接メモを把握。<br />
+            毎日5分の対話で、迷わず動ける就活が実現する。
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up delay-300">
@@ -148,7 +148,7 @@ export function LandingPage() {
                   "企業・ES・面接・締切がすべて一か所。いつでも全体像が見える",
                   "締切3日前に自動通知。見落としゼロ",
                   "面接後にメモを残せば、AIが通過率と改善点を分析",
-                  "毎週「今週やること」をAIが自動提案。迷わず動ける",
+                  "毎日AIコーチと対話。PDCA・自己分析が自動で蓄積される",
                   "自己分析を一度入力すればAIが毎回ES文章を生成",
                 ].map((t) => (
                   <li key={t} className="flex gap-3 text-sm text-[#0a1628]">
@@ -190,7 +190,7 @@ export function LandingPage() {
                   { label: "企業研究をAIが自動生成",      careo: true,  riku: false, sugoshu: true,  notion: false },
                   { label: "面接ログ・通過率分析",        careo: true,  riku: false, sugoshu: false, notion: "△"  },
                   { label: "週次PDCAをAIが自動分析",      careo: true,  riku: false, sugoshu: false, notion: false },
-                  { label: "あなたの状況を知るAIコーチ", careo: true,  riku: false, sugoshu: false, notion: false },
+                  { label: "毎日対話するAIコーチ",        careo: true,  riku: false, sugoshu: false, notion: false },
                   { label: "締切アラート通知",            careo: true,  riku: "△",  sugoshu: false, notion: false },
                   { label: "SPI模擬試験",                 careo: false, riku: false, sugoshu: true,  notion: false },
                   { label: "📵 広告・スカウト電話なし",   careo: true,  riku: false, sugoshu: false, notion: true  },

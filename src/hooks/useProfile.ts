@@ -65,5 +65,32 @@ export function useProfile() {
     if (saved) setProfile(rowToProfile(saved as Record<string, unknown>));
   }, []);
 
-  return { profile, loading, saveProfile, refetch: fetch };
+  // 自己分析フィールドだけ部分更新（他のプロフィール情報を上書きしない）
+  const patchSelfAnalysis = useCallback(async (
+    fields: Partial<Pick<UserProfile, "careerAxis" | "gakuchika" | "selfPr" | "strengths" | "weaknesses">>
+  ): Promise<boolean> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return false;
+    const fieldMap: Record<string, string> = {
+      careerAxis: "career_axis",
+      gakuchika: "gakuchika",
+      selfPr: "self_pr",
+      strengths: "strengths",
+      weaknesses: "weaknesses",
+    };
+    const row: Record<string, string> = {};
+    for (const [key, value] of Object.entries(fields)) {
+      if (value !== undefined) row[fieldMap[key]] = value as string;
+    }
+    const { data: saved } = await supabase
+      .from("user_profiles")
+      .update(row)
+      .eq("id", user.id)
+      .select()
+      .single();
+    if (saved) setProfile(rowToProfile(saved as Record<string, unknown>));
+    return !!saved;
+  }, []);
+
+  return { profile, loading, saveProfile, patchSelfAnalysis, refetch: fetch };
 }

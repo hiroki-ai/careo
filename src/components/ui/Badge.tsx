@@ -2,15 +2,16 @@ import { CompanyStatus, COMPANY_STATUS_COLORS, COMPANY_STATUS_LABELS } from "@/t
 
 interface StatusBadgeProps {
   status: CompanyStatus;
+  label?: string;
   className?: string;
 }
 
-export function StatusBadge({ status, className = "" }: StatusBadgeProps) {
+export function StatusBadge({ status, label, className = "" }: StatusBadgeProps) {
   return (
     <span
       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${COMPANY_STATUS_COLORS[status]} ${className}`}
     >
-      {COMPANY_STATUS_LABELS[status]}
+      {label ?? COMPANY_STATUS_LABELS[status]}
     </span>
   );
 }

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
+
+export const maxDuration = 60;
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { Company, ES, Interview, UserProfile } from "@/types";
 import { getShukatsuContext } from "@/lib/shukatsuSchedule";
@@ -76,8 +78,15 @@ export async function POST(req: NextRequest) {
     ? `\nユーザーの最近の相談・悩み（チャット履歴より）:\n${recentChatMessages.map(m => `- 「${m.slice(0, 80)}」`).join("\n")}\n→ これらの悩みや関心事を踏まえてアドバイスすること。`
     : "";
 
+  const offeredCos = companies.filter(c => c.status === "OFFERED");
+  const internOfferCount = offeredCos.filter(c => (c as { is_intern_offer?: boolean | null }).is_intern_offer === true).length;
+  const jobOfferCount = offeredCos.filter(c => (c as { is_intern_offer?: boolean | null }).is_intern_offer !== true).length;
+  const offeredDetail = offeredCos.length > 0
+    ? `（インターン合格: ${internOfferCount}社、内定（本選考）: ${jobOfferCount}社）`
+    : "";
+
   const activitySummary = `就活実績:
-- 企業数: ${companies.length}社（内定: ${companies.filter(c => c.status === "OFFERED").length}社、選考中: ${companies.filter(c => !["OFFERED","REJECTED","WISHLIST"].includes(c.status)).length}社）
+- 企業数: ${companies.length}社（合格/内定: ${offeredCos.length}社${offeredDetail}、選考中: ${companies.filter(c => !["OFFERED","REJECTED","WISHLIST"].includes(c.status)).length}社）
 - ES: ${esList.length}件（下書き: ${esList.filter(e => e.status === "DRAFT").length}件）
 - 面接: ${interviews.length}件
 - 直近締切: ${esList.filter(e => e.deadline && e.status === "DRAFT").map(e => e.title).slice(0, 3).join("、") || "なし"}`;
@@ -90,7 +99,8 @@ export async function POST(req: NextRequest) {
       content: `あなたは就活のパーソナルAIアドバイザーです。以下の情報をもとに今週やるべきことを具体的に提案してください。
 
 現在: ${new Date().getFullYear()}年${new Date().getMonth() + 1}月
-${(() => { const ctx = getShukatsuContext(profile?.graduationYear ?? 2028); return `対象: ${ctx.nendoLabel} / 現在フェーズ: ${ctx.phase}\n${ctx.isInternPhase ? "【重要】このユーザーはインターン活動期。「OFFERED」=インターン合格（本選考内定ではない）。アドバイスはインターン獲得・長期インターンでの実績作りを中心にすること。" : "【重要】このユーザーは本選考期。「OFFERED」=正式な内定。"}\n${ctx.schedule}\n\n【今この時期にやるべきこと】\n${ctx.currentAdvice}`; })()}
+${(() => { const ctx = getShukatsuContext(profile?.graduationYear ?? 2028); return `対象: ${ctx.nendoLabel} / 現在フェーズ: ${ctx.phase}\n${ctx.schedule}\n\n【今この時期にやるべきこと】\n${ctx.currentAdvice}`; })()}
+【重要】OFFERED企業はユーザーが「インターン合格」か「内定（本選考）」かを個別に設定済みです。就活実績の内訳（インターン合格N社、内定N社）を踏まえてアドバイスすること。
 → 上記スケジュールと現在フェーズを踏まえ、「本来やるべきこと」と「ユーザーの実際の進捗」のギャップを分析してアドバイスすること。
 
 ${profileSummary}

@@ -67,8 +67,26 @@ export function useActionItems() {
     ));
   }, []);
 
+  // 既存アイテムを保持したまま新しいアクションを追加（チャット連携用）
+  const addItems = useCallback(async (
+    newItems: { action: string; reason: string; priority: "high" | "medium" | "low" }[]
+  ) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user || newItems.length === 0) return;
+    // 未完了の既存アクションと重複しないものだけ追加
+    const existingActions = items.filter(i => !i.isCompleted).map(i => i.action);
+    const toAdd = newItems.filter(item =>
+      !existingActions.some(a => a.includes(item.action.slice(0, 10)))
+    );
+    if (toAdd.length === 0) return;
+    await supabase.from("action_items").insert(
+      toAdd.map(item => ({ ...item, user_id: user.id, is_completed: false }))
+    );
+    await fetch();
+  }, [items, fetch]);
+
   const completedItems = items.filter((i) => i.isCompleted);
   const pendingItems = items.filter((i) => !i.isCompleted);
 
-  return { items, pendingItems, completedItems, loading, replaceItems, toggleItem };
+  return { items, pendingItems, completedItems, loading, replaceItems, addItems, toggleItem };
 }

@@ -92,7 +92,7 @@ export function KareoWidget() {
       strengths: profile.strengths,
       weaknesses: profile.weaknesses,
     } : undefined,
-    companies: companies.map(c => ({ name: c.name, status: c.status, industry: c.industry })),
+    companies: companies.map(c => ({ name: c.name, status: c.status, industry: c.industry, is_intern_offer: c.is_intern_offer })),
     esList: esList.map(e => ({
       title: e.title,
       status: e.status,

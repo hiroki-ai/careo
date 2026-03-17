@@ -28,6 +28,7 @@ export interface Company {
   status: CompanyStatus;
   notes?: string;
   ai_research?: string | null;
+  is_intern_offer?: boolean | null;
   createdAt: string;
   updatedAt: string;
 }

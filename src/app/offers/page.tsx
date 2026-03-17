@@ -103,7 +103,9 @@ export default function OffersPage() {
             {offeredCompanies.map((company) => (
               <div key={company.id} className="bg-white rounded-xl border border-green-100 p-5 shadow-sm">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-700">内定</span>
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${company.is_intern_offer ? "bg-teal-100 text-teal-700" : "bg-green-100 text-green-700"}`}>
+                    {company.is_intern_offer ? "インターン合格" : "内定"}
+                  </span>
                   <h3 className="font-semibold text-gray-900">{company.name}</h3>
                 </div>
                 {company.industry && (

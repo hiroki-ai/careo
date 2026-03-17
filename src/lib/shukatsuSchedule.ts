@@ -10,7 +10,6 @@ export interface ShukatsuContext {
   schedule: string;         // 月別スケジュール全体
   currentAdvice: string;    // 今この時期にやるべきこと
   isInternPhase: boolean;   // true = インターン活動期（本選考前）
-  offeredLabel: string;     // "インターン合格" or "内定"
   monthsUntil: number;      // 卒業まで何ヶ月
 }
 
@@ -82,7 +81,6 @@ export function getShukatsuContext(graduationYear: number, now = new Date()): Sh
 
   // 卒業まで12ヶ月以上 = インターン活動期（本選考前）
   const isInternPhase = monthsUntil > 12;
-  const offeredLabel = isInternPhase ? "インターン合格" : "内定";
 
-  return { nendoLabel, phase, phaseDetail, schedule, currentAdvice, isInternPhase, offeredLabel, monthsUntil };
+  return { nendoLabel, phase, phaseDetail, schedule, currentAdvice, isInternPhase, monthsUntil };
 }

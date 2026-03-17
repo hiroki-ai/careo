@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+
+export const maxDuration = 60;
 import { Company, ES, Interview, UserProfile } from "@/types";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { getShukatsuContext } from "@/lib/shukatsuSchedule";
@@ -41,9 +43,16 @@ export async function POST(req: NextRequest) {
         }).join("\n")
       : "";
 
+    const offeredCompanies = companies.filter(c => c.status === "OFFERED");
+    const internOffers = offeredCompanies.filter(c => (c as { is_intern_offer?: boolean | null }).is_intern_offer === true);
+    const jobOffers = offeredCompanies.filter(c => (c as { is_intern_offer?: boolean | null }).is_intern_offer !== true);
+    const offeredDetail = offeredCompanies.length > 0
+      ? `（インターン合格: ${internOffers.length}社、内定（本選考）: ${jobOffers.length}社）`
+      : "";
+
     const doSummary = `
 【Do（実績）】
-- 登録企業数: ${companies.length}社（WISHLIST除く選考中: ${companies.filter(c => !["OFFERED","REJECTED","WISHLIST"].includes(c.status)).length}社、内定: ${companies.filter(c => c.status === "OFFERED").length}社、不採用: ${companies.filter(c => c.status === "REJECTED").length}社）
+- 登録企業数: ${companies.length}社（WISHLIST除く選考中: ${companies.filter(c => !["OFFERED","REJECTED","WISHLIST"].includes(c.status)).length}社、合格/内定: ${offeredCompanies.length}社${offeredDetail}、不採用: ${companies.filter(c => c.status === "REJECTED").length}社）
 - ES: ${esList.length}件（提出済み: ${esList.filter(e => e.status === "SUBMITTED").length}件、下書き: ${esList.filter(e => e.status === "DRAFT").length}件）
 - 面接: ${interviews.length}件（通過: ${interviews.filter(i => i.result === "PASS").length}件、不通過: ${interviews.filter(i => i.result === "FAIL").length}件、結果待ち: ${interviews.filter(i => i.result === "PENDING").length}件）`;
 
@@ -61,7 +70,7 @@ export async function POST(req: NextRequest) {
 
     const message = await anthropic.messages.create({
       model: "claude-haiku-4-5-20251001",
-      max_tokens: 1500,
+      max_tokens: 900,
       messages: [{
         role: "user",
         content: `あなたは就活コーチAIです。以下の就活データをもとにPDCAサイクルを分析してください。
@@ -75,7 +84,8 @@ ${checkSummary}
 ${chatSummary}
 
 現在: ${new Date().getFullYear()}年${new Date().getMonth() + 1}月
-${(() => { const ctx = getShukatsuContext(profile?.graduationYear ?? 2028); return `対象: ${ctx.nendoLabel} / 現在フェーズ: ${ctx.phase}\n${ctx.isInternPhase ? "【重要】インターン活動期のため「OFFERED」=インターン合格（本選考内定ではない）。PDCA評価はインターン獲得数・質を軸に行うこと。" : "【重要】本選考期のため「OFFERED」=正式内定。"}\n${ctx.phaseDetail}\n${ctx.schedule}\n\n今やるべきこと: ${ctx.currentAdvice}`; })()}
+${(() => { const ctx = getShukatsuContext(profile?.graduationYear ?? 2028); return `対象: ${ctx.nendoLabel} / 現在フェーズ: ${ctx.phase}\n${ctx.phaseDetail}\n${ctx.schedule}\n\n今やるべきこと: ${ctx.currentAdvice}`; })()}
+【重要】OFFERED企業はユーザーが「インターン合格」か「内定（本選考）」かを個別に設定済みです。Do実績の「合格/内定」の内訳（インターン合格N社、内定N社）を必ず区別して評価すること。
 
 【分析の重要ルール】
 - 自己分析（就活の軸・ガクチカ・自己PR・強み・弱み）が入力されている場合、それをCheckとActの評価に必ず反映すること

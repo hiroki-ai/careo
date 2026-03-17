@@ -114,3 +114,8 @@ BEGIN
   RETURN result;
 END;
 $$;
+
+
+-- 2026-03-18: companies テーブルに is_intern_offer カラムを追加
+-- OFFERED ステータスのときにユーザーが「インターン合格」か「内定（本選考）」かを選択できるようにする
+ALTER TABLE companies ADD COLUMN IF NOT EXISTS is_intern_offer BOOLEAN DEFAULT NULL;

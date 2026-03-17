@@ -139,7 +139,11 @@ export default function CompaniesPage() {
               <div className="bg-white rounded-xl border border-gray-100 p-5 hover:shadow-md transition-shadow cursor-pointer">
                 <div className="flex items-start justify-between mb-2">
                   <h3 className="font-semibold text-gray-900 leading-tight">{company.name}</h3>
-                  <StatusBadge status={company.status} className="ml-2 shrink-0" />
+                  <StatusBadge
+                    status={company.status}
+                    label={company.status === "OFFERED" ? (company.is_intern_offer ? "インターン合格" : "内定") : undefined}
+                    className="ml-2 shrink-0"
+                  />
                 </div>
                 {company.industry && (
                   <p className="text-sm text-gray-500 mb-2">{company.industry}</p>

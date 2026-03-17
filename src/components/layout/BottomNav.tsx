@@ -5,6 +5,13 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
+function hasChatToday(): boolean {
+  try {
+    const last = localStorage.getItem("careo_last_chat_date");
+    return last === new Date().toDateString();
+  } catch { return false; }
+}
+
 const mainItems = [
   {
     href: "/",
@@ -26,7 +33,7 @@ const mainItems = [
   },
   {
     href: "/chat",
-    label: "カレオ",
+    label: "コーチ",
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -45,11 +52,11 @@ const mainItems = [
 ];
 
 const moreItems = [
-  { href: "/career", label: "自己分析" },
   { href: "/interviews", label: "面接ログ" },
-  { href: "/deadlines", label: "締切一覧" },
   { href: "/ob-visits", label: "OB/OG訪問" },
   { href: "/tests", label: "筆記試験" },
+  { href: "/career", label: "自己分析" },
+  { href: "/deadlines", label: "締切一覧" },
   { href: "/offers", label: "内定比較" },
   { href: "/insights", label: "みんなの就活" },
   { href: "/services", label: "おすすめサービス" },
@@ -60,6 +67,12 @@ export function BottomNav() {
   const pathname = usePathname();
   const [isAuth, setIsAuth] = useState(false);
   const [showMore, setShowMore] = useState(false);
+  const [chatBadge, setChatBadge] = useState(false);
+
+  useEffect(() => {
+    // チャット未実施の日はバッジを表示
+    setChatBadge(!hasChatToday());
+  }, [pathname]);
 
   useEffect(() => {
     createClient().auth.getUser().then(({ data }) => setIsAuth(!!data.user));
@@ -109,15 +122,21 @@ export function BottomNav() {
         <div className="flex items-center justify-around h-16 px-2">
           {mainItems.map((item) => {
             const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+            const showBadge = item.href === "/chat" && chatBadge && !isActive;
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-2 rounded-lg transition-colors ${
+                className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-2 rounded-lg transition-colors relative ${
                   isActive ? "text-blue-600" : "text-gray-400"
                 }`}
               >
-                {item.icon}
+                <span className="relative">
+                  {item.icon}
+                  {showBadge && (
+                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full" />
+                  )}
+                </span>
                 <span className="text-[10px] font-medium">{item.label}</span>
               </Link>
             );
