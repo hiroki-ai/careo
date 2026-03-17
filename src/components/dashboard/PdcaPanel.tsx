@@ -1,178 +1,175 @@
 "use client";
 
 interface PdcaResult {
-  plan: {
-    weeklyGoal: string;
-    taskCompletion: string;
-  };
-  do: {
-    highlights: string[];
-    totalActivity: string;
-  };
-  check: {
-    score: number;
-    goodPoints: string[];
-    issues: string[];
-    insight: string;
-  };
-  act: {
-    improvements: string[];
-    nextWeekFocus: string;
-    encouragement: string;
-  };
+  plan: { weeklyGoal: string; taskCompletion: string };
+  do: { highlights: string[]; totalActivity: string };
+  check: { score: number; goodPoints: string[]; issues: string[]; insight: string };
+  act: { improvements: string[]; nextWeekFocus: string; encouragement: string };
 }
 
 interface PdcaPanelProps {
   result: PdcaResult;
 }
 
-function ScoreRing({ score }: { score: number }) {
-  const color =
-    score >= 80 ? "text-green-600" :
-    score >= 60 ? "text-blue-600" :
-    score >= 40 ? "text-yellow-600" : "text-red-500";
-  const bg =
-    score >= 80 ? "bg-green-50 border-green-200" :
-    score >= 60 ? "bg-blue-50 border-blue-200" :
-    score >= 40 ? "bg-yellow-50 border-yellow-200" : "bg-red-50 border-red-200";
+function ScoreBar({ score }: { score: number }) {
+  const gradient =
+    score >= 80 ? "from-emerald-400 to-green-500" :
+    score >= 60 ? "from-blue-400 to-indigo-500" :
+    score >= 40 ? "from-amber-400 to-orange-500" : "from-red-400 to-rose-500";
+  const label =
+    score >= 80 ? "非常に良い" : score >= 60 ? "良好" : score >= 40 ? "平均的" : "要改善";
 
   return (
-    <div className={`flex flex-col items-center justify-center w-20 h-20 rounded-full border-4 ${bg} shrink-0`}>
-      <span className={`text-2xl font-bold ${color}`}>{score}</span>
-      <span className="text-[9px] text-gray-400 font-medium">/ 100</span>
-    </div>
-  );
-}
-
-function Section({
-  letter, label, color, children
-}: {
-  letter: string; label: string; color: string; children: React.ReactNode;
-}) {
-  return (
-    <div className="flex-1 min-w-0">
-      <div className="flex items-center gap-2 mb-2">
-        <span className={`text-xs font-bold px-2 py-0.5 rounded ${color} shrink-0`}>{letter}</span>
-        <span className="text-xs font-semibold text-gray-600">{label}</span>
+    <div className="flex items-center gap-4">
+      <div className="flex-1">
+        <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+          <div
+            className={`h-full rounded-full bg-gradient-to-r ${gradient} transition-all duration-1000`}
+            style={{ width: `${score}%` }}
+          />
+        </div>
       </div>
-      {children}
+      <div className="flex items-baseline gap-1 shrink-0">
+        <span className={`text-2xl font-bold bg-gradient-to-r ${gradient} bg-clip-text text-transparent`}>{score}</span>
+        <span className="text-xs text-gray-400">/100</span>
+        <span className={`text-xs font-medium ml-1 bg-gradient-to-r ${gradient} bg-clip-text text-transparent`}>{label}</span>
+      </div>
     </div>
   );
 }
+
+const pdcaCards = [
+  {
+    key: "plan" as const,
+    letter: "P",
+    label: "Plan",
+    gradient: "from-blue-500/10 to-cyan-500/10",
+    border: "border-blue-200/60",
+    badge: "bg-blue-600 text-white",
+    accent: "text-blue-600",
+  },
+  {
+    key: "do" as const,
+    letter: "D",
+    label: "Do",
+    gradient: "from-emerald-500/10 to-green-500/10",
+    border: "border-emerald-200/60",
+    badge: "bg-emerald-600 text-white",
+    accent: "text-emerald-600",
+  },
+  {
+    key: "check" as const,
+    letter: "C",
+    label: "Check",
+    gradient: "from-amber-500/10 to-orange-500/10",
+    border: "border-amber-200/60",
+    badge: "bg-amber-500 text-white",
+    accent: "text-amber-600",
+  },
+  {
+    key: "act" as const,
+    letter: "A",
+    label: "Act",
+    gradient: "from-purple-500/10 to-violet-500/10",
+    border: "border-purple-200/60",
+    badge: "bg-purple-600 text-white",
+    accent: "text-purple-600",
+  },
+];
 
 export function PdcaPanel({ result }: PdcaPanelProps) {
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-5">
+    <div className="bg-white rounded-2xl border border-gray-200/60 shadow-sm overflow-hidden">
       {/* ヘッダー */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="flex gap-1">
-            {["P","D","C","A"].map((l, i) => (
-              <span key={l} className={`text-xs font-bold w-6 h-6 flex items-center justify-center rounded ${
-                i === 0 ? "bg-blue-600 text-white" :
-                i === 1 ? "bg-green-600 text-white" :
-                i === 2 ? "bg-amber-500 text-white" :
-                "bg-purple-600 text-white"
-              }`}>{l}</span>
-            ))}
+      <div className="bg-gradient-to-r from-[#0f1c2e] to-[#1a2f4e] px-5 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex gap-1">
+              {["P","D","C","A"].map((l, i) => (
+                <span key={l} className={`text-[10px] font-bold w-6 h-6 flex items-center justify-center rounded-lg ${
+                  i === 0 ? "bg-blue-500/30 text-blue-300 border border-blue-500/30" :
+                  i === 1 ? "bg-emerald-500/30 text-emerald-300 border border-emerald-500/30" :
+                  i === 2 ? "bg-amber-500/30 text-amber-300 border border-amber-500/30" :
+                  "bg-purple-500/30 text-purple-300 border border-purple-500/30"
+                }`}>{l}</span>
+              ))}
+            </div>
+            <h2 className="font-semibold text-white text-sm">週次レポート</h2>
           </div>
-          <h2 className="font-semibold text-gray-900 text-sm">PDCA 週次レポート</h2>
+          <span className="text-xs text-white/40">AIが自動分析</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-400">進捗スコア</span>
-          <span className={`text-sm font-bold ${
-            result.check.score >= 80 ? "text-green-600" :
-            result.check.score >= 60 ? "text-blue-600" :
-            result.check.score >= 40 ? "text-yellow-600" : "text-red-500"
-          }`}>{result.check.score}/100</span>
-        </div>
-      </div>
-
-      {/* スコアバー */}
-      <div className="mb-4">
-        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-all duration-700 ${
-              result.check.score >= 80 ? "bg-green-500" :
-              result.check.score >= 60 ? "bg-blue-500" :
-              result.check.score >= 40 ? "bg-yellow-500" : "bg-red-400"
-            }`}
-            style={{ width: `${result.check.score}%` }}
-          />
+        <div className="mt-3">
+          <ScoreBar score={result.check.score} />
         </div>
       </div>
 
       {/* PDCA 4象限 */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-        {/* P */}
-        <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
-          <div className="flex items-center gap-1.5 mb-2">
-            <span className="text-[10px] font-bold bg-blue-600 text-white px-1.5 py-0.5 rounded">Plan</span>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-gray-100">
+        {pdcaCards.map((card) => (
+          <div key={card.key} className={`bg-gradient-to-br ${card.gradient} p-4`}>
+            <div className="flex items-center gap-1.5 mb-3">
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${card.badge}`}>{card.label}</span>
+            </div>
+            {card.key === "plan" && (
+              <>
+                <p className="text-xs text-gray-700 font-medium mb-1.5 leading-relaxed">{result.plan.weeklyGoal}</p>
+                <p className={`text-xs font-bold ${card.accent}`}>{result.plan.taskCompletion}</p>
+              </>
+            )}
+            {card.key === "do" && (
+              <>
+                <p className="text-xs text-gray-600 mb-1.5 leading-relaxed">{result.do.totalActivity}</p>
+                <ul className="space-y-1">
+                  {result.do.highlights.slice(0, 2).map((h, i) => (
+                    <li key={i} className="text-[11px] text-gray-600 flex gap-1">
+                      <span className={`${card.accent} shrink-0`}>›</span>{h}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+            {card.key === "check" && (
+              <>
+                <p className="text-xs text-gray-600 mb-1.5 leading-relaxed">{result.check.insight}</p>
+                {result.check.issues.slice(0, 1).map((issue, i) => (
+                  <p key={i} className="text-[11px] text-amber-700 flex gap-1">
+                    <span className="shrink-0">⚠</span>{issue}
+                  </p>
+                ))}
+              </>
+            )}
+            {card.key === "act" && (
+              <>
+                <p className={`text-xs font-bold ${card.accent} mb-1.5`}>来週の重点：</p>
+                <p className="text-xs text-gray-700 font-medium leading-relaxed">{result.act.nextWeekFocus}</p>
+                <ul className="mt-1.5 space-y-0.5">
+                  {result.act.improvements.slice(0, 1).map((imp, i) => (
+                    <li key={i} className="text-[11px] text-gray-600 flex gap-1">
+                      <span className={`${card.accent} shrink-0`}>›</span>{imp}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
           </div>
-          <p className="text-xs text-gray-700 font-medium mb-1">{result.plan.weeklyGoal}</p>
-          <p className="text-[11px] text-blue-600 font-semibold">{result.plan.taskCompletion}</p>
-        </div>
-
-        {/* D */}
-        <div className="bg-green-50 rounded-lg p-3 border border-green-100">
-          <div className="flex items-center gap-1.5 mb-2">
-            <span className="text-[10px] font-bold bg-green-600 text-white px-1.5 py-0.5 rounded">Do</span>
-          </div>
-          <p className="text-xs text-gray-600 mb-1">{result.do.totalActivity}</p>
-          <ul className="space-y-0.5">
-            {result.do.highlights.slice(0, 2).map((h, i) => (
-              <li key={i} className="text-[11px] text-gray-600 flex gap-1">
-                <span className="text-green-400 shrink-0">›</span>{h}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* C */}
-        <div className="bg-amber-50 rounded-lg p-3 border border-amber-100">
-          <div className="flex items-center gap-1.5 mb-2">
-            <span className="text-[10px] font-bold bg-amber-500 text-white px-1.5 py-0.5 rounded">Check</span>
-          </div>
-          <p className="text-xs text-gray-600 mb-1.5">{result.check.insight}</p>
-          {result.check.issues.slice(0, 1).map((issue, i) => (
-            <p key={i} className="text-[11px] text-amber-700 flex gap-1">
-              <span>⚠</span>{issue}
-            </p>
-          ))}
-        </div>
-
-        {/* A */}
-        <div className="bg-purple-50 rounded-lg p-3 border border-purple-100">
-          <div className="flex items-center gap-1.5 mb-2">
-            <span className="text-[10px] font-bold bg-purple-600 text-white px-1.5 py-0.5 rounded">Act</span>
-          </div>
-          <p className="text-xs font-semibold text-purple-800 mb-1.5">来週の重点：</p>
-          <p className="text-xs text-purple-700 font-medium">{result.act.nextWeekFocus}</p>
-          <ul className="mt-1.5 space-y-0.5">
-            {result.act.improvements.slice(0, 1).map((imp, i) => (
-              <li key={i} className="text-[11px] text-gray-600 flex gap-1">
-                <span className="text-purple-400 shrink-0">›</span>{imp}
-              </li>
-            ))}
-          </ul>
-        </div>
+        ))}
       </div>
 
-      {/* 良い点 / 課題 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+      {/* 良い点 / 改善アクション */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-5 py-4 border-t border-gray-100">
         <div>
-          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1.5">うまくいっている点</p>
-          <ul className="space-y-1">
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">✓ うまくいっている点</p>
+          <ul className="space-y-1.5">
             {result.check.goodPoints.map((p, i) => (
               <li key={i} className="text-xs text-gray-700 flex gap-1.5">
-                <span className="text-green-500 shrink-0">✓</span>{p}
+                <span className="text-emerald-500 shrink-0">✓</span>{p}
               </li>
             ))}
           </ul>
         </div>
         <div>
-          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1.5">改善アクション</p>
-          <ul className="space-y-1">
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">→ 改善アクション</p>
+          <ul className="space-y-1.5">
             {result.act.improvements.map((imp, i) => (
               <li key={i} className="text-xs text-gray-700 flex gap-1.5">
                 <span className="text-purple-400 shrink-0">→</span>{imp}
@@ -183,7 +180,7 @@ export function PdcaPanel({ result }: PdcaPanelProps) {
       </div>
 
       {/* AIからの一言 */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg px-4 py-2.5 border border-blue-100">
+      <div className="mx-5 mb-5 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl px-4 py-3 border border-blue-100/60">
         <p className="text-xs text-gray-600 italic">💬 {result.act.encouragement}</p>
       </div>
     </div>

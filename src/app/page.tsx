@@ -222,7 +222,7 @@ function DashboardContent() {
   const hasItems = pendingItems.length > 0 || completedItems.length > 0;
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="p-4 md:p-6 min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
       {/* 幹部会議通知 */}
       <BoardMeetingCard />
 
@@ -247,14 +247,14 @@ function DashboardContent() {
       {/* ステータスサマリー */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 mb-4 md:mb-5">
         {[
-          { label: "選考中", count: companies.filter(c => !["OFFERED","REJECTED","WISHLIST"].includes(c.status)).length, color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-100" },
-          { label: "内定", count: statusCounts["OFFERED"] ?? 0, color: "text-green-600", bg: "bg-green-50", border: "border-green-100" },
-          { label: "ES提出待ち", count: esList.filter(e => e.status === "DRAFT").length, color: "text-amber-600", bg: "bg-amber-50", border: "border-amber-100" },
-          { label: "気になる", count: statusCounts["WISHLIST"] ?? 0, color: "text-gray-600", bg: "bg-gray-50", border: "border-gray-100" },
+          { label: "選考中", count: companies.filter(c => !["OFFERED","REJECTED","WISHLIST"].includes(c.status)).length, gradient: "from-blue-500 to-indigo-600", bg: "bg-gradient-to-br from-blue-50 to-indigo-50", border: "border-blue-100", text: "text-blue-600" },
+          { label: "内定", count: statusCounts["OFFERED"] ?? 0, gradient: "from-emerald-500 to-green-600", bg: "bg-gradient-to-br from-emerald-50 to-green-50", border: "border-emerald-100", text: "text-emerald-600" },
+          { label: "ES提出待ち", count: esList.filter(e => e.status === "DRAFT").length, gradient: "from-amber-500 to-orange-500", bg: "bg-gradient-to-br from-amber-50 to-orange-50", border: "border-amber-100", text: "text-amber-600" },
+          { label: "気になる", count: statusCounts["WISHLIST"] ?? 0, gradient: "from-gray-400 to-slate-500", bg: "bg-gradient-to-br from-gray-50 to-slate-50", border: "border-gray-200", text: "text-gray-600" },
         ].map((item) => (
-          <div key={item.label} className={`${item.bg} border ${item.border} rounded-xl p-4`}>
+          <div key={item.label} className={`${item.bg} border ${item.border} rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow`}>
             <p className="text-xs font-medium text-gray-500 mb-1">{item.label}</p>
-            <p className={`text-3xl font-bold ${item.color}`}>{item.count}</p>
+            <p className={`text-3xl font-bold bg-gradient-to-r ${item.gradient} bg-clip-text text-transparent`}>{item.count}</p>
           </div>
         ))}
       </div>
@@ -265,7 +265,7 @@ function DashboardContent() {
         {/* 左: Next Action チェックリスト */}
         <div className="md:col-span-4">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-semibold text-gray-900 text-sm">🎯 Next Action</h2>
+            <h2 className="font-semibold text-gray-900 text-sm flex items-center gap-1.5">🎯 <span>Next Action</span></h2>
             <Button variant="ghost" size="sm" onClick={() => fetchAiAdvice()} disabled={aiLoading}>
               {aiLoading ? "分析中..." : "再分析"}
             </Button>
@@ -421,11 +421,14 @@ function DashboardContent() {
         </div>
 
         {pdcaLoading && (
-          <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
-            <div className="h-2 bg-gray-100 rounded-full animate-pulse w-full" />
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="bg-white rounded-2xl border border-gray-200/60 shadow-sm overflow-hidden">
+            <div className="bg-gradient-to-r from-[#0f1c2e] to-[#1a2f4e] p-5 space-y-3">
+              <div className="h-3 bg-white/10 rounded-full animate-pulse w-1/3" />
+              <div className="h-2.5 bg-white/10 rounded-full animate-pulse w-full" />
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-gray-100">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-28 bg-gray-100 rounded-lg animate-pulse" />
+                <div key={i} className="h-28 bg-gray-50 animate-pulse" />
               ))}
             </div>
           </div>
@@ -434,7 +437,7 @@ function DashboardContent() {
         {!pdcaLoading && pdcaResult && <PdcaPanel result={pdcaResult} />}
 
         {!pdcaLoading && !pdcaResult && (
-          <div className="bg-white rounded-xl border border-gray-100 p-6 text-center text-gray-400">
+          <div className="bg-white rounded-2xl border border-gray-200/60 shadow-sm p-8 text-center text-gray-400">
             <p className="text-sm mb-3">就活データが揃うとPDCA分析が実行されます</p>
             <Button size="sm" onClick={fetchPdca}>PDCAを分析する</Button>
           </div>
