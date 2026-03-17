@@ -23,163 +23,227 @@ const jsonLd = {
         {
           "@type": "Question",
           "name": "Careoとは何ですか？",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "CareoはAIを使った就活管理アプリです。ES締切・面接日程・企業研究・反省メモを一か所で管理でき、AIが就活のPDCAを自動で分析します。28卒向けに開発されています。",
-          },
+          "acceptedAnswer": { "@type": "Answer", "text": "CareoはAIを使った就活管理アプリです。ES締切・面接日程・企業研究・反省メモを一か所で管理でき、AIが就活のPDCAを自動で分析します。28卒向けに開発されています。" },
         },
         {
           "@type": "Question",
           "name": "リクナビ・マイナビとの違いは何ですか？",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "リクナビ・マイナビは求人情報を探すサービスです。Careoはすでに応募している企業の選考状況・ES・面接をAIで管理するツールです。両方を併用することを推奨しています。",
-          },
+          "acceptedAnswer": { "@type": "Answer", "text": "リクナビ・マイナビは求人情報を探すサービスです。Careoはすでに応募している企業の選考状況・ES・面接をAIで管理するツールです。両方を併用することを推奨しています。" },
         },
         {
           "@type": "Question",
           "name": "無料で使えますか？",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "はい、Careoは完全無料で使えます。メールアドレスで登録するだけで、全機能をすぐに利用できます。",
-          },
+          "acceptedAnswer": { "@type": "Answer", "text": "はい、Careoは完全無料で使えます。メールアドレスで登録するだけで、全機能をすぐに利用できます。" },
         },
         {
           "@type": "Question",
           "name": "スマホでも使えますか？",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "はい、iPhoneでもAndroidでも使えます。ホーム画面に追加するとアプリのように使えます。",
-          },
+          "acceptedAnswer": { "@type": "Answer", "text": "はい、iPhoneでもAndroidでも使えます。ホーム画面に追加するとアプリのように使えます。" },
         },
       ],
     },
   ],
 };
 
+const features = [
+  {
+    icon: "📋",
+    title: "全部まとまる管理機能",
+    desc: "ES締切・面接日程・企業研究・反省メモを一か所に。スプレッドシートもNotionも要らない。",
+    gradient: "from-blue-500/20 to-cyan-500/20",
+    border: "border-blue-500/30",
+  },
+  {
+    icon: "🤖",
+    title: "AIが就活のPDCAを回す",
+    desc: "選考状況をもとにAIが毎週自動で振り返り。「今週何をすべきか」を迷わず動ける。",
+    gradient: "from-purple-500/20 to-pink-500/20",
+    border: "border-purple-500/30",
+  },
+  {
+    icon: "🎯",
+    title: "内定予測AI",
+    desc: "選考データをもとにAIが内定確率を予測。弱点を可視化して改善アクションを提案。",
+    gradient: "from-amber-500/20 to-orange-500/20",
+    border: "border-amber-500/30",
+  },
+  {
+    icon: "💬",
+    title: "就活AIアシスタント",
+    desc: "選考状況を把握したAIが相談相手に。ES添削・面接対策・業界分析をチャットで。",
+    gradient: "from-green-500/20 to-emerald-500/20",
+    border: "border-green-500/30",
+  },
+  {
+    icon: "📊",
+    title: "企業管理・研究",
+    desc: "志望企業を一覧管理。AIが企業研究を自動生成。選考ステータスをリアルタイムで追跡。",
+    gradient: "from-indigo-500/20 to-blue-500/20",
+    border: "border-indigo-500/30",
+  },
+  {
+    icon: "🚀",
+    title: "28卒が使いながら作ってる",
+    desc: "同じ就活生の視点で毎日アップデート。マイナビにはない、現場目線の機能が揃ってる。",
+    gradient: "from-rose-500/20 to-pink-500/20",
+    border: "border-rose-500/30",
+  },
+];
+
 const faqs = [
-  {
-    q: "リクナビ・マイナビとの違いは？",
-    a: "リクナビ・マイナビは求人情報を探すサービス。Careoは応募後の選考管理とAI分析に特化しています。両方を使うのがベストです。",
-  },
-  {
-    q: "無料で使えますか？",
-    a: "完全無料です。メールアドレスだけで登録でき、すべての機能をすぐに使えます。",
-  },
-  {
-    q: "スマホでも使えますか？",
-    a: "iPhone・Android両対応です。ホーム画面に追加するとアプリのように使えます。",
-  },
-  {
-    q: "AIは何をしてくれるの？",
-    a: "ES生成・企業研究・週次PDCA分析・内定予測・就活チャット相談など、就活のあらゆる場面でAIがサポートします。",
-  },
+  { q: "リクナビ・マイナビとの違いは？", a: "リクナビ・マイナビは求人情報を探すサービス。Careoは応募後の選考管理とAI分析に特化しています。両方を使うのがベストです。" },
+  { q: "無料で使えますか？", a: "完全無料です。メールアドレスだけで登録でき、すべての機能をすぐに使えます。" },
+  { q: "スマホでも使えますか？", a: "iPhone・Android両対応です。ホーム画面に追加するとアプリのように使えます。" },
+  { q: "AIは何をしてくれるの？", a: "ES生成・企業研究・週次PDCA分析・内定予測・就活チャット相談など、就活のあらゆる場面でAIがサポートします。" },
+];
+
+const stats = [
+  { value: "6+", label: "AI機能" },
+  { value: "無料", label: "完全無料" },
+  { value: "28卒", label: "向け特化" },
 ];
 
 export function LandingPage() {
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      <Script
-        id="json-ld"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+    <div className="min-h-screen bg-[#080c14] flex flex-col text-white overflow-x-hidden">
+      <Script id="json-ld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-        <div className="flex items-center gap-2">
-          <img src="/icon-new.svg" alt="Careo" className="w-7 h-7 rounded-lg" />
-          <span className="font-bold text-lg text-gray-900">Careo</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <Link href="/login" className="text-sm text-gray-600 hover:text-gray-900 font-medium">
-            ログイン
-          </Link>
-          <Link href="/signup" className="text-sm bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors">
-            無料で始める
-          </Link>
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#080c14]/80 backdrop-blur-xl border-b border-white/5">
+        <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
+          <div className="flex items-center gap-2.5">
+            <img src="/icon-new.svg" alt="Careo" className="w-8 h-8 rounded-xl" />
+            <span className="font-bold text-lg tracking-tight">Careo</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <Link href="/login" className="text-sm text-white/60 hover:text-white font-medium transition-colors">
+              ログイン
+            </Link>
+            <Link href="/signup" className="text-sm bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-5 py-2 rounded-xl font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/25">
+              無料で始める
+            </Link>
+          </div>
         </div>
       </header>
 
       {/* Hero */}
-      <section className="flex-1 flex flex-col items-center justify-center text-center px-6 py-20 bg-gradient-to-b from-[#1a2f4e] to-[#1e3a5f]">
-        <span className="inline-block bg-blue-400/20 text-blue-200 text-xs font-semibold px-3 py-1 rounded-full mb-6 border border-blue-400/30">
-          28卒が使いながら開発中 🚀
-        </span>
-        <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4">
-          28卒の就活は、<br />AIと始める。
-        </h1>
-        <p className="text-blue-200 text-lg md:text-xl mb-8 max-w-lg leading-relaxed">
-          就活の管理、もうNotionでやらなくていい。<br />
-          締切・面接・反省・企業研究——AIが整理して、<br className="hidden md:block" />
-          次の一手まで教えてくれる。
-        </p>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Link href="/signup" className="bg-blue-500 hover:bg-blue-400 text-white font-semibold px-8 py-3 rounded-xl transition-colors text-base">
-            無料で始める
-          </Link>
-          <Link href="/login" className="bg-white/10 hover:bg-white/20 text-white font-semibold px-8 py-3 rounded-xl transition-colors text-base border border-white/20">
-            ログインする
-          </Link>
+      <section className="relative flex flex-col items-center justify-center text-center px-6 pt-40 pb-32 overflow-hidden">
+        {/* Background blobs */}
+        <div className="absolute top-20 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-blob pointer-events-none" />
+        <div className="absolute bottom-10 right-1/4 w-80 h-80 bg-indigo-600/15 rounded-full blur-3xl animate-blob delay-2000 pointer-events-none" />
+        <div className="absolute top-40 right-1/3 w-64 h-64 bg-purple-600/10 rounded-full blur-3xl animate-blob delay-1000 pointer-events-none" />
+
+        {/* Grid pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:64px_64px] pointer-events-none" />
+
+        <div className="relative z-10 max-w-4xl mx-auto">
+          <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-semibold px-4 py-2 rounded-full mb-8 animate-fade-up">
+            <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse" />
+            28卒が使いながら開発中
+          </div>
+
+          <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6 animate-fade-up delay-100">
+            就活を、<br />
+            <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent animate-gradient">
+              AIで制する。
+            </span>
+          </h1>
+
+          <p className="text-white/50 text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed animate-fade-up delay-200">
+            ES・面接・企業管理・PDCA分析——<br className="hidden md:block" />
+            すべてをひとつのAIアプリで。<br />
+            Notionもスプレッドシートも、もう要らない。
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up delay-300">
+            <Link href="/signup" className="group relative inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold px-10 py-4 rounded-2xl text-base hover:opacity-90 transition-all shadow-2xl shadow-blue-500/30 animate-pulse-glow">
+              無料で始める
+              <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+            <Link href="/login" className="inline-flex items-center justify-center text-white/60 hover:text-white font-semibold px-10 py-4 rounded-2xl text-base border border-white/10 hover:border-white/20 transition-all bg-white/5 hover:bg-white/10">
+              ログインする
+            </Link>
+          </div>
+
+          {/* Stats */}
+          <div className="flex items-center justify-center gap-8 mt-16 animate-fade-up delay-400">
+            {stats.map((s) => (
+              <div key={s.label} className="text-center">
+                <p className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">{s.value}</p>
+                <p className="text-white/40 text-xs mt-0.5">{s.label}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Features */}
-      <section className="px-6 py-20 bg-gray-50">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 text-center mb-3">
-            就活管理のすべてが、ここに
+      <section className="px-6 py-24 relative">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-blue-400 text-sm font-semibold tracking-widest uppercase mb-3">Features</p>
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">
+              就活管理の<span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">すべてが</span>、ここに
+            </h2>
+            <p className="text-white/40 text-base max-w-xl mx-auto">マイナビ・リクナビは情報提供ツール。CareoはAIが動かしてくれる就活コックピット。</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {features.map((f) => (
+              <div
+                key={f.title}
+                className={`group relative bg-gradient-to-br ${f.gradient} border ${f.border} rounded-2xl p-6 hover:scale-[1.02] transition-all duration-300 cursor-default backdrop-blur-sm`}
+              >
+                <div className="absolute inset-0 rounded-2xl bg-white/[0.02] group-hover:bg-white/[0.04] transition-colors" />
+                <div className="relative">
+                  <span className="text-3xl mb-4 block">{f.icon}</span>
+                  <h3 className="font-bold text-white text-base mb-2">{f.title}</h3>
+                  <p className="text-white/50 text-sm leading-relaxed">{f.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="px-6 py-24 border-t border-white/5">
+        <div className="max-w-4xl mx-auto text-center">
+          <p className="text-blue-400 text-sm font-semibold tracking-widest uppercase mb-3">How it works</p>
+          <h2 className="text-3xl md:text-5xl font-bold mb-16">
+            3ステップで<span className="bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">始められる</span>
           </h2>
-          <p className="text-gray-500 text-center mb-12 text-sm">マイナビ・リクナビは情報提供ツール。CareoはAIが動かしてくれる就活コックピット。</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Feature 1 */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-              <div className="w-11 h-11 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { step: "01", title: "無料登録", desc: "メールアドレスだけで即日開始。クレジットカード不要。" },
+              { step: "02", title: "企業・ESを登録", desc: "応募企業とESを追加するだけ。AIが自動で整理してくれる。" },
+              { step: "03", title: "AIに任せる", desc: "週次PDCAをAIが自動分析。次の一手まで教えてくれる。" },
+            ].map((item) => (
+              <div key={item.step} className="relative">
+                <div className="text-6xl font-bold text-white/5 mb-4">{item.step}</div>
+                <div className="absolute top-3 left-0 right-0 flex justify-center">
+                  <span className="text-blue-400 text-sm font-bold">{item.step}</span>
+                </div>
+                <h3 className="font-bold text-white text-lg mb-2">{item.title}</h3>
+                <p className="text-white/40 text-sm leading-relaxed">{item.desc}</p>
               </div>
-              <h3 className="font-bold text-gray-900 text-base mb-2">全部まとまる管理機能</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">
-                ES締切・面接日程・企業研究・反省メモを一か所に。スプレッドシートもNotionも要らない。
-              </p>
-            </div>
-            {/* Feature 2 */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-              <div className="w-11 h-11 bg-green-100 rounded-xl flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
-              <h3 className="font-bold text-gray-900 text-base mb-2">AIが就活のPDCAを回す</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">
-                選考状況をもとにAIが毎週自動で振り返り。「今週何をすべきか」を迷わず動ける。
-              </p>
-            </div>
-            {/* Feature 3 */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-              <div className="w-11 h-11 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h3 className="font-bold text-gray-900 text-base mb-2">28卒が使いながら作ってる</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">
-                同じ就活生の視点で毎日アップデート。マイナビにはない、現場目線の機能が揃ってる。
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="px-6 py-16 bg-white border-t border-gray-100">
+      <section className="px-6 py-24 border-t border-white/5">
         <div className="max-w-2xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 text-center mb-10">よくある質問</h2>
+          <p className="text-blue-400 text-sm font-semibold tracking-widest uppercase mb-3 text-center">FAQ</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">よくある質問</h2>
           <div className="space-y-4">
             {faqs.map((faq) => (
-              <div key={faq.q} className="border border-gray-100 rounded-xl p-5">
-                <p className="font-semibold text-gray-900 text-sm mb-2">Q. {faq.q}</p>
-                <p className="text-gray-500 text-sm leading-relaxed">A. {faq.a}</p>
+              <div key={faq.q} className="border border-white/10 rounded-2xl p-6 bg-white/[0.03] hover:bg-white/[0.05] transition-colors">
+                <p className="font-semibold text-white text-sm mb-2">Q. {faq.q}</p>
+                <p className="text-white/50 text-sm leading-relaxed">A. {faq.a}</p>
               </div>
             ))}
           </div>
@@ -187,30 +251,38 @@ export function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section className="px-6 py-16 text-center bg-gray-50 border-t border-gray-100">
-        <h2 className="text-2xl font-bold text-gray-900 mb-3">就活、AIと一緒に始めよう</h2>
-        <p className="text-gray-500 text-sm mb-8">無料で使えます。登録はメールアドレスだけ。</p>
-        <Link href="/signup" className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-10 py-3 rounded-xl transition-colors">
-          無料で始める
-        </Link>
+      <section className="px-6 py-24 border-t border-white/5 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-indigo-600/10 to-purple-600/10 pointer-events-none" />
+        <div className="relative max-w-2xl mx-auto text-center">
+          <h2 className="text-3xl md:text-5xl font-bold mb-4">
+            就活、<span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">AIと一緒に</span>始めよう
+          </h2>
+          <p className="text-white/40 text-base mb-10">無料で使えます。登録はメールアドレスだけ。</p>
+          <Link href="/signup" className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold px-12 py-4 rounded-2xl text-base hover:opacity-90 transition-all shadow-2xl shadow-blue-500/30">
+            無料で始める
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </Link>
+        </div>
       </section>
 
       {/* Support */}
-      <section className="px-6 py-10 text-center bg-amber-50 border-t border-amber-100">
-        <p className="text-sm text-amber-800 font-medium mb-1">☕ 開発を応援する</p>
-        <p className="text-xs text-amber-600 mb-4">28卒の学生が一人で作っています。コーヒー1杯分の支援が開発の励みになります。</p>
+      <section className="px-6 py-10 border-t border-white/5 text-center">
+        <p className="text-sm text-white/40 font-medium mb-1">☕ 開発を応援する</p>
+        <p className="text-xs text-white/30 mb-4">28卒の学生が一人で作っています。コーヒー1杯分の支援が開発の励みになります。</p>
         <a
           href="https://buymeacoffee.com/careo"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-amber-900 font-bold px-6 py-2.5 rounded-xl transition-colors text-sm"
+          className="inline-flex items-center gap-2 bg-amber-400/10 border border-amber-400/20 hover:bg-amber-400/20 text-amber-300 font-bold px-6 py-2.5 rounded-xl transition-colors text-sm"
         >
           ☕ Buy me a coffee
         </a>
       </section>
 
       {/* Footer */}
-      <footer className="px-6 py-6 text-center text-xs text-gray-400 border-t border-gray-100">
+      <footer className="px-6 py-6 text-center text-xs text-white/20 border-t border-white/5">
         © 2025 Careo — 就活管理AIアプリ
       </footer>
     </div>
