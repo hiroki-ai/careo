@@ -110,6 +110,29 @@ export default function ObVisitsPage() {
         </div>
       )}
 
+      {/* 関連書籍リンク */}
+      <div className="mt-8 border-t border-gray-100 pt-6">
+        <p className="text-xs text-gray-400 font-medium mb-3">📚 OB/OG訪問・業界研究に役立つ本（Amazon）</p>
+        <div className="flex flex-wrap gap-2">
+          {[
+            { label: "OB訪問・就活準備", url: "https://www.amazon.co.jp/s?k=OB訪問+就活+準備&tag=careo-22" },
+            { label: "業界研究2026", url: "https://www.amazon.co.jp/s?k=業界研究+就活+2026&tag=careo-22" },
+            { label: "自己分析・ES", url: "https://www.amazon.co.jp/s?k=就活+自己分析+ES+書き方&tag=careo-22" },
+            { label: "面接対策", url: "https://www.amazon.co.jp/s?k=就活+面接+対策+2026&tag=careo-22" },
+          ].map(({ label, url }) => (
+            <a
+              key={label}
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-800 border border-gray-200 hover:border-gray-400 px-3 py-1.5 rounded-full transition-colors"
+            >
+              {label} →
+            </a>
+          ))}
+        </div>
+      </div>
+
       {/* 追加モーダル */}
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="OB/OG訪問を記録">
         <div className="space-y-4">
