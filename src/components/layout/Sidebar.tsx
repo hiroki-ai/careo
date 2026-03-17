@@ -142,7 +142,7 @@ export function Sidebar() {
 
   return (
     <aside
-      className={`hidden md:flex flex-col h-full bg-[#1a2f4e] transition-all duration-200 ${
+      className={`max-md:hidden flex flex-col h-full bg-[#1a2f4e] transition-all duration-200 ${
         collapsed ? "w-14" : "w-56"
       }`}
     >
