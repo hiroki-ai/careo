@@ -193,6 +193,7 @@ export function LandingPage() {
                   { label: "あなたの状況を知るAIコーチ", careo: true,  riku: false, sugoshu: false, notion: false },
                   { label: "締切アラート通知",            careo: true,  riku: "△",  sugoshu: false, notion: false },
                   { label: "SPI模擬試験",                 careo: false, riku: false, sugoshu: true,  notion: false },
+                  { label: "📵 広告・スカウト電話なし",   careo: true,  riku: false, sugoshu: false, notion: true  },
                 ].map((row) => {
                   const cell = (v: boolean | string) =>
                     v === true  ? <span className="text-[#00c896] font-bold text-base">✓</span>
@@ -227,6 +228,7 @@ export function LandingPage() {
             就活、<span className="text-[#00c896]">AIと一緒に</span>始めよう
           </h2>
           <p className="text-gray-500 text-base mb-10">無料で使えます。登録はメールアドレスだけ。</p>
+          <p className="text-xs text-gray-400 mb-6">📵 広告メール・スカウト電話は一切ありません</p>
           <Link href="/signup" className="inline-flex items-center gap-2 bg-[#00c896] hover:bg-[#00b586] text-white font-bold px-12 py-4 rounded-2xl text-base transition-colors shadow-xl shadow-[#00c896]/30">
             無料で始める
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
