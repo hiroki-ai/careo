@@ -60,10 +60,11 @@ export default function InsightsPage() {
       setInsightsLoading(true);
       try {
         const { data, error } = await supabase.rpc("get_careo_aggregate_insights");
-        if (error || !data) {
+        const parsed = Array.isArray(data) ? data[0] : data;
+        if (error || !parsed) {
           setInsightsError(true);
         } else {
-          setInsights(data as AggregateInsights);
+          setInsights(parsed as AggregateInsights);
         }
       } catch {
         setInsightsError(true);
