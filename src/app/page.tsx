@@ -113,7 +113,13 @@ function DashboardContent() {
       });
       const text = await res.text();
       if (!text) throw new Error("Empty response");
-      const data: NextActionResult = JSON.parse(text);
+      let data: NextActionResult;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        showToast("AIアドバイスの取得に失敗しました", "error");
+        return;
+      }
       if (!("error" in data)) {
         setAiSummary(data.summary ?? "");
         await replaceItems(data.weeklyActions);
@@ -140,9 +146,14 @@ function DashboardContent() {
       });
       const text = await res.text();
       if (!text) return;
-      const data = JSON.parse(text);
+      let data: Record<string, unknown>;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        return;
+      }
       if (!("error" in data)) {
-        setPrediction(data);
+        setPrediction(data as typeof prediction);
       } else {
         const errMsg = (data as { error: string }).error;
         showToast(errMsg.includes("多すぎ") ? errMsg : "内定予測の取得に失敗しました", "error");
@@ -170,9 +181,16 @@ function DashboardContent() {
       });
       const text = await res.text();
       if (!text) return;
-      const data = JSON.parse(text);
+      let data: Record<string, unknown>;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        console.error("[fetchPdca] invalid JSON:", text.slice(0, 200));
+        showToast("PDCA分析に失敗しました。再試行してください", "error");
+        return;
+      }
       if (!("error" in data)) {
-        setPdcaResult(data);
+        setPdcaResult(data as unknown as PdcaResult);
       } else {
         const errMsg = (data as { error: string }).error;
         showToast(errMsg.includes("多すぎ") ? errMsg : "PDCA分析に失敗しました", "error");

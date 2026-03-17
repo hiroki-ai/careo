@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Company, UserProfile } from "@/types";
 
 interface Service {
@@ -70,31 +71,35 @@ const SERVICE_CATALOG: Record<string, Service> = {
   },
 };
 
-function getRecommendations(companies: Company[], profile: UserProfile | null): Service[] {
+type ServiceStatus = "registered" | "dismissed";
+const STORAGE_KEY = "careo_service_status";
+
+function loadStatuses(): Record<string, ServiceStatus> {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}");
+  } catch {
+    return {};
+  }
+}
+
+function getRecommendations(companies: Company[], profile: UserProfile | null): string[] {
   const rejectedCount = companies.filter((c) => c.status === "REJECTED").length;
   const totalActive = companies.filter((c) => !["WISHLIST"].includes(c.status)).length;
   const targetIndustries = profile?.targetIndustries?.join("") ?? "";
 
   const rec: string[] = [];
 
-  // スカウト型：不採用が出た or 選考中が少ない
   if (rejectedCount > 0 || totalActive < 3) rec.push("offerbox");
-
-  // 業界別
   if (/IT|テック|スタートアップ|ベンチャー|Web/.test(targetIndustries)) rec.push("wantedly");
   if (/外資|グローバル|海外|英語/.test(targetIndustries)) rec.push("linkedin");
   if (/コンサル|IT|テック/.test(targetIndustries)) rec.push("goodfind");
-
-  // 企業数が少ない → 大手ナビ
   if (totalActive < 5) {
     if (!rec.includes("rikunabi")) rec.push("rikunabi");
     if (!rec.includes("mynavi")) rec.push("mynavi");
   }
-
-  // 常に就活会議は有用
   if (!rec.includes("syukatsucaigi")) rec.push("syukatsucaigi");
 
-  return rec.slice(0, 3).map((id) => SERVICE_CATALOG[id]);
+  return rec;
 }
 
 interface Props {
@@ -103,38 +108,154 @@ interface Props {
 }
 
 export function RecommendedServices({ companies, profile }: Props) {
-  const services = getRecommendations(companies, profile);
+  const [statuses, setStatuses] = useState<Record<string, ServiceStatus>>({});
+  const [showAll, setShowAll] = useState(false);
+
+  useEffect(() => {
+    setStatuses(loadStatuses());
+  }, []);
+
+  const saveStatus = (serviceId: string, status: ServiceStatus) => {
+    const next = { ...statuses, [serviceId]: status };
+    setStatuses(next);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  };
+
+  const removeStatus = (serviceId: string) => {
+    const next = { ...statuses };
+    delete next[serviceId];
+    setStatuses(next);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  };
+
+  const recommended = getRecommendations(companies, profile);
+  // 推奨リストに全サービスが含まれるよう、残りも末尾に追加
+  const allIds = [...recommended, ...Object.keys(SERVICE_CATALOG).filter(id => !recommended.includes(id))];
+
+  const visible = allIds
+    .filter(id => SERVICE_CATALOG[id])
+    .filter(id => {
+      if (showAll) return true;
+      return !statuses[id]; // dismissed/registered を除外
+    })
+    .slice(0, showAll ? undefined : 3);
+
+  const hiddenCount = allIds.filter(id => SERVICE_CATALOG[id] && statuses[id]).length;
+
+  if (visible.length === 0 && !showAll) {
+    return (
+      <div className="mt-4">
+        <div className="flex items-center gap-2 mb-3">
+          <h2 className="font-semibold text-gray-900">🔗 おすすめ就活サービス</h2>
+        </div>
+        <div className="bg-white border border-gray-100 rounded-xl p-4 text-center">
+          <p className="text-sm text-gray-400">すべてのサービスを整理しました</p>
+          <button
+            onClick={() => setShowAll(true)}
+            className="text-xs text-blue-500 hover:underline mt-2 inline-block"
+          >
+            全サービスを表示 ({Object.keys(SERVICE_CATALOG).length}件)
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-4">
-      <div className="flex items-center gap-2 mb-3">
-        <h2 className="font-semibold text-gray-900">🔗 おすすめ就活サービス</h2>
-        <span className="text-xs text-gray-400">Careoと組み合わせて使おう</span>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <h2 className="font-semibold text-gray-900">🔗 おすすめ就活サービス</h2>
+          <span className="text-xs text-gray-400">Careoと組み合わせて使おう</span>
+        </div>
+        <div className="flex items-center gap-2">
+          {hiddenCount > 0 && !showAll && (
+            <button
+              onClick={() => setShowAll(true)}
+              className="text-xs text-blue-500 hover:underline"
+            >
+              非表示{hiddenCount}件を表示
+            </button>
+          )}
+          {showAll && (
+            <button
+              onClick={() => setShowAll(false)}
+              className="text-xs text-gray-400 hover:underline"
+            >
+              まとめる
+            </button>
+          )}
+        </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        {services.map((s) => (
-          <a
-            key={s.name}
-            href={s.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-white border border-gray-100 rounded-xl p-4 hover:shadow-md transition-shadow group"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-                {s.name}
-              </span>
-              <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${s.tagColor}`}>
-                {s.tag}
-              </span>
+        {visible.map((id) => {
+          const s = SERVICE_CATALOG[id];
+          const status = statuses[id];
+          return (
+            <div
+              key={s.name}
+              className={`bg-white border rounded-xl p-4 transition-all ${
+                status === "registered"
+                  ? "border-green-200 opacity-70"
+                  : status === "dismissed"
+                  ? "border-gray-100 opacity-50"
+                  : "border-gray-100 hover:shadow-md"
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <a
+                  href={s.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-gray-900 hover:text-blue-600 transition-colors text-sm"
+                >
+                  {s.name} ↗
+                </a>
+                <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${s.tagColor}`}>
+                  {s.tag}
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 mb-2">{s.description}</p>
+              <div className="bg-blue-50 rounded-lg px-3 py-2 mb-3">
+                <p className="text-[11px] text-blue-700 font-medium">💡 Careoとの使い分け</p>
+                <p className="text-[11px] text-blue-600 mt-0.5">{s.careoTip}</p>
+              </div>
+              {/* アクションボタン */}
+              <div className="flex gap-1.5">
+                {status === "registered" ? (
+                  <button
+                    onClick={() => removeStatus(id)}
+                    className="flex-1 text-[11px] font-medium px-2 py-1 rounded-lg bg-green-100 text-green-700 border border-green-200 hover:bg-green-200 transition-colors"
+                  >
+                    ✓ 登録済み（取り消す）
+                  </button>
+                ) : status === "dismissed" ? (
+                  <button
+                    onClick={() => removeStatus(id)}
+                    className="flex-1 text-[11px] font-medium px-2 py-1 rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors"
+                  >
+                    再表示する
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => saveStatus(id, "registered")}
+                      className="flex-1 text-[11px] font-medium px-2 py-1 rounded-lg bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 transition-colors"
+                    >
+                      ✓ 登録済み
+                    </button>
+                    <button
+                      onClick={() => saveStatus(id, "dismissed")}
+                      className="flex-1 text-[11px] font-medium px-2 py-1 rounded-lg bg-gray-50 text-gray-400 border border-gray-200 hover:bg-gray-100 transition-colors"
+                    >
+                      興味なし
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
-            <p className="text-xs text-gray-500 mb-2">{s.description}</p>
-            <div className="bg-blue-50 rounded-lg px-3 py-2">
-              <p className="text-[11px] text-blue-700 font-medium">💡 Careoとの使い分け</p>
-              <p className="text-[11px] text-blue-600 mt-0.5">{s.careoTip}</p>
-            </div>
-          </a>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
