@@ -70,13 +70,8 @@ export function LandingPage() {
       </header>
 
       {/* Hero */}
-      <section className="relative flex flex-col items-center justify-center text-center px-6 pt-28 pb-20 overflow-hidden">
-        {/* 背景グラデーション */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white via-white to-teal-50/60 pointer-events-none" />
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-bl from-emerald-100/50 to-transparent rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-teal-50/60 to-transparent rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 max-w-3xl mx-auto">
+      <section className="relative text-center px-6 pt-24 pb-20">
+        <div className="max-w-3xl mx-auto relative z-10">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 border border-[#00c896]/40 bg-[#00c896]/5 text-[#00a87e] text-xs font-semibold px-4 py-2 rounded-full mb-10 animate-fade-up">
             <span className="w-1.5 h-1.5 bg-[#00c896] rounded-full animate-pulse" />
