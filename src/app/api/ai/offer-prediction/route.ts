@@ -31,6 +31,14 @@ export async function POST(req: NextRequest) {
       ? `ユーザー: ${profile.university || ""}${profile.faculty ? " " + profile.faculty : ""} ${profile.grade} ${profile.graduationYear}年卒 / 志望: ${(profile.targetIndustries ?? []).join("・") || "未設定"} / 就活軸: ${profile.careerAxis || "未設定"}`
       : "プロフィール未設定";
 
+    const selfAnalysis = profile ? [
+      profile.careerAxis ? `就活の軸: ${profile.careerAxis}` : "",
+      profile.gakuchika ? `ガクチカ: ${profile.gakuchika}` : "",
+      profile.selfPr ? `自己PR: ${profile.selfPr}` : "",
+      profile.strengths ? `強み: ${profile.strengths}` : "",
+      profile.weaknesses ? `弱み: ${profile.weaknesses}` : "",
+    ].filter(Boolean).join("\n") : "";
+
     const activeCompanies = companies.filter(
       (c) => !["WISHLIST", "REJECTED"].includes(c.status)
     );
@@ -57,6 +65,7 @@ export async function POST(req: NextRequest) {
           content: `あなたは就活AIコーチです。以下の就活データをもとに内定獲得予測スコアを算出してください。
 
 ${profileSummary}
+${selfAnalysis ? `\n【自己分析（ユーザーが入力した情報）】\n${selfAnalysis}\n→ ガクチカ・自己PRの質と具体性、強み・弱みの自己認識度もスコアに反映すること。` : ""}
 ${dataSummary}
 
 以下のJSON形式のみで返してください。他のテキストは一切含めないでください。マークダウン記法も使わないでください。
@@ -70,7 +79,8 @@ ${dataSummary}
 }
 
 gradeはS(90〜100)/A(75〜89)/B(55〜74)/C(0〜54)。
-scoreは選考中企業数・面接通過率・ES数・最終面接数などから総合判断した0〜100の整数。`,
+scoreは選考中企業数・面接通過率・ES数・最終面接数に加え、自己分析の質（ガクチカ・自己PR・強み弱みの充実度）も加味した0〜100の整数。
+improvementsでは自己分析情報を踏まえた具体的な改善点を指摘すること（例: 「弱みの○○を克服するため〜」「ガクチカをもっと数値で表現すると〜」）。`,
         },
       ],
     });

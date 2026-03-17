@@ -59,6 +59,14 @@ export async function POST(req: NextRequest) {
 - 志望職種: ${profile.targetJobs.length > 0 ? profile.targetJobs.join("、") : "未設定"}`
     : "プロフィール: 未設定";
 
+  const selfAnalysis = profile ? [
+    profile.careerAxis ? `就活の軸: ${profile.careerAxis}` : "",
+    profile.gakuchika ? `ガクチカ: ${profile.gakuchika}` : "",
+    profile.selfPr ? `自己PR: ${profile.selfPr}` : "",
+    profile.strengths ? `強み: ${profile.strengths}` : "",
+    profile.weaknesses ? `弱み（克服すべき課題）: ${profile.weaknesses}` : "",
+  ].filter(Boolean).join("\n") : "";
+
   const completedSummary = completedActions.length > 0
     ? `\n完了済みタスク（これらはすでに達成済みなので提案しないこと）:\n${completedActions.map(a => `- ${a}`).join("\n")}`
     : "";
@@ -81,6 +89,7 @@ export async function POST(req: NextRequest) {
       content: `あなたは就活のパーソナルAIアドバイザーです。以下の情報をもとに今週やるべきことを具体的に提案してください。
 
 ${profileSummary}
+${selfAnalysis ? `\n【自己分析（ユーザーが入力した情報）】\n${selfAnalysis}` : ""}
 
 ${activitySummary}
 ${completedSummary}
@@ -103,6 +112,7 @@ ${aggregateSummary}
 weeklyActionsは3〜5個。priority は "high" / "medium" / "low"。
 就活未開始の場合は「就活用Gmailの作成」「自己分析ノートを作る」「マイナビ・リクナビに登録する」「SPIの参考書を購入する」などの初歩的なアドバイスを含めること。
 学部・研究科の情報がある場合は、その専攻を活かせる企業・職種・アピールポイントを具体的にアドバイスすること（例: 情報工学→エンジニア職でのOB訪問推奨、経済学部→金融・コンサルのSPI数学対策など）。
+自己分析情報がある場合は必ずそれを活用すること。例: 弱みがある場合はその克服アクションを提案、ガクチカがある場合はそれをどのES・面接で活かすか提案、就活の軸と志望企業のズレがあれば指摘すること。
 集合知がある場合は「Careoユーザーの平均では〜」という形で根拠を示すこと。`,
     }],
   });

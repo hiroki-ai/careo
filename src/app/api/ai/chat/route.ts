@@ -56,11 +56,11 @@ export async function POST(req: NextRequest) {
     const analysisLines: string[] = [];
     if (context?.profile) {
       const p = context.profile;
-      if (p.careerAxis) analysisLines.push(`就活の軸: ${p.careerAxis.slice(0, 200)}`);
-      if (p.gakuchika) analysisLines.push(`ガクチカ: ${p.gakuchika.slice(0, 200)}`);
-      if (p.selfPr) analysisLines.push(`自己PR: ${p.selfPr.slice(0, 200)}`);
-      if (p.strengths) analysisLines.push(`強み: ${p.strengths.slice(0, 150)}`);
-      if (p.weaknesses) analysisLines.push(`弱み: ${p.weaknesses.slice(0, 150)}`);
+      if (p.careerAxis) analysisLines.push(`就活の軸: ${p.careerAxis.slice(0, 600)}`);
+      if (p.gakuchika) analysisLines.push(`ガクチカ: ${p.gakuchika.slice(0, 600)}`);
+      if (p.selfPr) analysisLines.push(`自己PR: ${p.selfPr.slice(0, 600)}`);
+      if (p.strengths) analysisLines.push(`強み: ${p.strengths.slice(0, 400)}`);
+      if (p.weaknesses) analysisLines.push(`弱み: ${p.weaknesses.slice(0, 400)}`);
     }
 
     // ── 企業管理 ──

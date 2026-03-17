@@ -25,6 +25,21 @@ export async function POST(req: NextRequest) {
       ? `ユーザー: ${profile.university || ""}${profile.faculty ? " " + profile.faculty : ""} ${profile.grade} ${profile.graduationYear}年卒 / 志望: ${profile.targetIndustries.join("・") || "未設定"} ${profile.targetJobs.join("・") || ""}`
       : "プロフィール未設定";
 
+    const selfAnalysis = profile ? [
+      profile.careerAxis ? `就活の軸: ${profile.careerAxis}` : "",
+      profile.gakuchika ? `ガクチカ: ${profile.gakuchika}` : "",
+      profile.selfPr ? `自己PR: ${profile.selfPr}` : "",
+      profile.strengths ? `強み: ${profile.strengths}` : "",
+      profile.weaknesses ? `弱み: ${profile.weaknesses}` : "",
+    ].filter(Boolean).join("\n") : "";
+
+    const interviewDetail = interviews.length > 0
+      ? interviews.slice(0, 10).map(i => {
+          const base = `${(i as { companyName?: string }).companyName ?? "企業"} ${i.round}次: ${i.result}`;
+          return (i as { notes?: string }).notes ? `${base}（メモ: ${(i as { notes?: string }).notes!.slice(0, 100)}）` : base;
+        }).join("\n")
+      : "";
+
     const doSummary = `
 【Do（実績）】
 - 登録企業数: ${companies.length}社（WISHLIST除く選考中: ${companies.filter(c => !["OFFERED","REJECTED","WISHLIST"].includes(c.status)).length}社、内定: ${companies.filter(c => c.status === "OFFERED").length}社、不採用: ${companies.filter(c => c.status === "REJECTED").length}社）
@@ -51,10 +66,17 @@ export async function POST(req: NextRequest) {
         content: `あなたは就活コーチAIです。以下の就活データをもとにPDCAサイクルを分析してください。
 
 ${profileSummary}
+${selfAnalysis ? `\n【自己分析・強み・弱み】\n${selfAnalysis}` : ""}
 ${doSummary}
+${interviewDetail ? `\n【面接詳細】\n${interviewDetail}` : ""}
 ${planSummary}
 ${checkSummary}
 ${chatSummary}
+
+【分析の重要ルール】
+- 自己分析（就活の軸・ガクチカ・自己PR・強み・弱み）が入力されている場合、それをCheckとActの評価に必ず反映すること
+- 例: 「強みの○○を活かせているか」「就活の軸と志望企業が一致しているか」「ガクチカをESや面接でどう伝えているか」
+- 面接のメモがある場合は具体的な課題を指摘すること
 
 以下のJSON形式のみで返してください。他のテキストは一切含めないでください。
 
