@@ -27,7 +27,7 @@ const jsonLd = {
       "operatingSystem": "Web, iOS, Android",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" },
       "audience": { "@type": "Audience", "audienceType": "大学生・就活生（28卒）" },
-      "featureList": ["ES管理", "面接ログ", "企業管理", "AIチャット", "PDCA自動分析", "内定予測"],
+      "featureList": ["ES管理", "面接ログ", "企業管理", "AIチャット（カレオコーチ）", "PDCA自動分析", "内定予測", "OB/OG訪問管理", "筆記試験管理", "自己分析自動保存", "音声入力・音声出力"],
       "publisher": { "@type": "Organization", "name": "Careo" },
       "author": { "@type": "Organization", "name": "Careo" },
     },
@@ -76,7 +76,7 @@ export function LandingPage() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 border border-[#00c896]/40 bg-[#00c896]/5 text-[#00a87e] text-xs font-semibold px-4 py-2 rounded-full mb-10 animate-fade-up">
             <span className="w-1.5 h-1.5 bg-[#00c896] rounded-full animate-pulse" />
-            28卒向け・AI就活コーチ
+            28卒向け・AI就活コーチ「カレオ」
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold leading-[1.15] mb-6 animate-fade-up delay-100 tracking-tight">
@@ -85,8 +85,8 @@ export function LandingPage() {
           </h1>
 
           <p className="text-gray-500 text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed animate-fade-up delay-200">
-            AIコーチ「カレオ」があなたの選考状況・自己分析・面接メモを把握。<br />
-            毎日5分の対話で、迷わず動ける就活が実現する。
+            AIコーチ「カレオ」があなたの選考状況・自己分析・OB訪問・面接メモを全部把握。<br />
+            話すだけで自己分析が育ち、就活データが自動で蓄積される。
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up delay-300">
@@ -104,7 +104,7 @@ export function LandingPage() {
           {/* Stats */}
           <div className="flex items-center justify-center gap-12 mt-20 animate-fade-up delay-400 border-t border-gray-100 pt-10">
             {[
-              { value: "6+", label: "AI機能" },
+              { value: "10+", label: "AI機能" },
               { value: "無料", label: "完全無料" },
               { value: "28卒", label: "向け特化" },
             ].map((s) => (
@@ -145,10 +145,10 @@ export function LandingPage() {
               <p className="text-xs font-bold text-[#00a87e] uppercase tracking-wider mb-5">✨ Careoを使った後</p>
               <ul className="space-y-4">
                 {[
-                  "企業・ES・面接・締切がすべて一か所。いつでも全体像が見える",
+                  "企業・ES・面接・OB訪問・締切がすべて一か所。全体像が常に見える",
                   "締切3日前に自動通知。見落としゼロ",
-                  "面接後にメモを残せば、AIが通過率と改善点を分析",
-                  "毎日AIコーチと対話。PDCA・自己分析が自動で蓄積される",
+                  "カレオと話すだけで自己分析・企業リストが自動で更新される",
+                  "毎週AIがPDCAを自動分析。来週やるべきことが即わかる",
                   "自己分析を一度入力すればAIが毎回ES文章を生成",
                 ].map((t) => (
                   <li key={t} className="flex gap-3 text-sm text-[#0a1628]">
@@ -190,7 +190,7 @@ export function LandingPage() {
                   { label: "企業研究をAIが自動生成",      careo: true,  riku: false, sugoshu: true,  notion: false },
                   { label: "面接ログ・通過率分析",        careo: true,  riku: false, sugoshu: false, notion: "△"  },
                   { label: "週次PDCAをAIが自動分析",      careo: true,  riku: false, sugoshu: false, notion: false },
-                  { label: "毎日対話するAIコーチ",        careo: true,  riku: false, sugoshu: false, notion: false },
+                  { label: "毎日対話するAIコーチ（音声入力対応）", careo: true, riku: false, sugoshu: false, notion: false },
                   { label: "締切アラート通知",            careo: true,  riku: "△",  sugoshu: false, notion: false },
                   { label: "SPI模擬試験",                 careo: false, riku: false, sugoshu: true,  notion: false },
                   { label: "📵 広告・スカウト電話なし",   careo: true,  riku: false, sugoshu: false, notion: true  },
@@ -261,7 +261,7 @@ export function LandingPage() {
           <span>·</span>
           <Link href="/signup" className="hover:text-gray-600 transition-colors">新規登録</Link>
         </div>
-        © 2025 Careo — 就活管理AIアプリ
+        © 2026 Careo — 就活管理AIアプリ
       </footer>
     </div>
   );
