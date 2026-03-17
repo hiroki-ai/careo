@@ -10,7 +10,7 @@ const jsonLd = {
       "@type": "WebApplication",
       "name": "Careo",
       "url": "https://careo-sigma.vercel.app",
-      "description": "ES締切・面接日程・企業研究・反省メモをAIが整理。就活のPDCAを自動で回す、28卒向け就活管理アプリ。",
+      "description": "ES締切・面接日程・企業研究・反省メモをAIが整理。就活のPDCAを自動で回す、28卒向けAI就活コーチアプリ。",
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "Web, iOS, Android",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" },
@@ -42,7 +42,8 @@ const faqs = [
   { q: "リクナビ・マイナビとの違いは？", a: "リクナビ・マイナビは求人情報を探すサービス。Careoは応募後の選考管理とAI分析に特化しています。両方を使うのがベストです。" },
   { q: "無料で使えますか？", a: "完全無料です。メールアドレスだけで登録でき、すべての機能をすぐに使えます。" },
   { q: "スマホでも使えますか？", a: "iPhone・Android両対応です。ホーム画面に追加するとアプリのように使えます。" },
-  { q: "AIは何をしてくれるの？", a: "ES生成・企業研究・週次PDCA分析・内定予測・就活チャット相談など、就活のあらゆる場面でAIがサポートします。" },
+  { q: "AIは何をしてくれるの？", a: "ES生成・企業研究・週次PDCA分析・内定予測・就活チャット相談など、就活のあらゆる場面でAIコーチがサポートします。" },
+  { q: "就活コーチとして何が違うの？", a: "CareoのAIはあなたの選考状況・ES・面接履歴をすべて把握した上でアドバイスします。一般的な就活サイトの情報とは違い、あなた専用のコーチとして機能します。" },
 ];
 
 export function LandingPage() {
@@ -79,7 +80,7 @@ export function LandingPage() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 border border-[#00c896]/40 bg-[#00c896]/5 text-[#00a87e] text-xs font-semibold px-4 py-2 rounded-full mb-10 animate-fade-up">
             <span className="w-1.5 h-1.5 bg-[#00c896] rounded-full animate-pulse" />
-            28卒向け・AI就活管理アプリ
+            28卒向け・AI就活コーチ
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold leading-[1.15] mb-6 animate-fade-up delay-100 tracking-tight">
@@ -129,7 +130,7 @@ export function LandingPage() {
             <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">
               就活管理の<span className="text-[#00c896]">すべてが</span>、ここに
             </h2>
-            <p className="text-gray-500 text-base max-w-xl mx-auto">マイナビ・リクナビは情報提供ツール。CareoはAIが動かしてくれる就活コックピット。</p>
+            <p className="text-gray-500 text-base max-w-xl mx-auto">マイナビ・リクナビは情報提供ツール。CareoはAIコーチが就活を一緒に動かしてくれるコックピット。</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
