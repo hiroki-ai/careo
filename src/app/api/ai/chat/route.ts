@@ -4,6 +4,16 @@ import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
+// 28卒就活スケジュール（実体験ベースのロードマップ）
+const SHUKATSU_SCHEDULE_28 = `【28卒就活 月別スケジュール】
+3月: メール作成・証明写真・就活会議/ワンキャリ/マイナビキャンパス登録・説明会・サマーインターン応募・Webテスト練習
+4〜5月: ES作成（ガクチカ・自己PR）・業界説明会・SPI勉強・面接練習・ベンチャー選考で場数
+6〜8月: 夏インターンエントリー（60〜100社目安）・OB/OG訪問・難質問ストック・SPI本番対策
+9〜12月: 夏インターン振り返り・早期選考（年内内定も）・冬インターン（本選考直結）・業界絞り込み
+1〜3月: 本選考エントリー・企業分析・キャリアプラン・SPI（ラストチャンス）
+4月: 内定獲得・就活終了（就活生の6割以上）
+重要: 早期選考ルートを狙う・就活の軸を一貫させる・面接は場数が全て・OB/OG訪問は最強の情報源`;
+
 export async function POST(req: NextRequest) {
   const { allowed, retryAfter } = checkRateLimit(getClientIp(req), "chat");
   if (!allowed) {
@@ -128,6 +138,11 @@ export async function POST(req: NextRequest) {
 - 絵文字は1メッセージに1〜2個まで
 - 長文にならず、要点を絞る（200字以内を目安）
 - 質問には具体的かつ実践的に答える
+
+【28卒就活スケジュール知識】
+現在: ${new Date().getFullYear()}年${new Date().getMonth() + 1}月
+${SHUKATSU_SCHEDULE_28}
+→ ユーザーの状況と現在の月を照らし合わせ、スケジュールに遅れがあれば優しく教えること。
 
 ${contextSection ? `【ユーザーの現在の状況】\n${contextSection}\n\n上記の情報を把握した上で、ユーザーの状況に合わせた個別アドバイスをすること。` : ""}
 

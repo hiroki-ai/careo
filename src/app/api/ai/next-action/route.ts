@@ -6,6 +6,21 @@ import { Company, ES, Interview, UserProfile } from "@/types";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
+// 28卒就活スケジュール（TikTok就活インフルエンサー発・実体験ベース）
+const SHUKATSU_SCHEDULE_28 = `【28卒就活スケジュール 標準ロードマップ】
+3月（大学3年開始）: 就活メール作成・証明写真・就活会議/ワンキャリ/マイナビキャンパス登録・説明会参加・サマーインターン応募開始・Webテスト練習必須
+4〜5月: ES作成（ガクチカ・自己PR）・業界説明会・SPI勉強・面接練習開始・夏インターン参加・ベンチャー選考で面接経験を積む
+6〜8月: 夏インターンエントリー（目安60〜100社/1業界12〜20社×5業界）・SPI/Webテスト対策・OB/OG訪問・逆質問・難質問のストックを貯める
+9〜12月: 夏インターン振り返り・早期選考ルート（ここで内定も）・冬インターンエントリー（本選考直結が多い）・業界絞り込み・OB/OG訪問継続
+1〜3月: 本選考企業決定・本選考エントリー・企業分析・キャリアプラン・SPI/Webテスト（ラストチャンス）
+4月: 内定獲得・就活終了（就活生の6割以上がこの時期に終了）
+
+【重要ポイント】
+- 早期選考ルートに乗れれば年内内定も可能
+- 就活の軸を一貫させることが志望動機の説得力につながる
+- 面接は場数が全て。ベンチャー・インターンで早めに経験を積む
+- OB/OG訪問は業界理解と面接練習を兼ねられる最強手段`;
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -87,6 +102,11 @@ export async function POST(req: NextRequest) {
     messages: [{
       role: "user",
       content: `あなたは就活のパーソナルAIアドバイザーです。以下の情報をもとに今週やるべきことを具体的に提案してください。
+
+現在: ${new Date().getFullYear()}年${new Date().getMonth() + 1}月
+
+${SHUKATSU_SCHEDULE_28}
+→ 上記スケジュールと現在の月を照らし合わせ、「今の時期に本来やるべきこと」と「ユーザーの実際の進捗」のギャップを分析してアドバイスすること。
 
 ${profileSummary}
 ${selfAnalysis ? `\n【自己分析（ユーザーが入力した情報）】\n${selfAnalysis}` : ""}
