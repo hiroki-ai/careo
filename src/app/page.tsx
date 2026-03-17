@@ -102,104 +102,86 @@ function DashboardContent() {
     return d >= 0 && d <= 3;
   }));
 
+  // ESの設問データを除いた軽量版（AI分析には件数だけ必要）
+  const esListSlim = esList.map(({ questions: _q, ...rest }) => rest);
+
+  // リトライ付きfetch（失敗時に1回自動リトライ）
+  const fetchAI = async (url: string, body: unknown, retries = 1): Promise<Record<string, unknown> | null> => {
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        if (attempt > 0) await new Promise(r => setTimeout(r, 2000));
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const text = await res.text();
+        if (!text) continue;
+        return JSON.parse(text);
+      } catch {
+        if (attempt === retries) return null;
+      }
+    }
+    return null;
+  };
+
   const fetchAiAdvice = async (completed?: string[]) => {
     setAiLoading(true);
     try {
       const completedActions = completed ?? completedItems.map(i => i.action);
-      const res = await fetch("/api/ai/next-action", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ companies, esList, interviews, profile, completedActions, recentChatMessages: recentUserMessages }),
-      });
-      const text = await res.text();
-      if (!text) throw new Error("Empty response");
-      let data: NextActionResult;
-      try {
-        data = JSON.parse(text);
-      } catch {
-        showToast("AIアドバイスの取得に失敗しました", "error");
-        return;
-      }
+      const data = await fetchAI("/api/ai/next-action", {
+        companies, esList: esListSlim, interviews, profile, completedActions,
+        recentChatMessages: recentUserMessages,
+      }) as NextActionResult | null;
+      if (!data) { showToast("AIアドバイスの取得に失敗しました", "error"); return; }
       if (!("error" in data)) {
         setAiSummary(data.summary ?? "");
         await replaceItems(data.weeklyActions);
       } else {
         const errMsg = (data as { error: string }).error;
-        console.error("[AI] error:", errMsg);
         showToast(errMsg.includes("多すぎ") ? errMsg : "AIアドバイスの取得に失敗しました", "error");
       }
-    } catch (err) {
-      console.error("[fetchAiAdvice]", err);
-      showToast("AIアドバイスの取得に失敗しました", "error");
     } finally {
       setAiLoading(false);
-    }
-  };
-
-  const fetchPrediction = async () => {
-    setPredLoading(true);
-    try {
-      const res = await fetch("/api/ai/offer-prediction", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ companies, esList, interviews, profile }),
-      });
-      const text = await res.text();
-      if (!text) return;
-      let data: Record<string, unknown>;
-      try {
-        data = JSON.parse(text);
-      } catch {
-        return;
-      }
-      if (!("error" in data)) {
-        setPrediction(data as typeof prediction);
-      } else {
-        const errMsg = (data as { error: string }).error;
-        showToast(errMsg.includes("多すぎ") ? errMsg : "内定予測の取得に失敗しました", "error");
-      }
-    } catch (err) {
-      console.error("[fetchPrediction]", err);
-      showToast("内定予測の取得に失敗しました", "error");
-    } finally {
-      setPredLoading(false);
     }
   };
 
   const fetchPdca = async () => {
     setPdcaLoading(true);
     try {
-      const res = await fetch("/api/ai/pdca", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          companies, esList, interviews, profile,
-          pendingActions: pendingItems.map(i => ({ action: i.action, priority: i.priority })),
-          completedActions: completedItems.map(i => ({ action: i.action })),
-          recentChatMessages: recentUserMessages,
-        }),
+      const data = await fetchAI("/api/ai/pdca", {
+        companies, esList: esListSlim, interviews, profile,
+        pendingActions: pendingItems.map(i => ({ action: i.action, priority: i.priority })),
+        completedActions: completedItems.map(i => ({ action: i.action })),
+        recentChatMessages: recentUserMessages,
       });
-      const text = await res.text();
-      if (!text) return;
-      let data: Record<string, unknown>;
-      try {
-        data = JSON.parse(text);
-      } catch {
-        console.error("[fetchPdca] invalid JSON:", text.slice(0, 200));
-        showToast("PDCA分析に失敗しました。再試行してください", "error");
-        return;
-      }
+      if (!data) { showToast("PDCA分析に失敗しました。再試行してください", "error"); return; }
       if (!("error" in data)) {
         setPdcaResult(data as unknown as PdcaResult);
       } else {
         const errMsg = (data as { error: string }).error;
         showToast(errMsg.includes("多すぎ") ? errMsg : "PDCA分析に失敗しました", "error");
       }
-    } catch (err) {
-      console.error("[fetchPdca]", err);
-      showToast("PDCA分析に失敗しました", "error");
     } finally {
       setPdcaLoading(false);
+    }
+  };
+
+  const fetchPrediction = async () => {
+    setPredLoading(true);
+    try {
+      const data = await fetchAI("/api/ai/offer-prediction", {
+        companies, esList: esListSlim, interviews, profile,
+      });
+      if (!data) return;
+      if (!("error" in data)) {
+        setPrediction(data as typeof prediction);
+      } else {
+        const errMsg = (data as { error: string }).error;
+        showToast(errMsg.includes("多すぎ") ? errMsg : "内定予測の取得に失敗しました", "error");
+      }
+    } finally {
+      setPredLoading(false);
     }
   };
 
@@ -214,8 +196,8 @@ function DashboardContent() {
 
   useEffect(() => {
     if (profile && !itemsLoading && hasLoaded && !pdcaResult && !pdcaLoading) {
-      fetchPdca();
-      fetchPrediction();
+      // PDCAと内定予測を順番に実行（同時発火でVercelタイムアウトを防ぐ）
+      fetchPdca().then(() => fetchPrediction());
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasLoaded, itemsLoading]);

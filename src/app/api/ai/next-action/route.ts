@@ -101,7 +101,7 @@ ${completedSummary}
 ${chatSummary}
 ${aggregateSummary}
 
-以下のJSON形式のみで返してください。他のテキストは一切含めないでください。
+【重要】JSONのみ出力すること。前後に説明文・マークダウン・コードブロックを一切含めないこと。
 
 {
   "summary": "現状の一言評価（1文、具体的に）",
