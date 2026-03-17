@@ -57,10 +57,10 @@ export function LandingPage() {
             <span className="font-bold text-lg tracking-tight text-[#0a1628]">Careo</span>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/features" className="text-sm text-gray-500 hover:text-gray-900 font-medium transition-colors hidden sm:block">
+            <Link href="/features" className="text-sm text-gray-500 hover:text-gray-900 font-medium transition-colors">
               機能を見る
             </Link>
-            <Link href="/login" className="text-sm text-gray-500 hover:text-gray-900 font-medium transition-colors">
+            <Link href="/login" className="text-sm text-gray-500 hover:text-gray-900 font-medium transition-colors hidden sm:block">
               ログイン
             </Link>
             <Link href="/signup" className="text-sm bg-[#00c896] hover:bg-[#00b586] text-white px-5 py-2.5 rounded-xl font-bold transition-colors shadow-lg shadow-[#00c896]/25">
@@ -254,6 +254,13 @@ export function LandingPage() {
 
       {/* Footer */}
       <footer className="px-6 py-6 text-center text-xs text-gray-400 border-t border-gray-100">
+        <div className="flex items-center justify-center gap-4 mb-3">
+          <Link href="/features" className="hover:text-gray-600 transition-colors">機能一覧</Link>
+          <span>·</span>
+          <Link href="/login" className="hover:text-gray-600 transition-colors">ログイン</Link>
+          <span>·</span>
+          <Link href="/signup" className="hover:text-gray-600 transition-colors">新規登録</Link>
+        </div>
         © 2025 Careo — 就活管理AIアプリ
       </footer>
     </div>
