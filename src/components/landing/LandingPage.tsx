@@ -93,14 +93,13 @@ export function LandingPage() {
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold leading-[1.15] mb-6 animate-fade-up delay-100 tracking-tight">
-            就活が動く前に、<br />
-            <span className="text-[#00c896]">内定が近づく。</span>
+            迷わず動ける、<br />
+            <span className="text-[#00c896]">就活へ。</span>
           </h1>
 
           <p className="text-gray-500 text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed animate-fade-up delay-200">
-            ES・面接・企業管理・PDCA分析——<br className="hidden md:block" />
-            すべてをひとつのAIアプリで。<br />
-            Notionもスプレッドシートも、もう要らない。
+            CareoのAIはあなたの選考状況をすべて知っている。<br />
+            だから「今週何をすべきか」が、いつでも明確になる。
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up delay-300">
