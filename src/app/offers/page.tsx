@@ -72,6 +72,24 @@ export default function OffersPage() {
         )}
       </div>
 
+      {/* 内定おめでとうバナー */}
+      {offeredCompanies.length >= 1 && (
+        <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-xl p-4 mb-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div>
+            <p className="font-semibold text-gray-800 text-sm">🎉 内定おめでとうございます！</p>
+            <p className="text-xs text-gray-500 mt-0.5">Careoが役に立ったら、コーヒー1杯分の支援が励みになります</p>
+          </div>
+          <a
+            href="https://buymeacoffee.com/careo"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 inline-flex items-center gap-1.5 bg-amber-400 hover:bg-amber-500 text-white font-bold px-4 py-2 rounded-lg transition-colors text-sm"
+          >
+            ☕ Buy me a coffee
+          </a>
+        </div>
+      )}
+
       {offeredCompanies.length < 2 ? (
         <div className="flex flex-col items-center justify-center py-24 text-gray-400">
           <div className="text-5xl mb-4">🏆</div>
