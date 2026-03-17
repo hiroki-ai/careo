@@ -52,6 +52,7 @@ const moreItems = [
   { href: "/tests", label: "筆記試験" },
   { href: "/offers", label: "内定比較" },
   { href: "/insights", label: "みんなの就活" },
+  { href: "/services", label: "おすすめサービス" },
   { href: "/settings", label: "設定" },
 ];
 
