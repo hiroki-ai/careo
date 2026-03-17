@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
           weaknesses?: string;
         };
         companies?: { name: string; status: string; industry?: string }[];
-        esList?: { title: string; status: string; companyName: string; questionsCount: number }[];
+        esList?: { title: string; status: string; companyName: string; questions: { question: string; answer: string }[] }[];
         interviews?: { round: number; result: string; companyName: string; notes?: string }[];
         pendingActions?: string[];
       };
@@ -85,8 +85,13 @@ export async function POST(req: NextRequest) {
       const submitted = context.esList.filter(e => e.status === "SUBMITTED");
       const draft = context.esList.filter(e => e.status === "DRAFT");
       esLines.push(`ES: 計${context.esList.length}件（提出済み${submitted.length}件、下書き${draft.length}件）`);
-      context.esList.slice(0, 10).forEach(e => {
-        esLines.push(`  - ${e.companyName}「${e.title}」: ${e.status === "SUBMITTED" ? "提出済み" : "下書き"}`);
+      context.esList.slice(0, 8).forEach(e => {
+        const statusLabel = e.status === "SUBMITTED" ? "提出済み" : "下書き";
+        esLines.push(`  ■ ${e.companyName}「${e.title}」[${statusLabel}]`);
+        e.questions.slice(0, 4).forEach(q => {
+          esLines.push(`    Q: ${q.question.slice(0, 80)}`);
+          if (q.answer) esLines.push(`    A: ${q.answer.slice(0, 300)}`);
+        });
       });
     }
 

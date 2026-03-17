@@ -87,7 +87,7 @@ export default function ChatPage() {
       title: e.title,
       status: e.status,
       companyName: companies.find(c => c.id === e.companyId)?.name ?? "不明",
-      questionsCount: e.questions.length,
+      questions: e.questions.map(q => ({ question: q.question, answer: q.answer })),
     })),
     interviews: interviews.map(i => ({
       round: i.round,
