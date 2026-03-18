@@ -127,6 +127,14 @@ export async function GET(request: NextRequest) {
       console.error("[board-meeting] mail error:", mailError);
     }
 
+    // Slack通知
+    const { postToSlack } = await import("@/lib/slack/client");
+    await postToSlack({
+      text: `🏢 *幹部会議レポート（${sessionLabel}）*\n\n*議題：* ${result.topic}\n*当番：* ${result.topicOwner}\n\n*推奨アクション*\n→ ${result.recommendedAction}\n\n*まとめ*\n${result.conclusion}\n\n_詳細は /honbu で確認できます_`,
+      username: "Careo本部",
+      icon_emoji: ":office:",
+    }).catch(() => {});
+
     console.log(`[board-meeting] session ${sessionIndex} by ${result.topicOwner}: ${result.topic}`);
     return NextResponse.json({ success: true, topic: result.topic, owner: result.topicOwner });
   } catch (err) {

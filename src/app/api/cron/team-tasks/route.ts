@@ -38,6 +38,19 @@ export async function GET(request: NextRequest) {
       } else {
         console.log(`[team-tasks] ${member.id}: ${result.headline}`);
         results.push({ member: member.id, success: true, headline: result.headline });
+
+        // Slack通知
+        const { postToSlack } = await import("@/lib/slack/client");
+        const emojis: Record<string, string> = {
+          engineer: ":hammer_and_wrench:",
+          sales: ":mega:",
+          designer: ":lower_left_paintbrush:",
+        };
+        await postToSlack({
+          text: `*${result.headline}*\n\n${result.body}\n\n*成果物*\n${result.deliverable}\n\n→ ${result.actionLabel}`,
+          username: `${result.memberName}｜${result.memberRole.split("（")[0]}`,
+          icon_emoji: emojis[member.id] ?? ":bust_in_silhouette:",
+        }).catch(() => {});
       }
     } catch (err) {
       console.error(`[team-tasks] ${member.id} error:`, err);

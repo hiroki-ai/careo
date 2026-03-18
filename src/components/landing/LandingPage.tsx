@@ -65,7 +65,7 @@ export function LandingPage() {
       .then((r) => r.json())
       .then((s: Record<string, string>) => {
         if (s.badge_text) setBadgeText(s.badge_text);
-        if (s.hero_subtext) setHeroSubtext(s.hero_subtext);
+        if (s.hero_subtext) setHeroSubtext(s.hero_subtext.replace(/\\n/g, "\n"));
         if (s.after_items) {
           try {
             const parsed = JSON.parse(s.after_items);
