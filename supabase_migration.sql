@@ -119,3 +119,18 @@ $$;
 -- 2026-03-18: companies テーブルに is_intern_offer カラムを追加
 -- OFFERED ステータスのときにユーザーが「インターン合格」か「内定（本選考）」かを選択できるようにする
 ALTER TABLE companies ADD COLUMN IF NOT EXISTS is_intern_offer BOOLEAN DEFAULT NULL;
+
+-- LP動的コピー設定テーブル
+CREATE TABLE IF NOT EXISTS lp_settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE lp_settings DISABLE ROW LEVEL SECURITY;
+
+INSERT INTO lp_settings (key, value) VALUES
+  ('hero_subtext',  'AIコーチ「カレオ」があなたの選考状況・自己分析・OB訪問・面接メモを全部把握。\n話すだけで自己分析が育ち、就活データが自動で蓄積される。'),
+  ('after_items',   '["企業・ES・面接・OB訪問・締切がすべて一か所。全体像が常に見える","締切3日前に自動通知。見落としゼロ","カレオと話すだけで自己分析・企業リストが自動で更新される","毎週AIがPDCAを自動分析。来週やるべきことが即わかる","自己分析を一度入力すればAIが毎回ES文章を生成"]'),
+  ('badge_text',    '28卒向け・AI就活コーチ「カレオ」')
+ON CONFLICT (key) DO NOTHING;

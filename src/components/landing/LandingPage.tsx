@@ -1,7 +1,18 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Script from "next/script";
+
+const DEFAULT_BADGE = "28卒向け・AI就活コーチ「カレオ」";
+const DEFAULT_HERO_SUBTEXT = "AIコーチ「カレオ」があなたの選考状況・自己分析・OB訪問・面接メモを全部把握。\n話すだけで自己分析が育ち、就活データが自動で蓄積される。";
+const DEFAULT_AFTER_ITEMS = [
+  "企業・ES・面接・OB訪問・締切がすべて一か所。全体像が常に見える",
+  "締切3日前に自動通知。見落としゼロ",
+  "カレオと話すだけで自己分析・企業リストが自動で更新される",
+  "毎週AIがPDCAを自動分析。来週やるべきことが即わかる",
+  "自己分析を一度入力すればAIが毎回ES文章を生成",
+];
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -45,6 +56,26 @@ const jsonLd = {
 
 
 export function LandingPage() {
+  const [badgeText, setBadgeText] = useState(DEFAULT_BADGE);
+  const [heroSubtext, setHeroSubtext] = useState(DEFAULT_HERO_SUBTEXT);
+  const [afterItems, setAfterItems] = useState<string[]>(DEFAULT_AFTER_ITEMS);
+
+  useEffect(() => {
+    fetch("/api/lp-settings")
+      .then((r) => r.json())
+      .then((s: Record<string, string>) => {
+        if (s.badge_text) setBadgeText(s.badge_text);
+        if (s.hero_subtext) setHeroSubtext(s.hero_subtext);
+        if (s.after_items) {
+          try {
+            const parsed = JSON.parse(s.after_items);
+            if (Array.isArray(parsed)) setAfterItems(parsed);
+          } catch { /* デフォルト維持 */ }
+        }
+      })
+      .catch(() => { /* デフォルト維持 */ });
+  }, []);
+
   return (
     <div className="min-h-screen bg-white flex flex-col text-[#0a1628] overflow-x-hidden">
       <Script id="json-ld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
@@ -76,7 +107,7 @@ export function LandingPage() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 border border-[#00c896]/40 bg-[#00c896]/5 text-[#00a87e] text-xs font-semibold px-4 py-2 rounded-full mb-10 animate-fade-up">
             <span className="w-1.5 h-1.5 bg-[#00c896] rounded-full animate-pulse" />
-            28卒向け・AI就活コーチ「カレオ」
+            {badgeText}
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold leading-[1.15] mb-6 animate-fade-up delay-100 tracking-tight">
@@ -85,8 +116,9 @@ export function LandingPage() {
           </h1>
 
           <p className="text-gray-500 text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed animate-fade-up delay-200">
-            AIコーチ「カレオ」があなたの選考状況・自己分析・OB訪問・面接メモを全部把握。<br />
-            話すだけで自己分析が育ち、就活データが自動で蓄積される。
+            {heroSubtext.split("\n").map((line, i, arr) => (
+              <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
+            ))}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up delay-300">
@@ -144,13 +176,7 @@ export function LandingPage() {
             <div className="bg-gradient-to-br from-[#00c896]/5 to-emerald-50 border border-[#00c896]/20 rounded-2xl p-6">
               <p className="text-xs font-bold text-[#00a87e] uppercase tracking-wider mb-5">✨ Careoを使った後</p>
               <ul className="space-y-4">
-                {[
-                  "企業・ES・面接・OB訪問・締切がすべて一か所。全体像が常に見える",
-                  "締切3日前に自動通知。見落としゼロ",
-                  "カレオと話すだけで自己分析・企業リストが自動で更新される",
-                  "毎週AIがPDCAを自動分析。来週やるべきことが即わかる",
-                  "自己分析を一度入力すればAIが毎回ES文章を生成",
-                ].map((t) => (
+                {afterItems.map((t) => (
                   <li key={t} className="flex gap-3 text-sm text-[#0a1628]">
                     <span className="text-[#00c896] shrink-0 mt-0.5 font-bold">✓</span>{t}
                   </li>
