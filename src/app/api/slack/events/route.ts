@@ -69,17 +69,16 @@ async function respondAsPersona(text: string, personaId?: string) {
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
-
-  // 署名検証
-  if (!verifySignature(body, req)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const payload = JSON.parse(body);
 
-  // URL検証チャレンジ（Slack App設定時の初回確認）
+  // URL検証チャレンジは署名チェック前に処理（Slack App設定時の初回確認）
   if (payload.type === "url_verification") {
     return NextResponse.json({ challenge: payload.challenge });
+  }
+
+  // 署名検証（通常のイベントのみ）
+  if (!verifySignature(body, req)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const event = payload.event;
