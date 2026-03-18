@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Careo AI — 一緒に就活を変えよう</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --indigo: #4f46e5;
+    --indigo-light: #6366f1;
+    --indigo-dark: #3730a3;
+    --blue: #3b82f6;
+    --cyan: #06b6d4;
+    --gray-900: #0f172a;
+    --gray-800: #1e293b;
+    --gray-700: #334155;
+    --gray-400: #94a3b8;
+    --gray-200: #e2e8f0;
+    --white: #ffffff;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Helvetica Neue', 'Hiragino Sans', 'Meiryo', sans-serif;
+    background: var(--gray-900);
+    color: var(--white);
+    overflow-x: hidden;
+  }
+
+  /* ナビ */
+  nav {
+    position: fixed; top: 0; width: 100%; z-index: 100;
+    padding: 16px 40px;
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(15,23,42,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .nav-logo { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+  .nav-logo span { color: var(--indigo-light); }
+  .nav-links { display: flex; gap: 24px; }
+  .nav-links a {
+    color: var(--gray-400); text-decoration: none; font-size: 14px;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+
+  /* スライド共通 */
+  section {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 100px 40px 60px;
+  }
+  .slide-inner { max-width: 960px; width: 100%; }
+
+  .tag {
+    display: inline-block;
+    background: rgba(99,102,241,0.15);
+    color: var(--indigo-light);
+    border: 1px solid rgba(99,102,241,0.3);
+    border-radius: 100px;
+    padding: 4px 14px;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  h1 { font-size: clamp(36px, 6vw, 64px); font-weight: 800; line-height: 1.1; letter-spacing: -1px; }
+  h2 { font-size: clamp(28px, 4vw, 44px); font-weight: 700; line-height: 1.2; letter-spacing: -0.5px; }
+  h3 { font-size: 20px; font-weight: 700; }
+
+  .gradient-text {
+    background: linear-gradient(135deg, #818cf8, #38bdf8);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  p.lead {
+    font-size: clamp(16px, 2vw, 20px);
+    color: var(--gray-400);
+    line-height: 1.7;
+    margin-top: 16px;
+  }
+
+  /* ヒーロー */
+  #hero {
+    background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(79,70,229,0.25), transparent);
+    text-align: center;
+  }
+  #hero h1 { margin-bottom: 24px; }
+  #hero .sub {
+    font-size: clamp(16px, 2.2vw, 22px);
+    color: var(--gray-400);
+    line-height: 1.7;
+    max-width: 640px;
+    margin: 0 auto 40px;
+  }
+  .cta-btn {
+    display: inline-block;
+    background: var(--indigo);
+    color: white;
+    padding: 14px 36px;
+    border-radius: 100px;
+    font-size: 16px; font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .cta-btn:hover { background: var(--indigo-light); transform: translateY(-2px); }
+
+  /* 問題 */
+  #problem { background: var(--gray-800); }
+  .pain-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px; margin-top: 40px;
+  }
+  .pain-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 28px;
+  }
+  .pain-card .emoji { font-size: 32px; margin-bottom: 12px; }
+  .pain-card h3 { margin-bottom: 8px; }
+  .pain-card p { color: var(--gray-400); font-size: 14px; line-height: 1.6; }
+
+  /* ソリューション */
+  #solution {}
+  .feature-list { margin-top: 40px; display: flex; flex-direction: column; gap: 16px; }
+  .feature-row {
+    display: flex; align-items: flex-start; gap: 20px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 16px;
+    padding: 24px 28px;
+    transition: border-color 0.2s;
+  }
+  .feature-row:hover { border-color: rgba(99,102,241,0.4); }
+  .feature-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: rgba(99,102,241,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .feature-row h3 { margin-bottom: 4px; }
+  .feature-row p { color: var(--gray-400); font-size: 14px; line-height: 1.6; }
+
+  /* 市場 */
+  #market { background: var(--gray-800); }
+  .market-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px; margin-top: 40px;
+  }
+  .market-card {
+    background: rgba(99,102,241,0.08);
+    border: 1px solid rgba(99,102,241,0.2);
+    border-radius: 16px;
+    padding: 28px 24px;
+    text-align: center;
+  }
+  .market-card .num {
+    font-size: 40px; font-weight: 800;
+    background: linear-gradient(135deg, #818cf8, #38bdf8);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .market-card .unit { font-size: 18px; font-weight: 700; }
+  .market-card p { color: var(--gray-400); font-size: 13px; margin-top: 8px; line-height: 1.5; }
+
+  /* ビジネスモデル */
+  #biz {}
+  .biz-phases { margin-top: 40px; display: flex; flex-direction: column; gap: 0; }
+  .phase {
+    display: flex; gap: 24px; align-items: flex-start;
+    padding: 24px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    position: relative;
+  }
+  .phase:last-child { border-bottom: none; }
+  .phase-num {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--indigo);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 16px; flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .phase-content h3 { margin-bottom: 6px; }
+  .phase-content p { color: var(--gray-400); font-size: 14px; line-height: 1.6; }
+  .phase-badge {
+    display: inline-block;
+    background: rgba(16,185,129,0.15);
+    color: #34d399;
+    border: 1px solid rgba(16,185,129,0.3);
+    border-radius: 100px;
+    padding: 2px 10px; font-size: 12px; font-weight: 600;
+    margin-left: 10px; vertical-align: middle;
+  }
+
+  /* チーム・募集 */
+  #team { background: var(--gray-800); }
+  .roles-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px; margin-top: 40px;
+  }
+  .role-card {
+    border-radius: 20px;
+    padding: 32px 28px;
+    position: relative; overflow: hidden;
+  }
+  .role-card.eng {
+    background: linear-gradient(135deg, rgba(79,70,229,0.2), rgba(59,130,246,0.1));
+    border: 1px solid rgba(79,70,229,0.3);
+  }
+  .role-card.design {
+    background: linear-gradient(135deg, rgba(236,72,153,0.15), rgba(168,85,247,0.1));
+    border: 1px solid rgba(236,72,153,0.3);
+  }
+  .role-card.biz {
+    background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.1));
+    border: 1px solid rgba(16,185,129,0.3);
+  }
+  .role-card .role-icon { font-size: 36px; margin-bottom: 16px; }
+  .role-card h3 { font-size: 22px; margin-bottom: 8px; }
+  .role-card .role-sub { color: var(--gray-400); font-size: 13px; margin-bottom: 20px; }
+  .role-card ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .role-card ul li {
+    color: var(--gray-200); font-size: 14px;
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+  .role-card ul li::before { content: "✓"; color: #34d399; font-weight: 700; flex-shrink: 0; }
+
+  /* なぜ今か */
+  #why {}
+  .why-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px; margin-top: 40px;
+  }
+  .why-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 28px;
+  }
+  .why-card .why-num {
+    font-size: 48px; font-weight: 800;
+    background: linear-gradient(135deg, #818cf8, #38bdf8);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .why-card h3 { margin-bottom: 8px; }
+  .why-card p { color: var(--gray-400); font-size: 14px; line-height: 1.6; }
+
+  /* 待遇 */
+  #offer { background: var(--gray-800); }
+  .offer-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px; margin-top: 40px;
+  }
+  .offer-item {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+  }
+  .offer-item .offer-icon { font-size: 32px; margin-bottom: 12px; }
+  .offer-item h3 { font-size: 16px; margin-bottom: 6px; }
+  .offer-item p { color: var(--gray-400); font-size: 13px; line-height: 1.5; }
+
+  /* CTA */
+  #cta {
+    text-align: center;
+    background: radial-gradient(ellipse 80% 60% at 50% 110%, rgba(79,70,229,0.3), transparent);
+  }
+  #cta h2 { margin-bottom: 16px; }
+  #cta p { color: var(--gray-400); font-size: 18px; margin-bottom: 40px; }
+  .contact-box {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  .contact-box p { color: var(--gray-200); font-size: 15px; margin-bottom: 8px; }
+  .contact-box .contact-name {
+    font-size: 24px; font-weight: 700; margin-bottom: 4px;
+    color: white;
+  }
+  .contact-box .contact-role {
+    color: var(--indigo-light); font-size: 14px; margin-bottom: 24px;
+  }
+  .contact-box .contact-links {
+    display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+  }
+  .contact-link {
+    background: rgba(99,102,241,0.15);
+    border: 1px solid rgba(99,102,241,0.3);
+    color: var(--indigo-light);
+    padding: 10px 22px;
+    border-radius: 100px;
+    font-size: 14px; font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .contact-link:hover { background: rgba(99,102,241,0.3); }
+
+  /* フッター */
+  footer {
+    text-align: center;
+    padding: 32px;
+    color: var(--gray-400);
+    font-size: 13px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  /* フェードイン */
+  .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 600px) {
+    nav { padding: 14px 20px; }
+    .nav-links { display: none; }
+    section { padding: 80px 20px 48px; }
+    .contact-box { padding: 28px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Care<span>o</span> AI</div>
+  <div class="nav-links">
+    <a href="#problem">課題</a>
+    <a href="#solution">プロダクト</a>
+    <a href="#market">市場</a>
+    <a href="#team">募集</a>
+    <a href="#cta">連絡する</a>
+  </div>
+</nav>
+
+<!-- ヒーロー -->
+<section id="hero">
+  <div class="slide-inner fade-in">
+    <div class="tag">🚀 Careo AI — Co-founder / 初期メンバー募集</div>
+    <h1>就活を、<br><span class="gradient-text">AIで変える。</span></h1>
+    <p class="sub">
+      毎年50万人の就活生が、非効率な就活に苦しんでいる。<br>
+      Careoは「AI就活コーチ」として、学生一人ひとりの就活を丸ごとサポートするプロダクトだ。<br>
+      一緒にこの市場を獲りにいく仲間を探している。
+    </p>
+    <a href="#team" class="cta-btn">募集ポジションを見る →</a>
+  </div>
+</section>
+
+<!-- 問題 -->
+<section id="problem">
+  <div class="slide-inner fade-in">
+    <div class="tag">Problem</div>
+    <h2>就活生が抱える<br><span class="gradient-text">リアルな課題</span></h2>
+    <p class="lead">情報過多・選考管理の煩雑さ・孤独感。誰も解決していない。</p>
+    <div class="pain-grid">
+      <div class="pain-card">
+        <div class="emoji">📋</div>
+        <h3>管理がバラバラ</h3>
+        <p>エントリー先・締切・選考状況をスプレッドシートやメモで管理。抜け漏れが起きる。</p>
+      </div>
+      <div class="pain-card">
+        <div class="emoji">✍️</div>
+        <h3>ES作成が一番しんどい</h3>
+        <p>同じような設問を何十社分も書く。ChatGPTを使っても「自分らしさ」が出ない。</p>
+      </div>
+      <div class="pain-card">
+        <div class="emoji">😰</div>
+        <h3>何から手をつければいいかわからない</h3>
+        <p>就活は「やること」が多すぎて、優先順位がわからないまま時間が過ぎる。</p>
+      </div>
+      <div class="pain-card">
+        <div class="emoji">🏫</div>
+        <h3>キャリアセンターは使いにくい</h3>
+        <p>相談したくても予約が取れない、何を聞けばいいかわからない。利用率50%以下。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ソリューション -->
+<section id="solution">
+  <div class="slide-inner fade-in">
+    <div class="tag">Solution</div>
+    <h2>Careoが提供する<br><span class="gradient-text">就活AIコーチ体験</span></h2>
+    <p class="lead">就活のあらゆるフェーズを、AIがまるごとサポートする。</p>
+    <div class="feature-list">
+      <div class="feature-row">
+        <div class="feature-icon">🏢</div>
+        <div>
+          <h3>企業・選考管理</h3>
+          <p>受けている企業を登録して選考ステータスをワンクリックで更新。締切アラートも自動。</p>
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon">✨</div>
+        <div>
+          <h3>AI ES生成</h3>
+          <p>自己分析データと企業情報をもとに、Claude AIがパーソナライズされたES回答を生成。キーワードとアドバイス付き。</p>
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon">📊</div>
+        <div>
+          <h3>週次PDCAレポート</h3>
+          <p>今週の就活を振り返り、来週やるべきことをAIが自動で提案。計画倒れを防ぐ。</p>
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon">💬</div>
+        <div>
+          <h3>AIチャット「カレオ」</h3>
+          <p>24時間いつでも就活の悩みを相談できるAIアドバイザー。志望動機から面接対策まで何でも聞ける。</p>
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon">🏫</div>
+        <div>
+          <h3>キャリアセンター連携（開発中）</h3>
+          <p>大学のキャリアセンターと連携し、職員が学生の就活状況をリアルタイムで把握。面談予約も一元管理。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 市場 -->
+<section id="market">
+  <div class="slide-inner fade-in">
+    <div class="tag">Market</div>
+    <h2>巨大な市場、<br><span class="gradient-text">まだ誰も獲っていない</span></h2>
+    <p class="lead">日本の就活市場は毎年リセットされる。学生は常に新しく、ニーズは消えない。</p>
+    <div class="market-grid">
+      <div class="market-card">
+        <div class="num">50<span class="unit">万人</span></div>
+        <p>毎年の就活生数<br>（大学・大学院卒）</p>
+      </div>
+      <div class="market-card">
+        <div class="num">780<span class="unit">校</span></div>
+        <p>日本の大学数<br>B2B展開の対象</p>
+      </div>
+      <div class="market-card">
+        <div class="num">50<span class="unit">%</span></div>
+        <p>キャリアセンターの<br>学生利用率（改善余地大）</p>
+      </div>
+      <div class="market-card">
+        <div class="num">2<span class="unit">兆円</span></div>
+        <p>就職情報市場規模<br>（人材・採用含む）</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ビジネスモデル -->
+<section id="biz">
+  <div class="slide-inner fade-in">
+    <div class="tag">Business Model</div>
+    <h2>3フェーズで<br><span class="gradient-text">収益を積み上げる</span></h2>
+    <p class="lead">まず学生を獲得し、大学を動かし、採用企業へ展開する。</p>
+    <div class="biz-phases">
+      <div class="phase">
+        <div class="phase-num">1</div>
+        <div class="phase-content">
+          <h3>フリーミアム（学生個人課金）<span class="phase-badge">今ここ</span></h3>
+          <p>無料で基本機能を提供。AI機能・無制限管理を月額500〜980円のプレミアムで提供。まずユーザーを増やす。</p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-num">2</div>
+        <div class="phase-content">
+          <h3>大学キャリアセンター向けB2B</h3>
+          <p>職員ダッシュボード・面談予約・就職率レポートを年間30〜100万円/校で提供。「就職率が上がる」ことが購入理由になる。780校が対象。</p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-num">3</div>
+        <div class="phase-content">
+          <h3>採用企業向けスカウト機能</h3>
+          <p>Careoユーザーの就活データをもとに、採用企業がスカウトを送れる機能。OfferBox・Wantedlyと同じ構造で、より深いデータ活用が可能。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- なぜ今か -->
+<section id="why">
+  <div class="slide-inner fade-in">
+    <div class="tag">Why Now</div>
+    <h2>なぜ<span class="gradient-text">今</span>やるのか</h2>
+    <p class="lead">3つの変化が、今この瞬間に重なっている。</p>
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-num">AI</div>
+        <h3>LLMの実用化</h3>
+        <p>Claude・GPT-4が実用レベルに達した今、「ESをAIで書く」が当たり前になりつつある。先に習慣を作った者が勝つ。</p>
+      </div>
+      <div class="why-card">
+        <div class="why-num">早期</div>
+        <h3>就活の超早期化</h3>
+        <p>インターンシップが実質的な採用選考になり、1〜2年生から就活が始まっている。管理ツールの需要が爆増中。</p>
+      </div>
+      <div class="why-card">
+        <div class="why-card why-num">DX</div>
+        <h3>大学のDX化</h3>
+        <p>コロナ以降、大学がオンラインツールを積極導入する文化が根付いた。キャリアセンターのデジタル化ニーズが急速に高まっている。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 募集ポジション -->
+<section id="team">
+  <div class="slide-inner fade-in">
+    <div class="tag">We're Hiring</div>
+    <h2>一緒に作る<br><span class="gradient-text">仲間を探している</span></h2>
+    <p class="lead">スタートアップの最初期に入ることの価値を、一緒に体感してほしい。</p>
+    <div class="roles-grid">
+      <div class="role-card eng">
+        <div class="role-icon">⚡</div>
+        <h3>エンジニア</h3>
+        <p class="role-sub">フロント / バックエンド / フルスタック</p>
+        <ul>
+          <li>Next.js / TypeScript での開発</li>
+          <li>Supabase（PostgreSQL）の設計・実装</li>
+          <li>Claude API を使った AI 機能開発</li>
+          <li>キャリアセンター向けダッシュボード構築</li>
+          <li>経験レベル不問・学ぶ意欲があればOK</li>
+        </ul>
+      </div>
+      <div class="role-card design">
+        <div class="role-icon">🎨</div>
+        <h3>デザイナー</h3>
+        <p class="role-sub">UI/UX / プロダクトデザイン</p>
+        <ul>
+          <li>就活生が毎日使いたくなるUI設計</li>
+          <li>キャリアセンター向け管理画面のUX</li>
+          <li>ブランドアイデンティティの確立</li>
+          <li>ユーザーインタビュー・仮説検証</li>
+          <li>Figma使えれば経験レベル不問</li>
+        </ul>
+      </div>
+      <div class="role-card biz">
+        <div class="role-icon">🚀</div>
+        <h3>ビジネス / 営業</h3>
+        <p class="role-sub">事業開発 / グロース / 大学営業</p>
+        <ul>
+          <li>大学キャリアセンターへの提携営業</li>
+          <li>就活コミュニティ・SNSでの拡散戦略</li>
+          <li>ユーザーインタビュー・フィードバック収集</li>
+          <li>マーケティング施策の企画・実行</li>
+          <li>就活経験を活かしてプロダクトを磨く</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 待遇・得られるもの -->
+<section id="offer">
+  <div class="slide-inner fade-in">
+    <div class="tag">What You Get</div>
+    <h2>入ることで<br><span class="gradient-text">得られるもの</span></h2>
+    <div class="offer-grid">
+      <div class="offer-item">
+        <div class="offer-icon">📈</div>
+        <h3>株式・報酬</h3>
+        <p>貢献度に応じてストックオプションを付与。収益化後は報酬も。</p>
+      </div>
+      <div class="offer-item">
+        <div class="offer-icon">🛠️</div>
+        <h3>0→1の経験</h3>
+        <p>プロダクトを最初から作り上げる経験。就活・転職で最強のポートフォリオになる。</p>
+      </div>
+      <div class="offer-item">
+        <div class="offer-icon">🤖</div>
+        <h3>最先端AI開発</h3>
+        <p>Claude APIを本番プロダクトで使いこなすスキルが身につく。</p>
+      </div>
+      <div class="offer-item">
+        <div class="offer-icon">📅</div>
+        <h3>柔軟な働き方</h3>
+        <p>フルリモート・自分のペースで参加可能。学業・仕事との両立OK。</p>
+      </div>
+      <div class="offer-item">
+        <div class="offer-icon">🏆</div>
+        <h3>Co-founderとして</h3>
+        <p>早期メンバーはCo-founderとして事業の方向性に関わる権限を持つ。</p>
+      </div>
+      <div class="offer-item">
+        <div class="offer-icon">🌏</div>
+        <h3>社会的インパクト</h3>
+        <p>毎年50万人の就活生の体験を変える。使われているプロダクトを作る喜び。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="slide-inner fade-in">
+    <h2>まず、<span class="gradient-text">話を聞いてほしい。</span></h2>
+    <p>興味があれば何でもいい。カジュアルに話しましょう。</p>
+    <div class="contact-box">
+      <p>Founder & CEO</p>
+      <div class="contact-name">Hiroki</div>
+      <div class="contact-role">Careo AI Company</div>
+      <div class="contact-links">
+        <a href="#" class="contact-link">📱 LINE で話す</a>
+        <a href="#" class="contact-link">🐦 X / Twitter</a>
+        <a href="#" class="contact-link">📧 メールする</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  © 2026 Careo AI — 就活を、AIで変える。
+</footer>
+
+<script>
+  // フェードイン
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
