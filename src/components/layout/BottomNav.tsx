@@ -52,6 +52,7 @@ const mainItems = [
 ];
 
 const moreItems = [
+  { href: "/team", label: "チーム" },
   { href: "/interviews", label: "面接ログ" },
   { href: "/ob-visits", label: "OB/OG訪問" },
   { href: "/tests", label: "筆記試験" },

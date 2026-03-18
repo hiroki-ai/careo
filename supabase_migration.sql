@@ -134,3 +134,21 @@ INSERT INTO lp_settings (key, value) VALUES
   ('after_items',   '["企業・ES・面接・OB訪問・締切がすべて一か所。全体像が常に見える","締切3日前に自動通知。見落としゼロ","カレオと話すだけで自己分析・企業リストが自動で更新される","毎週AIがPDCAを自動分析。来週やるべきことが即わかる","自己分析を一度入力すればAIが毎回ES文章を生成"]'),
   ('badge_text',    '28卒向け・AI就活コーチ「カレオ」')
 ON CONFLICT (key) DO NOTHING;
+
+-- 2026-03-18: AIチームメンバーのタスクレポートテーブル
+CREATE TABLE IF NOT EXISTS team_reports (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  member_id TEXT NOT NULL,
+  member_name TEXT NOT NULL,
+  task_type TEXT NOT NULL,
+  headline TEXT NOT NULL,
+  body TEXT NOT NULL,
+  deliverable TEXT NOT NULL,
+  action_label TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending',
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE team_reports DISABLE ROW LEVEL SECURITY;
+CREATE INDEX IF NOT EXISTS team_reports_member_id_idx ON team_reports(member_id);
+CREATE INDEX IF NOT EXISTS team_reports_created_at_idx ON team_reports(created_at DESC);
