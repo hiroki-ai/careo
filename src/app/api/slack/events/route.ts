@@ -31,7 +31,7 @@ function verifySignature(body: string, req: NextRequest): boolean {
 }
 
 /** ペルソナとしてClaudeに応答させてSlackに投稿 */
-async function respondAsPersona(text: string, personaId?: string) {
+async function respondAsPersona(text: string, channel: string, personaId?: string) {
   const cleanText = text.replace(/<@[A-Z0-9]+>/g, "").trim();
   const persona = personaId
     ? (PERSONAS.find((p) => p.id === personaId) ?? detectPersona(cleanText))
@@ -64,6 +64,7 @@ async function respondAsPersona(text: string, personaId?: string) {
     text: replyText,
     username: persona.username,
     icon_emoji: persona.icon_emoji,
+    channel,
   });
 }
 
@@ -91,7 +92,8 @@ export async function POST(req: NextRequest) {
 
   // メッセージイベントを非同期で処理（Slackの3秒タイムアウト対策）
   if (event.type === "app_mention" || event.type === "message") {
-    respondAsPersona(event.text ?? "").catch(console.error);
+    const channel = event.channel ?? process.env.SLACK_CHANNEL_ID ?? "";
+    respondAsPersona(event.text ?? "", channel).catch(console.error);
   }
 
   return NextResponse.json({ ok: true });
