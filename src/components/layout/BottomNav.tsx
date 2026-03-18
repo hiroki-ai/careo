@@ -52,6 +52,7 @@ const mainItems = [
 ];
 
 const moreItems = [
+  { href: "/honbu", label: "本部" },
   { href: "/team", label: "チーム" },
   { href: "/interviews", label: "面接ログ" },
   { href: "/ob-visits", label: "OB/OG訪問" },
