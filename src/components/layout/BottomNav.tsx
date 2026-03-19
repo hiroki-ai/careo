@@ -59,8 +59,6 @@ const moreItems = [
   { href: "/deadlines", label: "締切一覧" },
   { href: "/insights", label: "みんなの就活" },
   { href: "/settings", label: "設定" },
-  { href: "/honbu", label: "本部" },
-  { href: "/team", label: "チーム" },
 ];
 
 export function BottomNav() {

@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
 
     const message = await anthropic.messages.create({
       model: "claude-haiku-4-5-20251001",
-      max_tokens: 1100,
+      max_tokens: 600,
       messages: [{
         role: "user",
         content: `あなたは就活専門のパーソナルコーチAIです。ユーザーの就活データ全体を分析し、週次PDCAレポートを生成してください。
@@ -133,7 +133,7 @@ ${ctx.phaseDetail}
 6. Actは「具体的に何を・いつまでに」がわかるアクションにする（抽象的なアドバイスNG）
 7. scoreの根拠を数字で示す（「面接通過率XX%」「応募数がフェーズ平均の何%」など）
 
-【重要】JSONのみ出力すること。前後に説明文・マークダウン・コードブロックを一切含めないこと。
+【重要】JSONのみ出力すること。前後に説明文・マークダウン・コードブロックを一切含めないこと。各フィールドは簡潔に（配列は最大2要素、文字列は50字以内）。
 
 {
   "plan": {

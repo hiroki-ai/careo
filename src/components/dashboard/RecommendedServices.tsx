@@ -12,6 +12,25 @@ interface Service {
   careoTip: string;
 }
 
+// Careoで削除した機能の代替サービス（固定表示）
+const ALTERNATIVE_SERVICES = [
+  {
+    label: "ES文章を書く・添削する",
+    services: [
+      { name: "就活会議", url: "https://syukatsu-kaigi.jp", desc: "先輩のES例文・選考体験が豊富。ES作成前の参考に。" },
+      { name: "ワンキャリア", url: "https://www.onecareer.jp", desc: "ES添削・選考対策記事が充実。人気企業の通過ESを検索できる。" },
+      { name: "Unistyle", url: "https://unistyle.jp", desc: "内定者ESデータベース。志望業界の通過ESをチェック。" },
+    ],
+  },
+  {
+    label: "自己分析を深める",
+    services: [
+      { name: "StrengthsFinder（クリフトン）", url: "https://www.gallup.com/cliftonstrengths/ja/253676/home.aspx", desc: "強みを34の資質で診断。ESや面接の根拠づくりに。" },
+      { name: "Claude / ChatGPT", url: "https://claude.ai", desc: "「自己分析を手伝って」と話しかけてみよう。ガクチカの言語化にも。" },
+    ],
+  },
+];
+
 const SERVICE_CATALOG: Record<string, Service> = {
   offerbox: {
     name: "OfferBox",
@@ -163,6 +182,33 @@ export function RecommendedServices({ companies, profile }: Props) {
 
   return (
     <div className="mt-4">
+      {/* Careoにない機能→外部サービス案内 */}
+      <div className="mb-4 bg-amber-50 border border-amber-100 rounded-xl p-4">
+        <p className="text-sm font-semibold text-amber-900 mb-1">📌 CareoはデータとPDCAに特化しています</p>
+        <p className="text-xs text-amber-700 mb-3">ES添削・自己分析などは以下の外部サービスをご活用ください。</p>
+        <div className="space-y-3">
+          {ALTERNATIVE_SERVICES.map((cat) => (
+            <div key={cat.label}>
+              <p className="text-[11px] font-bold text-amber-800 mb-1.5">{cat.label}</p>
+              <div className="flex flex-wrap gap-2">
+                {cat.services.map((s) => (
+                  <a
+                    key={s.name}
+                    href={s.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={s.desc}
+                    className="text-xs bg-white border border-amber-200 text-amber-800 px-2.5 py-1 rounded-lg hover:bg-amber-100 transition-colors"
+                  >
+                    {s.name} ↗
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <h2 className="font-semibold text-gray-900">🔗 おすすめ就活サービス</h2>

@@ -21,7 +21,6 @@ import { RecommendedServices } from "@/components/dashboard/RecommendedServices"
 import { KareoWidget } from "@/components/dashboard/KareoWidget";
 import { createClient } from "@/lib/supabase/client";
 import { LandingPage } from "@/components/landing/LandingPage";
-import { BoardMeetingCard } from "@/components/dashboard/BoardMeetingCard";
 import { daysUntil } from "@/lib/utils";
 import { COMPANY_STATUS_ORDER, JOB_SEARCH_STAGE_LABELS } from "@/types";
 
@@ -218,13 +217,14 @@ function DashboardContent() {
         obVisits: obVisitsSlim,
         aptitudeTests: testsSlim,
       });
-      if (!data) { setPdcaError(true); return; }
+      if (!data) { setPdcaError(true); console.error("[PDCA] fetch returned null"); return; }
       if (!("error" in data)) {
         const result = data as unknown as PdcaResult;
         setPdcaResult(result);
         try { localStorage.setItem("careo_last_pdca", JSON.stringify(result)); } catch { /* ignore */ }
       } else {
         const errMsg = (data as { error: string }).error;
+        console.error("[PDCA] API error:", errMsg);
         setPdcaError(true);
         if (errMsg.includes("多すぎ")) showToast(errMsg, "error");
       }
@@ -233,9 +233,9 @@ function DashboardContent() {
     }
   };
 
-  // データが揃ったら一度だけ自動フェッチ
+  // データが揃ったら一度だけ自動フェッチ（profileがnullでも動かす）
   useEffect(() => {
-    if (!profile || itemsLoading) return;
+    if (itemsLoading) return;
     if (hasFetched.current) return;
     hasFetched.current = true;
     if (pendingItems.length === 0 && completedItems.length === 0) {
@@ -243,7 +243,7 @@ function DashboardContent() {
     }
     fetchPdca();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile, itemsLoading]);
+  }, [itemsLoading]);
 
   const handleToggle = async (id: string, isCompleted: boolean) => {
     await toggleItem(id, isCompleted);
@@ -265,9 +265,6 @@ function DashboardContent() {
 
   return (
     <div className="p-4 md:p-6 min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
-      {/* 幹部会議通知 */}
-      <BoardMeetingCard />
-
       {/* ページヘッダー */}
       <div className="flex items-center justify-between mb-4 md:mb-5">
         <div>
