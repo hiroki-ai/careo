@@ -3,20 +3,21 @@
 import Link from "next/link";
 
 const features = [
-  { icon: "📋", title: "全部まとまる管理機能", desc: "ES締切・面接日程・企業研究・反省メモを一か所に。スプレッドシートもNotionも要らない。" },
-  { icon: "🤖", title: "AIが就活のPDCAを回す", desc: "選考状況をもとにAIが毎週自動で振り返り。「今週何をすべきか」を迷わず動ける。" },
-  { icon: "🎯", title: "内定予測AI", desc: "選考データをもとにAIが内定確率を予測。弱点を可視化して改善アクションを提案。" },
-  { icon: "💬", title: "就活AIアシスタント", desc: "選考状況を把握したAIが相談相手に。ES添削・面接対策・業界分析をチャットで。" },
-  { icon: "📊", title: "企業管理・AI研究", desc: "志望企業を一覧管理。AIが企業研究を自動生成。選考ステータスをリアルタイムで追跡。" },
-  { icon: "🔗", title: "就活サービス連携ガイド", desc: "リクナビ・OfferBox・Wantedlyなど、適切なタイミングで使うべきサービスを提案。" },
+  { icon: "📋", title: "就活データを一元管理", desc: "企業・ES・面接ログ・OB/OG訪問・筆記試験・締切をすべて一か所に。スプレッドシートもNotionも要らない。" },
+  { icon: "📊", title: "AIが就活のPDCAを回す", desc: "毎週AIが選考データ全体を分析し、スコアと改善アクションを自動生成。「今週何をすべきか」が即わかる。" },
+  { icon: "🎯", title: "Next Action AIアドバイス", desc: "あなたの進捗・自己分析・就活フェーズをAIが把握し、今週やるべき具体的なアクションを3〜5個提案。" },
+  { icon: "💬", title: "AIコーチ「カレオ」", desc: "あなたの全データを把握したAIコーチが相談相手に。面接対策・悩み相談・自己分析の言語化をチャットで。" },
+  { icon: "🗓️", title: "締切カレンダー", desc: "ES締切・面接予定が自動でカレンダーに表示。締切3日前にブラウザ通知。見落としゼロ。" },
+  { icon: "📝", title: "選考パイプライン管理", desc: "WISHLIST→応募→書類→面接→内定まで選考ステータスをリアルタイムで追跡。全体像が常に見える。" },
 ];
 
 const faqs = [
-  { q: "リクナビ・マイナビとの違いは？", a: "リクナビ・マイナビは求人情報を探すサービス。Careoは応募後の選考管理とAI分析に特化しています。両方を使うのがベストです。" },
+  { q: "リクナビ・マイナビとの違いは？", a: "リクナビ・マイナビは求人情報を探すサービス。Careoは応募後の選考管理とAIコーチングに特化しています。両方を使うのがベストです。" },
   { q: "無料で使えますか？", a: "完全無料です。メールアドレスだけで登録でき、すべての機能をすぐに使えます。" },
   { q: "スマホでも使えますか？", a: "iPhone・Android両対応です。ホーム画面に追加するとアプリのように使えます。" },
-  { q: "AIは何をしてくれるの？", a: "ES生成・企業研究・週次PDCA分析・内定予測・就活チャット相談など、就活のあらゆる場面でAIコーチがサポートします。" },
-  { q: "就活コーチとして何が違うの？", a: "CareoのAIはあなたの選考状況・ES・面接履歴をすべて把握した上でアドバイスします。一般的な就活サイトの情報とは違い、あなた専用のコーチとして機能します。" },
+  { q: "AIは何をしてくれるの？", a: "週次PDCA分析・Next Actionアドバイス・AIコーチとのチャット相談をサポートします。あなたの全データを把握した上でアドバイスするので、汎用的な就活サイトとは違う個別対応ができます。" },
+  { q: "就活コーチとして何が違うの？", a: "CareoのAIはあなたの選考状況・ES・面接履歴・OB訪問・筆記試験すべてを把握した上でアドバイスします。一般的な就活情報ではなく、あなた専用のコーチとして機能します。" },
+  { q: "他の就活サービスと併用できますか？", a: "もちろんです。リクナビ・マイナビ・OfferBoxなどで企業を探し、応募したらCareoで記録・管理する使い方がベストです。" },
 ];
 
 export function FeaturesPage() {
@@ -47,8 +48,8 @@ export function FeaturesPage() {
           就活管理の<span className="text-[#00c896]">すべてが</span>、ここに
         </h1>
         <p className="text-gray-500 text-base md:text-lg max-w-xl mx-auto leading-relaxed">
-          マイナビ・リクナビは情報提供ツール。<br className="hidden md:block" />
-          CareoはAIコーチが就活を一緒に動かしてくれるコックピット。
+          マイナビ・リクナビは求人を探すツール。<br className="hidden md:block" />
+          Careoは応募後の就活データを管理し、AIが毎週PDCAを回してくれるコックピット。
         </p>
       </section>
 
@@ -80,8 +81,8 @@ export function FeaturesPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               { step: "01", title: "無料登録", desc: "メールアドレスだけで即日開始。クレジットカード不要。" },
-              { step: "02", title: "企業・ESを登録", desc: "応募企業とESを追加するだけ。AIが自動で整理してくれる。" },
-              { step: "03", title: "AIに任せる", desc: "週次PDCAをAIが自動分析。次の一手まで教えてくれる。" },
+              { step: "02", title: "就活データを記録", desc: "企業・ES・面接・OB訪問・筆記試験を記録するだけ。スプレッドシート代わりに使える。" },
+              { step: "03", title: "AIがPDCAを回す", desc: "週次PDCAをAIが自動分析。「今週何をすべきか」まで教えてくれる。" },
             ].map((item, i) => (
               <div key={item.step} className="relative text-center">
                 <div className="w-14 h-14 bg-[#00c896]/10 border border-[#00c896]/20 rounded-2xl flex items-center justify-center mx-auto mb-5">

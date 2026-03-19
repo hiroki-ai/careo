@@ -9,6 +9,8 @@ import { useInterviews } from "@/hooks/useInterviews";
 import { useProfile } from "@/hooks/useProfile";
 import { useActionItems } from "@/hooks/useActionItems";
 import { useChat } from "@/hooks/useChat";
+import { useObVisits } from "@/hooks/useObVisits";
+import { useAptitudeTests } from "@/hooks/useAptitudeTests";
 import { useToast } from "@/components/ui/Toast";
 import { useDeadlineNotifications } from "@/hooks/useDeadlineNotifications";
 import { StatusBadge, Badge } from "@/components/ui/Badge";
@@ -96,24 +98,22 @@ function DashboardContent() {
   const { profile } = useProfile();
   const { pendingItems, completedItems, loading: itemsLoading, replaceItems, toggleItem } = useActionItems();
   const { recentUserMessages } = useChat();
+  const { visits: obVisits } = useObVisits();
+  const { tests: aptitudeTests } = useAptitudeTests();
   const { showToast } = useToast();
   const router = useRouter();
   const [aiSummary, setAiSummary] = useState<string>("");
   const [aiLoading, setAiLoading] = useState(false);
-  const [hasLoaded, setHasLoaded] = useState(false);
   const [pdcaResult, setPdcaResult] = useState<PdcaResult | null>(null);
   const [pdcaLoading, setPdcaLoading] = useState(false);
-  const [prediction, setPrediction] = useState<{ score: number; grade: string; summary: string; strengths: string[]; improvements: string[] } | null>(null);
-  const [predLoading, setPredLoading] = useState(false);
-  const hasAutoFetched = useRef(false);
+  const [pdcaError, setPdcaError] = useState(false);
+  const hasFetched = useRef(false);
 
-  // キャッシュ復元: マウント時にlocalStorageからPDCA・内定予測を即座に表示
+  // キャッシュ復元: マウント時にlocalStorageからPDCAを即座に表示
   useEffect(() => {
     try {
       const cachedPdca = localStorage.getItem("careo_last_pdca");
       if (cachedPdca) setPdcaResult(JSON.parse(cachedPdca));
-      const cachedPred = localStorage.getItem("careo_last_prediction");
-      if (cachedPred) setPrediction(JSON.parse(cachedPred));
     } catch { /* ignore */ }
   }, []);
 
@@ -204,68 +204,46 @@ function DashboardContent() {
     }
   };
 
-  const fetchPdca = async (silent = false) => {
-    if (!silent) setPdcaLoading(true);
+  const fetchPdca = async () => {
+    setPdcaLoading(true);
+    setPdcaError(false);
     try {
+      const obVisitsSlim = obVisits.map(({ companyName, purpose, impression, insights }) => ({ companyName, purpose, impression, insights }));
+      const testsSlim = aptitudeTests.map(({ companyName, testType, result, scoreVerbal, scoreNonverbal }) => ({ companyName, testType, result, scoreVerbal, scoreNonverbal }));
       const data = await fetchAI("/api/ai/pdca", {
         companies: companiesSlim, esList: esListSlim, interviews: interviewsSlim, profile,
         pendingActions: pendingItems.map(i => ({ action: i.action, priority: i.priority })),
         completedActions: completedItems.map(i => ({ action: i.action })),
         recentChatMessages: recentUserMessages,
+        obVisits: obVisitsSlim,
+        aptitudeTests: testsSlim,
       });
-      if (!data) { if (!silent) showToast("PDCA分析に失敗しました。再試行してください", "error"); return; }
+      if (!data) { setPdcaError(true); return; }
       if (!("error" in data)) {
         const result = data as unknown as PdcaResult;
         setPdcaResult(result);
         try { localStorage.setItem("careo_last_pdca", JSON.stringify(result)); } catch { /* ignore */ }
       } else {
         const errMsg = (data as { error: string }).error;
-        if (!silent) showToast(errMsg.includes("多すぎ") ? errMsg : "PDCA分析に失敗しました", "error");
+        setPdcaError(true);
+        if (errMsg.includes("多すぎ")) showToast(errMsg, "error");
       }
     } finally {
-      if (!silent) setPdcaLoading(false);
+      setPdcaLoading(false);
     }
   };
 
-  const fetchPrediction = async (silent = false) => {
-    if (!silent) setPredLoading(true);
-    try {
-      const data = await fetchAI("/api/ai/offer-prediction", {
-        companies: companiesSlim, esList: esListSlim, interviews: interviewsSlim, profile,
-      });
-      if (!data) return;
-      if (!("error" in data)) {
-        const result = data as typeof prediction;
-        setPrediction(result);
-        try { localStorage.setItem("careo_last_prediction", JSON.stringify(result)); } catch { /* ignore */ }
-      } else {
-        const errMsg = (data as { error: string }).error;
-        if (!silent) showToast(errMsg.includes("多すぎ") ? errMsg : "内定予測の取得に失敗しました", "error");
-      }
-    } finally {
-      if (!silent) setPredLoading(false);
-    }
-  };
-
+  // データが揃ったら一度だけ自動フェッチ
   useEffect(() => {
-    if (profile && !itemsLoading && !hasLoaded && pendingItems.length === 0) {
-      setHasLoaded(true);
-      fetchAiAdvice(completedItems.map(i => i.action));
-    } else if (profile && !itemsLoading && !hasLoaded) {
-      setHasLoaded(true);
+    if (!profile || itemsLoading) return;
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+    if (pendingItems.length === 0 && completedItems.length === 0) {
+      fetchAiAdvice([]);
     }
-  }, [profile, itemsLoading]);
-
-  useEffect(() => {
-    if (profile && !itemsLoading && hasLoaded && !hasAutoFetched.current) {
-      hasAutoFetched.current = true;
-      // キャッシュあれば即表示済み→サイレント更新、キャッシュなしはローディング表示あり
-      // タイムアウト防止のため順番に実行（Vercel 60s制限）
-      const hasCached = !!localStorage.getItem("careo_last_pdca");
-      fetchPdca(hasCached).then(() => fetchPrediction(hasCached));
-    }
+    fetchPdca();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasLoaded, itemsLoading]);
+  }, [profile, itemsLoading]);
 
   const handleToggle = async (id: string, isCompleted: boolean) => {
     await toggleItem(id, isCompleted);
@@ -274,7 +252,6 @@ function DashboardContent() {
       const toggled = pendingItems.find(i => i.id === id);
       if (toggled) newCompleted.push(toggled.action);
       await fetchAiAdvice(newCompleted);
-      fetchPdca();
     }
   };
 
@@ -499,103 +476,17 @@ function DashboardContent() {
           </>
         )}
 
-        {!pdcaLoading && !pdcaResult && (
+        {!pdcaLoading && !pdcaResult && !pdcaError && (
           <div className="bg-white rounded-2xl border border-gray-200/60 shadow-sm p-8 text-center text-gray-400">
             <p className="text-sm mb-3">就活データが揃うとPDCA分析が実行されます</p>
             <Button size="sm" onClick={() => fetchPdca()}>PDCAを分析する</Button>
           </div>
         )}
-      </div>
 
-      {/* 内定予測AI */}
-      <div className="mt-4">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <h2 className="font-semibold text-gray-900">🎯 内定予測AI</h2>
-            <span className="text-xs text-gray-400">選考データからAIが内定確率を予測</span>
-          </div>
-          <Button variant="ghost" size="sm" onClick={() => fetchPrediction()} disabled={predLoading}>
-            {predLoading ? "分析中..." : "再分析"}
-          </Button>
-        </div>
-
-        {predLoading && (
-          <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-gray-100 rounded-full animate-pulse" />
-              <div className="flex-1 space-y-2">
-                <div className="h-3 bg-gray-100 rounded-full animate-pulse w-1/2" />
-                <div className="h-2 bg-gray-100 rounded-full animate-pulse w-full" />
-              </div>
-            </div>
-            <div className="h-3 bg-gray-100 rounded-full animate-pulse w-3/4" />
-            <div className="h-3 bg-gray-100 rounded-full animate-pulse w-2/3" />
-          </div>
-        )}
-
-        {!predLoading && prediction && (() => {
-          const gradeColor =
-            prediction.grade === "S" ? "bg-green-100 text-green-700 border-green-200" :
-            prediction.grade === "A" ? "bg-blue-100 text-blue-700 border-blue-200" :
-            prediction.grade === "B" ? "bg-yellow-100 text-yellow-700 border-yellow-200" :
-            "bg-red-100 text-red-700 border-red-200";
-          const barColor =
-            prediction.grade === "S" ? "bg-green-500" :
-            prediction.grade === "A" ? "bg-blue-500" :
-            prediction.grade === "B" ? "bg-yellow-400" :
-            "bg-red-400";
-          return (
-            <div className="bg-white rounded-xl border border-gray-100 p-5">
-              <div className="flex items-center gap-4 mb-4">
-                <div className={`w-14 h-14 rounded-full border-2 flex items-center justify-center font-bold text-xl shrink-0 ${gradeColor}`}>
-                  {prediction.grade}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-gray-700">内定予測スコア</span>
-                    <span className="text-lg font-bold text-gray-900">{prediction.score}<span className="text-xs font-normal text-gray-400">/100</span></span>
-                  </div>
-                  <div className="w-full bg-gray-100 rounded-full h-2">
-                    <div
-                      className={`h-2 rounded-full transition-all duration-700 ${barColor}`}
-                      style={{ width: `${prediction.score}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-              <p className="text-sm text-gray-600 mb-4">{prediction.summary}</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-xs font-semibold text-green-700 mb-2">強み</p>
-                  <ul className="space-y-1">
-                    {prediction.strengths.map((s, i) => (
-                      <li key={i} className="flex items-start gap-1.5 text-xs text-gray-700">
-                        <span className="text-green-500 shrink-0 mt-0.5">✓</span>
-                        {s}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-orange-600 mb-2">改善ポイント</p>
-                  <ul className="space-y-1">
-                    {prediction.improvements.map((imp, i) => (
-                      <li key={i} className="flex items-start gap-1.5 text-xs text-gray-700">
-                        <span className="text-orange-400 shrink-0 mt-0.5">▲</span>
-                        {imp}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
-          );
-        })()}
-
-        {!predLoading && !prediction && (
-          <div className="bg-white rounded-xl border border-gray-100 p-6 text-center text-gray-400">
-            <p className="text-sm mb-3">就活データが揃うと内定予測が実行されます</p>
-            <Button size="sm" onClick={() => fetchPrediction()}>予測を実行する</Button>
+        {!pdcaLoading && pdcaError && (
+          <div className="bg-white rounded-2xl border border-red-100 shadow-sm p-8 text-center">
+            <p className="text-sm text-red-500 mb-3">PDCA分析に失敗しました。時間をおいて再試行してください。</p>
+            <Button size="sm" onClick={() => fetchPdca()}>再試行する</Button>
           </div>
         )}
       </div>

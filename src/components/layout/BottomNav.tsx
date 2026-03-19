@@ -52,17 +52,15 @@ const mainItems = [
 ];
 
 const moreItems = [
-  { href: "/honbu", label: "本部" },
-  { href: "/team", label: "チーム" },
   { href: "/interviews", label: "面接ログ" },
   { href: "/ob-visits", label: "OB/OG訪問" },
   { href: "/tests", label: "筆記試験" },
   { href: "/career", label: "自己分析" },
   { href: "/deadlines", label: "締切一覧" },
-  { href: "/offers", label: "内定比較" },
   { href: "/insights", label: "みんなの就活" },
-  { href: "/services", label: "おすすめサービス" },
   { href: "/settings", label: "設定" },
+  { href: "/honbu", label: "本部" },
+  { href: "/team", label: "チーム" },
 ];
 
 export function BottomNav() {

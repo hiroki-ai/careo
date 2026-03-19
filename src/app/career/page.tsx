@@ -56,8 +56,6 @@ export default function CareerPage() {
   const { profile, loading, saveProfile } = useProfile();
   const { showToast } = useToast();
   const [editData, setEditData] = useState<CareerFields | null>(null);
-  const [aiLoading, setAiLoading] = useState(false);
-  const [aiDraft, setAiDraft] = useState<CareerFields | null>(null);
   const [saved, setSaved] = useState(false);
 
   if (loading) return <div className="p-8 text-gray-400 text-sm">読み込み中...</div>;
@@ -76,12 +74,10 @@ export default function CareerPage() {
   const handleEdit = () => {
     setSaved(false);
     setEditData({ ...current });
-    setAiDraft(null);
   };
 
   const handleCancel = () => {
     setEditData(null);
-    setAiDraft(null);
   };
 
   const handleSave = async () => {
@@ -91,39 +87,9 @@ export default function CareerPage() {
       ...editData,
     });
     setEditData(null);
-    setAiDraft(null);
     setSaved(true);
     showToast("保存しました", "success");
     setTimeout(() => setSaved(false), 3000);
-  };
-
-  const handleAiGenerate = async () => {
-    if (!profile) return;
-    setAiLoading(true);
-    try {
-      const res = await fetch("/api/ai/career-suggest", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ profile }),
-      });
-      const data = await res.json();
-      if (!data.error) {
-        const draft: CareerFields = {
-          careerAxis: data.careerAxis ?? "",
-          gakuchika: data.gakuchika ?? "",
-          selfPr: data.selfPr ?? "",
-          strengths: data.strengths ?? "",
-          weaknesses: data.weaknesses ?? "",
-        };
-        setAiDraft(draft);
-        setEditData(draft); // ドラフトを編集フォームに反映
-      }
-    } catch (err) {
-      console.error("[career-suggest]", err);
-      showToast("AI下書き生成に失敗しました", "error");
-    } finally {
-      setAiLoading(false);
-    }
   };
 
   return (
@@ -140,13 +106,6 @@ export default function CareerPage() {
             <Button onClick={handleEdit}>
               {hasAnyContent ? "編集する" : "入力を始める"}
             </Button>
-            <Button
-              variant="secondary"
-              onClick={() => { handleEdit(); handleAiGenerate(); }}
-              disabled={aiLoading || !profile}
-            >
-              {aiLoading ? "AIが考え中..." : "✨ AIと一緒に考える"}
-            </Button>
             {saved && <span className="text-sm text-green-600">保存しました ✓</span>}
           </>
         )}
@@ -154,26 +113,9 @@ export default function CareerPage() {
           <>
             <Button onClick={handleSave}>保存する</Button>
             <Button variant="secondary" onClick={handleCancel}>キャンセル</Button>
-            <Button
-              variant="ghost"
-              onClick={handleAiGenerate}
-              disabled={aiLoading}
-            >
-              {aiLoading ? "生成中..." : "✨ AIで下書きを生成"}
-            </Button>
           </>
         )}
       </div>
-
-      {/* AI下書き通知バナー */}
-      {aiDraft && isEditing && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-5">
-          <p className="text-sm text-blue-800 font-medium">✨ AIが下書きを生成しました</p>
-          <p className="text-xs text-blue-600 mt-0.5">
-            あなたのプロフィールをもとにしたたたき台です。実際の体験に書き換えて使ってください。
-          </p>
-        </div>
-      )}
 
       {/* セクション一覧 */}
       <div className="space-y-5">
@@ -223,9 +165,9 @@ export default function CareerPage() {
           <h3 className="text-sm font-semibold text-gray-800 mb-3">この情報の活用先</h3>
           <div className="space-y-2">
             {[
-              { icon: "📝", label: "ES自動生成", desc: "設問に合わせてガクチカ・就活の軸から回答を自動作成" },
-              { icon: "🤖", label: "Next Action AI", desc: "あなたの強みに合った業界・企業へのアドバイスを精度UP" },
-              { icon: "💬", label: "カレオ（AI相談）", desc: "あなたの自己分析を把握した上で、個別相談に対応" },
+              { icon: "📊", label: "PDCA分析", desc: "就活の軸・強み・弱みを踏まえてAIが週次レポートを個別最適化" },
+              { icon: "🎯", label: "Next Action AI", desc: "あなたの強みに合った業界・企業・アクションを具体的に提案" },
+              { icon: "💬", label: "カレオコーチ（AIチャット）", desc: "あなたの自己分析を把握した上で、個別相談・面接対策に対応" },
             ].map((item) => (
               <div key={item.label} className="flex gap-3 items-start">
                 <span className="text-lg shrink-0">{item.icon}</span>

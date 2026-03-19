@@ -5,13 +5,13 @@ import Link from "next/link";
 import Script from "next/script";
 
 const DEFAULT_BADGE = "28卒向け・AI就活コーチ「カレオ」";
-const DEFAULT_HERO_SUBTEXT = "AIコーチ「カレオ」があなたの選考状況・自己分析・OB訪問・面接メモを全部把握。\n話すだけで自己分析が育ち、就活データが自動で蓄積される。";
+const DEFAULT_HERO_SUBTEXT = "企業・ES・面接・OB訪問・筆記試験をすべて一か所に。\nAIコーチ「カレオ」が毎週PDCAを分析し、次に何をすべきかを教えてくれる。";
 const DEFAULT_AFTER_ITEMS = [
-  "企業・ES・面接・OB訪問・締切がすべて一か所。全体像が常に見える",
+  "企業・ES・面接・OB訪問・筆記試験がすべて一か所。全体像が常に見える",
   "締切3日前に自動通知。見落としゼロ",
-  "カレオと話すだけで自己分析・企業リストが自動で更新される",
-  "毎週AIがPDCAを自動分析。来週やるべきことが即わかる",
-  "自己分析を一度入力すればAIが毎回ES文章を生成",
+  "毎週AIがPDCAを自動分析。「今週何をすべきか」が即わかる",
+  "カレオコーチに話すだけで就活の悩みが整理され、次の一手が明確になる",
+  "全データを把握したAIコーチが、あなた専用のアドバイスをくれる",
 ];
 
 const jsonLd = {
@@ -136,7 +136,7 @@ export function LandingPage() {
           {/* Stats */}
           <div className="flex items-center justify-center gap-12 mt-20 animate-fade-up delay-400 border-t border-gray-100 pt-10">
             {[
-              { value: "10+", label: "AI機能" },
+              { value: "一元管理", label: "就活データを" },
               { value: "無料", label: "完全無料" },
               { value: "28卒", label: "向け特化" },
             ].map((s) => (
@@ -165,7 +165,7 @@ export function LandingPage() {
                   "締切を見落として焦る。カレンダーとNotionを行き来",
                   "面接が終わっても何が悪かったか分からないまま",
                   "「今週何をすればいいか」が毎週ゼロから考え直し",
-                  "ES下書きを何度も書き直す。自己PRを毎回コピペ修正",
+                  "OB訪問・筆記試験の記録がバラバラ。振り返りができない",
                 ].map((t) => (
                   <li key={t} className="flex gap-3 text-sm text-gray-500">
                     <span className="text-red-400 shrink-0 mt-0.5">✕</span>{t}
@@ -210,16 +210,15 @@ export function LandingPage() {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {[
-                  { label: "求人情報を探す",              careo: false, riku: true,  sugoshu: true,  notion: false },
-                  { label: "選考進捗を一元管理",          careo: true,  riku: false, sugoshu: false, notion: "△"  },
-                  { label: "ES下書きをAIが生成",          careo: true,  riku: false, sugoshu: true,  notion: false },
-                  { label: "企業研究をAIが自動生成",      careo: true,  riku: false, sugoshu: true,  notion: false },
-                  { label: "面接ログ・通過率分析",        careo: true,  riku: false, sugoshu: false, notion: "△"  },
-                  { label: "週次PDCAをAIが自動分析",      careo: true,  riku: false, sugoshu: false, notion: false },
-                  { label: "毎日対話するAIコーチ（音声入力対応）", careo: true, riku: false, sugoshu: false, notion: false },
-                  { label: "締切アラート通知",            careo: true,  riku: "△",  sugoshu: false, notion: false },
-                  { label: "SPI模擬試験",                 careo: false, riku: false, sugoshu: true,  notion: false },
-                  { label: "📵 広告・スカウト電話なし",   careo: true,  riku: false, sugoshu: false, notion: true  },
+                  { label: "求人情報を探す",                      careo: false, riku: true,  sugoshu: true,  notion: false },
+                  { label: "選考進捗を一元管理",                  careo: true,  riku: false, sugoshu: false, notion: "△"  },
+                  { label: "ES・面接・OB訪問・筆記を記録",        careo: true,  riku: false, sugoshu: false, notion: "△"  },
+                  { label: "週次PDCAをAIが自動分析",              careo: true,  riku: false, sugoshu: false, notion: false },
+                  { label: "次の一手をAIが毎週提案",              careo: true,  riku: false, sugoshu: false, notion: false },
+                  { label: "全データを把握したAIコーチ",          careo: true,  riku: false, sugoshu: false, notion: false },
+                  { label: "締切アラート通知",                    careo: true,  riku: "△",  sugoshu: false, notion: false },
+                  { label: "SPI模擬試験",                         careo: false, riku: false, sugoshu: true,  notion: false },
+                  { label: "📵 広告・スカウト電話なし",           careo: true,  riku: false, sugoshu: false, notion: true  },
                 ].map((row) => {
                   const cell = (v: boolean | string) =>
                     v === true  ? <span className="text-[#00c896] font-bold text-base">✓</span>
