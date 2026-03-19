@@ -87,6 +87,25 @@ export default function EsPage() {
         </div>
       )}
 
+      {/* ES書き方・添削 外部サービス案内 */}
+      <div className="mt-6 bg-blue-50 border border-blue-100 rounded-xl p-4">
+        <p className="text-sm font-semibold text-blue-900 mb-1">✍️ ESの書き方・添削はこちら</p>
+        <p className="text-xs text-blue-700 mb-3">Careoは記録と管理に特化しています。ES文章の作成・添削は以下のサービスが便利です。</p>
+        <div className="flex flex-wrap gap-2">
+          {[
+            { name: "就活会議（先輩のES例文）", url: "https://syukatsu-kaigi.jp" },
+            { name: "ワンキャリア（通過ES・選考対策）", url: "https://www.onecareer.jp" },
+            { name: "Unistyle（内定者ESデータベース）", url: "https://unistyle.jp" },
+            { name: "Claude・ChatGPT（ES下書き補助）", url: "https://claude.ai" },
+          ].map(s => (
+            <a key={s.name} href={s.url} target="_blank" rel="noopener noreferrer"
+              className="text-xs bg-white border border-blue-200 text-blue-800 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors">
+              {s.name} ↗
+            </a>
+          ))}
+        </div>
+      </div>
+
       {/* 証明写真アフィリエイト */}
       <div className="mt-8 border-t border-gray-100 pt-6">
         <p className="text-xs text-gray-400 font-medium mb-2">📸 ES提出前の準備</p>

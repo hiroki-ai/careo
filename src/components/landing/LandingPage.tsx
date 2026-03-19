@@ -245,6 +245,65 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* 他サービスとの使い分け */}
+      <section className="px-6 py-16 bg-gray-50/60">
+        <div className="max-w-3xl mx-auto">
+          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">Use with others</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-2 tracking-tight">Careoは「管理とコーチング」に集中する</h2>
+          <p className="text-gray-400 text-sm text-center mb-10">ES添削・自己分析・企業探しは専門サービスへ。Careoはそのデータを受け取ってPDCAを回す。</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              {
+                task: "企業を探す",
+                icon: "🔍",
+                services: [
+                  { name: "リクナビ", url: "https://job.rikunabi.com" },
+                  { name: "マイナビ", url: "https://job.mynavi.jp" },
+                  { name: "OfferBox", url: "https://offerbox.jp" },
+                ],
+                tip: "応募したらCareoに企業を登録して管理",
+              },
+              {
+                task: "ESを書く・添削する",
+                icon: "✍️",
+                services: [
+                  { name: "就活会議", url: "https://syukatsu-kaigi.jp" },
+                  { name: "ワンキャリア", url: "https://www.onecareer.jp" },
+                  { name: "Unistyle", url: "https://unistyle.jp" },
+                ],
+                tip: "書いたESをCareoに記録してPDCAに活用",
+              },
+              {
+                task: "自己分析を深める",
+                icon: "💡",
+                services: [
+                  { name: "Claude", url: "https://claude.ai" },
+                  { name: "ChatGPT", url: "https://chat.openai.com" },
+                  { name: "StrengthsFinder", url: "https://www.gallup.com/cliftonstrengths/ja/253676/home.aspx" },
+                ],
+                tip: "言語化できたらCareoの自己分析に保存",
+              },
+            ].map((cat) => (
+              <div key={cat.task} className="bg-white rounded-2xl p-5 border border-gray-100">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xl">{cat.icon}</span>
+                  <p className="font-bold text-sm text-[#0a1628]">{cat.task}</p>
+                </div>
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {cat.services.map(s => (
+                    <a key={s.name} href={s.url} target="_blank" rel="noopener noreferrer"
+                      className="text-xs bg-gray-50 border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg hover:bg-gray-100 transition-colors">
+                      {s.name} ↗
+                    </a>
+                  ))}
+                </div>
+                <p className="text-[11px] text-[#00c896] font-medium border-t border-gray-100 pt-2">→ {cat.tip}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="px-6 py-16 md:py-24 relative">
         <div className="absolute inset-0 bg-gradient-to-br from-white via-teal-50/40 to-emerald-50/60 pointer-events-none" />

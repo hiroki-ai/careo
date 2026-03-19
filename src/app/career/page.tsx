@@ -94,9 +94,27 @@ export default function CareerPage() {
 
   return (
     <div className="p-4 md:p-8 max-w-3xl">
-      <div className="mb-8">
+      <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">自己分析</h1>
         <p className="text-sm text-gray-500 mt-1">就活の軸・ガクチカ・自己PRを整理してESや面接のAI支援に活かします</p>
+      </div>
+
+      {/* 自己分析外部ツール案内 */}
+      <div className="mb-6 bg-amber-50 border border-amber-100 rounded-xl p-4">
+        <p className="text-sm font-semibold text-amber-900 mb-1">💡 自己分析をもっと深めるには</p>
+        <p className="text-xs text-amber-700 mb-3">ここに書いた内容がAIコーチとPDCA分析に使われます。まだ言語化できていない人は下記ツールで整理してから入力しよう。</p>
+        <div className="flex flex-wrap gap-2">
+          {[
+            { name: "Claude・ChatGPT（対話で言語化）", url: "https://claude.ai" },
+            { name: "StrengthsFinder（強みを診断）", url: "https://www.gallup.com/cliftonstrengths/ja/253676/home.aspx" },
+            { name: "就活会議（業界研究・口コミ）", url: "https://syukatsu-kaigi.jp" },
+          ].map(s => (
+            <a key={s.name} href={s.url} target="_blank" rel="noopener noreferrer"
+              className="text-xs bg-white border border-amber-200 text-amber-800 px-3 py-1.5 rounded-lg hover:bg-amber-100 transition-colors">
+              {s.name} ↗
+            </a>
+          ))}
+        </div>
       </div>
 
       {/* アクションバー */}
