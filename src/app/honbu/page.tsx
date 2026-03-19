@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 interface Meeting {
   id: string;
@@ -51,6 +53,8 @@ type Tab = "meetings" | "team";
 type MemberFilter = "all" | "engineer" | "sales" | "designer";
 
 export default function HonbuPage() {
+  const router = useRouter();
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [tab, setTab] = useState<Tab>("meetings");
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [teamReports, setTeamReports] = useState<TeamReport[]>([]);
@@ -58,6 +62,14 @@ export default function HonbuPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [memberFilter, setMemberFilter] = useState<MemberFilter>("all");
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    createClient().auth.getUser().then(({ data }) => {
+      const admin = data.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+      setIsAdmin(admin);
+      if (!admin) router.replace("/");
+    });
+  }, [router]);
 
   useEffect(() => {
     fetch("/api/honbu")
@@ -79,6 +91,9 @@ export default function HonbuPage() {
     memberFilter === "all"
       ? teamReports
       : teamReports.filter((r) => r.member_id === memberFilter);
+
+  if (isAdmin === null) return null;
+  if (!isAdmin) return null;
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 pb-24 md:pb-6">

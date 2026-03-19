@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import { useTeam } from "@/hooks/useTeam";
 import { TEAM_MEMBERS } from "@/lib/team/members";
 
@@ -16,6 +18,10 @@ const MEMBER_STYLES: Record<string, { gradient: string; badge: string }> = {
   designer: {
     gradient: "from-purple-600 to-pink-500",
     badge: "bg-purple-100 text-purple-700",
+  },
+  security: {
+    gradient: "from-slate-600 to-zinc-500",
+    badge: "bg-slate-100 text-slate-700",
   },
 };
 
@@ -54,10 +60,23 @@ const FOUNDER_TASKS = [
 ];
 
 export default function TeamPage() {
+  const router = useRouter();
   const { data, loading, triggerTask, respond } = useTeam();
   const [triggering, setTriggering] = useState<string | null>(null);
   const [responding, setResponding] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    createClient().auth.getUser().then(({ data }) => {
+      const admin = data.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+      setIsAdmin(admin);
+      if (!admin) router.replace("/");
+    });
+  }, [router]);
+
+  if (isAdmin === null) return null;
+  if (!isAdmin) return null;
 
   const handleTrigger = async (memberId: string) => {
     setTriggering(memberId);

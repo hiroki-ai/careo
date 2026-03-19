@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCompanies } from "@/hooks/useCompanies";
@@ -105,6 +105,17 @@ function DashboardContent() {
   const [pdcaLoading, setPdcaLoading] = useState(false);
   const [prediction, setPrediction] = useState<{ score: number; grade: string; summary: string; strengths: string[]; improvements: string[] } | null>(null);
   const [predLoading, setPredLoading] = useState(false);
+  const hasAutoFetched = useRef(false);
+
+  // キャッシュ復元: マウント時にlocalStorageからPDCA・内定予測を即座に表示
+  useEffect(() => {
+    try {
+      const cachedPdca = localStorage.getItem("careo_last_pdca");
+      if (cachedPdca) setPdcaResult(JSON.parse(cachedPdca));
+      const cachedPred = localStorage.getItem("careo_last_prediction");
+      if (cachedPred) setPrediction(JSON.parse(cachedPred));
+    } catch { /* ignore */ }
+  }, []);
 
   const statusCounts = COMPANY_STATUS_ORDER.reduce((acc, s) => {
     acc[s] = companies.filter((c) => c.status === s).length;
@@ -193,8 +204,8 @@ function DashboardContent() {
     }
   };
 
-  const fetchPdca = async () => {
-    setPdcaLoading(true);
+  const fetchPdca = async (silent = false) => {
+    if (!silent) setPdcaLoading(true);
     try {
       const data = await fetchAI("/api/ai/pdca", {
         companies: companiesSlim, esList: esListSlim, interviews: interviewsSlim, profile,
@@ -202,36 +213,37 @@ function DashboardContent() {
         completedActions: completedItems.map(i => ({ action: i.action })),
         recentChatMessages: recentUserMessages,
       });
-      if (!data) { showToast("PDCA分析に失敗しました。再試行してください", "error"); return; }
+      if (!data) { if (!silent) showToast("PDCA分析に失敗しました。再試行してください", "error"); return; }
       if (!("error" in data)) {
         const result = data as unknown as PdcaResult;
         setPdcaResult(result);
-        // チャットでカレオがPDCAを参照できるようにlocalStorageに保存
         try { localStorage.setItem("careo_last_pdca", JSON.stringify(result)); } catch { /* ignore */ }
       } else {
         const errMsg = (data as { error: string }).error;
-        showToast(errMsg.includes("多すぎ") ? errMsg : "PDCA分析に失敗しました", "error");
+        if (!silent) showToast(errMsg.includes("多すぎ") ? errMsg : "PDCA分析に失敗しました", "error");
       }
     } finally {
-      setPdcaLoading(false);
+      if (!silent) setPdcaLoading(false);
     }
   };
 
-  const fetchPrediction = async () => {
-    setPredLoading(true);
+  const fetchPrediction = async (silent = false) => {
+    if (!silent) setPredLoading(true);
     try {
       const data = await fetchAI("/api/ai/offer-prediction", {
         companies: companiesSlim, esList: esListSlim, interviews: interviewsSlim, profile,
       });
       if (!data) return;
       if (!("error" in data)) {
-        setPrediction(data as typeof prediction);
+        const result = data as typeof prediction;
+        setPrediction(result);
+        try { localStorage.setItem("careo_last_prediction", JSON.stringify(result)); } catch { /* ignore */ }
       } else {
         const errMsg = (data as { error: string }).error;
-        showToast(errMsg.includes("多すぎ") ? errMsg : "内定予測の取得に失敗しました", "error");
+        if (!silent) showToast(errMsg.includes("多すぎ") ? errMsg : "内定予測の取得に失敗しました", "error");
       }
     } finally {
-      setPredLoading(false);
+      if (!silent) setPredLoading(false);
     }
   };
 
@@ -245,9 +257,12 @@ function DashboardContent() {
   }, [profile, itemsLoading]);
 
   useEffect(() => {
-    if (profile && !itemsLoading && hasLoaded && !pdcaResult && !pdcaLoading) {
-      // PDCAと内定予測を順番に実行（同時発火でVercelタイムアウトを防ぐ）
-      fetchPdca().then(() => fetchPrediction());
+    if (profile && !itemsLoading && hasLoaded && !hasAutoFetched.current) {
+      hasAutoFetched.current = true;
+      // キャッシュあれば即表示済み→サイレント更新、キャッシュなしはローディング表示あり
+      // タイムアウト防止のため順番に実行（Vercel 60s制限）
+      const hasCached = !!localStorage.getItem("careo_last_pdca");
+      fetchPdca(hasCached).then(() => fetchPrediction(hasCached));
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasLoaded, itemsLoading]);
@@ -453,7 +468,7 @@ function DashboardContent() {
             <h2 className="font-semibold text-gray-900">📊 PDCA 週次レポート</h2>
             <span className="text-xs text-gray-400">チャット・選考状況からAIが自動分析</span>
           </div>
-          <Button variant="ghost" size="sm" onClick={fetchPdca} disabled={pdcaLoading}>
+          <Button variant="ghost" size="sm" onClick={() => fetchPdca()} disabled={pdcaLoading}>
             {pdcaLoading ? "分析中..." : "再分析"}
           </Button>
         </div>
@@ -487,7 +502,7 @@ function DashboardContent() {
         {!pdcaLoading && !pdcaResult && (
           <div className="bg-white rounded-2xl border border-gray-200/60 shadow-sm p-8 text-center text-gray-400">
             <p className="text-sm mb-3">就活データが揃うとPDCA分析が実行されます</p>
-            <Button size="sm" onClick={fetchPdca}>PDCAを分析する</Button>
+            <Button size="sm" onClick={() => fetchPdca()}>PDCAを分析する</Button>
           </div>
         )}
       </div>
@@ -499,7 +514,7 @@ function DashboardContent() {
             <h2 className="font-semibold text-gray-900">🎯 内定予測AI</h2>
             <span className="text-xs text-gray-400">選考データからAIが内定確率を予測</span>
           </div>
-          <Button variant="ghost" size="sm" onClick={fetchPrediction} disabled={predLoading}>
+          <Button variant="ghost" size="sm" onClick={() => fetchPrediction()} disabled={predLoading}>
             {predLoading ? "分析中..." : "再分析"}
           </Button>
         </div>
@@ -580,7 +595,7 @@ function DashboardContent() {
         {!predLoading && !prediction && (
           <div className="bg-white rounded-xl border border-gray-100 p-6 text-center text-gray-400">
             <p className="text-sm mb-3">就活データが揃うと内定予測が実行されます</p>
-            <Button size="sm" onClick={fetchPrediction}>予測を実行する</Button>
+            <Button size="sm" onClick={() => fetchPrediction()}>予測を実行する</Button>
           </div>
         )}
       </div>

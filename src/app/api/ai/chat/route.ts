@@ -2,12 +2,18 @@ import { NextRequest } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { getShukatsuContext } from "@/lib/shukatsuSchedule";
+import { requireAuth, checkDailyChatLimit } from "@/lib/apiAuth";
 
 export const maxDuration = 60;
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 export async function POST(req: NextRequest) {
+  // 認証チェック（未ログインは401）
+  const { user, errorResponse: authError } = await requireAuth();
+  if (authError) return authError;
+
+  // 1分あたりのIPレート制限
   const { allowed, retryAfter } = checkRateLimit(getClientIp(req), "chat");
   if (!allowed) {
     return new Response(JSON.stringify({ error: `リクエストが多すぎます。${retryAfter}秒後に再試行してください。` }), {
@@ -15,6 +21,12 @@ export async function POST(req: NextRequest) {
       headers: { "Content-Type": "application/json", "Retry-After": String(retryAfter) },
     });
   }
+
+  // 1日チャット上限チェック（管理者は無制限）
+  const isAdmin = user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+  const { errorResponse: limitError } = await checkDailyChatLimit(user.id, isAdmin);
+  if (limitError) return limitError;
+
   try {
     const { messages, context }: {
       messages: { role: "user" | "assistant"; content: string }[];

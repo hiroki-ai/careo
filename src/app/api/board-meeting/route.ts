@@ -1,17 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
-import { cookies } from "next/headers";
 import Anthropic from "@anthropic-ai/sdk";
 import { EXECUTIVES, type Executive } from "@/lib/board/executives";
+import { createClient as createServerClient } from "@/lib/supabase/server";
+
+async function isAdmin(): Promise<boolean> {
+  const supabase = await createServerClient();
+  const { data } = await supabase.auth.getUser();
+  return data.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+}
 
 // GET: 最新のpending会議を取得
 export async function GET() {
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
+  if (!(await isAdmin())) return NextResponse.json(null);
+  const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { cookies: { getAll: () => cookieStore.getAll(), setAll: () => {} } }
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
   const { data, error } = await supabase
@@ -31,11 +35,10 @@ export async function GET() {
 
 // PATCH: 承認 or 却下
 export async function PATCH(request: NextRequest) {
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
+  if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { cookies: { getAll: () => cookieStore.getAll(), setAll: () => {} } }
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
   const { id, status } = await request.json();
@@ -81,7 +84,7 @@ async function generateAndSaveLpCopy(
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
   const response = await anthropic.messages.create({

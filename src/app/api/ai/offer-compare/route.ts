@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+import { requireAuth } from "@/lib/apiAuth";
 import { Company, UserProfile } from "@/types";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 export async function POST(req: NextRequest) {
+  const { user: _authUser, errorResponse: authErr } = await requireAuth();
+  if (authErr) return authErr;
   const { allowed, retryAfter } = checkRateLimit(getClientIp(req), "offer-compare");
   if (!allowed) {
     return NextResponse.json(

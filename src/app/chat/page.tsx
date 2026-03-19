@@ -12,6 +12,13 @@ import { useChat } from "@/hooks/useChat";
 import { useToast } from "@/components/ui/Toast";
 import { parseCompanySuggestions, parseSelfAnalysis, SELF_ANALYSIS_LABELS, SelfAnalysisSuggestion } from "@/lib/chatUtils";
 
+interface CalendarEvent {
+  type: "interview" | "deadline" | "other";
+  title: string;
+  date: string;
+  companyName?: string;
+}
+
 interface LocalMessage {
   role: "user" | "assistant";
   content: string;
@@ -19,6 +26,7 @@ interface LocalMessage {
   suggestedCompanies?: string[];
   selfAnalysisSuggestions?: SelfAnalysisSuggestion[];
   savedFields?: string[]; // 保存済みフィールドを追跡
+  calendarEvents?: CalendarEvent[];
 }
 
 const KAREO_AVATAR = () => (
@@ -218,6 +226,7 @@ export default function ChatPage() {
         selfAnalysis: Record<string, string>;
         newCompanies: string[];
         actionItems: { action: string; reason: string; priority: "high" | "medium" | "low" }[];
+        calendarEvents: CalendarEvent[];
         shouldRefreshPdca: boolean;
       };
 
@@ -251,6 +260,15 @@ export default function ChatPage() {
         if (result.actionItems.length > 0) {
           showToast(`${result.actionItems.length}件のアクションをダッシュボードに追加しました`, "info");
         }
+      }
+
+      // カレンダーイベントを最後のメッセージに付与
+      if (result.calendarEvents && result.calendarEvents.length > 0) {
+        setLocalMessages((prev) => {
+          const last = prev[prev.length - 1];
+          if (!last || last.role !== "assistant") return prev;
+          return [...prev.slice(0, -1), { ...last, calendarEvents: result.calendarEvents }];
+        });
       }
 
       // PDCA更新が必要な場合はlocalStorageのキャッシュを削除して次回再取得を促す
@@ -287,6 +305,19 @@ export default function ChatPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: historyForApi, context: buildContext() }),
       });
+
+      // 1日制限 or レート制限
+      if (res.status === 429) {
+        const errData = await res.json().catch(() => ({})) as { error?: string; upgradeUrl?: string };
+        const limitMsg = errData.error ?? "今日のチャット上限に達したよ😢 Proプランにアップグレードすると無制限で使えるよ！→ /upgrade";
+        await saveMessage("assistant", limitMsg);
+        setLocalMessages((prev) => [
+          ...prev.slice(0, -1),
+          { role: "assistant", content: limitMsg },
+        ]);
+        setIsStreaming(false);
+        return;
+      }
 
       if (!res.ok || !res.body) throw new Error("Stream error");
 
@@ -524,6 +555,38 @@ export default function ChatPage() {
                     ))}
                   </div>
                 )}
+
+                {/* カレンダーイベントカード */}
+                {msg.calendarEvents && msg.calendarEvents.length > 0 && (
+                  <div className="ml-11 mt-2 space-y-2">
+                    {msg.calendarEvents.map((event, j) => {
+                      const dateLabel = (() => {
+                        try {
+                          const d = new Date(event.date);
+                          return `${d.getMonth() + 1}/${d.getDate()}（${["日","月","火","水","木","金","土"][d.getDay()]}）`;
+                        } catch { return event.date; }
+                      })();
+                      const href = event.type === "interview" ? "/interviews" : event.type === "deadline" ? "/es" : "/deadlines";
+                      const linkLabel = event.type === "interview" ? "面接ログに追加" : event.type === "deadline" ? "ES締切に設定" : "カレンダーで確認";
+                      return (
+                        <div key={j} className="rounded-xl border border-orange-200 bg-orange-50 p-3 flex items-center justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="text-xs font-semibold text-orange-800">📅 {event.title}</p>
+                            <p className="text-[11px] text-orange-600 mt-0.5">
+                              {event.companyName ? `${event.companyName} · ` : ""}{dateLabel}
+                            </p>
+                          </div>
+                          <a
+                            href={href}
+                            className="shrink-0 text-xs bg-orange-500 hover:bg-orange-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors"
+                          >
+                            {linkLabel}
+                          </a>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             ))}
 
@@ -576,6 +639,8 @@ export default function ChatPage() {
             disabled={isStreaming || historyLoading}
           />
           <button
+            type="button"
+            title="送信"
             onClick={() => sendMessage(input)}
             disabled={!input.trim() || isStreaming || historyLoading}
             className="w-8 h-8 bg-blue-600 text-white rounded-xl flex items-center justify-center shrink-0 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"

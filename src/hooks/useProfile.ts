@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { UserProfile, JobSearchStage } from "@/types";
+import { UserProfile, JobSearchStage, UserPlan } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 
 function rowToProfile(row: Record<string, unknown>): UserProfile {
@@ -14,6 +14,7 @@ function rowToProfile(row: Record<string, unknown>): UserProfile {
     targetIndustries: (row.target_industries as string[]) ?? [],
     targetJobs: (row.target_jobs as string[]) ?? [],
     jobSearchStage: row.job_search_stage as JobSearchStage,
+    plan: ((row.plan as string) ?? "free") as UserPlan,
     careerAxis: (row.career_axis as string) ?? "",
     gakuchika: (row.gakuchika as string) ?? "",
     selfPr: (row.self_pr as string) ?? "",

@@ -131,6 +131,8 @@ export const GRADES = [
   "その他",
 ];
 
+export type UserPlan = "free" | "pro";
+
 export interface UserProfile {
   id: string;
   university: string;
@@ -140,6 +142,7 @@ export interface UserProfile {
   targetIndustries: string[];
   targetJobs: string[];
   jobSearchStage: JobSearchStage;
+  plan?: UserPlan; // DB追加後にデフォルト'free'
   // 自己分析
   careerAxis?: string;
   gakuchika?: string;

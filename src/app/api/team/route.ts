@@ -2,16 +2,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { runTeamTask } from "@/lib/team/runTeamTask";
 import { TEAM_MEMBERS } from "@/lib/team/members";
+import { createClient as createServerClient } from "@/lib/supabase/server";
+
+async function isAdmin(): Promise<boolean> {
+  const supabase = await createServerClient();
+  const { data } = await supabase.auth.getUser();
+  return data.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+}
 
 function getSupabase() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 }
 
 // GET: 全メンバーの最新レポートを返す
 export async function GET() {
+  if (!(await isAdmin())) return NextResponse.json([], { status: 401 });
   const supabase = getSupabase();
 
   const results = await Promise.all(
@@ -32,6 +40,7 @@ export async function GET() {
 
 // POST: 特定メンバーのタスクを実行して保存
 export async function POST(req: NextRequest) {
+  if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { memberId } = await req.json();
   if (!memberId) {
     return NextResponse.json({ error: "memberId required" }, { status: 400 });
@@ -66,6 +75,7 @@ export async function POST(req: NextRequest) {
 
 // PATCH: 採用 or スキップ
 export async function PATCH(req: NextRequest) {
+  if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id, status } = await req.json();
   if (!id || !["adopted", "dismissed"].includes(status)) {
     return NextResponse.json({ error: "Invalid params" }, { status: 400 });

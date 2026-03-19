@@ -44,4 +44,15 @@ export const TEAM_MEMBERS: TeamMember[] = [
     gradientFrom: "from-purple-600",
     gradientTo: "to-pink-500",
   },
+  {
+    id: "security",
+    name: "Kai",
+    emoji: "🔒",
+    role: "セキュリティ・データ管理",
+    personality:
+      "リスクを先読みして動く。「問題が起きてから」ではなく「起きる前に」を徹底する。ユーザーデータの保護を最優先にしながら、開発スピードを妨げない現実的な対策を提案する。",
+    focus: "APIセキュリティ・レート制限・データプライバシー・不正利用対策・利用規約・プラン設計",
+    gradientFrom: "from-slate-600",
+    gradientTo: "to-zinc-500",
+  },
 ];

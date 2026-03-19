@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 
 export const maxDuration = 60;
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+import { requireAuth } from "@/lib/apiAuth";
 import { Company, ES, Interview, UserProfile } from "@/types";
 import { getShukatsuContext } from "@/lib/shukatsuSchedule";
 
@@ -15,6 +16,8 @@ const supabase = createClient(
 );
 
 export async function POST(req: NextRequest) {
+  const { user: _authUser, errorResponse: authErr } = await requireAuth();
+  if (authErr) return authErr;
   const { allowed, retryAfter } = checkRateLimit(getClientIp(req), "next-action");
   if (!allowed) {
     return NextResponse.json({ error: `リクエストが多すぎます。${retryAfter}秒後に再試行してください。` }, { status: 429 });

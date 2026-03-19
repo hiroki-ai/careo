@@ -1,14 +1,22 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { createClient as createServerClient } from "@/lib/supabase/server";
+
+async function isAdmin(): Promise<boolean> {
+  const supabase = await createServerClient();
+  const { data } = await supabase.auth.getUser();
+  return data.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+}
 
 function getSupabase() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 }
 
 export async function GET() {
+  if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const supabase = getSupabase();
 
   const [meetingsRes, reportsRes] = await Promise.all([

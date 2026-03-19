@@ -1,20 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+import { requireAuth } from "@/lib/apiAuth";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // チャットから抽出できる自己分析フィールド
 type SelfAnalysisField = "careerAxis" | "gakuchika" | "selfPr" | "strengths" | "weaknesses";
 
+interface CalendarEvent {
+  type: "interview" | "deadline" | "other";
+  title: string;
+  date: string; // YYYY-MM-DD
+  companyName?: string;
+}
+
 interface SyncResult {
   selfAnalysis: Partial<Record<SelfAnalysisField, string>>;
   newCompanies: string[];
   actionItems: { action: string; reason: string; priority: "high" | "medium" | "low" }[];
+  calendarEvents: CalendarEvent[];
   shouldRefreshPdca: boolean;
 }
 
 export async function POST(req: NextRequest) {
+  const { user: _authUser, errorResponse: authErr } = await requireAuth();
+  if (authErr) return authErr;
   const { allowed } = checkRateLimit(getClientIp(req), "chat-sync");
   if (!allowed) {
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });
@@ -38,6 +49,7 @@ export async function POST(req: NextRequest) {
         selfAnalysis: {},
         newCompanies: [],
         actionItems: [],
+        calendarEvents: [],
         shouldRefreshPdca: false,
       });
     }
@@ -85,7 +97,12 @@ ${existingAnalysisText}
    - weaknesses: 弱み・課題・克服したいこと
 2. newCompanies: 「気になる」「受けたい」「志望している」と発言した企業名のみ。登録済みは除外。
 3. actionItems: 会話でカレオが具体的に「やってみて」「おすすめ」と提案したアクション。既存アクションと重複しないもの。3件以内。
-4. shouldRefreshPdca: 重要な進捗（内定・落選・新企業追加・自己分析更新など）があった場合のみ true。
+4. calendarEvents: 会話で言及された具体的な日付を伴うイベント。3件以内。今日は${new Date().toISOString().slice(0, 10)}。
+   - type: "interview"（面接・面談・OB訪問）| "deadline"（ES締切・提出期限）| "other"（説明会・インターン等）
+   - title: イベント名（簡潔に、例: 「XX社 2次面接」「YY社 ES締切」）
+   - date: YYYY-MM-DD形式（相対日付は絶対日付に変換）
+   - companyName: 関連する企業名（あれば）
+5. shouldRefreshPdca: 重要な進捗（内定・落選・新企業追加・自己分析更新など）があった場合のみ true。
 
 【重要】JSONのみ出力。説明文・コードブロック不要。
 
@@ -93,6 +110,7 @@ ${existingAnalysisText}
   "selfAnalysis": {},
   "newCompanies": [],
   "actionItems": [],
+  "calendarEvents": [],
   "shouldRefreshPdca": false
 }`,
       }],
@@ -105,6 +123,7 @@ ${existingAnalysisText}
         selfAnalysis: {},
         newCompanies: [],
         actionItems: [],
+        calendarEvents: [],
         shouldRefreshPdca: false,
       });
     }
@@ -115,6 +134,7 @@ ${existingAnalysisText}
       selfAnalysis: parsed.selfAnalysis ?? {},
       newCompanies: Array.isArray(parsed.newCompanies) ? parsed.newCompanies : [],
       actionItems: Array.isArray(parsed.actionItems) ? parsed.actionItems : [],
+      calendarEvents: Array.isArray(parsed.calendarEvents) ? parsed.calendarEvents : [],
       shouldRefreshPdca: parsed.shouldRefreshPdca === true,
     });
   } catch (err) {
@@ -123,6 +143,7 @@ ${existingAnalysisText}
       selfAnalysis: {},
       newCompanies: [],
       actionItems: [],
+      calendarEvents: [],
       shouldRefreshPdca: false,
     });
   }
