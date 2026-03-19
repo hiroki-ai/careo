@@ -93,10 +93,10 @@ export default function EsPage() {
         <p className="text-xs text-blue-700 mb-3">Careoは記録と管理に特化しています。ES文章の作成・添削は以下のサービスが便利です。</p>
         <div className="flex flex-wrap gap-2">
           {[
-            { name: "就活会議（先輩のES例文）", url: "https://syukatsu-kaigi.jp" },
-            { name: "ワンキャリア（通過ES・選考対策）", url: "https://www.onecareer.jp" },
-            { name: "Unistyle（内定者ESデータベース）", url: "https://unistyle.jp" },
-            { name: "Claude・ChatGPT（ES下書き補助）", url: "https://claude.ai" },
+            { name: "就活会議（先輩のES例文）", url: "https://syukatsu-kaigi.jp/" },
+            { name: "ワンキャリア（通過ES・選考対策）", url: "https://www.onecareer.jp/" },
+            { name: "Unistyle（内定者ES86,000件）", url: "https://unistyleinc.com/" },
+            { name: "Claude・ChatGPT（ES下書き補助）", url: "https://claude.ai/" },
           ].map(s => (
             <a key={s.name} href={s.url} target="_blank" rel="noopener noreferrer"
               className="text-xs bg-white border border-blue-200 text-blue-800 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors">
@@ -111,7 +111,7 @@ export default function EsPage() {
         <p className="text-xs text-gray-400 font-medium mb-2">📸 ES提出前の準備</p>
         <a
           href="https://px.a8.net/svt/ejp?a8mat=4AZIOB+3YW1YQ+2O9U+HVFKY"
-          rel="nofollow"
+          rel="nofollow noopener noreferrer"
           target="_blank"
           className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-200 hover:border-gray-400 px-4 py-2 rounded-full transition-colors"
         >

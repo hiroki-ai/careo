@@ -10,12 +10,13 @@ interface ProfileFormProps {
   initialData?: Partial<FormData>;
   onSubmit: (data: FormData) => void;
   submitLabel?: string;
+  showSelfAnalysis?: boolean; // オンボーディングでは就活軸も聞く
 }
 
 const currentYear = new Date().getFullYear();
 const graduationYears = [currentYear, currentYear + 1, currentYear + 2, currentYear + 3];
 
-export function ProfileForm({ initialData, onSubmit, submitLabel = "保存" }: ProfileFormProps) {
+export function ProfileForm({ initialData, onSubmit, submitLabel = "保存", showSelfAnalysis = false }: ProfileFormProps) {
   const [form, setForm] = useState<FormData>({
     university: initialData?.university ?? "",
     faculty: initialData?.faculty ?? "",
@@ -24,6 +25,11 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存" }: P
     targetIndustries: initialData?.targetIndustries ?? [],
     targetJobs: initialData?.targetJobs ?? [],
     jobSearchStage: initialData?.jobSearchStage ?? "not_started",
+    careerAxis: initialData?.careerAxis ?? "",
+    gakuchika: initialData?.gakuchika ?? "",
+    selfPr: initialData?.selfPr ?? "",
+    strengths: initialData?.strengths ?? "",
+    weaknesses: initialData?.weaknesses ?? "",
   });
 
   const toggleItem = (field: "targetIndustries" | "targetJobs", value: string) => {
@@ -155,6 +161,45 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存" }: P
           ))}
         </div>
       </div>
+
+      {showSelfAnalysis && (
+        <>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              就活の軸 <span className="text-gray-400 font-normal text-xs">（AIコーチングの精度が上がります）</span>
+            </label>
+            <textarea
+              value={form.careerAxis ?? ""}
+              onChange={(e) => setForm({ ...form, careerAxis: e.target.value })}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              placeholder="例: 人の課題解決に直接関われる仕事がしたい。成長環境があり、チームで動ける会社。"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">強み <span className="text-gray-400 font-normal text-xs">（任意）</span></label>
+              <textarea
+                value={form.strengths ?? ""}
+                onChange={(e) => setForm({ ...form, strengths: e.target.value })}
+                rows={2}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                placeholder="例: 粘り強さ・巻き込み力"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">弱み <span className="text-gray-400 font-normal text-xs">（任意）</span></label>
+              <textarea
+                value={form.weaknesses ?? ""}
+                onChange={(e) => setForm({ ...form, weaknesses: e.target.value })}
+                rows={2}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                placeholder="例: 慎重すぎて決断が遅い"
+              />
+            </div>
+          </div>
+        </>
+      )}
 
       <Button type="submit" className="w-full">{submitLabel}</Button>
     </form>

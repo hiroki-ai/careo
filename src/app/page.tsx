@@ -105,7 +105,7 @@ function DashboardContent() {
   const [aiLoading, setAiLoading] = useState(false);
   const [pdcaResult, setPdcaResult] = useState<PdcaResult | null>(null);
   const [pdcaLoading, setPdcaLoading] = useState(false);
-  const [pdcaError, setPdcaError] = useState(false);
+  const [pdcaError, setPdcaError] = useState<string | false>(false);
   const hasFetched = useRef(false);
 
   // キャッシュ復元: マウント時にlocalStorageからPDCAを即座に表示
@@ -217,7 +217,7 @@ function DashboardContent() {
         obVisits: obVisitsSlim,
         aptitudeTests: testsSlim,
       });
-      if (!data) { setPdcaError(true); console.error("[PDCA] fetch returned null"); return; }
+      if (!data) { setPdcaError("通信エラー（タイムアウトの可能性）"); console.error("[PDCA] fetch returned null"); return; }
       if (!("error" in data)) {
         const result = data as unknown as PdcaResult;
         setPdcaResult(result);
@@ -225,7 +225,7 @@ function DashboardContent() {
       } else {
         const errMsg = (data as { error: string }).error;
         console.error("[PDCA] API error:", errMsg);
-        setPdcaError(true);
+        setPdcaError(errMsg);
         if (errMsg.includes("多すぎ")) showToast(errMsg, "error");
       }
     } finally {
@@ -481,8 +481,9 @@ function DashboardContent() {
         )}
 
         {!pdcaLoading && pdcaError && (
-          <div className="bg-white rounded-2xl border border-red-100 shadow-sm p-8 text-center">
-            <p className="text-sm text-red-500 mb-3">PDCA分析に失敗しました。時間をおいて再試行してください。</p>
+          <div className="bg-white rounded-2xl border border-red-100 shadow-sm p-6 text-center">
+            <p className="text-sm text-red-500 mb-1">PDCA分析に失敗しました</p>
+            <p className="text-xs text-gray-400 mb-3 font-mono break-all">{pdcaError}</p>
             <Button size="sm" onClick={() => fetchPdca()}>再試行する</Button>
           </div>
         )}

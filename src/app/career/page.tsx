@@ -105,9 +105,9 @@ export default function CareerPage() {
         <p className="text-xs text-amber-700 mb-3">ここに書いた内容がAIコーチとPDCA分析に使われます。まだ言語化できていない人は下記ツールで整理してから入力しよう。</p>
         <div className="flex flex-wrap gap-2">
           {[
-            { name: "Claude・ChatGPT（対話で言語化）", url: "https://claude.ai" },
-            { name: "StrengthsFinder（強みを診断）", url: "https://www.gallup.com/cliftonstrengths/ja/253676/home.aspx" },
-            { name: "就活会議（業界研究・口コミ）", url: "https://syukatsu-kaigi.jp" },
+            { name: "Claude・ChatGPT（対話で言語化）", url: "https://claude.ai/" },
+            { name: "StrengthsFinder（強みを診断）", url: "https://www.gallup.com/cliftonstrengths/en/252137/home.aspx" },
+            { name: "就活会議（業界研究・口コミ）", url: "https://syukatsu-kaigi.jp/" },
           ].map(s => (
             <a key={s.name} href={s.url} target="_blank" rel="noopener noreferrer"
               className="text-xs bg-white border border-amber-200 text-amber-800 px-3 py-1.5 rounded-lg hover:bg-amber-100 transition-colors">

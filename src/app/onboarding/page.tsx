@@ -69,7 +69,7 @@ export default function OnboardingPage() {
               <p className="text-gray-900 font-semibold mt-3">あなたのことを教えてください</p>
               <p className="text-sm text-gray-400 mt-1">AIがあなたに合ったアドバイスをします</p>
             </div>
-            <ProfileForm onSubmit={handleProfileSave} submitLabel="次へ →" />
+            <ProfileForm onSubmit={handleProfileSave} submitLabel="次へ →" showSelfAnalysis />
           </div>
         )}
 
