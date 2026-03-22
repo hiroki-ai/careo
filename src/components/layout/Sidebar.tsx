@@ -35,6 +35,15 @@ const navItems = [
     ),
   },
   {
+    href: "/career-center",
+    label: "キャリアセンター",
+    icon: (
+      <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+      </svg>
+    ),
+  },
+  {
     href: "/companies",
     label: "企業管理",
     icon: (
@@ -183,6 +192,7 @@ export function Sidebar() {
           <img src="/icon-new.svg" alt="Careo" className="w-7 h-7 rounded-lg" />
         )}
         <button
+          type="button"
           onClick={toggle}
           className={`text-purple-200/50 hover:text-white transition-colors p-1 rounded ${collapsed ? "mt-3 ml-0" : "ml-2 shrink-0"}`}
           title={collapsed ? "展開" : "折り畳む"}
