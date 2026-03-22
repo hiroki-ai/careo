@@ -25,6 +25,16 @@ const navItems = [
     ),
   },
   {
+    href: "/report",
+    label: "PDCAレポート",
+    badge: "注目",
+    icon: (
+      <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+    ),
+  },
+  {
     href: "/companies",
     label: "企業管理",
     icon: (
@@ -102,15 +112,6 @@ const navItems = [
     icon: (
       <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-      </svg>
-    ),
-  },
-  {
-    href: "/report",
-    label: "就活レポート",
-    icon: (
-      <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
       </svg>
     ),
   },
@@ -217,7 +218,16 @@ export function Sidebar() {
               }`}
             >
               {item.icon}
-              {!collapsed && item.label}
+              {!collapsed && (
+                <span className="flex-1 flex items-center justify-between min-w-0">
+                  <span>{item.label}</span>
+                  {"badge" in item && item.badge && (
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#00c896]/20 text-[#00c896] leading-none shrink-0">
+                      {item.badge}
+                    </span>
+                  )}
+                </span>
+              )}
             </Link>
           );
         })}

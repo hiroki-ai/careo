@@ -41,24 +41,24 @@ const mainItems = [
     ),
   },
   {
-    href: "/es",
-    label: "ES",
+    href: "/report",
+    label: "PDCA",
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
       </svg>
     ),
   },
 ];
 
 const moreItems = [
+  { href: "/es", label: "ES管理", emoji: "📄" },
   { href: "/interviews", label: "面接ログ", emoji: "👥" },
   { href: "/ob-visits", label: "OB/OG訪問", emoji: "🤝" },
   { href: "/tests", label: "筆記試験", emoji: "📝" },
   { href: "/career", label: "自己分析", emoji: "💡" },
   { href: "/deadlines", label: "締切一覧", emoji: "📅" },
   { href: "/groups", label: "友達と就活", emoji: "👫" },
-  { href: "/report", label: "PDCAレポート", emoji: "📊" },
   { href: "/settings", label: "設定", emoji: "⚙️" },
 ];
 
@@ -156,6 +156,7 @@ export function BottomNav() {
           })}
 
           <button
+            type="button"
             onClick={() => setShowMore((v) => !v)}
             className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-2 rounded-xl transition-colors relative ${
               showMore || isMoreActive ? "text-[#00c896]" : "text-gray-400"
