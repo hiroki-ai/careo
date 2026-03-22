@@ -52,15 +52,14 @@ const mainItems = [
 ];
 
 const moreItems = [
-  { href: "/interviews", label: "面接ログ" },
-  { href: "/ob-visits", label: "OB/OG訪問" },
-  { href: "/tests", label: "筆記試験" },
-  { href: "/career", label: "自己分析" },
-  { href: "/deadlines", label: "締切一覧" },
-  { href: "/groups", label: "友達と就活" },
-  { href: "/report", label: "レポート" },
-  { href: "/insights", label: "みんなの就活" },
-  { href: "/settings", label: "設定" },
+  { href: "/interviews", label: "面接ログ", emoji: "👥" },
+  { href: "/ob-visits", label: "OB/OG訪問", emoji: "🤝" },
+  { href: "/tests", label: "筆記試験", emoji: "📝" },
+  { href: "/career", label: "自己分析", emoji: "💡" },
+  { href: "/deadlines", label: "締切一覧", emoji: "📅" },
+  { href: "/groups", label: "友達と就活", emoji: "👫" },
+  { href: "/report", label: "PDCAレポート", emoji: "📊" },
+  { href: "/settings", label: "設定", emoji: "⚙️" },
 ];
 
 export function BottomNav() {
@@ -70,12 +69,16 @@ export function BottomNav() {
   const [chatBadge, setChatBadge] = useState(false);
 
   useEffect(() => {
-    // チャット未実施の日はバッジを表示
     setChatBadge(!hasChatToday());
   }, [pathname]);
 
   useEffect(() => {
-    createClient().auth.getUser().then(({ data }) => setIsAuth(!!data.user));
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => setIsAuth(!!data.user));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuth(!!session?.user);
+    });
+    return () => subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -84,19 +87,24 @@ export function BottomNav() {
 
   if (!isAuth) return null;
 
+  const isMoreActive = moreItems.some(item => pathname.startsWith(item.href));
+
   return (
     <>
       {showMore && (
         <div
-          className="fixed inset-0 z-40 bg-black/40"
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
           onClick={() => setShowMore(false)}
         />
       )}
 
       {showMore && (
-        <div className="fixed bottom-16 left-0 right-0 z-50 bg-white border-t border-gray-200 rounded-t-2xl shadow-xl md:hidden">
-          <div className="px-4 pt-3 pb-2">
-            <p className="text-xs font-semibold text-gray-400 mb-3">メニュー</p>
+        <div className="fixed bottom-16 left-0 right-0 z-50 bg-white border-t border-gray-100 rounded-t-3xl shadow-2xl md:hidden">
+          <div className="flex justify-center pt-3 pb-1">
+            <div className="w-10 h-1 bg-gray-200 rounded-full" />
+          </div>
+          <div className="px-5 pt-2 pb-6">
+            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-3">メニュー</p>
             <div className="grid grid-cols-4 gap-2">
               {moreItems.map((item) => {
                 const isActive = pathname.startsWith(item.href);
@@ -104,22 +112,24 @@ export function BottomNav() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex flex-col items-center justify-center gap-1 py-3 rounded-xl text-center transition-colors ${
-                      isActive ? "bg-[#00c896]/10 text-[#00c896]" : "bg-gray-50 text-gray-600"
+                    className={`flex flex-col items-center justify-center gap-1.5 py-3 rounded-2xl text-center transition-colors ${
+                      isActive
+                        ? "bg-[#00c896]/10 text-[#00a87e]"
+                        : "bg-gray-50 text-gray-600 active:bg-gray-100"
                     }`}
                   >
-                    <span className="text-[11px] font-medium leading-tight">{item.label}</span>
+                    <span className="text-xl">{item.emoji}</span>
+                    <span className="text-[10px] font-medium leading-tight">{item.label}</span>
                   </Link>
                 );
               })}
             </div>
           </div>
-          <div className="h-safe-area-inset-bottom" />
         </div>
       )}
 
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 md:hidden">
-        <div className="flex items-center justify-around h-16 px-2">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-gray-100 md:hidden safe-area-padding-bottom">
+        <div className="flex items-center justify-around h-16 px-1">
           {mainItems.map((item) => {
             const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
             const showBadge = item.href === "/chat" && chatBadge && !isActive;
@@ -127,14 +137,17 @@ export function BottomNav() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-2 rounded-lg transition-colors relative ${
+                className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-2 rounded-xl transition-colors relative ${
                   isActive ? "text-[#00c896]" : "text-gray-400"
                 }`}
               >
+                {isActive && (
+                  <span className="absolute top-0.5 left-1/2 -translate-x-1/2 w-5 h-0.5 bg-[#00c896] rounded-full" />
+                )}
                 <span className="relative">
                   {item.icon}
                   {showBadge && (
-                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full" />
+                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                   )}
                 </span>
                 <span className="text-[10px] font-medium">{item.label}</span>
@@ -144,10 +157,13 @@ export function BottomNav() {
 
           <button
             onClick={() => setShowMore((v) => !v)}
-            className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-2 rounded-lg transition-colors ${
-              showMore ? "text-[#00c896]" : "text-gray-400"
+            className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-2 rounded-xl transition-colors relative ${
+              showMore || isMoreActive ? "text-[#00c896]" : "text-gray-400"
             }`}
           >
+            {(showMore || isMoreActive) && (
+              <span className="absolute top-0.5 left-1/2 -translate-x-1/2 w-5 h-0.5 bg-[#00c896] rounded-full" />
+            )}
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>

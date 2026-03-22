@@ -58,7 +58,7 @@ function DailyCoachBanner({ profile }: { profile: { careerAxis?: string; gakuchi
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-white font-semibold text-sm">今日のカレオコーチ</p>
-          <p className="text-indigo-200 text-xs truncate">{topic}</p>
+          <p className="text-white/75 text-xs truncate">{topic}</p>
         </div>
         <span className="text-white text-lg shrink-0">→</span>
       </div>
@@ -218,16 +218,16 @@ function DashboardContent() {
         <div>
           <h1 className="text-xl md:text-2xl font-bold text-gray-900">ダッシュボード</h1>
           {profile && (
-            <p className="text-xs md:text-sm text-gray-500 mt-0.5 hidden sm:block">
-              {[profile.university, profile.faculty, profile.grade].filter(Boolean).join(" · ")} ／ {profile.graduationYear}年卒 ／ {JOB_SEARCH_STAGE_LABELS[profile.jobSearchStage]}
+            <p className="text-xs text-gray-500 mt-0.5">
+              {profile.university ? `${profile.university} · ` : ""}{profile.grade} ／ {JOB_SEARCH_STAGE_LABELS[profile.jobSearchStage]}
             </p>
           )}
         </div>
         <div className="flex gap-2">
-          <Link href="/settings" className="hidden md:block">
+          <Link href="/settings">
             <Button variant="secondary" size="sm">設定</Button>
           </Link>
-          <Button variant="ghost" size="sm" onClick={handleLogout}>ログアウト</Button>
+          <Button variant="ghost" size="sm" onClick={handleLogout} className="hidden md:inline-flex">ログアウト</Button>
         </div>
       </div>
 
@@ -326,36 +326,45 @@ function DashboardContent() {
           )}
         </div>
 
-        {/* 中: カレンダー + 締切 */}
+        {/* 中: カレンダー + 締切（モバイルは締切のみ） */}
         <div className="md:col-span-4">
-          <h2 className="font-semibold text-gray-900 text-sm mb-3">📅 カレンダー</h2>
-          <MiniCalendar events={calendarEvents} />
+          {/* カレンダーはPCのみ */}
+          <div className="hidden md:block">
+            <h2 className="font-semibold text-gray-900 text-sm mb-3">📅 カレンダー</h2>
+            <MiniCalendar events={calendarEvents} />
+          </div>
 
-          {upcomingDeadlines.length > 0 && (
-            <div className="mt-3">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-xs font-semibold text-gray-500">直近の締切</p>
-                <Link href="/deadlines" className="text-[10px] text-[#00c896] hover:underline">すべて</Link>
-              </div>
+          {/* 締切 */}
+          <div className="md:mt-3">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="font-semibold text-gray-900 text-sm">📅 直近の締切</h2>
+              <Link href="/deadlines" className="text-[10px] text-[#00c896] hover:underline">すべて見る</Link>
+            </div>
+            {upcomingDeadlines.length > 0 ? (
               <div className="space-y-1.5">
                 {upcomingDeadlines.map((d) => (
                   <Link key={`${d.type}-${d.id}`} href={d.link}>
-                    <div className={`flex items-center justify-between bg-white rounded-lg border p-2 hover:bg-gray-50 transition-colors ${d.days <= 3 ? "border-red-200" : "border-gray-100"}`}>
+                    <div className={`flex items-center justify-between bg-white rounded-xl border p-3 hover:bg-gray-50 transition-colors ${d.days <= 3 ? "border-red-200" : "border-gray-100"}`}>
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded shrink-0 ${d.type === "ES" ? "bg-[#00c896]/10 text-[#00a87e]" : "bg-purple-100 text-purple-700"}`}>
+                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0 ${d.type === "ES" ? "bg-[#00c896]/10 text-[#00a87e]" : "bg-purple-100 text-purple-700"}`}>
                           {d.type}
                         </span>
                         <p className="text-xs font-medium text-gray-900 truncate">{d.title}</p>
                       </div>
-                      <span className={`text-[10px] font-semibold shrink-0 ml-2 ${d.days === 0 ? "text-red-600" : d.days <= 3 ? "text-orange-600" : "text-gray-400"}`}>
-                        {d.days === 0 ? "今日" : `あと${d.days}日`}
+                      <span className={`text-[10px] font-bold shrink-0 ml-2 ${d.days === 0 ? "text-red-600" : d.days <= 3 ? "text-orange-500" : "text-gray-400"}`}>
+                        {d.days === 0 ? "今日！" : `あと${d.days}日`}
                       </span>
                     </div>
                   </Link>
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="bg-white border border-gray-100 rounded-xl p-4 text-center">
+                <p className="text-xs text-gray-400">直近7日に締切はありません</p>
+                <Link href="/deadlines" className="text-xs text-[#00c896] hover:underline mt-1 block">締切一覧を見る</Link>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* 右: カレオ ウィジェット (PC のみ) */}
