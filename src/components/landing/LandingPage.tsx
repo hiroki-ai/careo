@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Script from "next/script";
 
@@ -59,10 +59,39 @@ const jsonLd = {
 };
 
 
+const faqItems = [
+  {
+    q: "Careoは完全無料ですか？",
+    a: "はい、現在は全機能を完全無料でご利用いただけます。企業管理・ES管理・面接ログ・OB訪問・筆記試験管理・AIコーチング・気づき通知など、すべての機能が無料です。",
+  },
+  {
+    q: "スマホでも使えますか？",
+    a: "はい、iPhoneでもAndroidでもブラウザから利用できます。ホーム画面に追加するとアプリのように使えます（PWA対応）。",
+  },
+  {
+    q: "BaseMeやSmartESと何が違いますか？",
+    a: "BaseMe・SmartESは特定機能（スカウト・ES生成）に特化しています。Careoは「ES・面接・OB訪問・企業管理を全部知ったAIコーチ」が特徴。データを横断した気づきを自動通知するのはCareoだけです。",
+  },
+  {
+    q: "登録にクレジットカードは必要ですか？",
+    a: "不要です。メールアドレスとパスワードだけで登録できます。広告メールやスカウト電話も一切ありません。",
+  },
+  {
+    q: "データはどこに保存されますか？",
+    a: "Supabase（PostgreSQL）を使ったセキュアなクラウドデータベースに保存されます。行レベルセキュリティ（RLS）により、自分のデータには自分だけがアクセスできます。",
+  },
+  {
+    q: "28卒以外でも使えますか？",
+    a: "はい、29卒・30卒の方もご利用いただけます。登録時に卒業予定年度を設定すると、その年度に合わせたAIコーチングが受けられます。",
+  },
+];
+
 export function LandingPage() {
   const [badgeText, setBadgeText] = useState(DEFAULT_BADGE);
   const [heroSubtext, setHeroSubtext] = useState(DEFAULT_HERO_SUBTEXT);
   const [afterItems, setAfterItems] = useState<string[]>(DEFAULT_AFTER_ITEMS);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
     fetch("/api/lp-settings")
@@ -78,6 +107,23 @@ export function LandingPage() {
         }
       })
       .catch(() => { /* デフォルト維持 */ });
+  }, []);
+
+  // スクロールアニメーション
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+    const els = document.querySelectorAll(".reveal");
+    els.forEach((el) => observerRef.current?.observe(el));
+    return () => observerRef.current?.disconnect();
   }, []);
 
   return (
@@ -139,7 +185,7 @@ export function LandingPage() {
           <div className="flex items-center justify-center gap-12 mt-20 animate-fade-up delay-400 border-t border-gray-100 pt-10">
             {[
               { value: "7機能", label: "就活データを一元管理" },
-              { value: "無料", label: "基本機能は完全無料" },
+              { value: "完全無料", label: "全機能を無料で使える" },
               { value: "28卒", label: "向け特化" },
             ].map((s) => (
               <div key={s.label} className="text-center">
@@ -154,8 +200,8 @@ export function LandingPage() {
       {/* 核心差別化: Careoだけが持つ「縦串」*/}
       <section className="px-6 py-20 bg-[#0a1628] text-white">
         <div className="max-w-4xl mx-auto">
-          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">The Careo Difference</p>
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 tracking-tight">
+          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center reveal">The Careo Difference</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 tracking-tight reveal reveal-delay-1">
             就活AIは「点」で解決する。<br />
             <span className="text-[#00c896]">Careoは「全体」をコーチングする。</span>
           </h2>
@@ -231,8 +277,8 @@ export function LandingPage() {
       {/* Before / After */}
       <section className="px-6 py-20 bg-gray-50/60">
         <div className="max-w-4xl mx-auto">
-          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">Before / After</p>
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 tracking-tight">
+          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center reveal">Before / After</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 tracking-tight reveal reveal-delay-1">
             Careoを使うと、<span className="text-[#00c896]">何が変わる？</span>
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -269,8 +315,8 @@ export function LandingPage() {
       {/* 競合比較テーブル（BaseMeを含む） */}
       <section className="px-6 py-24 bg-white">
         <div className="max-w-4xl mx-auto">
-          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">Why Careo</p>
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 tracking-tight">
+          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center reveal">Why Careo</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 tracking-tight reveal reveal-delay-1">
             他のサービスと<span className="text-[#00c896]">何が違うの？</span>
           </h2>
           <p className="text-gray-500 text-center text-sm mb-12">全部使うのがベスト。Careoは「管理とコーチング」に特化しています。</p>
@@ -298,7 +344,7 @@ export function LandingPage() {
                   { label: "データ横断の気づき通知",                    careo: true,  base: false, smart: false, riku: false, notion: false },
                   { label: "全データを把握したAIコーチ",                careo: true,  base: "△",  smart: false, riku: false, notion: false },
                   { label: "キャリアセンターレポート出力",              careo: true,  base: false, smart: false, riku: false, notion: false },
-                  { label: "学生は完全無料",                            careo: "△",  base: true,  smart: true,  riku: true,  notion: true  },
+                  { label: "学生は完全無料",                            careo: true,  base: true,  smart: true,  riku: true,  notion: true  },
                   { label: "📵 広告・スカウト電話なし",                 careo: true,  base: false, smart: true,  riku: false, notion: true  },
                 ].map((row) => {
                   const cell = (v: boolean | string) =>
@@ -389,46 +435,116 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* Proプラン紹介 */}
+      {/* 全機能無料 */}
       <section className="px-6 py-20 bg-white">
         <div className="max-w-3xl mx-auto">
-          <p className="text-indigo-600 text-sm font-bold tracking-widest uppercase mb-3 text-center">Pro Plan</p>
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 tracking-tight">
-            本気で内定を取りに行く人へ、<br /><span className="text-indigo-600">Careo Pro</span>
+          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center reveal">Pricing</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 tracking-tight reveal reveal-delay-1">
+            全機能、<span className="text-[#00c896]">完全無料。</span>
           </h2>
-          <p className="text-gray-500 text-center text-sm mb-10">
-            基本機能は無料。Proでは「提出前チェック」「キャリアセンターレポート」などの高度な機能が使えます。
+          <p className="text-gray-500 text-center text-sm mb-10 reveal reveal-delay-2">
+            クレジットカード不要。メールアドレスだけで今すぐ始められます。
           </p>
+          <div className="bg-gradient-to-br from-[#00c896]/5 to-emerald-50 border-2 border-[#00c896]/30 rounded-2xl p-8 reveal reveal-delay-2">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <p className="text-xs font-bold text-[#00a87e] uppercase tracking-wider mb-1">現在のプラン</p>
+                <p className="text-4xl font-bold text-[#0a1628]">¥0 <span className="text-base font-normal text-gray-400">/ 月</span></p>
+              </div>
+              <span className="bg-[#00c896] text-white text-xs font-bold px-3 py-1.5 rounded-full">全機能利用可能</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-6">
+              {[
+                "企業・ES・面接・OB訪問・筆記試験の管理",
+                "カレオコーチAI（制限なし）",
+                "ES提出前AIチェック",
+                "週次PDCA自動分析",
+                "点と点を繋ぐ気づき通知",
+                "進捗ベンチマーク",
+                "キャリアセンターレポート出力",
+                "友達と就活グループ",
+              ].map(f => (
+                <div key={f} className="flex items-center gap-2 text-sm text-[#0a1628]">
+                  <span className="text-[#00c896] font-bold shrink-0">✓</span>{f}
+                </div>
+              ))}
+            </div>
+            <Link href="/signup" className="block text-center bg-[#00c896] hover:bg-[#00b586] text-white font-bold py-3 rounded-xl text-sm transition-colors shadow-lg shadow-[#00c896]/20">
+              無料で始める →
+            </Link>
+          </div>
+          <p className="text-center text-xs text-gray-400 mt-4">📵 広告メール・スカウト電話は一切ありません</p>
+        </div>
+      </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6">
-              <p className="text-xs font-bold text-gray-400 uppercase mb-3">Free</p>
-              <p className="text-3xl font-bold text-gray-900 mb-4">¥0 <span className="text-sm font-normal text-gray-400">/ 月</span></p>
-              <ul className="space-y-2">
-                {["企業・ES・面接・OB訪問・筆記試験の管理", "週次PDCA自動分析", "カレオコーチ（1日30回）", "気づき通知・進捗ベンチマーク"].map(f => (
-                  <li key={f} className="text-xs text-gray-600 flex gap-2"><span className="text-green-500">✓</span>{f}</li>
-                ))}
-              </ul>
+      {/* FAQ */}
+      <section className="px-6 py-20 bg-gray-50/60">
+        <div className="max-w-3xl mx-auto">
+          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center reveal">FAQ</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 tracking-tight reveal reveal-delay-1">
+            よくある質問
+          </h2>
+          <div className="space-y-3">
+            {faqItems.map((item, i) => (
+              <div
+                key={i}
+                className={`bg-white border rounded-2xl overflow-hidden transition-all duration-200 reveal reveal-delay-${Math.min(i + 1, 4)} ${
+                  openFaq === i ? "border-[#00c896]/40 shadow-sm" : "border-gray-100"
+                }`}
+              >
+                <button
+                  className="w-full text-left px-6 py-4 flex items-center justify-between gap-4"
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                >
+                  <span className="font-semibold text-[#0a1628] text-sm">{item.q}</span>
+                  <span className={`text-[#00c896] shrink-0 transition-transform duration-200 ${openFaq === i ? "rotate-180" : ""}`}>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </span>
+                </button>
+                {openFaq === i && (
+                  <div className="px-6 pb-5 text-sm text-gray-600 leading-relaxed border-t border-gray-50 pt-3">
+                    {item.a}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Our Story */}
+      <section className="px-6 py-16 bg-[#0a1628] text-white">
+        <div className="max-w-2xl mx-auto">
+          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center reveal">Our Story</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 reveal reveal-delay-1">
+            同じ就活生として、<br />本当に使えるツールを作りたかった。
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 reveal reveal-delay-2">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
+              <p className="text-[#00c896] font-bold text-sm mb-2">👨‍💻 作った人</p>
+              <p className="text-gray-300 text-sm leading-relaxed">
+                上智大学在籍の28卒学生が開発。自分自身の就活経験から「これが欲しかった」を形にしました。
+              </p>
             </div>
-            <div className="bg-indigo-600 rounded-2xl p-6 text-white relative overflow-hidden">
-              <div className="absolute top-3 right-3 bg-white/20 text-white text-[10px] font-bold px-2 py-1 rounded-full">おすすめ</div>
-              <p className="text-xs font-bold text-indigo-200 uppercase mb-3">Pro ✨</p>
-              <p className="text-3xl font-bold mb-4">¥980 <span className="text-sm font-normal text-indigo-300">/ 月</span></p>
-              <ul className="space-y-2">
-                {[
-                  "Freeの全機能",
-                  "カレオコーチ（無制限）",
-                  "ES提出前AIチェック（無制限）",
-                  "キャリアセンターレポート出力",
-                  "就活軸の成熟度トラッキング",
-                ].map(f => (
-                  <li key={f} className="text-xs text-indigo-100 flex gap-2"><span className="text-white font-bold">★</span>{f}</li>
-                ))}
-              </ul>
-              <Link href="/signup" className="mt-5 block text-center bg-white text-indigo-700 font-bold py-2.5 rounded-xl text-sm hover:bg-indigo-50 transition-colors">
-                無料で始める →
-              </Link>
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
+              <p className="text-[#00c896] font-bold text-sm mb-2">💡 なぜ作ったか</p>
+              <p className="text-gray-300 text-sm leading-relaxed">
+                Notion・スプレッドシート・ChatGPTを行き来する非効率さに限界を感じて。全データを知るAIコーチが欲しかった。
+              </p>
             </div>
+          </div>
+          <div className="text-center reveal reveal-delay-3">
+            <p className="text-gray-400 text-xs mb-4">開発の継続は皆さんのサポートで成り立っています</p>
+            <a
+              href="https://buymeacoffee.com/careo"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-300 text-amber-900 font-bold px-6 py-2.5 rounded-xl transition-colors text-sm"
+            >
+              ☕ Buy me a coffee
+            </a>
           </div>
         </div>
       </section>
@@ -437,32 +553,18 @@ export function LandingPage() {
       <section className="px-6 py-16 md:py-24 relative">
         <div className="absolute inset-0 bg-gradient-to-br from-white via-teal-50/40 to-emerald-50/60 pointer-events-none" />
         <div className="relative max-w-2xl mx-auto text-center">
-          <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">
+          <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight reveal">
             就活、<span className="text-[#00c896]">AIと一緒に</span>始めよう
           </h2>
-          <p className="text-gray-500 text-base mb-10">無料で使えます。登録はメールアドレスだけ。</p>
-          <p className="text-xs text-gray-400 mb-6">📵 広告メール・スカウト電話は一切ありません</p>
-          <Link href="/signup" className="inline-flex items-center gap-2 bg-[#00c896] hover:bg-[#00b586] text-white font-bold px-12 py-4 rounded-2xl text-base transition-colors shadow-xl shadow-[#00c896]/30">
+          <p className="text-gray-500 text-base mb-10 reveal reveal-delay-1">完全無料。登録はメールアドレスだけ。</p>
+          <p className="text-xs text-gray-400 mb-6 reveal reveal-delay-1">📵 広告メール・スカウト電話は一切ありません</p>
+          <Link href="/signup" className="inline-flex items-center gap-2 bg-[#00c896] hover:bg-[#00b586] text-white font-bold px-12 py-4 rounded-2xl text-base transition-colors shadow-xl shadow-[#00c896]/30 reveal reveal-delay-2">
             無料で始める
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
           </Link>
         </div>
-      </section>
-
-      {/* Support */}
-      <section className="px-6 py-10 border-t border-gray-100 text-center">
-        <p className="text-sm text-gray-500 font-medium mb-1">☕ 開発を応援する</p>
-        <p className="text-xs text-gray-400 mb-4">28卒の学生が一人で作っています。コーヒー1杯分の支援が開発の励みになります。</p>
-        <a
-          href="https://buymeacoffee.com/careo"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 bg-amber-50 border border-amber-200 hover:bg-amber-100 text-amber-700 font-bold px-6 py-2.5 rounded-xl transition-colors text-sm"
-        >
-          ☕ Buy me a coffee
-        </a>
       </section>
 
       {/* Footer */}

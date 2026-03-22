@@ -164,16 +164,44 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存", sho
 
       {showSelfAnalysis && (
         <>
+          <div className="bg-[#00c896]/5 border border-[#00c896]/20 rounded-xl p-4">
+            <p className="text-xs text-[#00a87e] font-semibold mb-1">✨ AIコーチングの精度が上がります</p>
+            <p className="text-xs text-gray-500">以下を入力するほど、カレオが的確なアドバイスを届けられます。後から設定でも変更できます。</p>
+          </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              就活の軸 <span className="text-gray-400 font-normal text-xs">（AIコーチングの精度が上がります）</span>
+              就活の軸 <span className="text-gray-400 font-normal text-xs">（任意）</span>
             </label>
             <textarea
               value={form.careerAxis ?? ""}
               onChange={(e) => setForm({ ...form, careerAxis: e.target.value })}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              rows={2}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896] resize-none"
               placeholder="例: 人の課題解決に直接関われる仕事がしたい。成長環境があり、チームで動ける会社。"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              ガクチカ（学生時代に力を入れたこと） <span className="text-gray-400 font-normal text-xs">（任意）</span>
+            </label>
+            <textarea
+              value={form.gakuchika ?? ""}
+              onChange={(e) => setForm({ ...form, gakuchika: e.target.value })}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896] resize-none"
+              placeholder="例: 大学のサッカー部でキャプテンとしてチームをまとめ、地区大会優勝を達成した。"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              自己PR <span className="text-gray-400 font-normal text-xs">（任意）</span>
+            </label>
+            <textarea
+              value={form.selfPr ?? ""}
+              onChange={(e) => setForm({ ...form, selfPr: e.target.value })}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896] resize-none"
+              placeholder="例: 課題に対してデータを収集・分析し、チームを巻き込んで改善策を実行できます。"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -183,7 +211,7 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存", sho
                 value={form.strengths ?? ""}
                 onChange={(e) => setForm({ ...form, strengths: e.target.value })}
                 rows={2}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896] resize-none"
                 placeholder="例: 粘り強さ・巻き込み力"
               />
             </div>
@@ -193,7 +221,7 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存", sho
                 value={form.weaknesses ?? ""}
                 onChange={(e) => setForm({ ...form, weaknesses: e.target.value })}
                 rows={2}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896] resize-none"
                 placeholder="例: 慎重すぎて決断が遅い"
               />
             </div>

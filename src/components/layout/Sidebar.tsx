@@ -136,13 +136,20 @@ export function Sidebar() {
   const [isMobile, setIsMobile] = useState(true);
 
   useEffect(() => {
-    createClient().auth.getUser().then(({ data }) => setIsAuth(!!data.user));
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => setIsAuth(!!data.user));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuth(!!session?.user);
+    });
     const saved = localStorage.getItem("sidebar-collapsed");
     if (saved === "true") setCollapsed(true);
     const check = () => setIsMobile(window.innerWidth < 768);
     check();
     window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener("resize", check);
+    };
   }, []);
 
   const toggle = () => {

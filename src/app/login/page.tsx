@@ -33,11 +33,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 w-full max-w-sm">
+    <div className="min-h-screen bg-[#0a1628] flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-blue-600">Careo</h1>
-          <p className="text-sm text-gray-400 mt-1">AIキャリアセンター</p>
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <img src="/icon-new.svg" alt="Careo" className="w-8 h-8 rounded-xl" />
+            <h1 className="text-2xl font-bold text-[#0a1628]">Careo</h1>
+          </div>
+          <p className="text-sm text-gray-400">ログイン</p>
         </div>
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
@@ -46,7 +49,7 @@ export default function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896]"
               placeholder="you@example.com"
               required
             />
@@ -57,7 +60,7 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896]"
               placeholder="••••••••"
               required
             />
@@ -68,13 +71,13 @@ export default function LoginPage() {
           </Button>
         </form>
         <p className="text-center text-sm mt-3">
-          <Link href="/forgot-password" className="text-blue-500 hover:text-blue-700 hover:underline">
+          <Link href="/forgot-password" className="text-[#00c896] hover:underline">
             パスワードを忘れた方はこちら
           </Link>
         </p>
         <p className="text-center text-sm text-gray-500 mt-3">
           アカウントがない方は{" "}
-          <Link href="/signup" className="text-blue-600 hover:underline">新規登録</Link>
+          <Link href="/signup" className="text-[#00c896] hover:underline">新規登録</Link>
         </p>
       </div>
     </div>

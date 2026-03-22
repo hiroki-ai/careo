@@ -36,10 +36,10 @@ export default function SignupPage() {
 
   if (emailSent) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 w-full max-w-sm text-center">
-          <div className="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-7 h-7 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="min-h-screen bg-[#0a1628] flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm text-center">
+          <div className="w-14 h-14 bg-[#00c896]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-7 h-7 text-[#00c896]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
           </div>
@@ -54,7 +54,7 @@ export default function SignupPage() {
             メールが届かない場合は迷惑メールフォルダを確認してください。
           </p>
           <div className="mt-6">
-            <Link href="/login" className="text-blue-600 text-sm hover:underline">
+            <Link href="/login" className="text-[#00c896] text-sm hover:underline">
               ログインページへ
             </Link>
           </div>
@@ -64,11 +64,14 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 w-full max-w-sm">
+    <div className="min-h-screen bg-[#0a1628] flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-blue-600">Careo</h1>
-          <p className="text-sm text-gray-400 mt-1">新規登録</p>
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <img src="/icon-new.svg" alt="Careo" className="w-8 h-8 rounded-xl" />
+            <h1 className="text-2xl font-bold text-[#0a1628]">Careo</h1>
+          </div>
+          <p className="text-sm text-gray-400">無料で始める</p>
         </div>
         <form onSubmit={handleSignup} className="space-y-4">
           <div>
@@ -77,7 +80,7 @@ export default function SignupPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896]"
               placeholder="you@example.com"
               required
             />
@@ -88,7 +91,7 @@ export default function SignupPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896]"
               placeholder="••••••••"
               minLength={6}
               required
@@ -101,7 +104,7 @@ export default function SignupPage() {
         </form>
         <p className="text-center text-sm text-gray-500 mt-6">
           すでにアカウントをお持ちの方は{" "}
-          <Link href="/login" className="text-blue-600 hover:underline">ログイン</Link>
+          <Link href="/login" className="text-[#00c896] hover:underline">ログイン</Link>
         </p>
       </div>
     </div>

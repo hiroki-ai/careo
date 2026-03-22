@@ -14,6 +14,13 @@ import type { InsightItem } from "@/app/api/ai/insights/route";
 const CACHE_KEY = "careo_last_insights";
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6時間キャッシュ
 
+// AIが生成するlinkのホワイトリスト（存在しないページへのリンクを防ぐ）
+const VALID_INSIGHT_LINKS = new Set([
+  "/", "/chat", "/companies", "/es", "/interviews",
+  "/ob-visits", "/tests", "/career", "/deadlines",
+  "/groups", "/report", "/settings",
+]);
+
 const typeConfig: Record<InsightItem["type"], { bg: string; border: string; iconBg: string; icon: string }> = {
   warning: {
     bg: "bg-red-50",
@@ -190,7 +197,7 @@ export function InsightsWidget() {
                 </span>
               </button>
 
-              {isExpanded && insight.link && (
+              {isExpanded && insight.link && VALID_INSIGHT_LINKS.has(insight.link) && (
                 <div className="px-3 pb-3">
                   <Link
                     href={insight.link}
