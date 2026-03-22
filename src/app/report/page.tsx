@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useProfile } from "@/hooks/useProfile";
 import { useCompanies } from "@/hooks/useCompanies";
@@ -8,8 +8,63 @@ import { useEs } from "@/hooks/useEs";
 import { useInterviews } from "@/hooks/useInterviews";
 import { useObVisits } from "@/hooks/useObVisits";
 import { useAptitudeTests } from "@/hooks/useAptitudeTests";
+import { useActionItems } from "@/hooks/useActionItems";
 import { COMPANY_STATUS_LABELS } from "@/types";
 import { formatDate } from "@/lib/utils";
+
+interface PdcaResult {
+  plan: { weeklyGoal: string; taskCompletion: string };
+  do: { highlights: string[]; totalActivity: string };
+  check: { score: number; goodPoints: string[]; issues: string[]; insight: string };
+  act: { improvements: string[]; nextWeekFocus: string; encouragement: string };
+}
+
+async function fetchAI<T>(url: string, body: unknown, retries = 1): Promise<T | null> {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const text = await res.text();
+      try {
+        return JSON.parse(text);
+      } catch {
+        if (attempt === retries) return null;
+      }
+    } catch {
+      if (attempt === retries) return null;
+      await new Promise(r => setTimeout(r, 2000));
+    }
+  }
+  return null;
+}
+
+function ScoreRing({ score }: { score: number }) {
+  const color = score >= 80 ? "#00c896" : score >= 60 ? "#f59e0b" : "#ef4444";
+  const label = score >= 80 ? "優秀" : score >= 60 ? "良好" : "要改善";
+  return (
+    <div className="flex flex-col items-center justify-center">
+      <div className="relative w-24 h-24">
+        <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f3f4f6" strokeWidth="3" />
+          <circle
+            cx="18" cy="18" r="15.9" fill="none"
+            stroke={color} strokeWidth="3"
+            strokeDasharray={`${score} ${100 - score}`}
+            strokeLinecap="round"
+          />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="text-2xl font-bold text-gray-900">{score}</span>
+          <span className="text-[10px] text-gray-400">/ 100</span>
+        </div>
+      </div>
+      <span className="text-xs font-semibold mt-1" style={{ color }}>{label}</span>
+    </div>
+  );
+}
 
 export default function ReportPage() {
   const { profile, loading: profileLoading } = useProfile();
@@ -18,14 +73,49 @@ export default function ReportPage() {
   const { interviews } = useInterviews();
   const { visits } = useObVisits();
   const { tests } = useAptitudeTests();
+  const { pendingItems, completedItems } = useActionItems();
   const printRef = useRef<HTMLDivElement>(null);
+
+  const [pdca, setPdca] = useState<PdcaResult | null>(null);
+  const [pdcaLoading, setPdcaLoading] = useState(false);
+  const [pdcaError, setPdcaError] = useState(false);
+
+  // localStorageからキャッシュを読み込む
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("careo_last_pdca");
+      if (raw) setPdca(JSON.parse(raw));
+    } catch { /* ignore */ }
+  }, []);
+
+  const runPdca = async () => {
+    setPdcaLoading(true);
+    setPdcaError(false);
+    const esListSlim = esList.map(({ questions: _q, ...rest }) => rest);
+    const result = await fetchAI<PdcaResult>("/api/ai/pdca", {
+      companies,
+      esList: esListSlim,
+      interviews,
+      profile,
+      pendingActions: pendingItems,
+      completedActions: completedItems,
+      obVisits: visits,
+      aptitudeTests: tests,
+    });
+    if (result && result.check) {
+      setPdca(result);
+      try { localStorage.setItem("careo_last_pdca", JSON.stringify(result)); } catch { /* ignore */ }
+    } else {
+      setPdcaError(true);
+    }
+    setPdcaLoading(false);
+  };
 
   const isPro = profile?.plan === "pro";
   const today = new Date().toLocaleDateString("ja-JP", { year: "numeric", month: "long", day: "numeric" });
 
   const activeCompanies = companies.filter(c => !["WISHLIST", "OFFERED", "REJECTED"].includes(c.status));
   const offeredCompanies = companies.filter(c => c.status === "OFFERED");
-  const rejectedCompanies = companies.filter(c => c.status === "REJECTED");
   const submittedEs = esList.filter(e => e.status === "SUBMITTED");
   const passedInterviews = interviews.filter(i => i.result === "PASS");
 
@@ -33,255 +123,322 @@ export default function ReportPage() {
     return <div className="p-8 text-gray-400 text-sm">読み込み中...</div>;
   }
 
-  if (!isPro) {
-    return (
-      <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-        <div className="text-5xl mb-4">🔒</div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Proプラン限定機能</h1>
-        <p className="text-gray-500 text-sm mb-6">
-          キャリアセンターレポートはProプランでご利用いただけます。
-          <br />
-          就活の全データを1枚のレポートにまとめ、キャリアセンターに持参できます。
-        </p>
-        <Link href="/upgrade" className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-3 rounded-xl transition-colors">
-          Proプランにアップグレード
-        </Link>
-        <div className="mt-8 bg-gray-50 rounded-xl p-6 text-left">
-          <p className="text-sm font-semibold text-gray-700 mb-3">レポートに含まれる内容</p>
-          <ul className="space-y-2">
-            {[
-              "プロフィール・就活の軸・自己PR",
-              "応募企業一覧（ステータス・業界別）",
-              "ES提出状況サマリー",
-              "面接経験・合否実績",
-              "OB/OG訪問記録",
-              "筆記試験スコア",
-              "週次PDCA評価推移",
-            ].map(item => (
-              <li key={item} className="flex items-center gap-2 text-sm text-gray-600">
-                <span className="text-indigo-500">✓</span>{item}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="p-4 md:p-8">
-      {/* 印刷ヘッダー（画面表示用） */}
-      <div className="flex items-center justify-between mb-6 print:hidden">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">就活レポート</h1>
-          <p className="text-sm text-gray-500 mt-1">キャリアセンター提出用 · {today}時点</p>
+    <div className="p-4 md:p-8 max-w-3xl">
+
+      {/* ===== PDCA分析セクション（全ユーザー） ===== */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">PDCAレポート</h1>
+            <p className="text-sm text-gray-400 mt-0.5">AIが就活データ全体を分析・スコアリング</p>
+          </div>
+          <button
+            type="button"
+            onClick={runPdca}
+            disabled={pdcaLoading}
+            className="flex items-center gap-2 bg-[#00c896] hover:bg-[#00b586] disabled:opacity-50 text-white font-bold px-5 py-2.5 rounded-xl transition-colors text-sm"
+          >
+            {pdcaLoading ? (
+              <>
+                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                </svg>
+                分析中...
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                {pdca ? "再分析する" : "AI分析を実行"}
+              </>
+            )}
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={() => window.print()}
-          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 py-2.5 rounded-xl transition-colors text-sm"
-        >
-          🖨️ 印刷・PDF保存
-        </button>
+
+        {pdcaError && (
+          <div className="bg-red-50 border border-red-100 rounded-xl p-4 text-sm text-red-600 mb-4">
+            分析に失敗しました。しばらく待ってから再試行してください。
+          </div>
+        )}
+
+        {!pdca && !pdcaLoading && (
+          <div className="bg-gray-50 border border-gray-100 rounded-2xl p-8 text-center">
+            <div className="text-4xl mb-3">📊</div>
+            <p className="text-gray-700 font-semibold mb-1">週次PDCA分析を実行しよう</p>
+            <p className="text-sm text-gray-400">企業・ES・面接・OB訪問・タスクを横断的にAIが分析します</p>
+          </div>
+        )}
+
+        {pdca && (
+          <div className="space-y-4">
+            {/* スコアと概要 */}
+            <div className="bg-white border border-gray-100 rounded-2xl p-5 flex gap-6 items-start">
+              <ScoreRing score={pdca.check.score} />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-1">今週の総合評価</p>
+                <p className="text-gray-800 text-sm leading-relaxed mb-2">{pdca.check.insight}</p>
+                <div className="bg-[#00c896]/10 text-[#00a87e] text-xs font-semibold px-3 py-1.5 rounded-lg inline-block">
+                  💬 {pdca.act.encouragement}
+                </div>
+              </div>
+            </div>
+
+            {/* Plan / Do */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="bg-white border border-gray-100 rounded-2xl p-5">
+                <p className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-3">📋 Plan — 今週の目標</p>
+                <p className="text-sm font-semibold text-gray-800 mb-2">{pdca.plan.weeklyGoal}</p>
+                <p className="text-xs text-gray-400">タスク達成: {pdca.plan.taskCompletion}</p>
+              </div>
+              <div className="bg-white border border-gray-100 rounded-2xl p-5">
+                <p className="text-xs font-bold text-purple-600 uppercase tracking-wider mb-3">✅ Do — 実績</p>
+                <p className="text-xs text-gray-500 mb-2">{pdca.do.totalActivity}</p>
+                <ul className="space-y-1">
+                  {pdca.do.highlights.map((h, i) => (
+                    <li key={i} className="flex items-start gap-1.5 text-xs text-gray-700">
+                      <span className="text-purple-400 shrink-0 mt-0.5">•</span>{h}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* Check */}
+            <div className="bg-white border border-gray-100 rounded-2xl p-5">
+              <p className="text-xs font-bold text-amber-600 uppercase tracking-wider mb-3">🔍 Check — 分析</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs text-gray-400 font-medium mb-2">良い点</p>
+                  <ul className="space-y-1.5">
+                    {pdca.check.goodPoints.map((g, i) => (
+                      <li key={i} className="flex items-start gap-1.5 text-xs text-gray-700">
+                        <span className="text-[#00c896] font-bold shrink-0 mt-0.5">✓</span>{g}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400 font-medium mb-2">課題</p>
+                  <ul className="space-y-1.5">
+                    {pdca.check.issues.map((issue, i) => (
+                      <li key={i} className="flex items-start gap-1.5 text-xs text-gray-700">
+                        <span className="text-amber-500 font-bold shrink-0 mt-0.5">!</span>{issue}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Act */}
+            <div className="bg-white border border-[#00c896]/20 rounded-2xl p-5">
+              <p className="text-xs font-bold text-[#00a87e] uppercase tracking-wider mb-3">🚀 Act — 来週のアクション</p>
+              <div className="bg-[#00c896]/5 rounded-xl px-4 py-2.5 mb-3">
+                <p className="text-xs text-gray-500 mb-0.5">最優先事項</p>
+                <p className="text-sm font-bold text-[#0D0B21]">{pdca.act.nextWeekFocus}</p>
+              </div>
+              <ul className="space-y-2">
+                {pdca.act.improvements.map((imp, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                    <span className="w-5 h-5 rounded-full bg-[#00c896]/20 text-[#00a87e] flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">{i + 1}</span>
+                    {imp}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* レポート本体 */}
-      <div ref={printRef} className="max-w-3xl print:max-w-full">
+      {/* 区切り */}
+      <div className="border-t border-gray-100 mb-8" />
 
-        {/* 印刷用ヘッダー */}
-        <div className="hidden print:block mb-6 pb-4 border-b border-gray-300">
-          <h1 className="text-2xl font-bold">就活進捗レポート</h1>
-          <p className="text-sm text-gray-600">{today}時点 · Careo (careo-sigma.vercel.app)</p>
+      {/* ===== キャリアセンターレポート（Proのみ） ===== */}
+      {!isPro ? (
+        <div className="text-center py-8">
+          <div className="text-4xl mb-3">🔒</div>
+          <h2 className="text-lg font-bold text-gray-900 mb-1">キャリアセンターレポート（Pro限定）</h2>
+          <p className="text-gray-500 text-sm mb-5">就活の全データを1枚のレポートにまとめ、キャリアセンターに持参できます。</p>
+          <Link href="/upgrade" className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-xl transition-colors text-sm">
+            Proプランにアップグレード
+          </Link>
         </div>
-
-        {/* セクション1: プロフィール */}
-        <section className="mb-6 bg-white rounded-2xl border border-gray-100 p-6 print:border-gray-300 print:rounded-none">
-          <h2 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-            基本情報・自己分析
-          </h2>
-          <div className="grid grid-cols-2 gap-4 mb-4">
+      ) : (
+        <div>
+          <div className="flex items-center justify-between mb-6 print:hidden">
             <div>
-              <p className="text-xs text-gray-500">氏名</p>
-              <p className="text-sm font-medium">{profile?.university} {profile?.faculty} {profile?.grade}</p>
+              <h2 className="text-lg font-bold text-gray-900">キャリアセンターレポート</h2>
+              <p className="text-sm text-gray-500 mt-1">キャリアセンター提出用 · {today}時点</p>
             </div>
-            <div>
-              <p className="text-xs text-gray-500">卒業予定</p>
-              <p className="text-sm font-medium">{profile?.graduationYear}年3月</p>
-            </div>
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 py-2.5 rounded-xl transition-colors text-sm"
+            >
+              🖨️ 印刷・PDF保存
+            </button>
           </div>
-          {profile?.careerAxis && (
-            <div className="mb-3">
-              <p className="text-xs text-gray-500 mb-1">就活の軸</p>
-              <p className="text-sm text-gray-700 whitespace-pre-wrap">{profile.careerAxis}</p>
-            </div>
-          )}
-          {profile?.selfPr && (
-            <div className="mb-3">
-              <p className="text-xs text-gray-500 mb-1">自己PR（抜粋）</p>
-              <p className="text-sm text-gray-700">{profile.selfPr.substring(0, 200)}{profile.selfPr.length > 200 && "…"}</p>
-            </div>
-          )}
-          {profile?.strengths && (
-            <div>
-              <p className="text-xs text-gray-500 mb-1">強み</p>
-              <p className="text-sm text-gray-700 whitespace-pre-wrap">{profile.strengths}</p>
-            </div>
-          )}
-        </section>
 
-        {/* セクション2: 選考サマリー */}
-        <section className="mb-6 bg-white rounded-2xl border border-gray-100 p-6 print:border-gray-300 print:rounded-none">
-          <h2 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-            選考活動サマリー
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-            {[
-              { label: "応募・選考企業", value: activeCompanies.length + offeredCompanies.length, unit: "社" },
-              { label: "ES提出", value: submittedEs.length, unit: "件" },
-              { label: "面接経験", value: interviews.length, unit: "回" },
-              { label: "内定", value: offeredCompanies.length, unit: "社" },
-            ].map(item => (
-              <div key={item.label} className="bg-gray-50 rounded-xl p-3 text-center">
-                <p className="text-2xl font-bold text-gray-900">{item.value}<span className="text-sm font-normal text-gray-500">{item.unit}</span></p>
-                <p className="text-xs text-gray-500 mt-1">{item.label}</p>
+          <div ref={printRef}>
+            <div className="hidden print:block mb-6 pb-4 border-b border-gray-300">
+              <h1 className="text-2xl font-bold">就活進捗レポート</h1>
+              <p className="text-sm text-gray-600">{today}時点 · Careo (careo-sigma.vercel.app)</p>
+            </div>
+
+            <section className="mb-6 bg-white rounded-2xl border border-gray-100 p-6">
+              <h3 className="text-base font-bold text-gray-900 mb-4 pb-2 border-b border-gray-100">基本情報・自己分析</h3>
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <p className="text-xs text-gray-500">大学・学部</p>
+                  <p className="text-sm font-medium">{profile?.university} {profile?.faculty} {profile?.grade}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">卒業予定</p>
+                  <p className="text-sm font-medium">{profile?.graduationYear}年3月</p>
+                </div>
               </div>
-            ))}
-          </div>
+              {profile?.careerAxis && (
+                <div className="mb-3">
+                  <p className="text-xs text-gray-500 mb-1">就活の軸</p>
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{profile.careerAxis}</p>
+                </div>
+              )}
+              {profile?.selfPr && (
+                <div className="mb-3">
+                  <p className="text-xs text-gray-500 mb-1">自己PR（抜粋）</p>
+                  <p className="text-sm text-gray-700">{profile.selfPr.substring(0, 200)}{profile.selfPr.length > 200 && "…"}</p>
+                </div>
+              )}
+              {profile?.strengths && (
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">強み</p>
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{profile.strengths}</p>
+                </div>
+              )}
+            </section>
 
-          {/* 企業リスト */}
-          <div>
-            <p className="text-xs font-semibold text-gray-500 mb-2">応募企業一覧</p>
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs min-w-[400px]">
-                <thead>
-                  <tr className="border-b border-gray-100">
-                    <th className="text-left py-1.5 text-gray-500 font-medium">企業名</th>
-                    <th className="text-left py-1.5 text-gray-500 font-medium">業界</th>
-                    <th className="text-left py-1.5 text-gray-500 font-medium">ステータス</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50">
-                  {companies
-                    .filter(c => c.status !== "WISHLIST")
-                    .sort((a, b) => (a.status === "OFFERED" ? -1 : b.status === "OFFERED" ? 1 : 0))
-                    .map(c => (
-                      <tr key={c.id}>
-                        <td className="py-1.5 font-medium text-gray-800">{c.name}</td>
-                        <td className="py-1.5 text-gray-500">{c.industry ?? "-"}</td>
-                        <td className="py-1.5">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${
-                            c.status === "OFFERED" ? "bg-green-100 text-green-700" :
-                            c.status === "REJECTED" ? "bg-red-100 text-red-600" :
-                            "bg-blue-100 text-blue-700"
-                          }`}>
-                            {COMPANY_STATUS_LABELS[c.status]}
-                          </span>
-                        </td>
+            <section className="mb-6 bg-white rounded-2xl border border-gray-100 p-6">
+              <h3 className="text-base font-bold text-gray-900 mb-4 pb-2 border-b border-gray-100">選考活動サマリー</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                {[
+                  { label: "応募・選考企業", value: activeCompanies.length + offeredCompanies.length, unit: "社" },
+                  { label: "ES提出", value: submittedEs.length, unit: "件" },
+                  { label: "面接経験", value: interviews.length, unit: "回" },
+                  { label: "内定", value: offeredCompanies.length, unit: "社" },
+                ].map(item => (
+                  <div key={item.label} className="bg-gray-50 rounded-xl p-3 text-center">
+                    <p className="text-2xl font-bold text-gray-900">{item.value}<span className="text-sm font-normal text-gray-500">{item.unit}</span></p>
+                    <p className="text-xs text-gray-500 mt-1">{item.label}</p>
+                  </div>
+                ))}
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-500 mb-2">応募企業一覧</p>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs min-w-[400px]">
+                    <thead>
+                      <tr className="border-b border-gray-100">
+                        <th className="text-left py-1.5 text-gray-500 font-medium">企業名</th>
+                        <th className="text-left py-1.5 text-gray-500 font-medium">業界</th>
+                        <th className="text-left py-1.5 text-gray-500 font-medium">ステータス</th>
                       </tr>
-                    ))
-                  }
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50">
+                      {companies.filter(c => c.status !== "WISHLIST")
+                        .sort((a, b) => (a.status === "OFFERED" ? -1 : b.status === "OFFERED" ? 1 : 0))
+                        .map(c => (
+                          <tr key={c.id}>
+                            <td className="py-1.5 font-medium text-gray-800">{c.name}</td>
+                            <td className="py-1.5 text-gray-500">{c.industry ?? "-"}</td>
+                            <td className="py-1.5">
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${
+                                c.status === "OFFERED" ? "bg-green-100 text-green-700" :
+                                c.status === "REJECTED" ? "bg-red-100 text-red-600" :
+                                "bg-blue-100 text-blue-700"
+                              }`}>
+                                {COMPANY_STATUS_LABELS[c.status]}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
 
-        {/* セクション3: 面接実績 */}
-        {interviews.length > 0 && (
-          <section className="mb-6 bg-white rounded-2xl border border-gray-100 p-6 print:border-gray-300 print:rounded-none">
-            <h2 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-              面接実績
-            </h2>
-            <div className="flex gap-6 mb-4">
-              <div className="text-center">
-                <p className="text-2xl font-bold text-gray-900">{interviews.length}</p>
-                <p className="text-xs text-gray-500">総面接数</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-emerald-600">{passedInterviews.length}</p>
-                <p className="text-xs text-gray-500">通過</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-gray-900">
-                  {interviews.length > 0 ? Math.round((passedInterviews.length / interviews.length) * 100) : 0}%
-                </p>
-                <p className="text-xs text-gray-500">通過率</p>
-              </div>
-            </div>
-            <div className="space-y-1">
-              {interviews.slice(0, 10).map(i => {
-                const c = companies.find(co => co.id === i.companyId);
-                return (
-                  <div key={i.id} className="flex items-center justify-between py-1 border-b border-gray-50 text-xs">
-                    <span className="text-gray-800 font-medium">{c?.name ?? "不明"} — {i.round}次面接</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-400">{i.scheduledAt ? formatDate(i.scheduledAt) : "-"}</span>
-                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                        i.result === "PASS" ? "bg-green-100 text-green-700" :
-                        i.result === "FAIL" ? "bg-red-100 text-red-600" :
-                        "bg-gray-100 text-gray-500"
-                      }`}>
-                        {i.result === "PASS" ? "通過" : i.result === "FAIL" ? "不合格" : "結果待ち"}
+            {interviews.length > 0 && (
+              <section className="mb-6 bg-white rounded-2xl border border-gray-100 p-6">
+                <h3 className="text-base font-bold text-gray-900 mb-4 pb-2 border-b border-gray-100">面接実績</h3>
+                <div className="flex gap-6 mb-4">
+                  <div className="text-center"><p className="text-2xl font-bold">{interviews.length}</p><p className="text-xs text-gray-500">総面接数</p></div>
+                  <div className="text-center"><p className="text-2xl font-bold text-emerald-600">{passedInterviews.length}</p><p className="text-xs text-gray-500">通過</p></div>
+                  <div className="text-center"><p className="text-2xl font-bold">{interviews.length > 0 ? Math.round((passedInterviews.length / interviews.length) * 100) : 0}%</p><p className="text-xs text-gray-500">通過率</p></div>
+                </div>
+                <div className="space-y-1">
+                  {interviews.slice(0, 10).map(i => {
+                    const c = companies.find(co => co.id === i.companyId);
+                    return (
+                      <div key={i.id} className="flex items-center justify-between py-1 border-b border-gray-50 text-xs">
+                        <span className="text-gray-800 font-medium">{c?.name ?? "不明"} — {i.round}次面接</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-400">{i.scheduledAt ? formatDate(i.scheduledAt) : "-"}</span>
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${i.result === "PASS" ? "bg-green-100 text-green-700" : i.result === "FAIL" ? "bg-red-100 text-red-600" : "bg-gray-100 text-gray-500"}`}>
+                            {i.result === "PASS" ? "通過" : i.result === "FAIL" ? "不合格" : "結果待ち"}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
+
+            {visits.length > 0 && (
+              <section className="mb-6 bg-white rounded-2xl border border-gray-100 p-6">
+                <h3 className="text-base font-bold text-gray-900 mb-4 pb-2 border-b border-gray-100">OB/OG訪問 ({visits.length}件)</h3>
+                <div className="space-y-2">
+                  {visits.map(v => (
+                    <div key={v.id} className="flex items-start justify-between text-xs border-b border-gray-50 pb-2">
+                      <div>
+                        <p className="font-medium text-gray-800">{v.companyName}</p>
+                        <p className="text-gray-500 mt-0.5">{v.purpose}</p>
+                      </div>
+                      <span className="text-gray-400 shrink-0 ml-4">{v.visitedAt ? formatDate(v.visitedAt) : "-"}</span>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {tests.length > 0 && (
+              <section className="mb-6 bg-white rounded-2xl border border-gray-100 p-6">
+                <h3 className="text-base font-bold text-gray-900 mb-4 pb-2 border-b border-gray-100">筆記試験記録</h3>
+                <div className="space-y-2">
+                  {tests.map(t => (
+                    <div key={t.id} className="flex items-center justify-between text-xs border-b border-gray-50 pb-2">
+                      <div>
+                        <p className="font-medium text-gray-800">{t.companyName} — {t.testType}</p>
+                        {t.scoreVerbal && <p className="text-gray-500 mt-0.5">言語: {t.scoreVerbal} / 非言語: {t.scoreNonverbal}</p>}
+                      </div>
+                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${t.result === "PASS" ? "bg-green-100 text-green-700" : t.result === "FAIL" ? "bg-red-100 text-red-600" : "bg-gray-100 text-gray-500"}`}>
+                        {t.result === "PASS" ? "通過" : t.result === "FAIL" ? "不通過" : "結果待ち"}
                       </span>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        )}
-
-        {/* セクション4: OB/OG訪問 */}
-        {visits.length > 0 && (
-          <section className="mb-6 bg-white rounded-2xl border border-gray-100 p-6 print:border-gray-300 print:rounded-none">
-            <h2 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-              OB/OG訪問 ({visits.length}件)
-            </h2>
-            <div className="space-y-2">
-              {visits.map(v => (
-                <div key={v.id} className="flex items-start justify-between text-xs border-b border-gray-50 pb-2">
-                  <div>
-                    <p className="font-medium text-gray-800">{v.companyName}</p>
-                    <p className="text-gray-500 mt-0.5">{v.purpose}</p>
-                  </div>
-                  <span className="text-gray-400 shrink-0 ml-4">{v.visitedAt ? formatDate(v.visitedAt) : "-"}</span>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </section>
-        )}
+              </section>
+            )}
 
-        {/* セクション5: 筆記試験 */}
-        {tests.length > 0 && (
-          <section className="mb-6 bg-white rounded-2xl border border-gray-100 p-6 print:border-gray-300 print:rounded-none">
-            <h2 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-              筆記試験記録
-            </h2>
-            <div className="space-y-2">
-              {tests.map(t => (
-                <div key={t.id} className="flex items-center justify-between text-xs border-b border-gray-50 pb-2">
-                  <div>
-                    <p className="font-medium text-gray-800">{t.companyName} — {t.testType}</p>
-                    {t.scoreVerbal && <p className="text-gray-500 mt-0.5">言語: {t.scoreVerbal} / 非言語: {t.scoreNonverbal}</p>}
-                  </div>
-                  <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                    t.result === "PASS" ? "bg-green-100 text-green-700" :
-                    t.result === "FAIL" ? "bg-red-100 text-red-600" :
-                    "bg-gray-100 text-gray-500"
-                  }`}>
-                    {t.result === "PASS" ? "通過" : t.result === "FAIL" ? "不通過" : "結果待ち"}
-                  </span>
-                </div>
-              ))}
+            <div className="text-center text-xs text-gray-400 mt-8 pt-4 border-t border-gray-100">
+              Careo — AI就活コーチアプリ · careo-sigma.vercel.app
             </div>
-          </section>
-        )}
-
-        {/* フッター */}
-        <div className="text-center text-xs text-gray-400 mt-8 pt-4 border-t border-gray-100">
-          Careo — AI就活コーチアプリ · careo-sigma.vercel.app
+          </div>
         </div>
-      </div>
+      )}
 
       <style>{`
         @media print {
