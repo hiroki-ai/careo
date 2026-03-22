@@ -308,8 +308,8 @@ export default function ChatPage() {
 
       // 1日制限 or レート制限
       if (res.status === 429) {
-        const errData = await res.json().catch(() => ({})) as { error?: string; upgradeUrl?: string };
-        const limitMsg = errData.error ?? "今日のチャット上限に達したよ😢 Proプランにアップグレードすると無制限で使えるよ！→ /upgrade";
+        const errData = await res.json().catch(() => ({})) as { error?: string };
+        const limitMsg = errData.error ?? "しばらく時間をおいてから再試行してね😢";
         await saveMessage("assistant", limitMsg);
         setLocalMessages((prev) => [
           ...prev.slice(0, -1),

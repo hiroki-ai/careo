@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef } from "react";
-import Link from "next/link";
 import { useProfile } from "@/hooks/useProfile";
 import { useCompanies } from "@/hooks/useCompanies";
 import { useEs } from "@/hooks/useEs";
@@ -20,7 +19,6 @@ export default function CareerCenterPage() {
   const { tests } = useAptitudeTests();
   const printRef = useRef<HTMLDivElement>(null);
 
-  const isPro = profile?.plan === "pro";
   const today = new Date().toLocaleDateString("ja-JP", { year: "numeric", month: "long", day: "numeric" });
 
   const activeCompanies = companies.filter(c => !["WISHLIST", "OFFERED", "REJECTED"].includes(c.status));
@@ -39,17 +37,7 @@ export default function CareerCenterPage() {
         <p className="text-sm text-gray-400 mt-0.5">就活の全データを1枚のレポートにまとめて印刷・提出</p>
       </div>
 
-      {!isPro ? (
-        <div className="text-center py-12 bg-white rounded-2xl border border-gray-100">
-          <div className="text-4xl mb-3">🔒</div>
-          <h2 className="text-lg font-bold text-gray-900 mb-1">Pro限定機能</h2>
-          <p className="text-gray-500 text-sm mb-5">就活の全データを1枚のレポートにまとめ、キャリアセンターに持参できます。</p>
-          <Link href="/upgrade" className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-xl transition-colors text-sm">
-            Proプランにアップグレード
-          </Link>
-        </div>
-      ) : (
-        <div>
+      <div>
           <div className="flex items-center justify-between mb-6 print:hidden">
             <p className="text-sm text-gray-500">キャリアセンター提出用 · {today}時点</p>
             <button
@@ -217,7 +205,6 @@ export default function CareerCenterPage() {
             </div>
           </div>
         </div>
-      )}
 
       <style>{`
         @media print {
