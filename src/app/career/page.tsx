@@ -177,9 +177,59 @@ export default function CareerPage() {
         ))}
       </div>
 
+      {/* 就活軸の成熟度グラフ（戦略4）*/}
+      {!isEditing && (
+        <div className="mt-6 bg-white rounded-xl border border-gray-100 p-5">
+          <h3 className="text-sm font-semibold text-gray-800 mb-1">自己分析の充実度</h3>
+          <p className="text-xs text-gray-400 mb-4">カレオとの対話で自己分析が成長するほど、AIのアドバイス精度が上がります</p>
+          <div className="space-y-3">
+            {SECTIONS.map((section) => {
+              const value = current[section.key];
+              const len = value?.trim().length ?? 0;
+              const level = len === 0 ? 0 : len < 50 ? 1 : len < 200 ? 2 : 3;
+              const levelLabels = ["未入力", "入門", "充実", "完成"];
+              const levelColors = ["bg-gray-200", "bg-amber-300", "bg-blue-400", "bg-emerald-500"];
+              const pct = (level / 3) * 100;
+              return (
+                <div key={section.key}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs text-gray-600">{section.label}</span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      level === 0 ? "bg-gray-100 text-gray-400" :
+                      level === 1 ? "bg-amber-100 text-amber-700" :
+                      level === 2 ? "bg-blue-100 text-blue-700" :
+                      "bg-emerald-100 text-emerald-700"
+                    }`}>
+                      {levelLabels[level]}
+                    </span>
+                  </div>
+                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${levelColors[level]}`}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
+            <p className="text-xs text-gray-500">
+              完成度が高いほどカレオのアドバイスが個別最適化されます
+            </p>
+            <a
+              href="/chat"
+              className="text-xs text-indigo-600 hover:underline font-medium"
+            >
+              カレオと対話して深める →
+            </a>
+          </div>
+        </div>
+      )}
+
       {/* 使われ方の説明 */}
       {!isEditing && (
-        <div className="mt-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100">
+        <div className="mt-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100">
           <h3 className="text-sm font-semibold text-gray-800 mb-3">この情報の活用先</h3>
           <div className="space-y-2">
             {[

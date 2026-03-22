@@ -5,13 +5,13 @@ import Link from "next/link";
 import Script from "next/script";
 
 const DEFAULT_BADGE = "28卒向け・AI就活コーチ「カレオ」";
-const DEFAULT_HERO_SUBTEXT = "企業・ES・面接・OB訪問・筆記試験をすべて一か所に。\nAIコーチ「カレオ」が毎週PDCAを分析し、次に何をすべきかを教えてくれる。";
+const DEFAULT_HERO_SUBTEXT = "企業・ES・面接・OB訪問・筆記試験をすべて一か所に。\nAIコーチ「カレオ」が全データを把握し、点と点を繋ぐ気づきを届ける。";
 const DEFAULT_AFTER_ITEMS = [
   "企業・ES・面接・OB訪問・筆記試験がすべて一か所。全体像が常に見える",
   "締切3日前に自動通知。見落としゼロ",
   "毎週AIがPDCAを自動分析。「今週何をすべきか」が即わかる",
-  "カレオコーチに話すだけで就活の悩みが整理され、次の一手が明確になる",
-  "全データを把握したAIコーチが、あなた専用のアドバイスをくれる",
+  "ES提出前にAIが自己分析との整合性・文体・具体性を一括チェック",
+  "面接・OB訪問・ESを横断した「点と点を繋ぐ気づき」をカレオが自動通知",
 ];
 
 const jsonLd = {
@@ -33,21 +33,25 @@ const jsonLd = {
       "@type": "WebApplication",
       "name": "Careo",
       "url": "https://careo-sigma.vercel.app",
-      "description": "ES締切・面接日程・企業研究・反省メモをAIが整理。就活のPDCAを自動で回す、28卒向けAI就活コーチアプリ。",
+      "description": "ES締切・面接日程・企業研究・OB訪問・筆記試験をAIが横断分析。就活のPDCAを自動で回す、28卒向けAI就活コーチアプリ。",
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "Web, iOS, Android",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" },
       "audience": { "@type": "Audience", "audienceType": "大学生・就活生（28卒）" },
-      "featureList": ["ES管理", "面接ログ", "企業管理", "AIチャット（カレオコーチ）", "PDCA自動分析", "内定予測", "OB/OG訪問管理", "筆記試験管理", "自己分析自動保存", "音声入力・音声出力"],
+      "featureList": [
+        "ES管理・AI提出前チェック", "面接ログ", "企業管理", "AIチャット（カレオコーチ）",
+        "PDCA自動分析", "内定予測", "OB/OG訪問管理", "筆記試験管理",
+        "クロスデータ気づき通知", "進捗ベンチマーク", "キャリアセンターレポート出力",
+        "就活仲間グループ機能", "自己分析充実度トラッキング",
+      ],
       "publisher": { "@type": "Organization", "name": "Careo" },
-      "author": { "@type": "Organization", "name": "Careo" },
     },
     {
       "@type": "FAQPage",
       "mainEntity": [
-        { "@type": "Question", "name": "Careoとは何ですか？", "acceptedAnswer": { "@type": "Answer", "text": "CareoはAIを使った就活管理アプリです。ES締切・面接日程・企業研究・反省メモを一か所で管理でき、AIが就活のPDCAを自動で分析します。28卒向けに開発されています。" } },
-        { "@type": "Question", "name": "リクナビ・マイナビとの違いは何ですか？", "acceptedAnswer": { "@type": "Answer", "text": "リクナビ・マイナビは求人情報を探すサービスです。Careoはすでに応募している企業の選考状況・ES・面接をAIで管理するツールです。両方を併用することを推奨しています。" } },
-        { "@type": "Question", "name": "無料で使えますか？", "acceptedAnswer": { "@type": "Answer", "text": "はい、Careoは完全無料で使えます。メールアドレスで登録するだけで、全機能をすぐに利用できます。" } },
+        { "@type": "Question", "name": "Careoとは何ですか？", "acceptedAnswer": { "@type": "Answer", "text": "CareoはAIを使った就活管理アプリです。ES締切・面接日程・企業研究・OB訪問・筆記試験を一か所で管理でき、AIが就活のPDCAを自動で分析します。他のツールにない「データを横断した気づき通知」が特徴です。28卒向けに開発されています。" } },
+        { "@type": "Question", "name": "BaseMeやSmartESと何が違いますか？", "acceptedAnswer": { "@type": "Answer", "text": "BaseMe・SmartESは特定機能（スカウト・ES生成）に特化したサービスです。CareoはES・面接・OB訪問・企業管理・筆記試験のすべてのデータを把握したAIコーチが、データを横断した気づきを提供します。「点解決」ではなく「就活OSとして全体を管理・コーチング」するのがCareoの役割です。" } },
+        { "@type": "Question", "name": "無料で使えますか？", "acceptedAnswer": { "@type": "Answer", "text": "はい、Careoは基本機能を無料で使えます。Pro版（¥980/月）ではES提出前AIチェック・キャリアセンターレポート出力など高度な機能が利用できます。" } },
         { "@type": "Question", "name": "スマホでも使えますか？", "acceptedAnswer": { "@type": "Answer", "text": "はい、iPhoneでもAndroidでも使えます。ホーム画面に追加するとアプリのように使えます。" } },
       ],
     },
@@ -104,7 +108,6 @@ export function LandingPage() {
       {/* Hero */}
       <section className="relative text-center px-6 pt-24 pb-20">
         <div className="max-w-3xl mx-auto relative z-10">
-          {/* Badge */}
           <div className="inline-flex items-center gap-2 border border-[#00c896]/40 bg-[#00c896]/5 text-[#00a87e] text-xs font-semibold px-4 py-2 rounded-full mb-10 animate-fade-up">
             <span className="w-1.5 h-1.5 bg-[#00c896] rounded-full animate-pulse" />
             {badgeText}
@@ -133,16 +136,92 @@ export function LandingPage() {
             </Link>
           </div>
 
-          {/* Stats */}
           <div className="flex items-center justify-center gap-12 mt-20 animate-fade-up delay-400 border-t border-gray-100 pt-10">
             {[
-              { value: "一元管理", label: "就活データを" },
-              { value: "無料", label: "完全無料" },
+              { value: "7機能", label: "就活データを一元管理" },
+              { value: "無料", label: "基本機能は完全無料" },
               { value: "28卒", label: "向け特化" },
             ].map((s) => (
               <div key={s.label} className="text-center">
                 <p className="text-3xl md:text-4xl font-bold text-[#0a1628]">{s.value}</p>
                 <p className="text-gray-400 text-sm mt-1">{s.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 核心差別化: Careoだけが持つ「縦串」*/}
+      <section className="px-6 py-20 bg-[#0a1628] text-white">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">The Careo Difference</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 tracking-tight">
+            就活AIは「点」で解決する。<br />
+            <span className="text-[#00c896]">Careoは「全体」をコーチングする。</span>
+          </h2>
+          <p className="text-gray-400 text-center text-sm mb-12 max-w-2xl mx-auto">
+            SmartESはES生成のみ。REALMEは面接練習のみ。BaseMeはスカウトのみ。<br />
+            どこにも「ES・面接・OB訪問・企業管理を全部知った上でアドバイスするAI」はなかった。
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+            {[
+              {
+                icon: "🔮",
+                title: "点と点を繋ぐ気づき",
+                desc: "「A社のESで強調した○○と、B社面接での詰められポイントが一致している」— データを横断した洞察をカレオが自動通知",
+                tag: "インサイト通知",
+              },
+              {
+                icon: "📋",
+                title: "ES提出前AIチェック",
+                desc: "自己分析との整合性・AIっぽい文体・過去ESとの重複・企業固有の志望理由を提出前に一括確認",
+                tag: "Pro機能",
+              },
+              {
+                icon: "📈",
+                title: "進捗ベンチマーク",
+                desc: "「同じ時期のCareoユーザー平均応募数は12社。あなたは3社」— 匿名統計でリアルな進み具合を可視化",
+                tag: "ネットワーク効果",
+              },
+            ].map((item) => (
+              <div key={item.title} className="bg-white/5 border border-white/10 rounded-2xl p-5">
+                <div className="flex items-start gap-3 mb-3">
+                  <span className="text-2xl">{item.icon}</span>
+                  <div>
+                    <span className="text-[10px] bg-[#00c896]/20 text-[#00c896] font-bold px-2 py-0.5 rounded-full">{item.tag}</span>
+                    <h3 className="font-bold text-white mt-1">{item.title}</h3>
+                  </div>
+                </div>
+                <p className="text-gray-400 text-sm leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[
+              {
+                icon: "🎓",
+                title: "キャリアセンターレポート出力",
+                desc: "就活の全データを1枚のPDFにまとめ、大学のキャリアセンターに持参できる（Pro機能）。大学側との連携をCareoが架け橋に。",
+                tag: "大学連携",
+              },
+              {
+                icon: "👥",
+                title: "友達と就活グループ",
+                desc: "就活仲間とグループを作り、お互いの進捗（応募数・面接数・PDCA スコア）を匿名で共有。ライバルと刺激し合える。",
+                tag: "コミュニティ",
+              },
+            ].map((item) => (
+              <div key={item.title} className="bg-white/5 border border-white/10 rounded-2xl p-5">
+                <div className="flex items-start gap-3 mb-3">
+                  <span className="text-2xl">{item.icon}</span>
+                  <div>
+                    <span className="text-[10px] bg-[#00c896]/20 text-[#00c896] font-bold px-2 py-0.5 rounded-full">{item.tag}</span>
+                    <h3 className="font-bold text-white mt-1">{item.title}</h3>
+                  </div>
+                </div>
+                <p className="text-gray-400 text-sm leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -165,7 +244,7 @@ export function LandingPage() {
                   "締切を見落として焦る。カレンダーとNotionを行き来",
                   "面接が終わっても何が悪かったか分からないまま",
                   "「今週何をすればいいか」が毎週ゼロから考え直し",
-                  "OB訪問・筆記試験の記録がバラバラ。振り返りができない",
+                  "ES提出前に自己分析と合っているか確認する方法がない",
                 ].map((t) => (
                   <li key={t} className="flex gap-3 text-sm text-gray-500">
                     <span className="text-red-400 shrink-0 mt-0.5">✕</span>{t}
@@ -187,8 +266,8 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* Comparison */}
-      <section className="px-6 py-24 bg-gray-50/60">
+      {/* 競合比較テーブル（BaseMeを含む） */}
+      <section className="px-6 py-24 bg-white">
         <div className="max-w-4xl mx-auto">
           <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">Why Careo</p>
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 tracking-tight">
@@ -196,29 +275,31 @@ export function LandingPage() {
           </h2>
           <p className="text-gray-500 text-center text-sm mb-12">全部使うのがベスト。Careoは「管理とコーチング」に特化しています。</p>
           <div className="overflow-x-auto -mx-2">
-            <table className="w-full text-sm min-w-[560px]">
+            <table className="w-full text-sm min-w-[600px]">
               <thead>
                 <tr>
                   <th className="text-left pb-4 text-gray-400 font-medium w-[30%]"></th>
                   <th className="pb-4 text-center">
                     <span className="bg-[#00c896] text-white text-xs font-bold px-3 py-1.5 rounded-lg">Careo</span>
                   </th>
+                  <th className="pb-4 text-center text-gray-400 font-medium text-xs">BaseMe<br/><span className="text-[10px]">（AI就活）</span></th>
+                  <th className="pb-4 text-center text-gray-400 font-medium text-xs">SmartES<br/><span className="text-[10px]">（ES生成）</span></th>
                   <th className="pb-4 text-center text-gray-400 font-medium text-xs">リクナビ<br/>マイナビ</th>
-                  <th className="pb-4 text-center text-gray-400 font-medium text-xs">すごい<br/>就活</th>
                   <th className="pb-4 text-center text-gray-400 font-medium text-xs">Notion<br/>スプレッド</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {[
-                  { label: "求人情報を探す",                      careo: false, riku: true,  sugoshu: true,  notion: false },
-                  { label: "選考進捗を一元管理",                  careo: true,  riku: false, sugoshu: false, notion: "△"  },
-                  { label: "ES・面接・OB訪問・筆記を記録",        careo: true,  riku: false, sugoshu: false, notion: "△"  },
-                  { label: "週次PDCAをAIが自動分析",              careo: true,  riku: false, sugoshu: false, notion: false },
-                  { label: "次の一手をAIが毎週提案",              careo: true,  riku: false, sugoshu: false, notion: false },
-                  { label: "全データを把握したAIコーチ",          careo: true,  riku: false, sugoshu: false, notion: false },
-                  { label: "締切アラート通知",                    careo: true,  riku: "△",  sugoshu: false, notion: false },
-                  { label: "SPI模擬試験",                         careo: false, riku: false, sugoshu: true,  notion: false },
-                  { label: "📵 広告・スカウト電話なし",           careo: true,  riku: false, sugoshu: false, notion: true  },
+                  { label: "求人情報・スカウト",                        careo: false, base: true,  smart: false, riku: true,  notion: false },
+                  { label: "選考進捗を一元管理",                        careo: true,  base: false, smart: false, riku: false, notion: "△"  },
+                  { label: "ES・面接・OB訪問・筆記を記録",              careo: true,  base: false, smart: false, riku: false, notion: "△"  },
+                  { label: "週次PDCAをAIが自動分析",                    careo: true,  base: false, smart: false, riku: false, notion: false },
+                  { label: "ES提出前AIチェック",                        careo: true,  base: false, smart: false, riku: false, notion: false },
+                  { label: "データ横断の気づき通知",                    careo: true,  base: false, smart: false, riku: false, notion: false },
+                  { label: "全データを把握したAIコーチ",                careo: true,  base: "△",  smart: false, riku: false, notion: false },
+                  { label: "キャリアセンターレポート出力",              careo: true,  base: false, smart: false, riku: false, notion: false },
+                  { label: "学生は完全無料",                            careo: "△",  base: true,  smart: true,  riku: true,  notion: true  },
+                  { label: "📵 広告・スカウト電話なし",                 careo: true,  base: false, smart: true,  riku: false, notion: true  },
                 ].map((row) => {
                   const cell = (v: boolean | string) =>
                     v === true  ? <span className="text-[#00c896] font-bold text-base">✓</span>
@@ -227,13 +308,14 @@ export function LandingPage() {
                   const careoCell = (v: boolean | string) =>
                     v === true  ? <span className="text-[#00c896] font-bold text-base">✓</span>
                     : v === false ? <span className="text-gray-200 text-base">—</span>
-                    : <span className="text-[#00c896] text-xs font-medium">{v}</span>;
+                    : <span className="text-amber-500 text-xs font-medium">{v}</span>;
                   return (
                     <tr key={row.label}>
                       <td className="py-3.5 text-gray-700 font-medium text-xs md:text-sm pr-2">{row.label}</td>
                       <td className="py-3.5 text-center bg-[#00c896]/3">{careoCell(row.careo)}</td>
+                      <td className="py-3.5 text-center">{cell(row.base)}</td>
+                      <td className="py-3.5 text-center">{cell(row.smart)}</td>
                       <td className="py-3.5 text-center">{cell(row.riku)}</td>
-                      <td className="py-3.5 text-center">{cell(row.sugoshu)}</td>
                       <td className="py-3.5 text-center">{cell(row.notion)}</td>
                     </tr>
                   );
@@ -241,7 +323,9 @@ export function LandingPage() {
               </tbody>
             </table>
           </div>
-          <p className="text-center text-xs text-gray-400 mt-6">※ 各サービスは競合ではなく目的が異なります。組み合わせて使うのがベストです。</p>
+          <p className="text-center text-xs text-gray-400 mt-6">
+            ※ △: 部分的に対応。各サービスは目的が異なるため、組み合わせて使うのがベストです。
+          </p>
         </div>
       </section>
 
@@ -260,7 +344,7 @@ export function LandingPage() {
                   { name: "リクナビ", url: "https://job.rikunabi.com/" },
                   { name: "マイナビ", url: "https://job.mynavi.jp/" },
                   { name: "OfferBox", url: "https://offerbox.jp/" },
-                  { name: "dodaキャンパス", url: "https://campus.doda.jp/" },
+                  { name: "BaseMe", url: "https://baseme.app/" },
                 ],
                 tip: "応募したらCareoに企業を登録して管理",
               },
@@ -270,9 +354,9 @@ export function LandingPage() {
                 services: [
                   { name: "就活会議", url: "https://syukatsu-kaigi.jp/" },
                   { name: "ワンキャリア", url: "https://www.onecareer.jp/" },
-                  { name: "Unistyle", url: "https://unistyleinc.com/" },
+                  { name: "SmartES", url: "https://smartes.jp/" },
                 ],
-                tip: "書いたESをCareoに記録してPDCAに活用",
+                tip: "書いたESをCareoで提出前チェック＆記録",
               },
               {
                 task: "自己分析を深める",
@@ -301,6 +385,50 @@ export function LandingPage() {
                 <p className="text-[11px] text-[#00c896] font-medium border-t border-gray-100 pt-2">→ {cat.tip}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Proプラン紹介 */}
+      <section className="px-6 py-20 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <p className="text-indigo-600 text-sm font-bold tracking-widest uppercase mb-3 text-center">Pro Plan</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 tracking-tight">
+            本気で内定を取りに行く人へ、<br /><span className="text-indigo-600">Careo Pro</span>
+          </h2>
+          <p className="text-gray-500 text-center text-sm mb-10">
+            基本機能は無料。Proでは「提出前チェック」「キャリアセンターレポート」などの高度な機能が使えます。
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6">
+              <p className="text-xs font-bold text-gray-400 uppercase mb-3">Free</p>
+              <p className="text-3xl font-bold text-gray-900 mb-4">¥0 <span className="text-sm font-normal text-gray-400">/ 月</span></p>
+              <ul className="space-y-2">
+                {["企業・ES・面接・OB訪問・筆記試験の管理", "週次PDCA自動分析", "カレオコーチ（1日30回）", "気づき通知・進捗ベンチマーク"].map(f => (
+                  <li key={f} className="text-xs text-gray-600 flex gap-2"><span className="text-green-500">✓</span>{f}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="bg-indigo-600 rounded-2xl p-6 text-white relative overflow-hidden">
+              <div className="absolute top-3 right-3 bg-white/20 text-white text-[10px] font-bold px-2 py-1 rounded-full">おすすめ</div>
+              <p className="text-xs font-bold text-indigo-200 uppercase mb-3">Pro ✨</p>
+              <p className="text-3xl font-bold mb-4">¥980 <span className="text-sm font-normal text-indigo-300">/ 月</span></p>
+              <ul className="space-y-2">
+                {[
+                  "Freeの全機能",
+                  "カレオコーチ（無制限）",
+                  "ES提出前AIチェック（無制限）",
+                  "キャリアセンターレポート出力",
+                  "就活軸の成熟度トラッキング",
+                ].map(f => (
+                  <li key={f} className="text-xs text-indigo-100 flex gap-2"><span className="text-white font-bold">★</span>{f}</li>
+                ))}
+              </ul>
+              <Link href="/signup" className="mt-5 block text-center bg-white text-indigo-700 font-bold py-2.5 rounded-xl text-sm hover:bg-indigo-50 transition-colors">
+                無料で始める →
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -341,6 +469,8 @@ export function LandingPage() {
       <footer className="px-6 py-6 text-center text-xs text-gray-400 border-t border-gray-100">
         <div className="flex items-center justify-center gap-4 mb-3">
           <Link href="/features" className="hover:text-gray-600 transition-colors">機能一覧</Link>
+          <span>·</span>
+          <Link href="/upgrade" className="hover:text-gray-600 transition-colors">料金</Link>
           <span>·</span>
           <Link href="/login" className="hover:text-gray-600 transition-colors">ログイン</Link>
           <span>·</span>

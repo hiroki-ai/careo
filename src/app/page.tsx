@@ -19,6 +19,9 @@ import { MiniCalendar } from "@/components/dashboard/MiniCalendar";
 import { PdcaPanel } from "@/components/dashboard/PdcaPanel";
 import { RecommendedServices } from "@/components/dashboard/RecommendedServices";
 import { KareoWidget } from "@/components/dashboard/KareoWidget";
+import { InsightsWidget } from "@/components/dashboard/InsightsWidget";
+import { BenchmarkWidget } from "@/components/dashboard/BenchmarkWidget";
+import { PostOfferWidget } from "@/components/dashboard/PostOfferWidget";
 import { createClient } from "@/lib/supabase/client";
 import { LandingPage } from "@/components/landing/LandingPage";
 import { daysUntil } from "@/lib/utils";
@@ -417,24 +420,17 @@ function DashboardContent() {
         </div>
       </div>
 
-      {/* 内定シェア */}
+      {/* 内定後コンテンツ（戦略6）または内定シェア */}
       {companies.filter(c => c.status === "OFFERED").length > 0 && (
-        <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-4 flex items-center justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold text-green-800">🎉 内定おめでとう！</p>
-            <p className="text-xs text-green-600 mt-0.5">Careoを使った感想をシェアしてもらえると嬉しいです</p>
-          </div>
-          <a
-            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Careoを使って就活を進めています！AIが就活のPDCAを回してくれるのが便利すぎる🤖\n28卒の人はぜひ使ってみて→ https://careo-sigma.vercel.app\n#28卒 #就活 #Careo`)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="shrink-0 bg-green-600 hover:bg-green-700 text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors"
-          >
-            Xでシェア
-          </a>
-        </div>
+        <PostOfferWidget offeredCompanies={companies.filter(c => c.status === "OFFERED")} />
       )}
 
+
+      {/* カレオからの気づき（戦略1: クロスデータ・インサイト通知）*/}
+      <InsightsWidget />
+
+      {/* 進捗ベンチマーク（戦略2）*/}
+      <BenchmarkWidget />
 
       {/* PDCA 週次レポート */}
       <div>
