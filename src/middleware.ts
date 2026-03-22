@@ -29,7 +29,7 @@ export async function middleware(request: NextRequest) {
     const isAuthRoute = authRoutes.includes(pathname);
     const isOnboarding = pathname === "/onboarding";
 
-    const publicRoutes = ["/", "/features"];
+    const publicRoutes = ["/"];
     const isPublicRoute = publicRoutes.includes(pathname);
 
     if (!user && !isAuthRoute && !isPublicRoute) {

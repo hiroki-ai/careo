@@ -9,18 +9,13 @@ import { useInterviews } from "@/hooks/useInterviews";
 import { useProfile } from "@/hooks/useProfile";
 import { useActionItems } from "@/hooks/useActionItems";
 import { useChat } from "@/hooks/useChat";
-import { useObVisits } from "@/hooks/useObVisits";
-import { useAptitudeTests } from "@/hooks/useAptitudeTests";
 import { useToast } from "@/components/ui/Toast";
 import { useDeadlineNotifications } from "@/hooks/useDeadlineNotifications";
 import { StatusBadge, Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { MiniCalendar } from "@/components/dashboard/MiniCalendar";
-import { PdcaPanel } from "@/components/dashboard/PdcaPanel";
-import { RecommendedServices } from "@/components/dashboard/RecommendedServices";
 import { KareoWidget } from "@/components/dashboard/KareoWidget";
 import { InsightsWidget } from "@/components/dashboard/InsightsWidget";
-import { BenchmarkWidget } from "@/components/dashboard/BenchmarkWidget";
 import { PostOfferWidget } from "@/components/dashboard/PostOfferWidget";
 import { createClient } from "@/lib/supabase/client";
 import { LandingPage } from "@/components/landing/LandingPage";
@@ -57,7 +52,7 @@ function DailyCoachBanner({ profile }: { profile: { careerAxis?: string; gakuchi
 
   return (
     <Link href="/chat">
-      <div className="mb-4 bg-gradient-to-r from-indigo-600 to-blue-600 rounded-xl px-4 py-3 flex items-center gap-3 hover:opacity-95 transition-opacity cursor-pointer shadow-sm">
+      <div className="mb-4 bg-gradient-to-r from-[#00c896] to-[#00a87e] rounded-xl px-4 py-3 flex items-center gap-3 hover:opacity-95 transition-opacity cursor-pointer shadow-sm">
         <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
           <span className="text-white font-bold text-sm">K</span>
         </div>
@@ -76,12 +71,6 @@ interface NextActionResult {
   weeklyActions: { priority: "high" | "medium" | "low"; action: string; reason: string }[];
 }
 
-interface PdcaResult {
-  plan: { weeklyGoal: string; taskCompletion: string };
-  do: { highlights: string[]; totalActivity: string };
-  check: { score: number; goodPoints: string[]; issues: string[]; insight: string };
-  act: { improvements: string[]; nextWeekFocus: string; encouragement: string };
-}
 
 const priorityColors = {
   high: "border-l-red-500 bg-red-50",
@@ -100,24 +89,11 @@ function DashboardContent() {
   const { profile } = useProfile();
   const { pendingItems, completedItems, loading: itemsLoading, replaceItems, toggleItem } = useActionItems();
   const { recentUserMessages } = useChat();
-  const { visits: obVisits } = useObVisits();
-  const { tests: aptitudeTests } = useAptitudeTests();
   const { showToast } = useToast();
   const router = useRouter();
   const [aiSummary, setAiSummary] = useState<string>("");
   const [aiLoading, setAiLoading] = useState(false);
-  const [pdcaResult, setPdcaResult] = useState<PdcaResult | null>(null);
-  const [pdcaLoading, setPdcaLoading] = useState(false);
-  const [pdcaError, setPdcaError] = useState<string | false>(false);
   const hasFetched = useRef(false);
-
-  // キャッシュ復元: マウント時にlocalStorageからPDCAを即座に表示
-  useEffect(() => {
-    try {
-      const cachedPdca = localStorage.getItem("careo_last_pdca");
-      if (cachedPdca) setPdcaResult(JSON.parse(cachedPdca));
-    } catch { /* ignore */ }
-  }, []);
 
   const statusCounts = COMPANY_STATUS_ORDER.reduce((acc, s) => {
     acc[s] = companies.filter((c) => c.status === s).length;
@@ -206,46 +182,14 @@ function DashboardContent() {
     }
   };
 
-  const fetchPdca = async () => {
-    setPdcaLoading(true);
-    setPdcaError(false);
-    try {
-      const obVisitsSlim = obVisits.map(({ companyName, purpose, impression, insights }) => ({ companyName, purpose, impression, insights }));
-      const testsSlim = aptitudeTests.map(({ companyName, testType, result, scoreVerbal, scoreNonverbal }) => ({ companyName, testType, result, scoreVerbal, scoreNonverbal }));
-      const data = await fetchAI("/api/ai/pdca", {
-        companies: companiesSlim, esList: esListSlim, interviews: interviewsSlim, profile,
-        pendingActions: pendingItems.map(i => ({ action: i.action, priority: i.priority })),
-        completedActions: completedItems.map(i => ({ action: i.action })),
-        recentChatMessages: recentUserMessages,
-        obVisits: obVisitsSlim,
-        aptitudeTests: testsSlim,
-      });
-      if (!data) { setPdcaError("通信エラー（タイムアウトの可能性）"); console.error("[PDCA] fetch returned null"); return; }
-      if (!("error" in data)) {
-        const result = data as unknown as PdcaResult;
-        setPdcaResult(result);
-        try { localStorage.setItem("careo_last_pdca", JSON.stringify(result)); } catch { /* ignore */ }
-      } else {
-        const errMsg = (data as { error: string }).error;
-        console.error("[PDCA] API error:", errMsg);
-        setPdcaError(errMsg);
-        if (errMsg.includes("多すぎ")) showToast(errMsg, "error");
-      }
-    } finally {
-      setPdcaLoading(false);
-    }
-  };
-
   // データが揃ったら一度だけ自動フェッチ（profileがnullでも動かす）
   useEffect(() => {
     if (itemsLoading) return;
     if (hasFetched.current) return;
     hasFetched.current = true;
-    fetchPdca().then(() => {
-      if (pendingItems.length === 0 && completedItems.length === 0) {
-        fetchAiAdvice([]);
-      }
-    });
+    if (pendingItems.length === 0 && completedItems.length === 0) {
+      fetchAiAdvice([]);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [itemsLoading]);
 
@@ -339,7 +283,7 @@ function DashboardContent() {
                     type="checkbox"
                     checked={false}
                     onChange={() => handleToggle(item.id, true)}
-                    className="mt-0.5 w-4 h-4 rounded border-gray-400 accent-blue-600 cursor-pointer shrink-0"
+                    className="mt-0.5 w-4 h-4 rounded border-gray-400 accent-[#00c896] cursor-pointer shrink-0"
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
@@ -364,7 +308,7 @@ function DashboardContent() {
                         type="checkbox"
                         checked={true}
                         onChange={() => toggleItem(item.id, false)}
-                        className="w-4 h-4 rounded border-gray-400 accent-blue-600 cursor-pointer shrink-0"
+                        className="w-4 h-4 rounded border-gray-400 accent-[#00c896] cursor-pointer shrink-0"
                       />
                       <p className="text-xs text-gray-500 line-through">{item.action}</p>
                     </label>
@@ -391,14 +335,14 @@ function DashboardContent() {
             <div className="mt-3">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-xs font-semibold text-gray-500">直近の締切</p>
-                <Link href="/deadlines" className="text-[10px] text-blue-500 hover:underline">すべて</Link>
+                <Link href="/deadlines" className="text-[10px] text-[#00c896] hover:underline">すべて</Link>
               </div>
               <div className="space-y-1.5">
                 {upcomingDeadlines.map((d) => (
                   <Link key={`${d.type}-${d.id}`} href={d.link}>
                     <div className={`flex items-center justify-between bg-white rounded-lg border p-2 hover:bg-gray-50 transition-colors ${d.days <= 3 ? "border-red-200" : "border-gray-100"}`}>
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded shrink-0 ${d.type === "ES" ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700"}`}>
+                        <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded shrink-0 ${d.type === "ES" ? "bg-[#00c896]/10 text-[#00a87e]" : "bg-purple-100 text-purple-700"}`}>
                           {d.type}
                         </span>
                         <p className="text-xs font-medium text-gray-900 truncate">{d.title}</p>
@@ -426,67 +370,22 @@ function DashboardContent() {
       )}
 
 
-      {/* カレオからの気づき（戦略1: クロスデータ・インサイト通知）*/}
+      {/* カレオからの気づき（クロスデータ・インサイト通知）*/}
       <InsightsWidget />
 
-      {/* 進捗ベンチマーク（戦略2）*/}
-      <BenchmarkWidget />
-
-      {/* PDCA 週次レポート */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
+      {/* PDCAレポートへのリンク */}
+      <div className="mb-4">
+        <Link href="/report" className="flex items-center justify-between bg-white border border-gray-100 rounded-xl px-4 py-3 hover:border-[#00c896]/30 hover:shadow-sm transition-all group">
           <div className="flex items-center gap-2">
-            <h2 className="font-semibold text-gray-900">📊 PDCA 週次レポート</h2>
-            <span className="text-xs text-gray-400">チャット・選考状況からAIが自動分析</span>
-          </div>
-          <Button variant="ghost" size="sm" onClick={() => fetchPdca()} disabled={pdcaLoading}>
-            {pdcaLoading ? "分析中..." : "再分析"}
-          </Button>
-        </div>
-
-        {pdcaLoading && (
-          <div className="bg-white rounded-2xl border border-gray-200/60 shadow-sm overflow-hidden">
-            <div className="bg-gradient-to-r from-[#0f1c2e] to-[#1a2f4e] p-5 space-y-3">
-              <div className="h-3 bg-white/10 rounded-full animate-pulse w-1/3" />
-              <div className="h-2.5 bg-white/10 rounded-full animate-pulse w-full" />
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-gray-100">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-28 bg-gray-50 animate-pulse" />
-              ))}
+            <span className="text-base">📊</span>
+            <div>
+              <p className="text-sm font-semibold text-gray-900">週次PDCAレポート</p>
+              <p className="text-xs text-gray-400">AIが就活全体を分析・スコアリング</p>
             </div>
           </div>
-        )}
-
-        {!pdcaLoading && pdcaResult && (
-          <>
-            <PdcaPanel result={pdcaResult} />
-            <div className="mt-3 flex justify-end">
-              <Link href="/chat" className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1.5 hover:underline">
-                <span className="w-5 h-5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-[9px] font-bold">K</span>
-                カレオに課題について相談する →
-              </Link>
-            </div>
-          </>
-        )}
-
-        {!pdcaLoading && !pdcaResult && !pdcaError && (
-          <div className="bg-white rounded-2xl border border-gray-200/60 shadow-sm p-8 text-center text-gray-400">
-            <p className="text-sm mb-3">就活データが揃うとPDCA分析が実行されます</p>
-            <Button size="sm" onClick={() => fetchPdca()}>PDCAを分析する</Button>
-          </div>
-        )}
-
-        {!pdcaLoading && pdcaError && (
-          <div className="bg-white rounded-2xl border border-red-100 shadow-sm p-6 text-center">
-            <p className="text-sm text-red-500 mb-1">PDCA分析に失敗しました</p>
-            <p className="text-xs text-gray-400 mb-3 font-mono break-all">{pdcaError}</p>
-            <Button size="sm" onClick={() => fetchPdca()}>再試行する</Button>
-          </div>
-        )}
+          <span className="text-gray-300 group-hover:text-[#00c896] transition-colors">→</span>
+        </Link>
       </div>
-
-      <RecommendedServices companies={companies} profile={profile} />
     </div>
   );
 }

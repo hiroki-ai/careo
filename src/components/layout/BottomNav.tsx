@@ -105,7 +105,7 @@ export function BottomNav() {
                     key={item.href}
                     href={item.href}
                     className={`flex flex-col items-center justify-center gap-1 py-3 rounded-xl text-center transition-colors ${
-                      isActive ? "bg-blue-50 text-blue-600" : "bg-gray-50 text-gray-600"
+                      isActive ? "bg-[#00c896]/10 text-[#00c896]" : "bg-gray-50 text-gray-600"
                     }`}
                   >
                     <span className="text-[11px] font-medium leading-tight">{item.label}</span>
@@ -128,7 +128,7 @@ export function BottomNav() {
                 key={item.href}
                 href={item.href}
                 className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-2 rounded-lg transition-colors relative ${
-                  isActive ? "text-blue-600" : "text-gray-400"
+                  isActive ? "text-[#00c896]" : "text-gray-400"
                 }`}
               >
                 <span className="relative">
@@ -145,7 +145,7 @@ export function BottomNav() {
           <button
             onClick={() => setShowMore((v) => !v)}
             className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-2 rounded-lg transition-colors ${
-              showMore ? "text-blue-600" : "text-gray-400"
+              showMore ? "text-[#00c896]" : "text-gray-400"
             }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

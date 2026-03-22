@@ -56,7 +56,7 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存", sho
             type="text"
             value={form.university}
             onChange={(e) => setForm({ ...form, university: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896]"
             placeholder="例: 東京大学"
           />
         </div>
@@ -66,7 +66,7 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存", sho
             type="text"
             value={form.faculty}
             onChange={(e) => setForm({ ...form, faculty: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896]"
             placeholder="例: 工学部情報工学科"
           />
         </div>
@@ -79,7 +79,7 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存", sho
           <select
             value={form.grade}
             onChange={(e) => setForm({ ...form, grade: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896]"
             required
           >
             <option value="">選択してください</option>
@@ -91,7 +91,7 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存", sho
           <select
             value={form.graduationYear}
             onChange={(e) => setForm({ ...form, graduationYear: Number(e.target.value) })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896]"
           >
             {graduationYears.map((y) => <option key={y} value={y}>{y}年卒</option>)}
           </select>
@@ -108,7 +108,7 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存", sho
               onClick={() => setForm({ ...form, jobSearchStage: value })}
               className={`px-3 py-2 rounded-lg text-sm font-medium border transition-colors cursor-pointer ${
                 form.jobSearchStage === value
-                  ? "bg-blue-600 text-white border-blue-600"
+                  ? "bg-[#00c896] text-white border-[#00c896]"
                   : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
               }`}
             >
@@ -130,7 +130,7 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存", sho
               onClick={() => toggleItem("targetIndustries", ind)}
               className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors cursor-pointer ${
                 form.targetIndustries.includes(ind)
-                  ? "bg-blue-600 text-white border-blue-600"
+                  ? "bg-[#00c896] text-white border-[#00c896]"
                   : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
               }`}
             >
@@ -152,7 +152,7 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存", sho
               onClick={() => toggleItem("targetJobs", job)}
               className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors cursor-pointer ${
                 form.targetJobs.includes(job)
-                  ? "bg-blue-600 text-white border-blue-600"
+                  ? "bg-[#00c896] text-white border-[#00c896]"
                   : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
               }`}
             >

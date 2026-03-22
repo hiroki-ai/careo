@@ -163,7 +163,7 @@ export function Sidebar() {
 
   return (
     <aside
-      className={`flex flex-col h-full bg-[#1a2f4e] transition-all duration-200 ${
+      className={`flex flex-col h-full bg-[#14103A] transition-all duration-200 ${
         collapsed ? "w-14" : "w-56"
       }`}
     >
@@ -175,7 +175,7 @@ export function Sidebar() {
               <img src="/icon-new.svg" alt="Careo" className="w-7 h-7 rounded-lg shrink-0" />
               <span className="text-white font-bold text-lg tracking-wide">Careo</span>
             </div>
-            <p className="text-blue-200/60 text-[10px] tracking-widest uppercase pl-9">AI Career Center</p>
+            <p className="text-purple-200/50 text-[10px] tracking-widest uppercase pl-9">AI Career Center</p>
           </div>
         )}
         {collapsed && (
@@ -183,7 +183,7 @@ export function Sidebar() {
         )}
         <button
           onClick={toggle}
-          className={`text-blue-200/50 hover:text-white transition-colors p-1 rounded ${collapsed ? "mt-3 ml-0" : "ml-2 shrink-0"}`}
+          className={`text-purple-200/50 hover:text-white transition-colors p-1 rounded ${collapsed ? "mt-3 ml-0" : "ml-2 shrink-0"}`}
           title={collapsed ? "展開" : "折り畳む"}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -199,7 +199,7 @@ export function Sidebar() {
       {/* メインナビ */}
       <nav className={`flex-1 py-3 space-y-0.5 overflow-y-auto ${collapsed ? "px-1.5" : "px-3"}`}>
         {!collapsed && (
-          <p className="text-blue-200/40 text-[10px] font-semibold uppercase tracking-widest px-3 pt-1 pb-1.5">メニュー</p>
+          <p className="text-purple-200/40 text-[10px] font-semibold uppercase tracking-widest px-3 pt-1 pb-1.5">メニュー</p>
         )}
         {navItems.map((item) => {
           const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
@@ -212,8 +212,8 @@ export function Sidebar() {
                 collapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5"
               } text-sm font-medium ${
                 isActive
-                  ? "bg-blue-500/30 text-white"
-                  : "text-blue-100/70 hover:bg-white/5 hover:text-white"
+                  ? "bg-[#00c896]/20 text-white"
+                  : "text-purple-100/70 hover:bg-white/5 hover:text-white"
               }`}
             >
               {item.icon}
@@ -236,8 +236,8 @@ export function Sidebar() {
                 collapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5"
               } text-sm font-medium ${
                 isActive
-                  ? "bg-blue-500/30 text-white"
-                  : "text-blue-100/70 hover:bg-white/5 hover:text-white"
+                  ? "bg-[#00c896]/20 text-white"
+                  : "text-purple-100/70 hover:bg-white/5 hover:text-white"
               }`}
             >
               {item.icon}

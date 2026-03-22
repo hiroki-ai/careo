@@ -127,7 +127,7 @@ export function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white flex flex-col text-[#0a1628] overflow-x-hidden">
+    <div className="min-h-screen bg-white flex flex-col text-[#0D0B21] overflow-x-hidden">
       <Script id="json-ld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       {/* Header */}
@@ -135,12 +135,9 @@ export function LandingPage() {
         <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2.5">
             <img src="/icon-new.svg" alt="Careo" className="w-8 h-8 rounded-xl" />
-            <span className="font-bold text-lg tracking-tight text-[#0a1628]">Careo</span>
+            <span className="font-bold text-lg tracking-tight text-[#0D0B21]">Careo</span>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/features" className="text-sm text-gray-500 hover:text-gray-900 font-medium transition-colors">
-              機能を見る
-            </Link>
             <Link href="/login" className="text-sm text-gray-500 hover:text-gray-900 font-medium transition-colors hidden sm:block">
               ログイン
             </Link>
@@ -152,7 +149,13 @@ export function LandingPage() {
       </header>
 
       {/* Hero */}
-      <section className="relative text-center px-6 pt-24 pb-20">
+      <section className="relative text-center px-6 pt-24 pb-20 overflow-hidden">
+        {/* Ambient background animations */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-24 left-1/4 w-[480px] h-[480px] rounded-full bg-[#00c896]/10 blur-3xl animate-blob" />
+          <div className="absolute bottom-0 right-1/6 w-[360px] h-[360px] rounded-full bg-purple-400/8 blur-3xl animate-blob delay-2000" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full bg-[#00c896]/5 blur-2xl animate-float-slow delay-1000" />
+        </div>
         <div className="max-w-3xl mx-auto relative z-10">
           <div className="inline-flex items-center gap-2 border border-[#00c896]/40 bg-[#00c896]/5 text-[#00a87e] text-xs font-semibold px-4 py-2 rounded-full mb-10 animate-fade-up">
             <span className="w-1.5 h-1.5 bg-[#00c896] rounded-full animate-pulse" />
@@ -189,7 +192,7 @@ export function LandingPage() {
               { value: "28卒", label: "向け特化" },
             ].map((s) => (
               <div key={s.label} className="text-center">
-                <p className="text-3xl md:text-4xl font-bold text-[#0a1628]">{s.value}</p>
+                <p className="text-3xl md:text-4xl font-bold text-[#0D0B21]">{s.value}</p>
                 <p className="text-gray-400 text-sm mt-1">{s.label}</p>
               </div>
             ))}
@@ -198,8 +201,13 @@ export function LandingPage() {
       </section>
 
       {/* 核心差別化: Careoだけが持つ「縦串」*/}
-      <section className="px-6 py-20 bg-[#0a1628] text-white">
-        <div className="max-w-4xl mx-auto">
+      <section className="px-6 py-20 bg-[#0D0B21] text-white relative overflow-hidden">
+        {/* Ambient animations for dark section */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] rounded-full bg-[#00c896]/6 blur-3xl animate-blob delay-500" />
+          <div className="absolute bottom-0 left-0 w-[320px] h-[320px] rounded-full bg-purple-600/5 blur-3xl animate-blob delay-1000" />
+        </div>
+        <div className="max-w-4xl mx-auto relative z-10">
           <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center reveal">The Careo Difference</p>
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 tracking-tight reveal reveal-delay-1">
             就活AIは「点」で解決する。<br />
@@ -302,7 +310,7 @@ export function LandingPage() {
               <p className="text-xs font-bold text-[#00a87e] uppercase tracking-wider mb-5">✨ Careoを使った後</p>
               <ul className="space-y-4">
                 {afterItems.map((t) => (
-                  <li key={t} className="flex gap-3 text-sm text-[#0a1628]">
+                  <li key={t} className="flex gap-3 text-sm text-[#0D0B21]">
                     <span className="text-[#00c896] shrink-0 mt-0.5 font-bold">✓</span>{t}
                   </li>
                 ))}
@@ -418,7 +426,7 @@ export function LandingPage() {
               <div key={cat.task} className="bg-white rounded-2xl p-5 border border-gray-100">
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-xl">{cat.icon}</span>
-                  <p className="font-bold text-sm text-[#0a1628]">{cat.task}</p>
+                  <p className="font-bold text-sm text-[#0D0B21]">{cat.task}</p>
                 </div>
                 <div className="flex flex-wrap gap-1.5 mb-3">
                   {cat.services.map(s => (
@@ -449,7 +457,7 @@ export function LandingPage() {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <p className="text-xs font-bold text-[#00a87e] uppercase tracking-wider mb-1">現在のプラン</p>
-                <p className="text-4xl font-bold text-[#0a1628]">¥0 <span className="text-base font-normal text-gray-400">/ 月</span></p>
+                <p className="text-4xl font-bold text-[#0D0B21]">¥0 <span className="text-base font-normal text-gray-400">/ 月</span></p>
               </div>
               <span className="bg-[#00c896] text-white text-xs font-bold px-3 py-1.5 rounded-full">全機能利用可能</span>
             </div>
@@ -464,7 +472,7 @@ export function LandingPage() {
                 "キャリアセンターレポート出力",
                 "友達と就活グループ",
               ].map(f => (
-                <div key={f} className="flex items-center gap-2 text-sm text-[#0a1628]">
+                <div key={f} className="flex items-center gap-2 text-sm text-[#0D0B21]">
                   <span className="text-[#00c896] font-bold shrink-0">✓</span>{f}
                 </div>
               ))}
@@ -488,7 +496,7 @@ export function LandingPage() {
             {faqItems.map((item, i) => (
               <div
                 key={i}
-                className={`bg-white border rounded-2xl overflow-hidden transition-all duration-200 reveal reveal-delay-${Math.min(i + 1, 4)} ${
+                className={`bg-white border rounded-2xl overflow-hidden transition-colors duration-200 ${
                   openFaq === i ? "border-[#00c896]/40 shadow-sm" : "border-gray-100"
                 }`}
               >
@@ -496,18 +504,18 @@ export function LandingPage() {
                   className="w-full text-left px-6 py-4 flex items-center justify-between gap-4"
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                 >
-                  <span className="font-semibold text-[#0a1628] text-sm">{item.q}</span>
+                  <span className="font-semibold text-[#0D0B21] text-sm">{item.q}</span>
                   <span className={`text-[#00c896] shrink-0 transition-transform duration-200 ${openFaq === i ? "rotate-180" : ""}`}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
                     </svg>
                   </span>
                 </button>
-                {openFaq === i && (
+                <div className={`overflow-hidden transition-all duration-300 ${openFaq === i ? "max-h-48" : "max-h-0"}`}>
                   <div className="px-6 pb-5 text-sm text-gray-600 leading-relaxed border-t border-gray-50 pt-3">
                     {item.a}
                   </div>
-                )}
+                </div>
               </div>
             ))}
           </div>
@@ -515,8 +523,12 @@ export function LandingPage() {
       </section>
 
       {/* Our Story */}
-      <section className="px-6 py-16 bg-[#0a1628] text-white">
-        <div className="max-w-2xl mx-auto">
+      <section className="px-6 py-16 bg-[#0D0B21] text-white relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/3 w-72 h-72 rounded-full bg-[#00c896]/8 blur-3xl animate-float-slow" />
+          <div className="absolute bottom-0 right-1/4 w-56 h-56 rounded-full bg-purple-500/6 blur-2xl animate-blob delay-1000" />
+        </div>
+        <div className="max-w-2xl mx-auto relative z-10">
           <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center reveal">Our Story</p>
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 reveal reveal-delay-1">
             同じ就活生として、<br />本当に使えるツールを作りたかった。
@@ -570,10 +582,6 @@ export function LandingPage() {
       {/* Footer */}
       <footer className="px-6 py-6 text-center text-xs text-gray-400 border-t border-gray-100">
         <div className="flex items-center justify-center gap-4 mb-3">
-          <Link href="/features" className="hover:text-gray-600 transition-colors">機能一覧</Link>
-          <span>·</span>
-          <Link href="/upgrade" className="hover:text-gray-600 transition-colors">料金</Link>
-          <span>·</span>
           <Link href="/login" className="hover:text-gray-600 transition-colors">ログイン</Link>
           <span>·</span>
           <Link href="/signup" className="hover:text-gray-600 transition-colors">新規登録</Link>

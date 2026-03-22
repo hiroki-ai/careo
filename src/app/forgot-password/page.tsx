@@ -31,7 +31,7 @@ export default function ForgotPasswordPage() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-blue-600">Careo</h1>
+          <h1 className="text-2xl font-bold text-[#00c896]">Careo</h1>
           <p className="text-sm text-gray-400 mt-1">パスワードをリセット</p>
         </div>
 
@@ -46,7 +46,7 @@ export default function ForgotPasswordPage() {
             <p className="text-sm text-gray-500">
               <span className="font-medium">{email}</span> に再設定用のリンクを送りました。メールをご確認ください。
             </p>
-            <Link href="/login" className="block text-sm text-blue-600 hover:underline mt-4">
+            <Link href="/login" className="block text-sm text-[#00c896] hover:underline mt-4">
               ログインに戻る
             </Link>
           </div>
@@ -61,7 +61,7 @@ export default function ForgotPasswordPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896]"
                 placeholder="you@example.com"
                 required
               />
@@ -71,7 +71,7 @@ export default function ForgotPasswordPage() {
               {loading ? "送信中..." : "リセットメールを送る"}
             </Button>
             <p className="text-center text-sm text-gray-500">
-              <Link href="/login" className="text-blue-600 hover:underline">ログインに戻る</Link>
+              <Link href="/login" className="text-[#00c896] hover:underline">ログインに戻る</Link>
             </p>
           </form>
         )}

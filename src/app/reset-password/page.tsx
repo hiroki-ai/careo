@@ -39,7 +39,7 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-blue-600">Careo</h1>
+          <h1 className="text-2xl font-bold text-[#00c896]">Careo</h1>
           <p className="text-sm text-gray-400 mt-1">新しいパスワードを設定</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -49,7 +49,7 @@ export default function ResetPasswordPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896]"
               placeholder="6文字以上"
               required
             />
@@ -60,7 +60,7 @@ export default function ResetPasswordPage() {
               type="password"
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896]"
               placeholder="もう一度入力"
               required
             />
