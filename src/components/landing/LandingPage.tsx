@@ -157,23 +157,23 @@ export function LandingPage() {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full bg-[#00c896]/5 blur-2xl animate-float-slow delay-1000" />
         </div>
         <div className="max-w-3xl mx-auto relative z-10">
-          <div className="inline-flex items-center gap-2 border border-[#00c896]/40 bg-[#00c896]/5 text-[#00a87e] text-xs font-semibold px-4 py-2 rounded-full mb-10 animate-fade-up">
+          <div className="inline-flex items-center gap-2 border border-[#00c896]/40 bg-[#00c896]/5 text-[#00a87e] text-xs font-semibold px-4 py-2 rounded-full mb-10">
             <span className="w-1.5 h-1.5 bg-[#00c896] rounded-full animate-pulse" />
             {badgeText}
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold leading-[1.15] mb-6 animate-fade-up delay-100 tracking-tight">
+          <h1 className="text-5xl md:text-7xl font-bold leading-[1.15] mb-6 tracking-tight">
             迷わず動ける、<br />
             <span className="text-[#00c896]">就活へ。</span>
           </h1>
 
-          <p className="text-gray-500 text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed animate-fade-up delay-200">
+          <p className="text-gray-500 text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed">
             {heroSubtext.split("\n").map((line, i, arr) => (
               <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
             ))}
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up delay-300">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/signup" className="inline-flex items-center justify-center gap-2 bg-[#00c896] hover:bg-[#00b586] text-white font-bold px-10 py-4 rounded-2xl text-base transition-colors shadow-xl shadow-[#00c896]/30">
               無料で始める
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -185,7 +185,7 @@ export function LandingPage() {
             </Link>
           </div>
 
-          <div className="flex items-center justify-center gap-12 mt-20 animate-fade-up delay-400 border-t border-gray-100 pt-10">
+          <div className="flex items-center justify-center gap-12 mt-20 border-t border-gray-100 pt-10">
             {[
               { value: "7機能", label: "就活データを一元管理" },
               { value: "完全無料", label: "全機能を無料で使える" },
@@ -208,8 +208,8 @@ export function LandingPage() {
           <div className="absolute bottom-0 left-0 w-[320px] h-[320px] rounded-full bg-purple-600/5 blur-3xl animate-blob delay-1000" />
         </div>
         <div className="max-w-4xl mx-auto relative z-10">
-          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center reveal">The Careo Difference</p>
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 tracking-tight reveal reveal-delay-1">
+          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">The Careo Difference</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 tracking-tight">
             就活AIは「点」で解決する。<br />
             <span className="text-[#00c896]">Careoは「全体」をコーチングする。</span>
           </h2>
@@ -285,8 +285,8 @@ export function LandingPage() {
       {/* Before / After */}
       <section className="px-6 py-20 bg-gray-50/60">
         <div className="max-w-4xl mx-auto">
-          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center reveal">Before / After</p>
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 tracking-tight reveal reveal-delay-1">
+          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">Before / After</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 tracking-tight">
             Careoを使うと、<span className="text-[#00c896]">何が変わる？</span>
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -323,8 +323,8 @@ export function LandingPage() {
       {/* 競合比較テーブル（BaseMeを含む） */}
       <section className="px-6 py-24 bg-white">
         <div className="max-w-4xl mx-auto">
-          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center reveal">Why Careo</p>
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 tracking-tight reveal reveal-delay-1">
+          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">Why Careo</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 tracking-tight">
             他のサービスと<span className="text-[#00c896]">何が違うの？</span>
           </h2>
           <p className="text-gray-500 text-center text-sm mb-12">全部使うのがベスト。Careoは「管理とコーチング」に特化しています。</p>
@@ -446,14 +446,14 @@ export function LandingPage() {
       {/* 全機能無料 */}
       <section className="px-6 py-20 bg-white">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center reveal">Pricing</p>
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 tracking-tight reveal reveal-delay-1">
+          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">Pricing</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 tracking-tight">
             全機能、<span className="text-[#00c896]">完全無料。</span>
           </h2>
-          <p className="text-gray-500 text-center text-sm mb-10 reveal reveal-delay-2">
+          <p className="text-gray-500 text-center text-sm mb-10">
             クレジットカード不要。メールアドレスだけで今すぐ始められます。
           </p>
-          <div className="bg-gradient-to-br from-[#00c896]/5 to-emerald-50 border-2 border-[#00c896]/30 rounded-2xl p-8 reveal reveal-delay-2">
+          <div className="bg-gradient-to-br from-[#00c896]/5 to-emerald-50 border-2 border-[#00c896]/30 rounded-2xl p-8">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <p className="text-xs font-bold text-[#00a87e] uppercase tracking-wider mb-1">現在のプラン</p>
@@ -488,8 +488,8 @@ export function LandingPage() {
       {/* FAQ */}
       <section className="px-6 py-20 bg-gray-50/60">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center reveal">FAQ</p>
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 tracking-tight reveal reveal-delay-1">
+          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">FAQ</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 tracking-tight">
             よくある質問
           </h2>
           <div className="space-y-3">
@@ -529,11 +529,11 @@ export function LandingPage() {
           <div className="absolute bottom-0 right-1/4 w-56 h-56 rounded-full bg-purple-500/6 blur-2xl animate-blob delay-1000" />
         </div>
         <div className="max-w-2xl mx-auto relative z-10">
-          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center reveal">Our Story</p>
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 reveal reveal-delay-1">
+          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">Our Story</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
             同じ就活生として、<br />本当に使えるツールを作りたかった。
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 reveal reveal-delay-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
               <p className="text-[#00c896] font-bold text-sm mb-2">👨‍💻 作った人</p>
               <p className="text-gray-300 text-sm leading-relaxed">
@@ -547,7 +547,7 @@ export function LandingPage() {
               </p>
             </div>
           </div>
-          <div className="text-center reveal reveal-delay-3">
+          <div className="text-center">
             <p className="text-gray-400 text-xs mb-4">開発の継続は皆さんのサポートで成り立っています</p>
             <a
               href="https://buymeacoffee.com/careo"
@@ -565,12 +565,12 @@ export function LandingPage() {
       <section className="px-6 py-16 md:py-24 relative">
         <div className="absolute inset-0 bg-gradient-to-br from-white via-teal-50/40 to-emerald-50/60 pointer-events-none" />
         <div className="relative max-w-2xl mx-auto text-center">
-          <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight reveal">
+          <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">
             就活、<span className="text-[#00c896]">AIと一緒に</span>始めよう
           </h2>
-          <p className="text-gray-500 text-base mb-10 reveal reveal-delay-1">完全無料。登録はメールアドレスだけ。</p>
-          <p className="text-xs text-gray-400 mb-6 reveal reveal-delay-1">📵 広告メール・スカウト電話は一切ありません</p>
-          <Link href="/signup" className="inline-flex items-center gap-2 bg-[#00c896] hover:bg-[#00b586] text-white font-bold px-12 py-4 rounded-2xl text-base transition-colors shadow-xl shadow-[#00c896]/30 reveal reveal-delay-2">
+          <p className="text-gray-500 text-base mb-10">完全無料。登録はメールアドレスだけ。</p>
+          <p className="text-xs text-gray-400 mb-6">📵 広告メール・スカウト電話は一切ありません</p>
+          <Link href="/signup" className="inline-flex items-center gap-2 bg-[#00c896] hover:bg-[#00b586] text-white font-bold px-12 py-4 rounded-2xl text-base transition-colors shadow-xl shadow-[#00c896]/30">
             無料で始める
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
