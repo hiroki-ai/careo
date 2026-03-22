@@ -306,8 +306,8 @@ export default function ChatPage() {
         body: JSON.stringify({ messages: historyForApi, context: buildContext() }),
       });
 
-      // 1日制限 or レート制限
-      if (res.status === 429) {
+      // レート制限 or コンテンツモデレーション
+      if (res.status === 429 || res.status === 400) {
         const errData = await res.json().catch(() => ({})) as { error?: string };
         const limitMsg = errData.error ?? "しばらく時間をおいてから再試行してね😢";
         await saveMessage("assistant", limitMsg);
