@@ -7,6 +7,7 @@ import { useCompanies } from "@/hooks/useCompanies";
 import { useEs } from "@/hooks/useEs";
 import { useInterviews } from "@/hooks/useInterviews";
 import { useChat } from "@/hooks/useChat";
+import { useProfile } from "@/hooks/useProfile";
 import { CompanyForm } from "@/components/companies/CompanyForm";
 import { StatusBadge, Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -15,6 +16,15 @@ import { COMPANY_STATUS_ORDER, COMPANY_STATUS_LABELS } from "@/types";
 import { formatDate, formatDateTime } from "@/lib/utils";
 import { useToast } from "@/components/ui/Toast";
 
+interface ResearchResult {
+  overview: string;
+  strengths: string[];
+  culture: string;
+  recentNews: string[];
+  interviewPoints: string[];
+  whyUs: string;
+}
+
 export default function CompanyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
@@ -22,6 +32,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
   const { esList } = useEs();
   const { interviews } = useInterviews();
   const { recentUserMessages } = useChat();
+  const { profile } = useProfile();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
   const [isOfferedTypeOpen, setIsOfferedTypeOpen] = useState(false);
@@ -29,11 +40,62 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
   const [aiDetected, setAiDetected] = useState<{ isInternOffer: boolean | null; reason: string } | null>(null);
   const { showToast } = useToast();
 
+  // 企業研究
+  const [research, setResearch] = useState<ResearchResult | null>(() => {
+    // ai_researchフィールドが既存ならパース
+    return null; // companyがまだないので後でセット
+  });
+  const [researchLoading, setResearchLoading] = useState(false);
+  const [researchMemo, setResearchMemo] = useState("");
+  const [memoEditing, setMemoEditing] = useState(false);
+
   const company = companies.find((c) => c.id === id);
   const companyEs = esList.filter((e) => e.companyId === id);
   const companyInterviews = interviews
     .filter((i) => i.companyId === id)
     .sort((a, b) => a.round - b.round);
+
+  // ai_researchの初期化（companyが解決したとき）
+  const savedResearch = (() => {
+    if (!company?.ai_research) return null;
+    try { return JSON.parse(company.ai_research) as ResearchResult; } catch { return null; }
+  })();
+  const displayResearch = research ?? savedResearch;
+
+  const runResearch = async () => {
+    if (!company) return;
+    setResearchLoading(true);
+    try {
+      const res = await fetch("/api/ai/company-research", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          companyName: company.name,
+          industry: company.industry,
+          profile: {
+            careerAxis: profile?.careerAxis,
+            targetIndustries: profile?.targetIndustries,
+            graduationYear: profile?.graduationYear,
+          },
+        }),
+      });
+      if (!res.ok) throw new Error("failed");
+      const data = await res.json() as ResearchResult;
+      setResearch(data);
+      await updateCompany(id, { ai_research: JSON.stringify(data) });
+      showToast("企業分析を保存しました", "success");
+    } catch {
+      showToast("企業分析に失敗しました。しばらく後に再試行してください。", "error");
+    } finally {
+      setResearchLoading(false);
+    }
+  };
+
+  const saveMemo = async () => {
+    await updateCompany(id, { notes: researchMemo });
+    setMemoEditing(false);
+    showToast("メモを保存しました", "success");
+  };
 
   if (!company) {
     return (
@@ -176,13 +238,128 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
         </div>
       </div>
 
-      {/* メモ */}
-      {company.notes && (
-        <div className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
-          <h2 className="font-semibold text-gray-900 mb-2">メモ</h2>
-          <p className="text-sm text-gray-700 whitespace-pre-wrap">{company.notes}</p>
+      {/* 企業研究 */}
+      <div className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="font-semibold text-gray-900">企業研究</h2>
+            {displayResearch && <p className="text-xs text-gray-400 mt-0.5">AIが生成した分析結果</p>}
+          </div>
+          <button
+            type="button"
+            onClick={runResearch}
+            disabled={researchLoading}
+            className="flex items-center gap-1.5 text-sm font-medium bg-[#00c896] hover:bg-[#00b586] disabled:opacity-50 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            {researchLoading ? (
+              <>
+                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                </svg>
+                分析中...
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+                {displayResearch ? "再分析" : "AI分析"}
+              </>
+            )}
+          </button>
         </div>
-      )}
+
+        {!displayResearch && !researchLoading && (
+          <div className="text-center py-8 bg-gray-50 rounded-xl">
+            <p className="text-gray-500 text-sm">AIが事業概要・強み・社風・面接対策などを分析します</p>
+          </div>
+        )}
+
+        {displayResearch && (
+          <div className="space-y-5">
+            <div>
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">事業概要</p>
+              <p className="text-sm text-gray-700 leading-relaxed">{displayResearch.overview}</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1.5">強み</p>
+                <ul className="space-y-1">
+                  {displayResearch.strengths.map((s, i) => (
+                    <li key={i} className="flex items-start gap-1.5 text-sm text-gray-700">
+                      <span className="text-blue-400 shrink-0 mt-0.5">▸</span>{s}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <p className="text-xs font-bold text-purple-600 uppercase tracking-wider mb-1.5">社風・働き方</p>
+                <p className="text-sm text-gray-700 leading-relaxed">{displayResearch.culture}</p>
+              </div>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-amber-600 uppercase tracking-wider mb-1.5">最近のトピック</p>
+              <ul className="space-y-1">
+                {displayResearch.recentNews.map((n, i) => (
+                  <li key={i} className="flex items-start gap-1.5 text-sm text-gray-700">
+                    <span className="text-amber-400 shrink-0 mt-0.5">•</span>{n}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-[#00a87e] uppercase tracking-wider mb-1.5">面接でよく聞かれること</p>
+              <ul className="space-y-1">
+                {displayResearch.interviewPoints.map((p, i) => (
+                  <li key={i} className="flex items-start gap-1.5 text-sm text-gray-700">
+                    <span className="w-4 h-4 rounded-full bg-[#00c896]/20 text-[#00a87e] flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">{i + 1}</span>{p}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="bg-[#00c896]/5 border border-[#00c896]/20 rounded-xl p-4">
+              <p className="text-xs font-bold text-[#00a87e] uppercase tracking-wider mb-1.5">志望動機のヒント</p>
+              <p className="text-sm text-gray-700 leading-relaxed">{displayResearch.whyUs}</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* メモ */}
+      <div className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-semibold text-gray-900">メモ</h2>
+          {!memoEditing && (
+            <button
+              type="button"
+              onClick={() => { setResearchMemo(company.notes ?? ""); setMemoEditing(true); }}
+              className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              編集
+            </button>
+          )}
+        </div>
+        {memoEditing ? (
+          <div>
+            <textarea
+              value={researchMemo}
+              onChange={e => setResearchMemo(e.target.value)}
+              className="w-full border border-gray-200 rounded-lg p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#00c896]/30"
+              rows={5}
+              placeholder="OB訪問のメモ、企業研究のポイントなど自由に書いてください"
+            />
+            <div className="flex justify-end gap-2 mt-2">
+              <button type="button" onClick={() => setMemoEditing(false)} className="text-xs text-gray-400 hover:text-gray-600 px-3 py-1.5">キャンセル</button>
+              <button type="button" onClick={saveMemo} className="text-xs font-medium bg-gray-900 text-white px-4 py-1.5 rounded-lg hover:bg-gray-700 transition-colors">保存</button>
+            </div>
+          </div>
+        ) : company.notes ? (
+          <p className="text-sm text-gray-700 whitespace-pre-wrap">{company.notes}</p>
+        ) : (
+          <p className="text-sm text-gray-400">メモはありません。「編集」から追加できます。</p>
+        )}
+      </div>
 
       {/* ES一覧 */}
       <div className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
