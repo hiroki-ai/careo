@@ -149,20 +149,14 @@ export function LandingPage() {
       </header>
 
       {/* Hero */}
-      <section className="relative text-center px-6 pt-24 pb-20 overflow-hidden">
-        {/* Ambient background animations */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-24 left-1/4 w-[480px] h-[480px] rounded-full bg-[#00c896]/10 blur-3xl animate-blob" />
-          <div className="absolute bottom-0 right-1/6 w-[360px] h-[360px] rounded-full bg-purple-400/8 blur-3xl animate-blob delay-2000" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full bg-[#00c896]/5 blur-2xl animate-float-slow delay-1000" />
-        </div>
-        <div className="max-w-3xl mx-auto relative z-10">
+      <section className="text-center px-6 pt-28 pb-20 bg-white">
+        <div className="max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 border border-[#00c896]/40 bg-[#00c896]/5 text-[#00a87e] text-xs font-semibold px-4 py-2 rounded-full mb-10">
             <span className="w-1.5 h-1.5 bg-[#00c896] rounded-full animate-pulse" />
             {badgeText}
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold leading-[1.15] mb-6 tracking-tight">
+          <h1 className="text-5xl md:text-7xl font-bold leading-[1.15] mb-6 tracking-tight text-[#0D0B21]">
             迷わず動ける、<br />
             <span className="text-[#00c896]">就活へ。</span>
           </h1>
