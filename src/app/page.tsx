@@ -238,10 +238,11 @@ function DashboardContent() {
     if (itemsLoading) return;
     if (hasFetched.current) return;
     hasFetched.current = true;
-    if (pendingItems.length === 0 && completedItems.length === 0) {
-      fetchAiAdvice([]);
-    }
-    fetchPdca();
+    fetchPdca().then(() => {
+      if (pendingItems.length === 0 && completedItems.length === 0) {
+        fetchAiAdvice([]);
+      }
+    });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [itemsLoading]);
 

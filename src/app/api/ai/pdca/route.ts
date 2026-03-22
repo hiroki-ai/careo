@@ -50,7 +50,7 @@ scoreは整数（50=普通/75=良好/90=優秀）。`;
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 500,
+        max_tokens: 800,
         messages: [{ role: 'user', content: prompt }],
       }),
     });
@@ -62,7 +62,8 @@ scoreは整数（50=普通/75=良好/90=優秀）。`;
 
     const result = await anthropicRes.json() as { content?: { type: string; text: string }[] };
     const text = result.content?.[0]?.text ?? '';
-    const match = text.match(/\{[\s\S]*\}/);
+    const raw = text.replace(/```(?:json)?\n?/g, '').replace(/```/g, '').trim();
+    const match = raw.match(/\{[\s\S]*\}/);
     if (!match) {
       return Response.json({ error: `JSONが見つかりません。応答: ${text.slice(0, 200)}` }, { status: 500 });
     }
