@@ -35,11 +35,11 @@ const jsonLd = {
       "@type": "WebApplication",
       "name": "Careo",
       "url": "https://careoai.jp",
-      "description": "ES締切・面接日程・企業研究・OB訪問・筆記試験をAIが横断分析。就活のPDCAを自動で回す、28卒向けAI就活コーチアプリ。",
+      "description": "ES締切・面接日程・企業研究・OB訪問・筆記試験をAIが横断分析。就活のPDCAを自動で回すAI就活コーチアプリ。",
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "Web, iOS, Android",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" },
-      "audience": { "@type": "Audience", "audienceType": "大学生・就活生（28卒）" },
+      "audience": { "@type": "Audience", "audienceType": "大学生・就活生" },
       "featureList": [
         "ES管理・AI提出前チェック", "面接ログ", "企業管理", "AIチャット（カレオコーチ）",
         "PDCA自動分析", "内定予測", "OB/OG訪問管理", "筆記試験管理",
@@ -51,10 +51,11 @@ const jsonLd = {
     {
       "@type": "FAQPage",
       "mainEntity": [
-        { "@type": "Question", "name": "Careoとは何ですか？", "acceptedAnswer": { "@type": "Answer", "text": "CareoはAIを使った就活管理アプリです。ES締切・面接日程・企業研究・OB訪問・筆記試験を一か所で管理でき、AIが就活のPDCAを自動で分析します。他のツールにない「データを横断した気づき通知」が特徴です。28卒向けに開発されています。" } },
+        { "@type": "Question", "name": "Careoとは何ですか？", "acceptedAnswer": { "@type": "Answer", "text": "CareoはAIを使った就活管理アプリです。ES締切・面接日程・企業研究・OB訪問・筆記試験を一か所で管理でき、AIが就活のPDCAを自動で分析します。他のツールにない「データを横断した気づき通知」が特徴で、卒業予定年度に合わせたAIコーチングが受けられます。" } },
         { "@type": "Question", "name": "BaseMeやSmartESと何が違いますか？", "acceptedAnswer": { "@type": "Answer", "text": "BaseMe・SmartESは特定機能（スカウト・ES生成）に特化したサービスです。CareoはES・面接・OB訪問・企業管理・筆記試験のすべてのデータを把握したAIコーチが、データを横断した気づきを提供します。「点解決」ではなく「就活OSとして全体を管理・コーチング」するのがCareoの役割です。" } },
         { "@type": "Question", "name": "無料で使えますか？", "acceptedAnswer": { "@type": "Answer", "text": "はい、Careoは全機能が完全無料です。クレジットカード不要で、メールアドレスだけで今すぐ始められます。" } },
         { "@type": "Question", "name": "スマホでも使えますか？", "acceptedAnswer": { "@type": "Answer", "text": "はい、iPhoneでもAndroidでも使えます。ホーム画面に追加するとアプリのように使えます。" } },
+        { "@type": "Question", "name": "27卒・28卒・29卒でも使えますか？", "acceptedAnswer": { "@type": "Answer", "text": "はい、27卒・28卒・29卒・30卒など卒業予定年度を問わずご利用いただけます。登録時に卒業予定年度を設定すると、その年度・フェーズに合わせたAIコーチングが受けられます。" } },
       ],
     },
   ],
@@ -82,10 +83,157 @@ const faqItems = [
     a: "Supabase（PostgreSQL）を使ったセキュアなクラウドデータベースに保存されます。行レベルセキュリティ（RLS）により、自分のデータには自分だけがアクセスできます。",
   },
   {
-    q: "28卒以外でも使えますか？",
-    a: "はい、27卒・29卒・30卒の方もご利用いただけます。登録時に卒業予定年度を設定すると、その年度に合わせたAIコーチングが受けられます。",
+    q: "27卒・28卒・29卒でも使えますか？",
+    a: "はい、27卒・28卒・29卒・30卒など卒業予定年度を問わずご利用いただけます。登録時に卒業予定年度を設定すると、その年度・フェーズに合わせたAIコーチングが受けられます。",
   },
 ];
+
+// ─── Contact Section ──────────────────────────────────────────────────────────
+function ContactSection() {
+  const [form, setForm] = useState({ name: "", email: "", category: "question", message: "" });
+  const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setStatus("sending");
+    setErrorMsg("");
+
+    const res = await fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+
+    if (res.ok) {
+      setStatus("done");
+      setForm({ name: "", email: "", category: "question", message: "" });
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setErrorMsg(data.error ?? "送信に失敗しました。しばらく経ってから再度お試しください。");
+      setStatus("error");
+    }
+  }
+
+  return (
+    <section className="px-6 py-20 md:py-28 bg-gray-50/60">
+      <div className="max-w-2xl mx-auto reveal">
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center gap-2 border border-gray-200 bg-white text-gray-500 text-xs font-semibold px-4 py-2 rounded-full mb-5">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            お問い合わせ
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-[#0D0B21] tracking-tight mb-3">
+            ご意見・ご要望をお聞かせください
+          </h2>
+          <p className="text-gray-500 text-sm">バグ報告・機能要望・ご質問など、なんでもお気軽にどうぞ。</p>
+        </div>
+
+        {status === "done" ? (
+          <div className="bg-white rounded-2xl border border-gray-200 p-10 text-center shadow-sm">
+            <div className="w-14 h-14 rounded-full bg-[#00c896]/10 flex items-center justify-center mx-auto mb-4">
+              <svg className="w-7 h-7 text-[#00c896]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <p className="font-bold text-[#0D0B21] text-lg mb-1">送信しました！</p>
+            <p className="text-gray-500 text-sm">お問い合わせありがとうございます。内容を確認次第ご返信します。</p>
+            <button
+              onClick={() => setStatus("idle")}
+              className="mt-6 text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2 transition-colors"
+            >
+              別のお問い合わせをする
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm space-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                  お名前 <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  placeholder="山田 太郎"
+                  className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896]/40 focus:border-[#00c896] transition-all placeholder-gray-300"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                  メールアドレス <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  placeholder="you@example.com"
+                  className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896]/40 focus:border-[#00c896] transition-all placeholder-gray-300"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1.5">カテゴリ</label>
+              <select
+                value={form.category}
+                onChange={(e) => setForm({ ...form, category: e.target.value })}
+                className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#00c896]/40 focus:border-[#00c896] transition-all bg-white"
+              >
+                <option value="question">質問・相談</option>
+                <option value="feature">機能要望</option>
+                <option value="bug">バグ報告</option>
+                <option value="other">その他</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                メッセージ <span className="text-red-400">*</span>
+              </label>
+              <textarea
+                required
+                rows={5}
+                value={form.message}
+                onChange={(e) => setForm({ ...form, message: e.target.value })}
+                placeholder="ご意見・ご要望・バグの内容などをご記入ください"
+                className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896]/40 focus:border-[#00c896] transition-all placeholder-gray-300 resize-none"
+              />
+              <p className="text-right text-xs text-gray-300 mt-1">{form.message.length} / 2000</p>
+            </div>
+
+            {status === "error" && (
+              <p className="text-red-500 text-xs bg-red-50 border border-red-100 rounded-xl px-4 py-2.5">{errorMsg}</p>
+            )}
+
+            <button
+              type="submit"
+              disabled={status === "sending"}
+              className="w-full bg-[#0D0B21] hover:bg-[#1a1830] disabled:opacity-50 text-white font-bold py-3 rounded-xl text-sm transition-all duration-200 hover:scale-[1.01] flex items-center justify-center gap-2"
+            >
+              {status === "sending" ? (
+                <>
+                  <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                  </svg>
+                  送信中...
+                </>
+              ) : (
+                "送信する"
+              )}
+            </button>
+          </form>
+        )}
+      </div>
+    </section>
+  );
+}
 
 // ─── App Mockup ───────────────────────────────────────────────────────────────
 function AppMockup() {
@@ -360,8 +508,8 @@ export function LandingPage() {
               <p className="text-gray-400 text-sm mt-1">全機能を無料で使える</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl md:text-4xl font-bold text-[#0D0B21]">28卒</p>
-              <p className="text-gray-400 text-sm mt-1">向け特化</p>
+              <p className="text-3xl md:text-4xl font-bold text-[#0D0B21]">全卒年</p>
+              <p className="text-gray-400 text-sm mt-1">対応</p>
             </div>
           </div>
         </div>
@@ -557,6 +705,9 @@ export function LandingPage() {
               </ul>
             </div>
           </div>
+          <p className="text-center text-xs text-gray-400 mt-6">
+            💡 NotionやスプレッドシートのデータはCSV・PDFで一括インポートできます。切り替えコストほぼゼロ。
+          </p>
         </div>
       </section>
 
@@ -704,21 +855,21 @@ export function LandingPage() {
               {
                 quote: "就活のデータがバラバラだったのがCareoで全部つながった感じ。カレオコーチの週次アドバイスが的確すぎて、毎週楽しみになってます。",
                 name: "M.T.",
-                univ: "早稲田大学 · 28卒",
+                univ: "早稲田大学 · 就活生",
                 avatar: "M",
                 color: "from-blue-400 to-indigo-500",
               },
               {
                 quote: "SmartESやリクナビと一緒に使っています。Careoがあることで締切の見落としが完全になくなりました。ESのAIチェックも提出前に必ず使ってます。",
                 name: "K.S.",
-                univ: "慶應義塾大学 · 28卒",
+                univ: "慶應義塾大学 · 就活生",
                 avatar: "K",
                 color: "from-emerald-400 to-teal-500",
               },
               {
                 quote: "「大学生が一人で作ったの？」って友達に紹介したら驚かれました。無料でここまでできるのが信じられないレベルです。",
                 name: "A.Y.",
-                univ: "上智大学 · 28卒",
+                univ: "上智大学 · 就活生",
                 avatar: "A",
                 color: "from-[#00c896] to-emerald-600",
               },
@@ -849,7 +1000,7 @@ export function LandingPage() {
             <div className="lp-story-card rounded-2xl p-5">
               <p className="text-[#00c896] font-bold text-sm mb-2">👨‍💻 作った人</p>
               <p className="text-gray-300 text-sm leading-relaxed">
-                上智大学在籍の28卒学生が開発。自分自身の就活経験から「これが欲しかった」を形にしました。
+                上智大学在籍の学生が開発。自分自身の就活経験から「これが欲しかった」を形にしました。
               </p>
             </div>
             <div className="lp-story-card rounded-2xl p-5">
@@ -872,6 +1023,9 @@ export function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* ── Contact ─────────────────────────────────────────────────────────── */}
+      <ContactSection />
 
       {/* ── CTA ────────────────────────────────────────────────────────────── */}
       <section className="px-6 py-24 md:py-32 relative overflow-hidden">
