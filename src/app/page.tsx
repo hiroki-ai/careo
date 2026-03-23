@@ -238,18 +238,24 @@ function DashboardContent() {
         </div>
       </div>
 
-      {/* ステータスサマリー — モバイルは横4列コンパクト */}
-      <div className="grid grid-cols-4 gap-1.5 mb-2 md:gap-2 md:mb-3">
+      {/* ステータスサマリー — モバイルは2×2グリッド */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
         {[
-          { label: "選考中", count: companies.filter(c => !["OFFERED","REJECTED","WISHLIST"].includes(c.status)).length, gradient: "from-teal-500 to-emerald-500", bg: "bg-gradient-to-br from-teal-50/60 to-emerald-50/40", border: "border-teal-100" },
-          { label: "内定", count: statusCounts["OFFERED"] ?? 0, gradient: "from-emerald-500 to-green-500", bg: "bg-gradient-to-br from-emerald-50 to-green-50", border: "border-emerald-100" },
-          { label: "ES待ち", count: esList.filter(e => e.status === "DRAFT").length, gradient: "from-amber-500 to-orange-500", bg: "bg-gradient-to-br from-amber-50 to-orange-50", border: "border-amber-100" },
-          { label: "気になる", count: statusCounts["WISHLIST"] ?? 0, gradient: "from-gray-400 to-slate-500", bg: "bg-gradient-to-br from-gray-50 to-slate-50", border: "border-gray-200" },
+          { label: "選考中", icon: "🏃", count: companies.filter(c => !["OFFERED","REJECTED","WISHLIST"].includes(c.status)).length, gradient: "from-teal-500 to-emerald-500", bg: "bg-gradient-to-br from-teal-50/60 to-emerald-50/40", border: "border-teal-100", link: "/companies" },
+          { label: "内定", icon: "🎉", count: statusCounts["OFFERED"] ?? 0, gradient: "from-emerald-500 to-green-500", bg: "bg-gradient-to-br from-emerald-50 to-green-50", border: "border-emerald-100", link: "/companies" },
+          { label: "ES提出待ち", icon: "✍️", count: esList.filter(e => e.status === "DRAFT").length, gradient: "from-amber-500 to-orange-500", bg: "bg-gradient-to-br from-amber-50 to-orange-50", border: "border-amber-100", link: "/es" },
+          { label: "気になる", icon: "🔖", count: statusCounts["WISHLIST"] ?? 0, gradient: "from-gray-400 to-slate-500", bg: "bg-gradient-to-br from-gray-50 to-slate-50", border: "border-gray-200", link: "/companies" },
         ].map((item) => (
-          <div key={item.label} className={`${item.bg} border ${item.border} rounded-xl p-2 md:p-3 shadow-sm text-center md:text-left`}>
-            <p className="text-[10px] md:text-xs font-medium text-gray-500 mb-0.5 truncate">{item.label}</p>
-            <p className={`text-xl md:text-2xl font-bold bg-gradient-to-r ${item.gradient} bg-clip-text text-transparent`}>{item.count}</p>
-          </div>
+          <Link key={item.label} href={item.link}>
+            <div className={`${item.bg} border ${item.border} rounded-2xl p-3.5 md:p-3 shadow-sm active:scale-[0.97] transition-transform`}>
+              <div className="flex items-center justify-between mb-1.5">
+                <p className="text-xs font-medium text-gray-500">{item.label}</p>
+                <span className="text-base">{item.icon}</span>
+              </div>
+              <p className={`text-3xl md:text-2xl font-bold bg-gradient-to-r ${item.gradient} bg-clip-text text-transparent leading-none`}>{item.count}</p>
+              <p className="text-[10px] text-gray-400 mt-1">社 / 件</p>
+            </div>
+          </Link>
         ))}
       </div>
 
@@ -258,20 +264,20 @@ function DashboardContent() {
 
       {/* モバイル：直近の締切を最上部に表示 */}
       {upcomingDeadlines.length > 0 && (
-        <div className="mb-2 md:hidden">
-          <div className="flex items-center justify-between mb-1.5">
+        <div className="mb-3 md:hidden">
+          <div className="flex items-center justify-between mb-2">
             <h2 className="font-semibold text-gray-900 text-sm">📅 直近の締切</h2>
-            <Link href="/deadlines" className="text-[10px] text-[#00c896] hover:underline">すべて →</Link>
+            <Link href="/deadlines" className="text-xs text-[#00c896] hover:underline">すべて →</Link>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
             {upcomingDeadlines.map((d) => (
               <Link key={`${d.type}-${d.id}`} href={d.link} className="shrink-0">
-                <div className={`flex items-center gap-2 bg-white rounded-xl border px-3 py-2 ${d.days <= 3 ? "border-red-200" : "border-gray-100"}`}>
-                  <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0 ${d.type === "ES" ? "bg-[#00c896]/10 text-[#00a87e]" : "bg-purple-100 text-purple-700"}`}>
+                <div className={`flex items-center gap-2 bg-white rounded-xl border px-3 py-2.5 ${d.days <= 3 ? "border-red-200 bg-red-50/30" : "border-gray-100"}`}>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${d.type === "ES" ? "bg-[#00c896]/10 text-[#00a87e]" : "bg-purple-100 text-purple-700"}`}>
                     {d.type}
                   </span>
-                  <p className="text-xs font-medium text-gray-900 max-w-[100px] truncate">{d.title}</p>
-                  <span className={`text-[10px] font-bold shrink-0 ${d.days === 0 ? "text-red-600" : d.days <= 3 ? "text-orange-500" : "text-gray-400"}`}>
+                  <p className="text-xs font-medium text-gray-900 max-w-[110px] truncate">{d.title}</p>
+                  <span className={`text-xs font-bold shrink-0 ${d.days === 0 ? "text-red-600" : d.days <= 3 ? "text-orange-500" : "text-gray-400"}`}>
                     {d.days === 0 ? "今日！" : `${d.days}日`}
                   </span>
                 </div>
@@ -286,8 +292,8 @@ function DashboardContent() {
 
         {/* Left / モバイルは上: Next Action */}
         <div className="md:col-span-7">
-          <div className="flex items-center justify-between mb-1.5">
-            <h2 className="font-semibold text-gray-900 text-sm flex items-center gap-1.5">🎯 <span>Next Action</span></h2>
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="font-semibold text-gray-900 text-base flex items-center gap-1.5">🎯 <span>Next Action</span></h2>
             <Button variant="ghost" size="sm" onClick={() => fetchAiAdvice()} disabled={aiLoading}>
               {aiLoading ? "分析中..." : "再分析"}
             </Button>
@@ -309,23 +315,23 @@ function DashboardContent() {
               {pendingItems.map((item) => (
                 <div
                   key={item.id}
-                  className={`flex items-center gap-2 border-l-4 rounded-r-xl p-2.5 ${priorityColors[item.priority]}`}
+                  className={`flex items-start gap-3 border-l-4 rounded-r-xl p-3 ${priorityColors[item.priority]}`}
                 >
                   <input
                     type="checkbox"
                     checked={false}
                     title={`完了: ${item.action}`}
                     onChange={() => handleToggle(item.id, true)}
-                    className="mt-0.5 w-4 h-4 rounded border-gray-400 accent-[#00c896] cursor-pointer shrink-0"
+                    className="mt-0.5 w-5 h-5 rounded border-gray-400 accent-[#00c896] cursor-pointer shrink-0"
                   />
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
+                    <div className="flex items-center gap-1.5 mb-1 flex-wrap">
                       <Badge variant={priorityBadgeVariants[item.priority]}>
                         {priorityLabels[item.priority]}
                       </Badge>
-                      <p className="text-xs font-medium text-gray-900 leading-tight">{item.action}</p>
+                      <p className="text-sm font-semibold text-gray-900 leading-tight">{item.action}</p>
                     </div>
-                    <p className="text-[11px] text-gray-500 mt-0.5">{item.reason}</p>
+                    <p className="text-xs text-gray-500">{item.reason}</p>
                   </div>
                   {item.link && (
                     item.link.external
