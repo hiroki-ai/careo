@@ -5,7 +5,7 @@ import Link from "next/link";
 import Script from "next/script";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
-const DEFAULT_BADGE = "28卒向け・AI就活コーチ「カレオ」";
+const DEFAULT_BADGE = "AI就活コーチ「カレオ」";
 const DEFAULT_HERO_SUBTEXT =
   "企業・ES・面接・OB訪問・筆記試験をすべて一か所に。\nAIコーチ「カレオ」が全データを把握し、点と点を繋ぐ気づきを届ける。";
 const DEFAULT_AFTER_ITEMS = [
@@ -584,16 +584,16 @@ export function LandingPage() {
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {[
-                  { label: "求人情報・スカウト", careo: false, base: true, smart: false, riku: true, notion: false },
-                  { label: "選考進捗を一元管理", careo: true, base: false, smart: false, riku: false, notion: "△" },
-                  { label: "ES・面接・OB訪問・筆記を記録", careo: true, base: false, smart: false, riku: false, notion: "△" },
+                  { label: "求人情報・スカウト受信", careo: false, base: "△スカウトのみ", smart: false, riku: true, notion: false },
+                  { label: "選考進捗を一元管理", careo: true, base: false, smart: false, riku: false, notion: "△手動" },
+                  { label: "ES・面接・OB訪問・筆記を記録", careo: true, base: false, smart: false, riku: false, notion: "△手動" },
                   { label: "週次PDCAをAIが自動分析", careo: true, base: false, smart: false, riku: false, notion: false },
                   { label: "ES提出前AIチェック", careo: true, base: false, smart: false, riku: false, notion: false },
                   { label: "データ横断の気づき通知", careo: true, base: false, smart: false, riku: false, notion: false },
                   { label: "全データを把握したAIコーチ", careo: true, base: "△", smart: false, riku: false, notion: false },
                   { label: "キャリアセンターレポート出力", careo: true, base: false, smart: false, riku: false, notion: false },
-                  { label: "学生は完全無料", careo: true, base: true, smart: true, riku: true, notion: true },
-                  { label: "📵 広告・スカウト電話なし", careo: true, base: false, smart: true, riku: false, notion: true },
+                  { label: "学生は完全無料", careo: true, base: true, smart: "△制限あり", riku: true, notion: true },
+                  { label: "広告・スカウト電話なし", careo: true, base: false, smart: true, riku: false, notion: true },
                 ].map((row) => {
                   const cell = (v: boolean | string) =>
                     v === true ? <span className="text-[#00c896] font-bold text-base">✓</span>
