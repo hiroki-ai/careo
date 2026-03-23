@@ -9,17 +9,36 @@ export interface ActionItem {
   reason: string;
   priority: "high" | "medium" | "low";
   isCompleted: boolean;
+  link?: string;
   createdAt: string;
   completedAt?: string;
 }
 
+// アクション文言からアプリ内リンクを推定
+export function inferActionLink(action: string): string | undefined {
+  const a = action;
+  if (/ES|エントリーシート|提出/.test(a)) return "/es";
+  if (/面接|インタビュー|面談/.test(a)) return "/interviews";
+  if (/OB|OG|訪問|OBOG/.test(a)) return "/ob-visits";
+  if (/SPI|筆記|適性|テスト|検査/.test(a)) return "/tests";
+  if (/企業|応募|リサーチ|調べ|登録|受験/.test(a)) return "/companies";
+  if (/自己分析|ガクチカ|自己PR|強み|弱み|就活の軸/.test(a)) return "/career";
+  if (/コーチ|チャット|相談|カレオ|話/.test(a)) return "/chat";
+  if (/PDCA|振り返り|レポート|分析/.test(a)) return "/report";
+  if (/締切|スケジュール|カレンダー/.test(a)) return "/calendar";
+  if (/プロフィール|設定|登録/.test(a)) return "/settings";
+  return undefined;
+}
+
 function rowToItem(row: Record<string, unknown>): ActionItem {
+  const action = row.action as string;
   return {
     id: row.id as string,
-    action: row.action as string,
+    action,
     reason: (row.reason as string) ?? "",
     priority: row.priority as "high" | "medium" | "low",
     isCompleted: row.is_completed as boolean,
+    link: inferActionLink(action),
     createdAt: row.created_at as string,
     completedAt: row.completed_at as string | undefined,
   };

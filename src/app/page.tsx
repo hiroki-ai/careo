@@ -246,6 +246,31 @@ function DashboardContent() {
       {/* 今日のカレオコーチ CTA */}
       <DailyCoachBanner profile={profile} />
 
+      {/* モバイル：直近の締切を最上部に表示 */}
+      {upcomingDeadlines.length > 0 && (
+        <div className="mb-2 md:hidden">
+          <div className="flex items-center justify-between mb-1.5">
+            <h2 className="font-semibold text-gray-900 text-sm">📅 直近の締切</h2>
+            <Link href="/deadlines" className="text-[10px] text-[#00c896] hover:underline">すべて →</Link>
+          </div>
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            {upcomingDeadlines.map((d) => (
+              <Link key={`${d.type}-${d.id}`} href={d.link} className="shrink-0">
+                <div className={`flex items-center gap-2 bg-white rounded-xl border px-3 py-2 ${d.days <= 3 ? "border-red-200" : "border-gray-100"}`}>
+                  <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0 ${d.type === "ES" ? "bg-[#00c896]/10 text-[#00a87e]" : "bg-purple-100 text-purple-700"}`}>
+                    {d.type}
+                  </span>
+                  <p className="text-xs font-medium text-gray-900 max-w-[100px] truncate">{d.title}</p>
+                  <span className={`text-[10px] font-bold shrink-0 ${d.days === 0 ? "text-red-600" : d.days <= 3 ? "text-orange-500" : "text-gray-400"}`}>
+                    {d.days === 0 ? "今日！" : `${d.days}日`}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* メインコンテンツ */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4">
 
@@ -271,15 +296,15 @@ function DashboardContent() {
 
           {!aiLoading && !itemsLoading && hasItems && (
             <div className="space-y-1.5">
-              {/* モバイルは3件まで、PCは全件 */}
               {pendingItems.slice(0, 3).map((item) => (
-                <label
+                <div
                   key={item.id}
-                  className={`flex items-start gap-2 border-l-4 rounded-r-xl p-2.5 cursor-pointer ${priorityColors[item.priority]}`}
+                  className={`flex items-center gap-2 border-l-4 rounded-r-xl p-2.5 ${priorityColors[item.priority]}`}
                 >
                   <input
                     type="checkbox"
                     checked={false}
+                    title={`完了: ${item.action}`}
                     onChange={() => handleToggle(item.id, true)}
                     className="mt-0.5 w-4 h-4 rounded border-gray-400 accent-[#00c896] cursor-pointer shrink-0"
                   />
@@ -292,17 +317,22 @@ function DashboardContent() {
                     </div>
                     <p className="text-[11px] text-gray-500 hidden md:block">{item.reason}</p>
                   </div>
-                </label>
+                  {item.link && (
+                    <Link href={item.link} className="shrink-0 ml-1 text-[10px] font-bold text-[#00a87e] bg-[#00c896]/10 hover:bg-[#00c896]/20 border border-[#00c896]/30 px-2 py-1 rounded-lg transition-colors whitespace-nowrap">
+                      やる →
+                    </Link>
+                  )}
+                </div>
               ))}
-              {/* PC: 4件目以降も表示 */}
               {pendingItems.slice(3).map((item) => (
-                <label
+                <div
                   key={item.id}
-                  className={`hidden md:flex items-start gap-2 border-l-4 rounded-r-xl p-2.5 cursor-pointer ${priorityColors[item.priority]}`}
+                  className={`hidden md:flex items-center gap-2 border-l-4 rounded-r-xl p-2.5 ${priorityColors[item.priority]}`}
                 >
                   <input
                     type="checkbox"
                     checked={false}
+                    title={`完了: ${item.action}`}
                     onChange={() => handleToggle(item.id, true)}
                     className="mt-0.5 w-4 h-4 rounded border-gray-400 accent-[#00c896] cursor-pointer shrink-0"
                   />
@@ -315,15 +345,18 @@ function DashboardContent() {
                     </div>
                     <p className="text-[11px] text-gray-500">{item.reason}</p>
                   </div>
-                </label>
+                  {item.link && (
+                    <Link href={item.link} className="shrink-0 ml-1 text-[10px] font-bold text-[#00a87e] bg-[#00c896]/10 hover:bg-[#00c896]/20 border border-[#00c896]/30 px-2 py-1 rounded-lg transition-colors whitespace-nowrap">
+                      やる →
+                    </Link>
+                  )}
+                </div>
               ))}
-              {/* モバイル: 3件以上ある場合は残り件数リンク */}
               {pendingItems.length > 3 && (
                 <p className="text-[11px] text-[#00c896] text-right px-1 md:hidden">
                   他 {pendingItems.length - 3} 件 →
                 </p>
               )}
-              {/* PC: 完了済み */}
               {completedItems.length > 0 && (
                 <div className="mt-1 hidden md:block">
                   <p className="text-[10px] text-gray-400 mb-1 px-1">完了済み</p>
@@ -354,18 +387,17 @@ function DashboardContent() {
           )}
         </div>
 
-        {/* Right / モバイルは下: 直近の締切 + 気づき */}
+        {/* Right / モバイルは下: 直近の締切 + 気づき (PC のみ締切表示) */}
         <div className="md:col-span-5 space-y-3 md:space-y-4">
-          {/* 直近の締切 */}
-          <div>
+          {/* 直近の締切 — PCのみ */}
+          <div className="hidden md:block">
             <div className="flex items-center justify-between mb-1.5">
               <h2 className="font-semibold text-gray-900 text-sm">📅 直近の締切</h2>
               <Link href="/calendar" className="text-[10px] text-[#00c896] hover:underline">カレンダー →</Link>
             </div>
             {upcomingDeadlines.length > 0 ? (
               <div className="space-y-1.5">
-                {/* モバイルは2件まで、PCは3件 */}
-                {upcomingDeadlines.slice(0, 2).map((d) => (
+                {upcomingDeadlines.map((d) => (
                   <Link key={`${d.type}-${d.id}`} href={d.link}>
                     <div className={`flex items-center justify-between bg-white rounded-xl border p-2.5 hover:bg-gray-50 transition-colors ${d.days <= 3 ? "border-red-200" : "border-gray-100"}`}>
                       <div className="flex items-center gap-2 min-w-0">
@@ -380,21 +412,6 @@ function DashboardContent() {
                     </div>
                   </Link>
                 ))}
-                {upcomingDeadlines[2] && (
-                  <Link key={`${upcomingDeadlines[2].type}-${upcomingDeadlines[2].id}`} href={upcomingDeadlines[2].link} className="hidden md:block">
-                    <div className={`flex items-center justify-between bg-white rounded-xl border p-2.5 hover:bg-gray-50 transition-colors ${upcomingDeadlines[2].days <= 3 ? "border-red-200" : "border-gray-100"}`}>
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0 ${upcomingDeadlines[2].type === "ES" ? "bg-[#00c896]/10 text-[#00a87e]" : "bg-purple-100 text-purple-700"}`}>
-                          {upcomingDeadlines[2].type}
-                        </span>
-                        <p className="text-xs font-medium text-gray-900 truncate">{upcomingDeadlines[2].title}</p>
-                      </div>
-                      <span className={`text-[10px] font-bold shrink-0 ml-2 ${upcomingDeadlines[2].days === 0 ? "text-red-600" : upcomingDeadlines[2].days <= 3 ? "text-orange-500" : "text-gray-400"}`}>
-                        {upcomingDeadlines[2].days === 0 ? "今日！" : `あと${upcomingDeadlines[2].days}日`}
-                      </span>
-                    </div>
-                  </Link>
-                )}
               </div>
             ) : (
               <div className="bg-white border border-gray-100 rounded-xl p-2.5 text-center">
