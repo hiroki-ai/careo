@@ -18,6 +18,7 @@ import { useToast } from "@/components/ui/Toast";
 
 interface ResearchResult {
   overview: string;
+  industryPosition?: string;
   strengths: string[];
   culture: string;
   recentNews: string[];
@@ -282,6 +283,12 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
               <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">事業概要</p>
               <p className="text-sm text-gray-700 leading-relaxed">{displayResearch.overview}</p>
             </div>
+            {displayResearch.industryPosition && (
+              <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4">
+                <p className="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1.5">業界内での立ち位置</p>
+                <p className="text-sm text-gray-700 leading-relaxed">{displayResearch.industryPosition}</p>
+              </div>
+            )}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <p className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1.5">強み</p>

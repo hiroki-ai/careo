@@ -167,3 +167,8 @@
   background-image: radial-gradient(circle, rgba(0,0,0,0.03) 1px, transparent 1px);
   background-size: 28px 28px;
 }
+
+/* QuickAddModal 保存ボタンエリア（safe-area対応） */
+.quick-add-save-area {
+  padding-bottom: max(env(safe-area-inset-bottom), 16px);
+}

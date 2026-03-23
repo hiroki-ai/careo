@@ -313,9 +313,9 @@ function DashboardContent() {
                       <Badge variant={priorityBadgeVariants[item.priority]}>
                         {priorityLabels[item.priority]}
                       </Badge>
-                      <p className="text-xs font-medium text-gray-900 truncate md:whitespace-normal">{item.action}</p>
+                      <p className="text-xs font-medium text-gray-900 leading-tight">{item.action}</p>
                     </div>
-                    <p className="text-[11px] text-gray-500 hidden md:block">{item.reason}</p>
+                    <p className="text-[11px] text-gray-500 mt-0.5">{item.reason}</p>
                   </div>
                   {item.link && (
                     item.link.external
@@ -425,6 +425,11 @@ function DashboardContent() {
             <InsightsWidget />
           </div>
         </div>
+      </div>
+
+      {/* モバイル：カレオからの気づき */}
+      <div className="md:hidden mt-3">
+        <InsightsWidget />
       </div>
 
       {/* 内定後コンテンツ */}

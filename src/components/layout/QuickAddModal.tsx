@@ -87,165 +87,162 @@ export function QuickAddModal({ isOpen, onClose }: Props) {
   if (!isOpen) return null;
 
   return (
-    <>
-      <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm md:hidden" onClick={handleClose} />
-      <div
-        className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl shadow-2xl md:hidden animate-slide-up"
-        style={{ paddingBottom: "max(env(safe-area-inset-bottom), 16px)" }}
-      >
-        {/* ハンドル */}
-        <div className="flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1 bg-gray-200 rounded-full" />
-        </div>
-
-        {/* ヘッダー */}
-        <div className="flex items-center justify-between px-5 py-3">
-          <h2 className="font-bold text-gray-900">クイック記録</h2>
-          <button
-            onClick={handleClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        {/* タブ */}
-        <div className="flex gap-2 px-5 pb-4 overflow-x-auto scrollbar-hide">
-          {TABS.map(t => (
-            <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                tab === t.id ? "bg-[#00c896] text-white" : "bg-gray-100 text-gray-600"
-              }`}
-            >
-              <span>{t.emoji}</span>
-              <span>{t.label}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* フォーム */}
-        <div className="px-5 pb-4 space-y-3">
-          {tab === "company" && (
-            <>
-              <div>
-                <label className={LABEL}>企業名 *</label>
-                <input
-                  autoFocus
-                  type="text"
-                  value={coName}
-                  onChange={e => setCoName(e.target.value)}
-                  placeholder="例：トヨタ自動車"
-                  className={INPUT}
-                />
-              </div>
-              <p className="text-xs text-gray-400">「気になる」ステータスで追加されます</p>
-            </>
-          )}
-
-          {tab === "interview" && (
-            <>
-              <div>
-                <label className={LABEL}>企業 *</label>
-                <select value={ivCo} onChange={e => setIvCo(e.target.value)} className={INPUT}>
-                  <option value="">選択してください</option>
-                  {companies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className={LABEL}>日付 *</label>
-                  <input type="date" value={ivDate} onChange={e => setIvDate(e.target.value)} className={INPUT} />
-                </div>
-                <div>
-                  <label className={LABEL}>次数</label>
-                  <select value={ivRound} onChange={e => setIvRound(Number(e.target.value))} className={INPUT}>
-                    {[1,2,3,4,5].map(n => <option key={n} value={n}>{n}次</option>)}
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className={LABEL}>結果</label>
-                <div className="flex gap-2">
-                  {([["PENDING", "結果待ち"], ["PASS", "通過"], ["FAIL", "不合格"]] as const).map(([v, lbl]) => (
-                    <button
-                      key={v}
-                      onClick={() => setIvResult(v)}
-                      className={`flex-1 py-2 rounded-xl text-xs font-medium transition-colors ${
-                        ivResult === v
-                          ? v === "PASS" ? "bg-green-500 text-white"
-                            : v === "FAIL" ? "bg-red-500 text-white"
-                            : "bg-[#00c896] text-white"
-                          : "bg-gray-100 text-gray-600"
-                      }`}
-                    >
-                      {lbl}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
-
-          {tab === "ob" && (
-            <>
-              <div>
-                <label className={LABEL}>企業名 *</label>
-                <input
-                  autoFocus
-                  type="text"
-                  value={obCo}
-                  onChange={e => setObCo(e.target.value)}
-                  placeholder="例：ソニーグループ"
-                  className={INPUT}
-                />
-              </div>
-              <div>
-                <label className={LABEL}>訪問日</label>
-                <input type="date" value={obDate} onChange={e => setObDate(e.target.value)} className={INPUT} />
-              </div>
-              <div>
-                <label className={LABEL}>メモ（任意）</label>
-                <textarea
-                  value={obNotes}
-                  onChange={e => setObNotes(e.target.value)}
-                  placeholder="気づき・印象など"
-                  rows={2}
-                  className={INPUT + " resize-none"}
-                />
-              </div>
-            </>
-          )}
-
-          {tab === "es" && (
-            <>
-              <div>
-                <label className={LABEL}>企業 *</label>
-                <select value={esCo} onChange={e => setEsCo(e.target.value)} className={INPUT}>
-                  <option value="">選択してください</option>
-                  {companies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className={LABEL}>締切日（任意）</label>
-                <input type="date" value={esDeadline} onChange={e => setEsDeadline(e.target.value)} className={INPUT} />
-              </div>
-              <p className="text-xs text-gray-400">詳細な設問はESページから編集できます</p>
-            </>
-          )}
-
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="w-full bg-[#00c896] hover:bg-[#00a87e] disabled:opacity-60 text-white font-semibold rounded-xl py-3 transition-colors"
-          >
-            {saving ? "保存中..." : "保存する"}
-          </button>
-        </div>
+    <div className="fixed inset-0 z-50 bg-white md:hidden flex flex-col animate-slide-up">
+      {/* ヘッダー */}
+      <div className="shrink-0 flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <h2 className="font-bold text-gray-900">クイック記録</h2>
+        <button
+          type="button"
+          title="閉じる"
+          onClick={handleClose}
+          className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
-    </>
+
+      {/* タブ */}
+      <div className="shrink-0 flex gap-2 px-5 py-3 overflow-x-auto scrollbar-hide border-b border-gray-100">
+        {TABS.map(t => (
+          <button
+            key={t.id}
+            type="button"
+            onClick={() => setTab(t.id)}
+            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+              tab === t.id ? "bg-[#00c896] text-white" : "bg-gray-100 text-gray-600"
+            }`}
+          >
+            <span>{t.emoji}</span>
+            <span>{t.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* フォーム（スクロール可能） */}
+      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+        {tab === "company" && (
+          <>
+            <div>
+              <label className={LABEL}>企業名 *</label>
+              <input
+                autoFocus
+                type="text"
+                value={coName}
+                onChange={e => setCoName(e.target.value)}
+                placeholder="例：トヨタ自動車"
+                className={INPUT}
+              />
+            </div>
+            <p className="text-xs text-gray-400">「気になる」ステータスで追加されます</p>
+          </>
+        )}
+
+        {tab === "interview" && (
+          <>
+            <div>
+              <label className={LABEL}>企業 *</label>
+              <select title="企業を選択" value={ivCo} onChange={e => setIvCo(e.target.value)} className={INPUT}>
+                <option value="">選択してください</option>
+                {companies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className={LABEL}>日付 *</label>
+                <input title="面接日付" type="date" value={ivDate} onChange={e => setIvDate(e.target.value)} className={INPUT} />
+              </div>
+              <div>
+                <label className={LABEL}>次数</label>
+                <select title="面接次数" value={ivRound} onChange={e => setIvRound(Number(e.target.value))} className={INPUT}>
+                  {[1,2,3,4,5].map(n => <option key={n} value={n}>{n}次</option>)}
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className={LABEL}>結果</label>
+              <div className="flex gap-2">
+                {([["PENDING", "結果待ち"], ["PASS", "通過"], ["FAIL", "不合格"]] as const).map(([v, lbl]) => (
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={() => setIvResult(v)}
+                    className={`flex-1 py-2.5 rounded-xl text-xs font-medium transition-colors ${
+                      ivResult === v
+                        ? v === "PASS" ? "bg-green-500 text-white"
+                          : v === "FAIL" ? "bg-red-500 text-white"
+                          : "bg-[#00c896] text-white"
+                        : "bg-gray-100 text-gray-600"
+                    }`}
+                  >
+                    {lbl}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {tab === "ob" && (
+          <>
+            <div>
+              <label className={LABEL}>企業名 *</label>
+              <input
+                autoFocus
+                type="text"
+                value={obCo}
+                onChange={e => setObCo(e.target.value)}
+                placeholder="例：ソニーグループ"
+                className={INPUT}
+              />
+            </div>
+            <div>
+              <label className={LABEL}>訪問日</label>
+              <input title="訪問日" type="date" value={obDate} onChange={e => setObDate(e.target.value)} className={INPUT} />
+            </div>
+            <div>
+              <label className={LABEL}>メモ（任意）</label>
+              <textarea
+                value={obNotes}
+                onChange={e => setObNotes(e.target.value)}
+                placeholder="気づき・印象など"
+                rows={4}
+                className={INPUT + " resize-none"}
+              />
+            </div>
+          </>
+        )}
+
+        {tab === "es" && (
+          <>
+            <div>
+              <label className={LABEL}>企業 *</label>
+              <select title="企業を選択" value={esCo} onChange={e => setEsCo(e.target.value)} className={INPUT}>
+                <option value="">選択してください</option>
+                {companies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className={LABEL}>締切日（任意）</label>
+              <input title="締切日" type="date" value={esDeadline} onChange={e => setEsDeadline(e.target.value)} className={INPUT} />
+            </div>
+            <p className="text-xs text-gray-400">詳細な設問はESページから編集できます</p>
+          </>
+        )}
+      </div>
+
+      {/* 保存ボタン（常に画面下部に固定） */}
+      <div className="shrink-0 px-5 pt-4 border-t border-gray-100 bg-white quick-add-save-area">
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={saving}
+          className="w-full bg-[#00c896] hover:bg-[#00a87e] disabled:opacity-60 text-white font-semibold rounded-xl py-3.5 transition-colors"
+        >
+          {saving ? "保存中..." : "保存する"}
+        </button>
+      </div>
+    </div>
   );
 }

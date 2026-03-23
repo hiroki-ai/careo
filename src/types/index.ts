@@ -1,6 +1,10 @@
 export type CompanyStatus =
   | "WISHLIST"
   | "INTERN_APPLYING"
+  | "INTERN_DOCUMENT"
+  | "INTERN_INTERVIEW_1"
+  | "INTERN_INTERVIEW_2"
+  | "INTERN_FINAL"
   | "INTERN"
   | "APPLIED"
   | "DOCUMENT"
@@ -59,7 +63,11 @@ export interface Interview {
 
 export const COMPANY_STATUS_LABELS: Record<CompanyStatus, string> = {
   WISHLIST: "気になる",
-  INTERN_APPLYING: "インターン選考中",
+  INTERN_APPLYING: "インターン応募",
+  INTERN_DOCUMENT: "インターン書類選考",
+  INTERN_INTERVIEW_1: "インターン1次面接",
+  INTERN_INTERVIEW_2: "インターン2次面接",
+  INTERN_FINAL: "インターン最終面接",
   INTERN: "インターン中",
   APPLIED: "応募済み",
   DOCUMENT: "書類選考中",
@@ -73,6 +81,10 @@ export const COMPANY_STATUS_LABELS: Record<CompanyStatus, string> = {
 export const COMPANY_STATUS_ORDER: CompanyStatus[] = [
   "WISHLIST",
   "INTERN_APPLYING",
+  "INTERN_DOCUMENT",
+  "INTERN_INTERVIEW_1",
+  "INTERN_INTERVIEW_2",
+  "INTERN_FINAL",
   "INTERN",
   "APPLIED",
   "DOCUMENT",
@@ -208,8 +220,12 @@ export const APTITUDE_TEST_TYPES: AptitudeTest["testType"][] = [
 
 export const COMPANY_STATUS_COLORS: Record<CompanyStatus, string> = {
   WISHLIST: "bg-gray-100 text-gray-700",
-  INTERN_APPLYING: "bg-teal-100 text-teal-700",
-  INTERN: "bg-teal-200 text-teal-800",
+  INTERN_APPLYING: "bg-teal-50 text-teal-600",
+  INTERN_DOCUMENT: "bg-teal-100 text-teal-700",
+  INTERN_INTERVIEW_1: "bg-teal-200 text-teal-800",
+  INTERN_INTERVIEW_2: "bg-teal-300 text-teal-900",
+  INTERN_FINAL: "bg-cyan-200 text-cyan-900",
+  INTERN: "bg-cyan-100 text-cyan-800",
   APPLIED: "bg-blue-100 text-blue-700",
   DOCUMENT: "bg-yellow-100 text-yellow-700",
   INTERVIEW_1: "bg-orange-100 text-orange-700",

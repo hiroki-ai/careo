@@ -12,6 +12,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [agreed, setAgreed] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -98,7 +99,22 @@ export default function SignupPage() {
             />
           </div>
           {error && <p className="text-sm text-red-500">{error}</p>}
-          <Button type="submit" className="w-full" disabled={loading}>
+          <div className="flex items-start gap-2.5 py-1">
+            <input
+              id="agree"
+              type="checkbox"
+              checked={agreed}
+              onChange={(e) => setAgreed(e.target.checked)}
+              className="mt-0.5 w-4 h-4 rounded border-gray-300 accent-[#00c896] cursor-pointer shrink-0"
+            />
+            <label htmlFor="agree" className="text-xs text-gray-600 leading-relaxed cursor-pointer">
+              <Link href="/terms" target="_blank" className="text-[#00c896] hover:underline">利用規約</Link>
+              {" "}および{" "}
+              <Link href="/privacy" target="_blank" className="text-[#00c896] hover:underline">プライバシーポリシー</Link>
+              に同意します
+            </label>
+          </div>
+          <Button type="submit" className="w-full" disabled={loading || !agreed}>
             {loading ? "登録中..." : "アカウントを作成"}
           </Button>
         </form>

@@ -44,6 +44,7 @@ ${profileContext ? `【就活生のプロフィール】\n${profileContext}\n` :
 
 {
   "overview": "事業概要・主要サービス（2〜3文）",
+  "industryPosition": "業界内での立ち位置・主要競合との比較（2文）",
   "strengths": ["強み1", "強み2", "強み3"],
   "culture": "社風・働き方の特徴（2文）",
   "recentNews": ["注目トピック・動向1", "注目トピック・動向2"],
