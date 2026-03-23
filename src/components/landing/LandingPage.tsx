@@ -983,6 +983,59 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* ── Trust ──────────────────────────────────────────────────────────── */}
+      <section className="px-6 py-20 bg-white reveal">
+        <div className="max-w-3xl mx-auto">
+          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">Trust</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 tracking-tight">
+            安心して使えるサービスを、<br className="hidden md:block" />真剣に作っています。
+          </h2>
+          <p className="text-gray-500 text-sm text-center mb-10">
+            学生が開発しているからこそ、信頼される設計にこだわりました。
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              {
+                icon: "📄",
+                title: "利用規約・プライバシーポリシーを整備",
+                body: "登録前にご確認いただける利用規約とプライバシーポリシーを公開。データの取り扱い方針を明示しています。",
+                links: [
+                  { label: "利用規約", href: "/terms" },
+                  { label: "プライバシーポリシー", href: "/privacy" },
+                ],
+              },
+              {
+                icon: "🔒",
+                title: "データは自分だけが見られる",
+                body: "Supabaseの行レベルセキュリティ（RLS）により、自分のデータには自分だけがアクセスできます。他のユーザーには一切見えません。",
+                links: [],
+              },
+              {
+                icon: "🎓",
+                title: "就活生目線で誠実に運営",
+                body: "広告メール・スカウト電話なし。データを第三者に販売しません。同じ就活生として、使いたいと思えるサービスだけを目指しています。",
+                links: [],
+              },
+            ].map((item) => (
+              <div key={item.title} className="bg-gray-50/70 border border-gray-100 rounded-2xl p-6">
+                <p className="text-2xl mb-3">{item.icon}</p>
+                <p className="font-bold text-[#0D0B21] text-sm mb-2">{item.title}</p>
+                <p className="text-gray-500 text-xs leading-relaxed">{item.body}</p>
+                {item.links.length > 0 && (
+                  <div className="flex gap-3 mt-3">
+                    {item.links.map((l) => (
+                      <Link key={l.label} href={l.href} target="_blank" className="text-xs text-[#00c896] hover:underline font-medium">
+                        {l.label} →
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Our Story ──────────────────────────────────────────────────────── */}
       <section className="px-6 py-24 bg-[#0D0B21] text-white relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none lp-dark-grid-subtle" />
