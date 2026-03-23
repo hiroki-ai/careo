@@ -2,17 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import Anthropic from "@anthropic-ai/sdk";
 import { EXECUTIVES, type Executive } from "@/lib/board/executives";
-import { createClient as createServerClient } from "@/lib/supabase/server";
-
-async function isAdmin(): Promise<boolean> {
-  const supabase = await createServerClient();
-  const { data } = await supabase.auth.getUser();
-  return data.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-}
+import { requireAdmin } from "@/lib/apiAuth";
 
 // GET: 最新のpending会議を取得
 export async function GET() {
-  if (!(await isAdmin())) return NextResponse.json(null);
+  const { errorResponse } = await requireAdmin();
+  if (errorResponse) return NextResponse.json(null);
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -35,7 +30,8 @@ export async function GET() {
 
 // PATCH: 承認 or 却下
 export async function PATCH(request: NextRequest) {
-  if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { errorResponse } = await requireAdmin();
+  if (errorResponse) return errorResponse;
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -92,7 +88,7 @@ async function generateAndSaveLpCopy(
     max_tokens: 800,
     messages: [{
       role: "user",
-      content: `あなたはCareo（28卒向けAI就活管理アプリ）のランディングページのコピーライターです。
+      content: `あなたはCareo（就活生向けAI就活管理アプリ）のランディングページのコピーライターです。
 ${owner.name}（${owner.role}）が主導した以下の幹部会議の承認を受け、LPのコピーを更新してください。
 
 【承認された議題】${meeting.topic}
@@ -107,7 +103,7 @@ ${owner.name}（${owner.role}）が主導した以下の幹部会議の承認を
   "badge_text": "ヒーローのバッジテキスト（20字以内）"
 }
 
-就活生（28卒）が「使ってみたい」と思う、共感・具体性・ベネフィット重視のコピーにしてください。`,
+就活生が「使ってみたい」と思う、共感・具体性・ベネフィット重視のコピーにしてください。`,
     }],
   });
 

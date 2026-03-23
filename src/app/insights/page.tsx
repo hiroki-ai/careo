@@ -7,8 +7,6 @@ import { useEs } from "@/hooks/useEs";
 import { useInterviews } from "@/hooks/useInterviews";
 import { useProfile } from "@/hooks/useProfile";
 
-const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL ?? "";
-
 interface AggregateInsights {
   total_users: number;
   avg_companies_per_user: number;
@@ -74,7 +72,6 @@ export default function InsightsPage() {
   const { interviews, loading: interviewsLoading } = useInterviews();
   const { profile } = useProfile();
 
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [insights, setInsights] = useState<AggregateInsights | null>(null);
   const [isRealData, setIsRealData] = useState(false);
   const [insightsLoading, setInsightsLoading] = useState(true);
@@ -83,13 +80,6 @@ export default function InsightsPage() {
   const [peerInsights, setPeerInsights] = useState<AggregateInsights | null>(null);
   const [isPeerRealData, setIsPeerRealData] = useState(false);
   const [peerLoading, setPeerLoading] = useState(false);
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setIsAdmin(!!user && user.email === ADMIN_EMAIL);
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     async function fetchInsights() {
@@ -159,16 +149,6 @@ export default function InsightsPage() {
   const activeIsReal = peerInsights ? isPeerRealData : isRealData;
   const activeBadge = peerInsights ? peerBadge : badge;
   const activeLoading = peerInsights ? peerLoading : insightsLoading;
-
-  if (isAdmin === null) return null;
-
-  if (!isAdmin) return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-6">
-      <p className="text-4xl mb-4">📊</p>
-      <h2 className="text-lg font-semibold text-gray-700 mb-2">準備中</h2>
-      <p className="text-sm text-gray-400">データが蓄積され次第、公開予定です。</p>
-    </div>
-  );
 
   return (
     <div className="p-4 md:p-8">

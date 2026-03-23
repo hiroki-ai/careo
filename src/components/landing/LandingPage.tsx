@@ -420,6 +420,23 @@ export function LandingPage() {
             <img src="/icon-new.svg" alt="Careo" className="w-8 h-8 rounded-xl" />
             <span className="font-bold text-lg tracking-tight text-[#0D0B21]">Careo</span>
           </div>
+          <nav className="hidden md:flex items-center gap-6">
+            {[
+              { label: "機能", href: "#features" },
+              { label: "比較", href: "#compare" },
+              { label: "大学連携", href: "#university" },
+              { label: "料金", href: "#pricing" },
+              { label: "FAQ", href: "#faq" },
+            ].map(({ label, href }) => (
+              <a
+                key={href}
+                href={href}
+                className="text-sm text-gray-500 hover:text-gray-900 font-medium transition-colors"
+              >
+                {label}
+              </a>
+            ))}
+          </nav>
           <div className="flex items-center gap-3">
             <Link href="/login" className="text-sm text-gray-500 hover:text-gray-900 font-medium transition-colors hidden sm:block">
               ログイン
@@ -516,13 +533,13 @@ export function LandingPage() {
       </section>
 
       {/* ── How it works ───────────────────────────────────────────────────── */}
-      <section className="px-6 py-24 bg-gray-50/60 reveal">
+      <section id="features" className="px-6 py-24 bg-gray-50/60 reveal">
         <div className="max-w-4xl mx-auto">
           <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">How it works</p>
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 tracking-tight">
             使い方は、<span className="text-[#00c896]">シンプル。</span>
           </h2>
-          <p className="text-gray-400 text-sm text-center mb-16">記録するだけで、あとはCareoとAIが全部整理する。</p>
+          <p className="text-gray-400 text-sm text-center mb-16">記録するだけで、あとはCareoが全部整理する。</p>
 
           <div className="relative">
             {/* Connecting line */}
@@ -712,7 +729,7 @@ export function LandingPage() {
       </section>
 
       {/* ── 競合比較テーブル ────────────────────────────────────────────────── */}
-      <section className="px-6 py-24 bg-gray-50/60 reveal">
+      <section id="compare" className="px-6 py-24 bg-gray-50/60 reveal">
         <div className="max-w-4xl mx-auto">
           <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">Why Careo</p>
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 tracking-tight">
@@ -902,8 +919,88 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* ── 大学キャリアセンター連携 ─────────────────────────────────────────── */}
+      <section id="university" className="px-6 py-24 bg-white reveal">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">University Partnership</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 tracking-tight">
+            大学キャリアセンターと、<span className="text-[#00c896]">つながる。</span>
+          </h2>
+          <p className="text-gray-500 text-sm text-center mb-3 max-w-xl mx-auto">
+            Careoは大学のキャリアセンターと連携し、学生一人ひとりにより的確な就活サポートを届けることを目指しています。
+          </p>
+          <div className="flex items-center justify-center gap-2 mb-12">
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-600 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-full">
+              <span className="w-1.5 h-1.5 bg-amber-400 rounded-full" />
+              現在、提携大学を準備中
+            </span>
+          </div>
+
+          {/* 仕組みの図 */}
+          <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-12">
+            {[
+              { icon: "🎓", label: "学生", desc: "就活データをCareoに記録" },
+              { icon: "↔", label: "", desc: "", isArrow: true },
+              { icon: "📱", label: "Careo", desc: "プラットフォームで安全に連携" },
+              { icon: "↔", label: "", desc: "", isArrow: true },
+              { icon: "🏫", label: "キャリアセンター", desc: "学生の状況を把握してサポート" },
+            ].map((item, i) =>
+              item.isArrow ? (
+                <div key={i} className="text-2xl text-gray-300 hidden md:block">→</div>
+              ) : (
+                <div key={i} className="flex-1 max-w-[200px] text-center bg-gray-50 border border-gray-100 rounded-2xl p-5">
+                  <div className="text-3xl mb-2">{item.icon}</div>
+                  <p className="font-bold text-sm text-[#0D0B21] mb-1">{item.label}</p>
+                  <p className="text-xs text-gray-400">{item.desc}</p>
+                </div>
+              )
+            )}
+          </div>
+
+          {/* 特徴3点 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+            {[
+              {
+                icon: "🔒",
+                title: "学生がコントロール",
+                desc: "キャリアセンターへの情報開示はデフォルト公開ですが、項目ごとに非公開に設定できます。選考中の企業・ES内容・フェーズなど、見せたくない情報は自分で管理できます。",
+              },
+              {
+                icon: "🏫",
+                title: "自分の大学だけに共有",
+                desc: "データが共有されるのは、あなたが在籍する大学のキャリアセンターのみ。他大学やCareoの外部に個人データが出ることはありません。",
+              },
+              {
+                icon: "💬",
+                title: "キャリアセンターから連絡も",
+                desc: "キャリアセンターのスタッフがCareoを通じてメッセージを送ることができます。的確なタイミングで個別サポートを受けられます。",
+              },
+            ].map((item) => (
+              <div key={item.title} className="bg-gray-50/70 border border-gray-100 rounded-2xl p-6">
+                <p className="text-2xl mb-3">{item.icon}</p>
+                <p className="font-bold text-[#0D0B21] text-sm mb-2">{item.title}</p>
+                <p className="text-gray-500 text-xs leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* 提携予定バナー */}
+          <div className="rounded-2xl border border-[#00c896]/20 bg-[#00c896]/4 p-6 text-center">
+            <p className="text-sm font-bold text-[#0D0B21] mb-1">提携大学、順次拡大予定</p>
+            <p className="text-xs text-gray-500 mb-4">
+              現在、複数の大学キャリアセンターと提携に向けた準備を進めています。
+              提携が実現した際にはアプリ内でお知らせします。
+            </p>
+            <div className="inline-flex items-center gap-2 text-xs text-gray-400 bg-white border border-gray-100 px-4 py-2 rounded-full">
+              <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
+              準備中 — 正式提携はまだありません
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── Pricing ────────────────────────────────────────────────────────── */}
-      <section className="px-6 py-24 bg-white reveal">
+      <section id="pricing" className="px-6 py-24 bg-gray-50/60 reveal">
         <div className="max-w-3xl mx-auto">
           <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">Pricing</p>
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 tracking-tight">
@@ -950,7 +1047,7 @@ export function LandingPage() {
       </section>
 
       {/* ── FAQ ────────────────────────────────────────────────────────────── */}
-      <section className="px-6 py-24 bg-gray-50/60 reveal">
+      <section id="faq" className="px-6 py-24 bg-gray-50/60 reveal">
         <div className="max-w-3xl mx-auto">
           <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">FAQ</p>
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 tracking-tight">よくある質問</h2>

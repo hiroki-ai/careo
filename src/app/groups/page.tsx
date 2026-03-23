@@ -39,7 +39,7 @@ function GroupPreview() {
 
   const mockGroup: StudyGroup = {
     id: "preview",
-    name: "28卒就活仲間",
+    name: "就活仲間グループ",
     inviteCode: "CAREO-XXXX",
     createdAt: new Date().toISOString(),
     members: [

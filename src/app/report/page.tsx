@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useProfile } from "@/hooks/useProfile";
 import { useCompanies } from "@/hooks/useCompanies";
@@ -11,6 +11,10 @@ import { useAptitudeTests } from "@/hooks/useAptitudeTests";
 import { useActionItems } from "@/hooks/useActionItems";
 import { inferActionLink } from "@/hooks/useActionItems";
 import { useToast } from "@/components/ui/Toast";
+import { InsightsWidget } from "@/components/dashboard/InsightsWidget";
+
+const PDCA_CACHE_KEY = "careo_last_pdca";
+const PDCA_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24時間
 
 interface PdcaResult {
   plan: { weeklyGoal: string; taskCompletion: string };
@@ -68,12 +72,26 @@ export default function ReportPage() {
   const [pdca, setPdca] = useState<PdcaResult | null>(null);
   const [pdcaLoading, setPdcaLoading] = useState(false);
   const [pdcaError, setPdcaError] = useState(false);
+  const hasAutoRun = useRef(false);
 
-  // localStorageからキャッシュを読み込む
+  // localStorageからキャッシュを読み込む（TTLチェック付き）
   useEffect(() => {
     try {
-      const raw = localStorage.getItem("careo_last_pdca");
-      if (raw) setPdca(JSON.parse(raw));
+      const raw = localStorage.getItem(PDCA_CACHE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        // 新形式: { data, ts } または旧形式: PdcaResult直接
+        if (parsed.data && parsed.ts) {
+          if (Date.now() - parsed.ts < PDCA_CACHE_TTL_MS) {
+            setPdca(parsed.data);
+          } else {
+            localStorage.removeItem(PDCA_CACHE_KEY); // 期限切れ
+          }
+        } else if (parsed.check) {
+          // 旧形式はそのまま表示（次回保存時に新形式に移行）
+          setPdca(parsed);
+        }
+      }
     } catch { /* ignore */ }
   }, []);
 
@@ -97,7 +115,7 @@ export default function ReportPage() {
         setPdcaError(true);
       } else if (result?.check) {
         setPdca(result);
-        try { localStorage.setItem("careo_last_pdca", JSON.stringify(result)); } catch { /* ignore */ }
+        try { localStorage.setItem(PDCA_CACHE_KEY, JSON.stringify({ data: result, ts: Date.now() })); } catch { /* ignore */ }
       } else {
         setPdcaError(true);
       }
@@ -109,6 +127,16 @@ export default function ReportPage() {
       setPdcaLoading(false);
     }
   };
+
+  // キャッシュがない場合は自動実行
+  useEffect(() => {
+    if (profileLoading) return;
+    if (pdca) return; // キャッシュあり
+    if (hasAutoRun.current) return;
+    hasAutoRun.current = true;
+    runPdca();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profileLoading]);
 
   if (profileLoading) {
     return <div className="p-8 text-gray-400 text-sm">読み込み中...</div>;
@@ -258,6 +286,11 @@ export default function ReportPage() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* カレオからの気づき */}
+      <div className="mb-8">
+        <InsightsWidget />
       </div>
 
     </div>

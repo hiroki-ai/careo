@@ -1,12 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { createClient as createServerClient } from "@/lib/supabase/server";
-
-async function isAdmin(): Promise<boolean> {
-  const supabase = await createServerClient();
-  const { data } = await supabase.auth.getUser();
-  return data.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-}
+import { requireAdmin } from "@/lib/apiAuth";
 
 function getSupabase() {
   return createClient(
@@ -16,7 +10,8 @@ function getSupabase() {
 }
 
 export async function GET() {
-  if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { errorResponse } = await requireAdmin();
+  if (errorResponse) return errorResponse;
   const supabase = getSupabase();
 
   const [meetingsRes, reportsRes] = await Promise.all([

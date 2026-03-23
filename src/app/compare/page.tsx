@@ -147,27 +147,39 @@ const comparisonRows = [
 const migrationSteps = [
   {
     icon: "📥",
-    title: "企業リストをインポート",
-    detail: "NotionのテーブルをCSVエクスポート、またはページをPDF出力してCareoにアップロード。AIが企業名・ステータス・OB訪問・筆記試験まで自動で読み取ります。",
-    tip: "CSV・PDFをドロップするだけ。手入力ゼロも可能",
+    step: "STEP 1",
+    time: "約1〜2分",
+    title: "データをインポート",
+    detail: "NotionのテーブルはCSVエクスポート、ページはPDF出力してCareoにドロップ。AIが企業名・ステータス・OB訪問・筆記試験を自動抽出します。",
+    tip: "手入力ゼロ。AIが読み取れない項目だけ確認",
+    highlight: true,
   },
   {
-    icon: "📝",
-    title: "ESの下書きをコピー",
-    detail: "NotionにあるESの文章をCareoのES管理にコピー。企業ごとに設問と回答をセットで保存できます。",
-    tip: "保存後すぐにAI提出前チェックが使えます",
+    icon: "✏️",
+    step: "STEP 2",
+    time: "約3〜5分",
+    title: "ESをCareoに保存",
+    detail: "NotionにあるESの文章をコピー&ペーストするだけ。企業ごとに設問と回答をセットで管理できます。",
+    tip: "保存後すぐAI提出前チェックが使えます",
+    highlight: false,
   },
   {
     icon: "🗒️",
+    step: "STEP 3",
+    time: "約3〜5分",
     title: "面接・OB訪問メモを移す",
-    detail: "箇条書きで残してある面接のメモやOB訪問の記録を、CareoのログにコピーするだけでOK。",
-    tip: "入力後にAIが横断分析を始めます",
+    detail: "箇条書きのメモをそのままCareoに貼るだけ。入力後すぐにAIが面接・ES・OB訪問を横断して気づきを通知します。",
+    tip: "Notionの長文メモは消さなくてOK",
+    highlight: false,
   },
   {
     icon: "🤖",
-    title: "AIコーチングがすぐ使える",
-    detail: "データを入れた瞬間から、AIコーチ「カレオ」が全体を把握。「今週何をすべきか」「このESの弱点は何か」などを聞けます。",
+    step: "STEP 4",
+    time: "以降ずっと",
+    title: "AIが自動で動き出す",
+    detail: "データが揃った瞬間からAIコーチ「カレオ」が全体把握。週次PDCA・締切通知・内定予測が自動で届きます。",
     tip: "これがNotionでは絶対にできないこと",
+    highlight: false,
   },
 ];
 
@@ -491,26 +503,76 @@ export default function ComparePage() {
           </div>
 
           {/* 移行ステップ */}
-          <h3 className="text-xl font-bold text-gray-900 text-center mb-8">移行4ステップ（合計30分）</h3>
-          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
-            {migrationSteps.map((step, i) => (
-              <div key={step.title} className="relative">
-                <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 h-full">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="bg-[#00c896] text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center shrink-0">
-                      {i + 1}
-                    </span>
-                    <span className="text-xl">{step.icon}</span>
+          <div className="flex items-center justify-center gap-3 mb-10">
+            <h3 className="text-xl font-bold text-gray-900">移行4ステップ</h3>
+            <span className="bg-[#00c896]/10 text-[#00c896] text-xs font-bold px-3 py-1 rounded-full">合計10分でできる</span>
+          </div>
+
+          {/* Desktop: horizontal timeline */}
+          <div className="hidden md:block relative">
+            {/* connector line */}
+            <div className="absolute top-10 left-[calc(12.5%)] right-[calc(12.5%)] h-0.5 bg-gradient-to-r from-[#00c896] via-[#00c896]/50 to-gray-200" />
+            <div className="grid grid-cols-4 gap-4">
+              {migrationSteps.map((step, i) => (
+                <div key={step.title} className="flex flex-col items-center text-center relative">
+                  {/* circle */}
+                  <div className={`w-20 h-20 rounded-full flex flex-col items-center justify-center mb-4 z-10 shadow-sm border-2 ${
+                    step.highlight
+                      ? "bg-[#00c896] border-[#00c896] text-white"
+                      : "bg-white border-gray-200 text-gray-700"
+                  }`}>
+                    <span className="text-2xl leading-none">{step.icon}</span>
+                    <span className={`text-[9px] font-bold mt-1 ${step.highlight ? "text-white/80" : "text-gray-400"}`}>{i + 1}</span>
                   </div>
-                  <h4 className="font-bold text-gray-900 text-sm mb-2">{step.title}</h4>
+                  {/* badge */}
+                  <span className={`text-[10px] font-bold tracking-widest mb-1 ${step.highlight ? "text-[#00c896]" : "text-gray-400"}`}>
+                    {step.step}
+                  </span>
+                  <span className="text-[10px] text-gray-400 mb-2">{step.time}</span>
+                  <h4 className="font-bold text-gray-900 text-sm mb-2 leading-snug">{step.title}</h4>
                   <p className="text-xs text-gray-500 leading-relaxed mb-3">{step.detail}</p>
-                  <p className="text-[11px] text-[#00c896] font-semibold border-t border-gray-200 pt-2">
+                  <p className={`text-[11px] font-semibold px-2 py-1.5 rounded-lg w-full ${
+                    step.highlight
+                      ? "bg-[#00c896]/10 text-[#00c896]"
+                      : "bg-gray-50 text-gray-500"
+                  }`}>
                     💡 {step.tip}
                   </p>
                 </div>
-                {i < migrationSteps.length - 1 && (
-                  <div className="hidden md:flex absolute -right-2 top-1/2 -translate-y-1/2 z-10 text-gray-300 text-lg">→</div>
-                )}
+              ))}
+            </div>
+          </div>
+
+          {/* Mobile: vertical timeline */}
+          <div className="md:hidden space-y-4 relative">
+            <div className="absolute left-6 top-10 bottom-10 w-0.5 bg-gradient-to-b from-[#00c896] to-gray-200" />
+            {migrationSteps.map((step, i) => (
+              <div key={step.title} className="flex gap-4 relative">
+                {/* circle */}
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 z-10 shadow-sm border-2 ${
+                  step.highlight
+                    ? "bg-[#00c896] border-[#00c896]"
+                    : "bg-white border-gray-200"
+                }`}>
+                  <span className="text-xl">{step.icon}</span>
+                </div>
+                <div className={`flex-1 rounded-2xl p-4 border ${
+                  step.highlight
+                    ? "bg-gradient-to-br from-[#00c896]/5 to-[#00c896]/10 border-[#00c896]/20"
+                    : "bg-gray-50 border-gray-100"
+                }`}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={`text-[10px] font-bold tracking-widest ${step.highlight ? "text-[#00c896]" : "text-gray-400"}`}>
+                      {step.step}
+                    </span>
+                    <span className="text-[10px] text-gray-400">{step.time}</span>
+                  </div>
+                  <h4 className="font-bold text-gray-900 text-sm mb-1">{step.title}</h4>
+                  <p className="text-xs text-gray-500 leading-relaxed mb-2">{step.detail}</p>
+                  <p className={`text-[11px] font-semibold ${step.highlight ? "text-[#00c896]" : "text-gray-500"}`}>
+                    💡 {step.tip}
+                  </p>
+                </div>
               </div>
             ))}
           </div>

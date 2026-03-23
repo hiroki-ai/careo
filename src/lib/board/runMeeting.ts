@@ -20,12 +20,12 @@ export interface MeetingResult {
 
 const CAREO_CONTEXT = `
 【Careoとは】
-- 28卒向けAI就活管理アプリ（Next.js + Supabase + Claude API）
+- 就活生向けAI就活管理アプリ（Next.js + Supabase + Claude API）
 - 開発者：上智大2年（4月から3年）・経済学部・これから就活本格始動する当事者が自ら作ったツール
-- URL: https://careo-sigma.vercel.app
+- URL: https://careoai.jp
 - 主要機能：企業管理・ES管理・面接ログ・AI PDCA・カレオAIチャット・OB/OG訪問ログ・筆記試験管理・内定比較・自己分析
-- ターゲット：27卒・28卒の就活生
-- キャッチコピー：「28卒の就活は、AIと始める。」
+- ターゲット：27〜30卒の就活生（卒業予定年度を問わず全就活生）
+- キャッチコピー：「就活は、AIと始める。」
 - 差別化：就活生本人が作っている・AIがPDCAを自動で回す・NotionやスプレッドシートよりAIが使いやすい
 - 現状：リリース直後・ユーザー獲得フェーズ・無料提供中・マネタイズ未実施
 `;

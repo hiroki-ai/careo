@@ -12,7 +12,7 @@ export default function TermsPage() {
         </div>
 
         <h1 className="text-2xl font-bold text-gray-900 mb-2">利用規約</h1>
-        <p className="text-xs text-gray-400 mb-8">最終更新日：2026年3月23日</p>
+        <p className="text-xs text-gray-400 mb-8">最終更新日：2026年3月23日（大学キャリアセンター連携に関する条項を追記）</p>
 
         <div className="space-y-8 text-sm text-gray-700 leading-relaxed">
           <section>
@@ -75,6 +75,23 @@ export default function TermsPage() {
               サービス提供のために利用します。
               詳細は<Link href="/privacy" className="text-[#00c896] hover:underline">プライバシーポリシー</Link>をご確認ください。
             </p>
+          </section>
+
+          <section>
+            <h2 className="font-bold text-gray-900 mb-2">第6条の2（大学キャリアセンター連携機能）</h2>
+            <p className="mb-2">
+              当サービスでは、提携する大学のキャリアセンターと連携し、学生の就活データをキャリアセンターと共有する機能を提供しています（以下「大学連携機能」）。
+            </p>
+            <ul className="list-disc pl-5 space-y-1 mb-2">
+              <li>大学連携機能は、ユーザーが在籍する大学が当サービスと正式に提携している場合にのみ適用されます</li>
+              <li>共有されるデータの範囲はプライバシーポリシー第3条に定めるとおりです</li>
+              <li>ユーザーは設定ページから項目ごとに非公開を選択できます</li>
+              <li>キャリアセンターはユーザーに対して情報の公開をリクエストできますが、強制することはできません</li>
+              <li>共有されたデータは当該大学のキャリアセンターによる就活支援目的にのみ使用され、外部への再提供・商業利用は禁止されています</li>
+            </ul>
+            <div className="bg-gray-50 border border-gray-100 rounded-xl p-3 text-xs text-gray-500 mt-2">
+              現在、提携大学は準備中です。提携が成立した際にはアプリ内でお知らせします。
+            </div>
           </section>
 
           <section>

@@ -25,6 +25,33 @@ export async function requireAuth(): Promise<
 }
 
 /**
+ * 管理者専用APIルート用の認証。
+ * 未認証 or 非管理者の場合は 401/403 レスポンスを返す。
+ * ADMIN_EMAIL 環境変数（サーバー専用）でメールアドレスを照合する。
+ */
+export async function requireAdmin(): Promise<
+  { user: { id: string; email?: string }; errorResponse: null } |
+  { user: null; errorResponse: NextResponse }
+> {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getUser();
+  if (!data.user) {
+    return {
+      user: null,
+      errorResponse: NextResponse.json({ error: "認証が必要です" }, { status: 401 }),
+    };
+  }
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!adminEmail || data.user.email !== adminEmail) {
+    return {
+      user: null,
+      errorResponse: NextResponse.json({ error: "権限がありません" }, { status: 403 }),
+    };
+  }
+  return { user: data.user, errorResponse: null };
+}
+
+/**
  * チャット上限チェック（現在は全ユーザー無制限）
  */
 export async function checkDailyChatLimit(_userId: string, _isAdmin: boolean): Promise<

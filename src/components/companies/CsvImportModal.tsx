@@ -101,12 +101,13 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   onImportComplete: (counts: Record<string, number>) => void;
+  defaultTab?: "csv" | "pdf" | "text";
 }
 
 type Step = "input" | "map";
 
-export function CsvImportModal({ isOpen, onClose, onImportComplete }: Props) {
-  const [tab, setTab] = useState<"csv" | "pdf" | "text">("csv");
+export function CsvImportModal({ isOpen, onClose, onImportComplete, defaultTab = "csv" }: Props) {
+  const [tab, setTab] = useState<"csv" | "pdf" | "text">(defaultTab);
   const [step, setStep] = useState<Step>("input");
   const [rawRows, setRawRows] = useState<string[][]>([]);
   const [headers, setHeaders] = useState<string[]>([]);

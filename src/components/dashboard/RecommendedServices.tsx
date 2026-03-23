@@ -12,7 +12,7 @@ interface Service {
   careoTip: string;
 }
 
-// 27卒〜28卒が実際に使ったサービス（URL検証済み）
+// 就活生が実際に使ったサービス（URL検証済み）
 const SERVICE_CATALOG: Record<string, Service> = {
   offerbox: {
     name: "OfferBox",
@@ -27,7 +27,7 @@ const SERVICE_CATALOG: Record<string, Service> = {
     url: "https://job.mynavi.jp/",
     tag: "総合ナビ",
     tagColor: "bg-blue-100 text-blue-700",
-    description: "28卒対応済み。中堅・中小企業に強い2大ナビサイトの一つ。",
+    description: "中堅・中小企業に強い2大ナビサイトの一つ。",
     careoTip: "エントリーしたらCareoの企業管理に追加して一括管理しよう。",
   },
   rikunabi: {
@@ -107,7 +107,7 @@ const SERVICE_CATALOG: Record<string, Service> = {
     url: "https://ababa.co.jp/",
     tag: "新興・逆求人",
     tagColor: "bg-pink-100 text-pink-700",
-    description: "最終面接不合格者に別企業からスカウトが届く。28卒から急速に普及。",
+    description: "最終面接不合格者に別企業からスカウトが届く。近年急速に普及。",
     careoTip: "不採用になった企業もCareoに記録。次のスカウト企業もCareoで管理。",
   },
 };

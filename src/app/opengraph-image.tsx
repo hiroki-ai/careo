@@ -55,7 +55,7 @@ export default function Image() {
             borderRadius: "100px", padding: "8px 24px",
             color: "#00c896", fontSize: "22px", fontWeight: "bold",
           }}>
-            28卒向け
+            就活生向け
           </div>
           <div style={{
             background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)",

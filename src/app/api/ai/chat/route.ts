@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
   }
 
   // 1日チャット上限チェック（管理者は無制限）
-  const isAdmin = user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+  const isAdmin = !!process.env.ADMIN_EMAIL && user.email === process.env.ADMIN_EMAIL;
   const { errorResponse: limitError } = await checkDailyChatLimit(user.id, isAdmin);
   if (limitError) return limitError;
 

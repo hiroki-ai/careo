@@ -17,8 +17,6 @@ interface UserStats {
   last30: number; // 直近30日
 }
 
-const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL ?? "";
-
 function MiniBarChart({ data, maxVal }: { data: DailyCount[]; maxVal: number }) {
   return (
     <div className="flex items-end gap-px h-20 w-full">
@@ -80,21 +78,12 @@ function CumulativeChart({ data }: { data: DailyCount[] }) {
 
 export default function AdminPage() {
   const supabase = createClient();
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [stats, setStats] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [range, setRange] = useState<30 | 60 | 90>(30);
 
   useEffect(() => {
     async function init() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user || user.email !== ADMIN_EMAIL) {
-        setIsAdmin(false);
-        setLoading(false);
-        return;
-      }
-      setIsAdmin(true);
-
       // 全ユーザー（created_at + graduation_year）
       const { data: allUsers } = await supabase
         .from("user_profiles")
@@ -150,15 +139,6 @@ export default function AdminPage() {
     </div>
   );
 
-  if (!isAdmin) return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center">
-        <p className="text-2xl mb-2">🔒</p>
-        <p className="text-gray-500 text-sm">アクセス権限がありません</p>
-      </div>
-    </div>
-  );
-
   const slicedDaily = stats?.daily.slice(-(range)) ?? [];
   const maxDaily = Math.max(...slicedDaily.map(d => d.count), 1);
 
@@ -166,7 +146,7 @@ export default function AdminPage() {
     <div className="p-4 md:p-6 max-w-2xl mx-auto">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">管理者ダッシュボード</h1>
-        <p className="text-xs text-gray-400 mt-1">URLを知っている管理者のみ表示</p>
+        <p className="text-xs text-gray-400 mt-1">管理者専用ページ</p>
       </div>
 
       {stats && (

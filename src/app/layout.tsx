@@ -11,8 +11,8 @@ const geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
 const APP_URL = "https://careoai.jp";
 
 export const metadata: Metadata = {
-  title: "Careo（カレオ）| AIで就活を管理する28卒向けアプリ",
-  description: "AI就活コーチ「カレオ」が選考・ES・面接・OB訪問を全部把握。就活のPDCAを自動で回す28卒向けアプリ。無料・登録5分。",
+  title: "Careo（カレオ）| AIで就活を管理するアプリ",
+  description: "AI就活コーチ「カレオ」が選考・ES・面接・OB訪問を全部把握。就活のPDCAを自動で回すAI就活アプリ。無料・登録5分。",
   manifest: "/manifest.json",
   icons: {
     icon: [{ url: "/icon-new.svg", type: "image/svg+xml" }],
@@ -26,20 +26,20 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "Careo",
   },
-  keywords: ["就活管理", "AI就活", "28卒", "就活アプリ", "ES管理", "面接管理", "就活PDCA", "就活ツール", "就活コーチ", "AIコーチ", "就活サポート", "Careo", "カレオ"],
+  keywords: ["就活管理", "AI就活", "就活アプリ", "ES管理", "面接管理", "就活PDCA", "就活ツール", "就活コーチ", "AIコーチ", "就活サポート", "Careo", "カレオ", "27卒", "28卒", "29卒", "30卒"],
   openGraph: {
     type: "website",
     url: APP_URL,
     siteName: "Careo",
-    title: "Careo（カレオ）| AIで就活を管理する28卒向けアプリ",
-    description: "AI就活コーチ「カレオ」が選考・ES・面接・OB訪問を全部把握。就活のPDCAを自動で回す28卒向けアプリ。無料・登録5分。",
+    title: "Careo（カレオ）| AIで就活を管理するアプリ",
+    description: "AI就活コーチ「カレオ」が選考・ES・面接・OB訪問を全部把握。就活のPDCAを自動で回すAI就活アプリ。無料・登録5分。",
     locale: "ja_JP",
     images: [{ url: `${APP_URL}/opengraph-image`, width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Careo（カレオ）| AIで就活を管理する28卒向けアプリ",
-    description: "AI就活コーチ「カレオ」が選考・ES・面接・OB訪問を全部把握。就活のPDCAを自動で回す28卒向けアプリ。無料・登録5分。",
+    title: "Careo（カレオ）| AIで就活を管理するアプリ",
+    description: "AI就活コーチ「カレオ」が選考・ES・面接・OB訪問を全部把握。就活のPDCAを自動で回すAI就活アプリ。無料・登録5分。",
     images: [{ url: `${APP_URL}/opengraph-image`, width: 1200, height: 630 }],
   },
   alternates: {

@@ -17,6 +17,7 @@ import { InsightsWidget } from "@/components/dashboard/InsightsWidget";
 import { PostOfferWidget } from "@/components/dashboard/PostOfferWidget";
 import { createClient } from "@/lib/supabase/client";
 import { LandingPage } from "@/components/landing/LandingPage";
+import { MobileLandingPage } from "@/components/landing/MobileLandingPage";
 import { daysUntil } from "@/lib/utils";
 import { COMPANY_STATUS_ORDER, JOB_SEARCH_STAGE_LABELS } from "@/types";
 
@@ -305,7 +306,7 @@ function DashboardContent() {
 
           {!aiLoading && !itemsLoading && hasItems && (
             <div className="space-y-1.5">
-              {pendingItems.slice(0, 3).map((item) => (
+              {pendingItems.map((item) => (
                 <div
                   key={item.id}
                   className={`flex items-center gap-2 border-l-4 rounded-r-xl p-2.5 ${priorityColors[item.priority]}`}
@@ -333,39 +334,6 @@ function DashboardContent() {
                   )}
                 </div>
               ))}
-              {pendingItems.slice(3).map((item) => (
-                <div
-                  key={item.id}
-                  className={`hidden md:flex items-center gap-2 border-l-4 rounded-r-xl p-2.5 ${priorityColors[item.priority]}`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={false}
-                    title={`完了: ${item.action}`}
-                    onChange={() => handleToggle(item.id, true)}
-                    className="mt-0.5 w-4 h-4 rounded border-gray-400 accent-[#00c896] cursor-pointer shrink-0"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
-                      <Badge variant={priorityBadgeVariants[item.priority]}>
-                        {priorityLabels[item.priority]}
-                      </Badge>
-                      <p className="text-xs font-medium text-gray-900">{item.action}</p>
-                    </div>
-                    <p className="text-[11px] text-gray-500">{item.reason}</p>
-                  </div>
-                  {item.link && (
-                    item.link.external
-                      ? <a href={item.link.href} target="_blank" rel="noopener noreferrer" className="shrink-0 ml-1 text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2 py-1 rounded-lg transition-colors whitespace-nowrap">{item.link.label}</a>
-                      : <Link href={item.link.href} className="shrink-0 ml-1 text-[10px] font-bold text-[#00a87e] bg-[#00c896]/10 hover:bg-[#00c896]/20 border border-[#00c896]/30 px-2 py-1 rounded-lg transition-colors whitespace-nowrap">{item.link.label}</Link>
-                  )}
-                </div>
-              ))}
-              {pendingItems.length > 3 && (
-                <p className="text-[11px] text-[#00c896] text-right px-1 md:hidden">
-                  他 {pendingItems.length - 3} 件 →
-                </p>
-              )}
               {completedItems.length > 0 && (
                 <div className="mt-1 hidden md:block">
                   <p className="text-[10px] text-gray-400 mb-1 px-1">完了済み</p>
@@ -436,11 +404,6 @@ function DashboardContent() {
         </div>
       </div>
 
-      {/* モバイル：カレオからの気づき */}
-      <div className="md:hidden mt-3">
-        <InsightsWidget />
-      </div>
-
       {/* 内定後コンテンツ */}
       {companies.filter(c => c.status === "OFFERED").length > 0 && (
         <div className="mt-3 md:mt-4">
@@ -453,14 +416,17 @@ function DashboardContent() {
 
 export default function RootPage() {
   const [isAuth, setIsAuth] = useState<boolean | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    const ua = navigator.userAgent;
+    setIsMobile(/iPhone|Android|Mobile/i.test(ua) || window.innerWidth < 768);
     createClient().auth.getUser().then(({ data }) => setIsAuth(!!data.user));
   }, []);
 
   if (isAuth === null) return (
     <div className="min-h-screen bg-gradient-to-br from-[#0D0B21] via-[#1a2f4e] to-[#0D0B21]" />
   );
-  if (!isAuth) return <LandingPage />;
+  if (!isAuth) return isMobile ? <MobileLandingPage /> : <LandingPage />;
   return <DashboardContent />;
 }

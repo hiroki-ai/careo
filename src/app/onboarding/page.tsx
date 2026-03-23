@@ -16,7 +16,13 @@ export default function OnboardingPage() {
   const { saveProfile } = useProfile();
   const [step, setStep] = useState<Step>(1);
   const [importOpen, setImportOpen] = useState(false);
+  const [importTab, setImportTab] = useState<"csv" | "pdf" | "text">("csv");
   const [importedCount, setImportedCount] = useState(0);
+
+  const openImport = (tab: "csv" | "pdf" | "text") => {
+    setImportTab(tab);
+    setImportOpen(true);
+  };
 
   const handleProfileSave = async (data: FormData) => {
     await saveProfile(data);
@@ -69,10 +75,10 @@ export default function OnboardingPage() {
               <p className="text-gray-900 font-semibold">今まで管理していたデータを取り込もう</p>
               <p className="text-sm text-gray-400 mt-1">NotionやスプレッドシートのデータをそのままCareoに移行できます</p>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-3">
               <button
                 type="button"
-                onClick={() => setImportOpen(true)}
+                onClick={() => openImport("csv")}
                 className="w-full py-4 rounded-xl font-semibold border-2 border-[#00c896] text-[#00c896] hover:bg-[#00c896]/5 transition-colors flex items-center justify-center gap-2 text-base"
               >
                 <span>📂</span>
@@ -81,6 +87,14 @@ export default function OnboardingPage() {
               <p className="text-xs text-gray-400 text-center">
                 AIが企業名・ステータス・OB訪問・筆記試験を自動で読み取ります
               </p>
+              <button
+                type="button"
+                onClick={() => openImport("text")}
+                className="w-full py-3 rounded-xl font-semibold border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+              >
+                <span>✏️</span>
+                企業名をテキストで入力する
+              </button>
               <button
                 type="button"
                 onClick={() => setStep(3)}
@@ -100,6 +114,7 @@ export default function OnboardingPage() {
             setImportOpen(false);
             setStep(3);
           }}
+          defaultTab={importTab}
         />
 
         {/* Step 3: 完了・ウェルカム */}
@@ -128,9 +143,9 @@ export default function OnboardingPage() {
             </div>
 
             <button
+              type="button"
               onClick={() => router.push("/")}
-              className="w-full py-3 rounded-xl font-semibold text-white transition-all hover:opacity-90"
-              style={{ backgroundColor: "#00c896" }}
+              className="w-full py-3 rounded-xl font-semibold text-white transition-all hover:opacity-90 bg-[#00c896]"
             >
               ダッシュボードへ →
             </button>
