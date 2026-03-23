@@ -1037,43 +1037,156 @@ export function LandingPage() {
       </section>
 
       {/* ── Our Story ──────────────────────────────────────────────────────── */}
-      <section className="px-6 py-24 bg-[#0D0B21] text-white relative overflow-hidden">
+      <section className="px-6 py-24 md:py-32 bg-[#0D0B21] text-white relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none lp-dark-grid-subtle" />
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/3 w-72 h-72 rounded-full bg-[#00c896]/8 blur-3xl animate-float-slow" />
-          <div className="absolute bottom-0 right-1/4 w-56 h-56 rounded-full bg-purple-500/6 blur-2xl animate-blob delay-1000" />
+          <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-[#00c896]/6 blur-3xl animate-float-slow" />
+          <div className="absolute bottom-1/4 right-1/5 w-72 h-72 rounded-full bg-purple-500/5 blur-3xl animate-blob delay-1000" />
+          <div className="absolute top-1/2 right-0 w-64 h-64 rounded-full bg-[#00c896]/4 blur-3xl animate-float-slow delay-2000" />
         </div>
-        <div className="max-w-2xl mx-auto relative z-10 reveal">
-          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">Our Story</p>
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-3 leading-tight">
-            同じ就活生として、<br />本当に使えるツールを作りたかった。
-          </h2>
-          <p className="text-gray-400 text-sm text-center mb-10">「Notion・スプレッドシート・ChatGPTを行き来する非効率さ」— その答えがCareoです。</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            <div className="lp-story-card rounded-2xl p-5">
-              <p className="text-[#00c896] font-bold text-sm mb-2">👨‍💻 作った人</p>
-              <p className="text-gray-300 text-sm leading-relaxed">
-                上智大学在籍の学生が開発。自分自身の就活経験から「これが欲しかった」を形にしました。
-              </p>
+
+        <div className="max-w-3xl mx-auto relative z-10">
+
+          {/* ── セクションヘッダー ── */}
+          <div className="text-center mb-16 reveal">
+            <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-4">Our Story</p>
+            <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-5">
+              就活の「非効率」を、<br />
+              <span className="bg-clip-text text-transparent lp-gradient-text-dark">終わらせたかった。</span>
+            </h2>
+            <p className="text-gray-400 text-base leading-relaxed max-w-xl mx-auto">
+              Careoは、就活を戦略的に乗り越えたいすべての学生のために<br className="hidden md:block" />
+              同じ立場の学生が本気で作ったプロダクトです。
+            </p>
+          </div>
+
+          {/* ── ストーリーライン ── */}
+          <div className="space-y-5 mb-14">
+
+            {/* 01 きっかけ */}
+            <div className="lp-story-card rounded-2xl p-6 md:p-8 reveal reveal-delay-1">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-[#00c896]/15 flex items-center justify-center text-lg">
+                  😤
+                </div>
+                <div>
+                  <p className="text-[#00c896] text-xs font-bold tracking-widest uppercase mb-2">01 — きっかけ</p>
+                  <h3 className="text-white font-bold text-lg mb-3 leading-snug">
+                    ツールを行き来するだけで、<br className="hidden md:block" />時間が溶けていく。
+                  </h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">
+                    就活を始めた当初、企業管理はスプレッドシート、自己分析はNotion、ES添削はChatGPT——
+                    それぞれのツールは優秀でも、<strong className="text-gray-200">データがバラバラで連携ゼロ</strong>。
+                    「先週の面接で何を言ったか」「どの企業のESが提出済みか」をたどるだけで
+                    30分消える、そんな状況でした。
+                    就活の本質である「考える・準備する・振り返る」ではなく、
+                    <strong className="text-gray-200">「管理する」ことに膨大な時間を奪われていた</strong>のです。
+                  </p>
+                </div>
+              </div>
             </div>
-            <div className="lp-story-card rounded-2xl p-5">
-              <p className="text-[#00c896] font-bold text-sm mb-2">💡 なぜ作ったか</p>
-              <p className="text-gray-300 text-sm leading-relaxed">
-                全データを知るAIコーチが欲しかった。Careoは自分が本当に使いたいと思って作った、就活のOSです。
-              </p>
+
+            {/* 02 本質的な問題 */}
+            <div className="lp-story-card rounded-2xl p-6 md:p-8 reveal reveal-delay-2">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-purple-500/15 flex items-center justify-center text-lg">
+                  🔍
+                </div>
+                <div>
+                  <p className="text-purple-400 text-xs font-bold tracking-widest uppercase mb-2">02 — 本質的な問題</p>
+                  <h3 className="text-white font-bold text-lg mb-3 leading-snug">
+                    AIに相談しても、<br className="hidden md:block" />「あなたの就活」を知らない。
+                  </h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">
+                    ChatGPTは優秀ですが、<strong className="text-gray-200">あなたが何社受けていて、どの面接でつまずいたか、志望軸は何か</strong>——
+                    そういった文脈を知りません。毎回ゼロから説明し直す必要があり、
+                    「パーソナライズされたアドバイス」にはほど遠い状態でした。
+                    本当に必要なのは、自分のすべてのデータを把握した上で
+                    「あなたの就活」に最適化して動いてくれるAIコーチだと気づきました。
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* 03 Careoという答え */}
+            <div className="rounded-2xl p-6 md:p-8 reveal reveal-delay-3" style={{background: "linear-gradient(135deg, rgba(0,200,150,0.07), rgba(16,185,129,0.1))", border: "1px solid rgba(0,200,150,0.2)"}}>
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-[#00c896]/20 flex items-center justify-center text-lg">
+                  ✨
+                </div>
+                <div>
+                  <p className="text-[#00c896] text-xs font-bold tracking-widest uppercase mb-2">03 — Careoという答え</p>
+                  <h3 className="text-white font-bold text-lg mb-3 leading-snug">
+                    就活のすべてを一か所に。<br className="hidden md:block" />データを知るAIが、隣に立つ。
+                  </h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">
+                    企業管理・ES・面接ログ・自己分析・OB訪問・筆記試験——
+                    <strong className="text-gray-200">就活に必要なすべてを一つのプラットフォームに集約</strong>することで、
+                    AIがあなたの全データをコンテキストとして持ちながら動けるようになります。
+                    「○○社の面接が近いね。前回の面接で志望動機が浅いと言われていたから、
+                    今日はそこを一緒に深めよう」——そんなパーソナルなサポートを、
+                    誰でも無料で受けられる世界を作りたかった。
+                    それが<strong className="text-[#00c896]">Careo</strong>です。
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="text-center">
-            <p className="text-gray-500 text-xs mb-4">開発の継続は皆さんのサポートで成り立っています</p>
-            <a
-              href="https://buymeacoffee.com/careo"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-300 text-amber-900 font-bold px-6 py-2.5 rounded-xl transition-colors text-sm"
-            >
-              ☕ Buy me a coffee
-            </a>
+
+          {/* ── 開発者プロフィール ── */}
+          <div className="lp-story-card rounded-2xl p-6 md:p-8 mb-10 reveal">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-5">
+              <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-[#00c896]/15 flex items-center justify-center text-2xl">
+                👨‍💻
+              </div>
+              <div className="flex-1">
+                <p className="text-[#00c896] text-xs font-bold tracking-widest uppercase mb-1">Developer</p>
+                <p className="text-white font-bold text-base mb-2">上智大学在籍の学生が、ひとりで開発</p>
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  デザイン・フロントエンド・バックエンド・AI連携・インフラまで、すべてを一人で担当。
+                  自分が使いたいと思うプロダクトを、妥協なく作り続けています。
+                  就活生ユーザーの声をもとに毎週アップデートを重ねており、
+                  <strong className="text-gray-200">「開発者自身が最もヘビーなユーザー」</strong>というスタンスで開発しています。
+                </p>
+              </div>
+            </div>
           </div>
+
+          {/* ── 理念一言 ── */}
+          <div className="text-center mb-10 reveal">
+            <p className="text-gray-500 text-xs uppercase tracking-widest mb-3">Our Mission</p>
+            <p className="text-xl md:text-2xl font-bold text-white leading-relaxed">
+              「就活の成否を、情報格差や運ではなく<br className="hidden md:block" />
+              <span className="bg-clip-text text-transparent lp-gradient-text-dark">戦略と準備の差で決まるものに。」</span>
+            </p>
+          </div>
+
+          {/* ── Buy Me a Coffee ── */}
+          <div className="rounded-2xl p-6 md:p-8 reveal" style={{background: "linear-gradient(135deg, rgba(251,191,36,0.08), rgba(245,158,11,0.12))", border: "1px solid rgba(251,191,36,0.2)"}}>
+            <div className="flex flex-col md:flex-row items-center gap-5 text-center md:text-left">
+              <div className="flex-shrink-0 text-4xl">☕</div>
+              <div className="flex-1">
+                <p className="text-amber-400 text-xs font-bold tracking-widest uppercase mb-1">Support the Dev</p>
+                <p className="text-white font-bold text-base mb-1">開発を続けられるのは、皆さんのサポートのおかげです</p>
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  Careoは完全無料で提供しています。広告なし、制限なし。
+                  もし「役に立った」と思ったら、コーヒー1杯分のサポートが開発継続の大きな力になります。
+                </p>
+              </div>
+              <div className="flex-shrink-0 flex flex-col items-center gap-2">
+                <a
+                  href="https://buymeacoffee.com/careo"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-300 text-amber-900 font-bold px-6 py-3 rounded-xl transition-colors text-sm whitespace-nowrap"
+                >
+                  ☕ Buy me a coffee
+                </a>
+                <p className="text-amber-500/60 text-xs">¥150〜 / 何度でも</p>
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 
