@@ -266,7 +266,7 @@ export default function ComparePage() {
         </div>
         <div className="relative max-w-4xl mx-auto text-center">
           <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-5">
-            就活ツール比較ガイド 2025
+            就活ツール比較ガイド 2026
           </p>
           <h1 className="text-3xl md:text-5xl font-bold mb-6 leading-tight tracking-tight">
             就活ツール、<br className="md:hidden" />全部使うのが<span className="text-[#00c896]">正解</span>。
@@ -389,7 +389,7 @@ export default function ComparePage() {
             </table>
           </div>
           <p className="text-center text-xs text-gray-400 mt-4">
-            ※ △: 部分的に対応 / 条件あり。各サービスの公開情報をもとに作成（2025年現在）。情報は変更される可能性があります。
+            ※ △: 部分的に対応 / 条件あり。各サービスの公開情報をもとに作成（2026年現在）。情報は変更される可能性があります。
           </p>
         </div>
       </section>
@@ -581,7 +581,7 @@ export default function ComparePage() {
             <Link href="/terms" className="hover:text-gray-300 transition-colors">利用規約</Link>
             <Link href="/privacy" className="hover:text-gray-300 transition-colors">プライバシーポリシー</Link>
           </div>
-          <p className="text-gray-600 text-xs">© 2025 Careo</p>
+          <p className="text-gray-600 text-xs">© 2026 Careo</p>
         </div>
       </footer>
     </div>
