@@ -12,7 +12,7 @@ const APP_URL = "https://careo-sigma.vercel.app";
 
 export const metadata: Metadata = {
   title: "Careo - 28卒の就活は、AIと始める。",
-  description: "ES締切・面接日程・企業研究・反省メモをAIが整理。就活のPDCAを自動で回す、28卒向け就活管理アプリ。Notionやスプレッドシートより簡単に、AIが次の一手まで教えてくれる。",
+  description: "カレオ（Careo）は、ES締切・面接日程・企業研究・反省メモをAIが整理する28卒向け就活管理アプリ。就活のPDCAを自動で回し、AIが次の一手まで教えてくれる。",
   manifest: "/manifest.json",
   icons: {
     icon: [{ url: "/icon-new.svg", type: "image/svg+xml" }],
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "Careo",
   },
-  keywords: ["就活管理", "AI就活", "28卒", "就活アプリ", "ES管理", "面接管理", "就活PDCA", "就活ツール", "就活コーチ", "AIコーチ", "就活サポート", "Careo"],
+  keywords: ["就活管理", "AI就活", "28卒", "就活アプリ", "ES管理", "面接管理", "就活PDCA", "就活ツール", "就活コーチ", "AIコーチ", "就活サポート", "Careo", "カレオ"],
   openGraph: {
     type: "website",
     url: APP_URL,
