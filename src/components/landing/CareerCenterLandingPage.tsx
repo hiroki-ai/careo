@@ -150,15 +150,14 @@ export default function CareerCenterLandingPage() {
     e.preventDefault();
     setFormState("sending");
     try {
-      const messageWithUniversity = `【大学名】${form.university}\n\n${form.message}`;
-      const res = await fetch("/api/contact", {
+      const res = await fetch("/api/career-center-inquiry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.name,
           email: form.email,
-          category: "other",
-          message: messageWithUniversity,
+          university: form.university,
+          message: form.message,
         }),
       });
       if (res.ok) setFormState("done");
