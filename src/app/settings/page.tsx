@@ -15,11 +15,29 @@ export default function SettingsPage() {
   const { permission, isSubscribed, isSupported, loading: pushLoading, subscribe, unsubscribe } = usePushNotifications();
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
+  const [deleteInput, setDeleteInput] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
     router.push("/login");
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    try {
+      const res = await fetch("/api/account/delete", { method: "DELETE" });
+      if (!res.ok) throw new Error("failed");
+      const supabase = createClient();
+      await supabase.auth.signOut();
+      router.push("/login");
+    } catch {
+      alert("アカウントの削除に失敗しました。しばらく後に再試行してください。");
+    } finally {
+      setDeleting(false);
+    }
   };
 
   if (loading) return <div className="p-8 text-gray-400 text-sm">読み込み中...</div>;
@@ -143,7 +161,7 @@ export default function SettingsPage() {
       <section className="bg-white rounded-xl border border-gray-100 p-6">
         <h2 className="font-semibold text-gray-900 mb-5">アカウント</h2>
         <div className="space-y-3">
-          <div className="flex items-center justify-between py-2">
+          <div className="flex items-center justify-between py-2 border-b border-gray-50">
             <div>
               <p className="text-sm font-medium text-gray-700">ログアウト</p>
               <p className="text-xs text-gray-400">このデバイスからサインアウトします</p>
@@ -152,8 +170,56 @@ export default function SettingsPage() {
               ログアウト
             </Button>
           </div>
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <p className="text-sm font-medium text-red-600">アカウントを削除</p>
+              <p className="text-xs text-gray-400">すべてのデータが完全に削除されます</p>
+            </div>
+            <Button variant="danger" size="sm" onClick={() => { setIsDeleteConfirm(true); setDeleteInput(""); }}>
+              削除
+            </Button>
+          </div>
         </div>
       </section>
+
+      {/* アカウント削除確認 */}
+      {isDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">アカウントを削除しますか？</h3>
+            <p className="text-sm text-gray-500 mb-4">
+              企業・ES・面接・OB訪問など<span className="font-medium text-red-600">すべてのデータが完全に削除</span>され、元に戻せません。
+            </p>
+            <p className="text-sm text-gray-600 mb-2">
+              確認のため <span className="font-mono font-bold">削除する</span> と入力してください
+            </p>
+            <input
+              type="text"
+              value={deleteInput}
+              onChange={e => setDeleteInput(e.target.value)}
+              placeholder="削除する"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-red-300"
+            />
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setIsDeleteConfirm(false)}
+                className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+              >
+                キャンセル
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteAccount}
+                disabled={deleteInput !== "削除する" || deleting}
+                className="flex-1 py-2.5 rounded-xl bg-red-600 text-sm font-medium text-white disabled:opacity-40 hover:bg-red-700 transition-colors"
+              >
+                {deleting ? "削除中..." : "完全に削除する"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

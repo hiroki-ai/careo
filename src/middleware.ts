@@ -29,7 +29,7 @@ export async function middleware(request: NextRequest) {
     const isAuthRoute = authRoutes.includes(pathname);
     const isOnboarding = pathname === "/onboarding";
 
-    const publicRoutes = ["/"];
+    const publicRoutes = ["/", "/terms", "/privacy"];
     const isPublicRoute = publicRoutes.includes(pathname);
 
     if (!user && !isAuthRoute && !isPublicRoute) {
@@ -59,7 +59,8 @@ export async function middleware(request: NextRequest) {
     // エラー時は安全のためログインページへリダイレクト
     const { pathname } = request.nextUrl;
     const authRoutes = ["/login", "/signup", "/forgot-password", "/reset-password"];
-    if (authRoutes.includes(pathname)) return NextResponse.next();
+    const publicRoutes2 = ["/", "/terms", "/privacy"];
+    if (authRoutes.includes(pathname) || publicRoutes2.includes(pathname)) return NextResponse.next();
     return NextResponse.redirect(new URL("/login", request.url));
   }
 }
