@@ -991,9 +991,17 @@ export function LandingPage() {
               現在、複数の大学キャリアセンターと提携に向けた準備を進めています。
               提携が実現した際にはアプリ内でお知らせします。
             </p>
-            <div className="inline-flex items-center gap-2 text-xs text-gray-400 bg-white border border-gray-100 px-4 py-2 rounded-full">
+            <div className="inline-flex items-center gap-2 text-xs text-gray-400 bg-white border border-gray-100 px-4 py-2 rounded-full mb-4">
               <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
               準備中 — 正式提携はまだありません
+            </div>
+            <div>
+              <Link
+                href="/for-career-center"
+                className="inline-flex items-center gap-2 text-sm font-bold text-[#00a87e] hover:text-[#00c896] transition-colors"
+              >
+                🏫 キャリアセンターご担当者様はこちら →
+              </Link>
             </div>
           </div>
         </div>
