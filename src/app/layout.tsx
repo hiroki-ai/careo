@@ -8,11 +8,11 @@ import { ToastProvider } from "@/components/ui/Toast";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
 
-const APP_URL = "https://careo-sigma.vercel.app";
+const APP_URL = "https://careoai.jp";
 
 export const metadata: Metadata = {
-  title: "Careo - 28卒の就活は、AIと始める。",
-  description: "カレオ（Careo）は、ES締切・面接日程・企業研究・反省メモをAIが整理する28卒向け就活管理アプリ。就活のPDCAを自動で回し、AIが次の一手まで教えてくれる。",
+  title: "Careo（カレオ）| AIで就活を管理する28卒向けアプリ",
+  description: "AI就活コーチ「カレオ」が選考・ES・面接・OB訪問を全部把握。就活のPDCAを自動で回す28卒向けアプリ。無料・登録5分。",
   manifest: "/manifest.json",
   icons: {
     icon: [{ url: "/icon-new.svg", type: "image/svg+xml" }],
@@ -31,14 +31,16 @@ export const metadata: Metadata = {
     type: "website",
     url: APP_URL,
     siteName: "Careo",
-    title: "Careo - 28卒の就活は、AIと始める。",
-    description: "ES締切・面接日程・企業研究・反省メモをAIが整理。就活のPDCAを自動で回す、28卒向け就活管理アプリ。",
+    title: "Careo（カレオ）| AIで就活を管理する28卒向けアプリ",
+    description: "AI就活コーチ「カレオ」が選考・ES・面接・OB訪問を全部把握。就活のPDCAを自動で回す28卒向けアプリ。無料・登録5分。",
     locale: "ja_JP",
+    images: [{ url: `${APP_URL}/opengraph-image`, width: 1200, height: 630 }],
   },
   twitter: {
-    card: "summary",
-    title: "Careo - 28卒の就活は、AIと始める。",
-    description: "ES締切・面接日程・企業研究・反省メモをAIが整理。就活のPDCAを自動で回す、28卒向け就活管理アプリ。",
+    card: "summary_large_image",
+    title: "Careo（カレオ）| AIで就活を管理する28卒向けアプリ",
+    description: "AI就活コーチ「カレオ」が選考・ES・面接・OB訪問を全部把握。就活のPDCAを自動で回す28卒向けアプリ。無料・登録5分。",
+    images: [{ url: `${APP_URL}/opengraph-image`, width: 1200, height: 630 }],
   },
   alternates: {
     canonical: APP_URL,

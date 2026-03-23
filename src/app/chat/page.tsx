@@ -50,8 +50,8 @@ const SUGGESTIONS = [
 ];
 
 export default function ChatPage() {
-  const { profile, patchSelfAnalysis, saveAiSelfAnalysis } = useProfile();
-  const { companies, addCompany } = useCompanies();
+  const { profile, saveProfile, patchSelfAnalysis, saveAiSelfAnalysis } = useProfile();
+  const { companies, addCompany, updateCompany } = useCompanies();
   const { esList } = useEs();
   const { interviews } = useInterviews();
   const { pendingItems, completedItems, addItems } = useActionItems();
@@ -232,6 +232,12 @@ export default function ChatPage() {
           weaknesses: profile?.weaknesses ?? "",
         },
         pendingActions: pendingItems.map(i => i.action),
+        existingProfile: {
+          university: profile?.university ?? "",
+          faculty: profile?.faculty ?? "",
+          graduationYear: profile?.graduationYear,
+          targetIndustries: profile?.targetIndustries ?? [],
+        },
       };
 
       const res = await fetch("/api/ai/chat-sync", {
@@ -247,6 +253,8 @@ export default function ChatPage() {
         actionItems: { action: string; reason: string; priority: "high" | "medium" | "low" }[];
         calendarEvents: CalendarEvent[];
         shouldRefreshPdca: boolean;
+        companyStatusUpdates: { companyName: string; newStatus: string }[];
+        profileUpdates: { university?: string; faculty?: string; graduationYear?: number; targetIndustries?: string[] };
       };
 
       // AIが生成した自己分析をai_self_analysisに保存（ユーザー入力は上書きしない）
@@ -290,6 +298,34 @@ export default function ChatPage() {
         });
       }
 
+      // 企業ステータスの自動更新
+      if (result.companyStatusUpdates?.length > 0) {
+        for (const update of result.companyStatusUpdates) {
+          const company = companies.find(c => c.name === update.companyName);
+          if (company) {
+            await updateCompany(company.id, { status: update.newStatus as import("@/types").CompanyStatus });
+            const statusLabels: Record<string, string> = {
+              OFFERED: "内定", REJECTED: "不採用", FINAL: "最終面接",
+              INTERVIEW_2: "2次面接", INTERVIEW_1: "1次面接", DOCUMENT: "書類選考",
+              APPLIED: "応募済み", INTERN: "インターン中", INTERN_FINAL: "インターン最終面接",
+            };
+            showToast(`「${company.name}」のステータスを${statusLabels[update.newStatus] ?? update.newStatus}に更新しました`, "success");
+          }
+        }
+      }
+
+      // プロフィールの自動更新
+      if (result.profileUpdates && Object.keys(result.profileUpdates).length > 0 && profile) {
+        const merged = {
+          ...profile,
+          ...Object.fromEntries(
+            Object.entries(result.profileUpdates).filter(([, v]) => v !== undefined && v !== "")
+          ),
+        };
+        await saveProfile(merged);
+        showToast("プロフィール情報を更新しました", "success");
+      }
+
       // PDCA更新が必要な場合はlocalStorageのキャッシュを削除して次回再取得を促す
       if (result.shouldRefreshPdca) {
         try { localStorage.removeItem("careo_last_pdca"); } catch { /* ignore */ }
@@ -297,7 +333,7 @@ export default function ChatPage() {
     } catch (err) {
       console.error("[chat-sync]", err);
     }
-  }, [companies, profile, pendingItems, patchSelfAnalysis, addCompany, addItems, showToast]);
+  }, [companies, profile, pendingItems, patchSelfAnalysis, addCompany, updateCompany, saveProfile, addItems, showToast]);
 
   const sendMessage = async (text: string) => {
     if (!text.trim() || isStreaming) return;
