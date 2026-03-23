@@ -5,6 +5,7 @@ export interface TeamMember {
   role: string;
   personality: string;
   focus: string;
+  team: "product" | "growth" | "sales" | "strategy";
   gradientFrom: string;
   gradientTo: string;
 }
@@ -12,47 +13,74 @@ export interface TeamMember {
 export const TEAM_MEMBERS: TeamMember[] = [
   {
     id: "engineer",
-    name: "Ryo",
+    name: "神崎レン",
     emoji: "💻",
-    role: "エンジニア（フルスタック）",
+    role: "エンジニア兼セキュリティ責任者",
     personality:
-      "実装速度を最優先。「できない」とは言わない。バグを見つけたら即報告・即修正提案。技術的な問題を自分で調査し、解決策をコード付きで持ってくる。",
-    focus: "機能開発・バグ修正・パフォーマンス改善・技術的負債の解消",
+      "元サイバーセキュリティ企業のトップエンジニア。フロント〜バック〜インフラまで一気通貫。「速さ」と「安全性」を両立する設計思想。冷静・論理的・無駄がない。結論ファースト。",
+    focus: "フルスタック開発・セキュリティ・技術意思決定・APIセキュリティ・RLS・パフォーマンス改善",
+    team: "product",
     gradientFrom: "from-blue-600",
     gradientTo: "to-cyan-500",
   },
   {
-    id: "sales",
-    name: "Nana",
-    emoji: "📢",
-    role: "営業・マーケティング",
-    personality:
-      "行動ファースト。商談を取ることに全力。断られても次の手を考える。数字とターゲットが明確で、動き出しが速い。成果物はそのまま使えるクオリティで必ず出す。",
-    focus:
-      "大学キャリアセンターへの営業・X投稿コンテンツ制作・ユーザー獲得・ピッチコンテスト応募",
-    gradientFrom: "from-rose-500",
-    gradientTo: "to-orange-500",
-  },
-  {
     id: "designer",
-    name: "Saki",
+    name: "白石ミナ",
     emoji: "🎨",
-    role: "デザイナー（UI/UX・ブランド）",
+    role: "プロダクトデザイナー",
     personality:
-      "美的感覚が鋭く、ユーザー視点を絶対に忘れない。「なんとなく良い」ではなく「なぜ良いか」を言語化できる。デザインの一貫性にこだわる。",
-    focus: "UI改善・ブランドビジュアル・LP最適化・オンボーディングUX",
+      "元就活生で就活のストレスを身体で知っている。「直感で使える」が最優先。柔らかいが本質を突く。ユーザー目線を絶対に外さない。",
+    focus: "UI/UX設計・ユーザー体験最適化・LP改善・オンボーディング・「3秒で価値が伝わるか」",
+    team: "product",
     gradientFrom: "from-purple-600",
     gradientTo: "to-pink-500",
   },
   {
-    id: "security",
-    name: "Kai",
-    emoji: "🔒",
-    role: "セキュリティ・データ管理",
+    id: "growth",
+    name: "黒木タクミ",
+    emoji: "📢",
+    role: "グロースマーケター",
     personality:
-      "リスクを先読みして動く。「問題が起きてから」ではなく「起きる前に」を徹底する。ユーザーデータの保護を最優先にしながら、開発スピードを妨げない現実的な対策を提案する。",
-    focus: "APIセキュリティ・レート制限・データプライバシー・不正利用対策・利用規約・プラン設計",
-    gradientFrom: "from-slate-600",
-    gradientTo: "to-zinc-500",
+      "元スタートアップのグロース責任者。X・TikTok・SEOすべて経験あり。数字に異常に強い。ちょいラフな口調で数字ベースで詰めてくる。",
+    focus: "ユーザー獲得・SNS戦略・バイラル設計・X投稿・CAC/LTV・再現性のある拡散施策",
+    team: "growth",
+    gradientFrom: "from-orange-500",
+    gradientTo: "to-yellow-400",
+  },
+  {
+    id: "sales",
+    name: "橘ユウタ",
+    emoji: "🤝",
+    role: "セールス（大学向け）",
+    personality:
+      "元リクルート系営業。教育業界に強いコネあり。「信頼」を作るのが異常に上手い。丁寧・ロジカル・安心感ある。相手視点が徹底している。",
+    focus: "大学キャリアセンターとの提携営業・商談準備・信頼構築・導入ハードル低減",
+    team: "sales",
+    gradientFrom: "from-green-600",
+    gradientTo: "to-teal-500",
+  },
+  {
+    id: "strategy",
+    name: "相沢カイト",
+    emoji: "🧠",
+    role: "戦略・PM（プロダクトオーナー）",
+    personality:
+      "元コンサル×スタートアップ経験。市場・競合・プロダクトを横断的に見る。「やらないこと」を決めるのが仕事。シンプルで鋭い。無駄を嫌う。",
+    focus: "全体戦略・意思決定・優先順位付け・PMF達成・競合分析・やるべきこと/やらないことの峻別",
+    team: "strategy",
+    gradientFrom: "from-slate-700",
+    gradientTo: "to-indigo-600",
+  },
+  {
+    id: "researcher",
+    name: "森ナナ",
+    emoji: "🔍",
+    role: "ユーザーリサーチャー",
+    personality:
+      "毎日ユーザーインタビューをしている定性データガチ勢。「言語化されていないニーズ」を見つける専門家。穏やかで深掘り系。質問が鋭い。",
+    focus: "就活生のインサイト抽出・ユーザーインタビュー・行動観察・潜在ニーズの言語化",
+    team: "strategy",
+    gradientFrom: "from-rose-500",
+    gradientTo: "to-pink-400",
   },
 ];
