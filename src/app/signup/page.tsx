@@ -122,6 +122,10 @@ export default function SignupPage() {
           すでにアカウントをお持ちの方は{" "}
           <Link href="/login" className="text-[#00c896] hover:underline">ログイン</Link>
         </p>
+        <div className="flex justify-center gap-4 mt-4 pt-4 border-t border-gray-100">
+          <Link href="/terms" target="_blank" className="text-xs text-gray-400 hover:text-gray-600">利用規約</Link>
+          <Link href="/privacy" target="_blank" className="text-xs text-gray-400 hover:text-gray-600">プライバシーポリシー</Link>
+        </div>
       </div>
     </div>
   );

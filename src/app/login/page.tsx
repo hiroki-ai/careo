@@ -79,6 +79,10 @@ export default function LoginPage() {
           アカウントがない方は{" "}
           <Link href="/signup" className="text-[#00c896] hover:underline">新規登録</Link>
         </p>
+        <div className="flex justify-center gap-4 mt-6 pt-4 border-t border-gray-100">
+          <Link href="/terms" target="_blank" className="text-xs text-gray-400 hover:text-gray-600">利用規約</Link>
+          <Link href="/privacy" target="_blank" className="text-xs text-gray-400 hover:text-gray-600">プライバシーポリシー</Link>
+        </div>
       </div>
     </div>
   );

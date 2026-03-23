@@ -903,6 +903,8 @@ export function LandingPage() {
             <span className="text-gray-300 text-xs ml-2">© 2026 — 就活管理AIアプリ</span>
           </div>
           <div className="flex items-center gap-5 text-xs text-gray-400">
+            <Link href="/terms" className="hover:text-gray-700 transition-colors">利用規約</Link>
+            <Link href="/privacy" className="hover:text-gray-700 transition-colors">プライバシーポリシー</Link>
             <Link href="/login" className="hover:text-gray-700 transition-colors">ログイン</Link>
             <Link href="/signup" className="hover:text-gray-700 transition-colors">新規登録</Link>
           </div>
