@@ -48,7 +48,6 @@ const moreItems = [
   { href: "/companies", label: "企業管理", emoji: "🏢" },
   { href: "/report", label: "PDCA", emoji: "📊" },
   { href: "/calendar", label: "カレンダー", emoji: "📅" },
-  { href: "/career-center", label: "キャリアセンター", emoji: "🖨️" },
   { href: "/es", label: "ES管理", emoji: "📄" },
   { href: "/interviews", label: "面接ログ", emoji: "👥" },
   { href: "/ob-visits", label: "OB/OG訪問", emoji: "🤝" },
@@ -57,6 +56,7 @@ const moreItems = [
   { href: "/groups", label: "友達と就活", emoji: "👫" },
   { href: "/import", label: "インポート", emoji: "📥" },
   { href: "/settings", label: "設定", emoji: "⚙️" },
+  { href: "/career-center", label: "キャリアセンター", emoji: "🖨️" },
 ];
 
 export function BottomNav() {
