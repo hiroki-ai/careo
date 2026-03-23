@@ -115,16 +115,18 @@ interface Props {
 type Step = "input" | "map" | "preview";
 
 export function CsvImportModal({ isOpen, onClose, onImport }: Props) {
-  const [tab, setTab] = useState<"csv" | "text">("csv");
+  const [tab, setTab] = useState<"csv" | "pdf" | "text">("csv");
   const [step, setStep] = useState<Step>("input");
   const [rawRows, setRawRows] = useState<string[][]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
   const [mapping, setMapping] = useState<CareoField[]>([]);
   const [preview, setPreview] = useState<Omit<Company, "id" | "createdAt" | "updatedAt">[]>([]);
   const [importing, setImporting] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
   const [error, setError] = useState("");
   const [textInput, setTextInput] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
+  const pdfRef = useRef<HTMLInputElement>(null);
 
   const reset = () => {
     setStep("input");
@@ -135,7 +137,32 @@ export function CsvImportModal({ isOpen, onClose, onImport }: Props) {
     setError("");
     setTextInput("");
     if (fileRef.current) fileRef.current.value = "";
+    if (pdfRef.current) pdfRef.current.value = "";
   };
+
+  const handlePdfFile = useCallback(async (file: File) => {
+    setError("");
+    setPdfLoading(true);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch("/api/import/pdf", { method: "POST", body: form });
+      const json = await res.json() as { companies?: { name: string; industry: string; status: string; notes: string }[]; error?: string };
+      if (!res.ok || json.error) { setError(json.error ?? "解析に失敗しました"); return; }
+      const rows = (json.companies ?? []).map(c => ({
+        name: c.name,
+        industry: c.industry ?? "",
+        status: (c.status as CompanyStatus) ?? "WISHLIST",
+        notes: c.notes || undefined,
+        url: undefined,
+      }));
+      if (!rows.length) { setError("企業情報が見つかりませんでした。別のPDFをお試しください。"); return; }
+      setPreview(rows);
+      setStep("preview");
+    } finally {
+      setPdfLoading(false);
+    }
+  }, []);
 
   const handleClose = () => { reset(); onClose(); };
 
@@ -226,17 +253,24 @@ export function CsvImportModal({ isOpen, onClose, onImport }: Props) {
           <div className="flex border border-gray-200 rounded-xl overflow-hidden text-sm">
             <button
               type="button"
-              onClick={() => setTab("csv")}
+              onClick={() => { setTab("csv"); setError(""); }}
               className={`flex-1 py-2.5 font-medium transition-colors ${tab === "csv" ? "bg-[#00c896] text-white" : "bg-white text-gray-500 hover:bg-gray-50"}`}
             >
-              CSVファイル
+              CSV
             </button>
             <button
               type="button"
-              onClick={() => setTab("text")}
+              onClick={() => { setTab("pdf"); setError(""); }}
+              className={`flex-1 py-2.5 font-medium transition-colors ${tab === "pdf" ? "bg-[#00c896] text-white" : "bg-white text-gray-500 hover:bg-gray-50"}`}
+            >
+              PDF
+            </button>
+            <button
+              type="button"
+              onClick={() => { setTab("text"); setError(""); }}
               className={`flex-1 py-2.5 font-medium transition-colors ${tab === "text" ? "bg-[#00c896] text-white" : "bg-white text-gray-500 hover:bg-gray-50"}`}
             >
-              企業名を入力
+              テキスト入力
             </button>
           </div>
         )}
@@ -279,9 +313,56 @@ export function CsvImportModal({ isOpen, onClose, onImport }: Props) {
             </div>
 
             <div className="text-xs text-gray-400 space-y-1">
-              <p>• Notion → 「エクスポート」→「CSV」で出力</p>
+              <p>• Notion（テーブル形式のみ）→ 「...」→「エクスポート」→「CSV」</p>
               <p>• Google スプレッドシート → 「ファイル」→「ダウンロード」→「CSV」</p>
               <p>• Excel → 「名前を付けて保存」→「CSV UTF-8」</p>
+              <p className="text-amber-500">※ Notion のテキストページ（箇条書き等）は PDF タブをお使いください</p>
+            </div>
+
+            {error && <p className="text-red-500 text-xs">{error}</p>}
+          </>
+        )}
+
+        {/* ── Step: input / pdf ────────────────────────────── */}
+        {step === "input" && tab === "pdf" && (
+          <>
+            <div className="bg-blue-50 rounded-xl p-3 text-xs text-blue-700 space-y-1 border border-blue-100">
+              <p className="font-semibold">AIがPDFを読んで企業情報を自動抽出します</p>
+              <p className="text-blue-500">Notionの就活ページをPDF出力したもの、キャリアセンターの様式、自作まとめPDFなど何でも対応。スキャン画像のみのPDFは非対応。</p>
+            </div>
+
+            <div
+              onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handlePdfFile(f); }}
+              onDragOver={(e) => e.preventDefault()}
+              onClick={() => !pdfLoading && pdfRef.current?.click()}
+              className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all ${pdfLoading ? "border-blue-200 bg-blue-50/50 cursor-wait" : "border-gray-200 cursor-pointer hover:border-blue-300 hover:bg-blue-50/30"}`}
+            >
+              {pdfLoading ? (
+                <div className="space-y-3">
+                  <div className="text-3xl animate-pulse">🤖</div>
+                  <p className="text-sm font-semibold text-blue-600">AIが解析中...</p>
+                  <p className="text-xs text-gray-400">企業情報を読み取っています。しばらくお待ちください。</p>
+                </div>
+              ) : (
+                <>
+                  <div className="text-3xl mb-2">📄</div>
+                  <p className="text-sm font-semibold text-gray-700 mb-1">PDFファイルをドロップ</p>
+                  <p className="text-xs text-gray-400">または クリックして選択（.pdf・最大10MB）</p>
+                </>
+              )}
+              <input
+                ref={pdfRef}
+                type="file"
+                accept=".pdf,application/pdf"
+                className="hidden"
+                onChange={(e) => e.target.files?.[0] && handlePdfFile(e.target.files[0])}
+              />
+            </div>
+
+            <div className="text-xs text-gray-400 space-y-1">
+              <p>• Notion ページ → 「...」→「エクスポート」→「PDF」</p>
+              <p>• Word / Google Docs → 「ファイル」→「ダウンロード」→「PDF」</p>
+              <p>• キャリアセンターの様式・自作管理シートもそのままOK</p>
             </div>
 
             {error && <p className="text-red-500 text-xs">{error}</p>}
