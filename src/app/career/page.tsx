@@ -53,10 +53,11 @@ const SECTIONS: {
 ];
 
 export default function CareerPage() {
-  const { profile, loading, saveProfile } = useProfile();
+  const { profile, loading, saveProfile, patchSelfAnalysis } = useProfile();
   const { showToast } = useToast();
   const [editData, setEditData] = useState<CareerFields | null>(null);
   const [saved, setSaved] = useState(false);
+  const [applyingField, setApplyingField] = useState<string | null>(null);
 
   if (loading) return <div className="p-8 text-gray-400 text-sm">読み込み中...</div>;
 
@@ -90,6 +91,13 @@ export default function CareerPage() {
     setSaved(true);
     showToast("保存しました", "success");
     setTimeout(() => setSaved(false), 3000);
+  };
+
+  const handleApplyAi = async (key: keyof CareerFields, content: string) => {
+    setApplyingField(key);
+    await patchSelfAnalysis({ [key]: content } as Parameters<typeof patchSelfAnalysis>[0]);
+    showToast("自己分析に反映しました", "success");
+    setApplyingField(null);
   };
 
   return (
@@ -137,44 +145,80 @@ export default function CareerPage() {
 
       {/* セクション一覧 */}
       <div className="space-y-5">
-        {SECTIONS.map((section) => (
-          <div key={section.key} className="bg-white rounded-xl border border-gray-100 p-6">
-            <div className="flex items-start justify-between mb-3">
-              <div>
-                <h2 className="font-semibold text-gray-900">{section.label}</h2>
-                <p className="text-xs text-gray-400 mt-0.5">{section.hint}</p>
+        {SECTIONS.map((section) => {
+          const aiContent = profile?.aiSelfAnalysis?.[section.key];
+          const hasAiContent = !!aiContent?.trim();
+          return (
+            <div key={section.key} className="bg-white rounded-xl border border-gray-100 p-6">
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <h2 className="font-semibold text-gray-900">{section.label}</h2>
+                  <p className="text-xs text-gray-400 mt-0.5">{section.hint}</p>
+                </div>
               </div>
+
+              {isEditing ? (
+                <>
+                  <textarea
+                    value={editData?.[section.key] ?? ""}
+                    onChange={(e) =>
+                      setEditData((prev) => prev ? { ...prev, [section.key]: e.target.value } : prev)
+                    }
+                    rows={section.rows}
+                    placeholder={section.placeholder}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  />
+                  {editData?.[section.key] && (
+                    <p className="text-xs text-gray-400 text-right mt-1">
+                      {editData[section.key]?.length ?? 0}字
+                    </p>
+                  )}
+                  {hasAiContent && (
+                    <div className="mt-3 bg-[#00c896]/5 border border-[#00c896]/20 rounded-lg p-3">
+                      <p className="text-[10px] font-bold text-[#00a87e] uppercase tracking-wider mb-1.5">カレオが生成したメモ（参考）</p>
+                      <p className="text-xs text-gray-600 whitespace-pre-wrap leading-relaxed mb-2">{aiContent}</p>
+                      <button
+                        type="button"
+                        onClick={() => setEditData(prev => prev ? { ...prev, [section.key]: aiContent } : prev)}
+                        className="text-[11px] font-medium text-[#00a87e] hover:text-[#00c896] transition-colors"
+                      >
+                        ↑ この内容を入力欄に反映
+                      </button>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="min-h-[60px]">
+                    {current[section.key] ? (
+                      <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
+                        {current[section.key]}
+                      </p>
+                    ) : (
+                      <p className="text-sm text-gray-400 italic">未入力</p>
+                    )}
+                  </div>
+                  {hasAiContent && (
+                    <div className="mt-4 bg-[#00c896]/5 border border-[#00c896]/20 rounded-xl p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-[10px] font-bold text-[#00a87e] uppercase tracking-wider">カレオのAIメモ</p>
+                        <button
+                          type="button"
+                          disabled={applyingField === section.key}
+                          onClick={() => handleApplyAi(section.key, aiContent ?? "")}
+                          className="text-[11px] font-medium bg-[#00c896] hover:bg-[#00b586] disabled:opacity-50 text-white px-3 py-1 rounded-lg transition-colors"
+                        >
+                          {applyingField === section.key ? "反映中..." : "自己分析に反映する"}
+                        </button>
+                      </div>
+                      <p className="text-xs text-gray-600 whitespace-pre-wrap leading-relaxed">{aiContent}</p>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
-
-            {isEditing ? (
-              <textarea
-                value={editData?.[section.key] ?? ""}
-                onChange={(e) =>
-                  setEditData((prev) => prev ? { ...prev, [section.key]: e.target.value } : prev)
-                }
-                rows={section.rows}
-                placeholder={section.placeholder}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-              />
-            ) : (
-              <div className="min-h-[60px]">
-                {current[section.key] ? (
-                  <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
-                    {current[section.key]}
-                  </p>
-                ) : (
-                  <p className="text-sm text-gray-400 italic">未入力</p>
-                )}
-              </div>
-            )}
-
-            {isEditing && editData?.[section.key] && (
-              <p className="text-xs text-gray-400 text-right mt-1">
-                {editData[section.key]?.length ?? 0}字
-              </p>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* 就活軸の成熟度グラフ（戦略4）*/}

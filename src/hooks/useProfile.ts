@@ -20,6 +20,7 @@ function rowToProfile(row: Record<string, unknown>): UserProfile {
     selfPr: (row.self_pr as string) ?? "",
     strengths: (row.strengths as string) ?? "",
     weaknesses: (row.weaknesses as string) ?? "",
+    aiSelfAnalysis: (row.ai_self_analysis as UserProfile["aiSelfAnalysis"]) ?? {},
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
   };
@@ -66,7 +67,7 @@ export function useProfile() {
     if (saved) setProfile(rowToProfile(saved as Record<string, unknown>));
   }, []);
 
-  // 自己分析フィールドだけ部分更新（他のプロフィール情報を上書きしない）
+  // 自己分析フィールドだけ部分更新（ユーザー入力。他のプロフィール情報を上書きしない）
   const patchSelfAnalysis = useCallback(async (
     fields: Partial<Pick<UserProfile, "careerAxis" | "gakuchika" | "selfPr" | "strengths" | "weaknesses">>
   ): Promise<boolean> => {
@@ -93,5 +94,30 @@ export function useProfile() {
     return !!saved;
   }, []);
 
-  return { profile, loading, saveProfile, patchSelfAnalysis, refetch: fetch };
+  // AIがチャットで生成した自己分析を別フィールド(ai_self_analysis)に保存
+  // ユーザーが手入力した情報は一切上書きしない
+  const saveAiSelfAnalysis = useCallback(async (
+    fields: Partial<NonNullable<UserProfile["aiSelfAnalysis"]>>
+  ): Promise<boolean> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return false;
+    // 現在のai_self_analysisとマージ
+    const current = (await supabase
+      .from("user_profiles")
+      .select("ai_self_analysis")
+      .eq("id", user.id)
+      .single()
+    ).data?.ai_self_analysis as UserProfile["aiSelfAnalysis"] ?? {};
+    const merged = { ...current, ...fields };
+    const { data: saved } = await supabase
+      .from("user_profiles")
+      .update({ ai_self_analysis: merged })
+      .eq("id", user.id)
+      .select()
+      .single();
+    if (saved) setProfile(rowToProfile(saved as Record<string, unknown>));
+    return !!saved;
+  }, []);
+
+  return { profile, loading, saveProfile, patchSelfAnalysis, saveAiSelfAnalysis, refetch: fetch };
 }

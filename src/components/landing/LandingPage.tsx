@@ -51,7 +51,7 @@ const jsonLd = {
       "mainEntity": [
         { "@type": "Question", "name": "Careoとは何ですか？", "acceptedAnswer": { "@type": "Answer", "text": "CareoはAIを使った就活管理アプリです。ES締切・面接日程・企業研究・OB訪問・筆記試験を一か所で管理でき、AIが就活のPDCAを自動で分析します。他のツールにない「データを横断した気づき通知」が特徴です。28卒向けに開発されています。" } },
         { "@type": "Question", "name": "BaseMeやSmartESと何が違いますか？", "acceptedAnswer": { "@type": "Answer", "text": "BaseMe・SmartESは特定機能（スカウト・ES生成）に特化したサービスです。CareoはES・面接・OB訪問・企業管理・筆記試験のすべてのデータを把握したAIコーチが、データを横断した気づきを提供します。「点解決」ではなく「就活OSとして全体を管理・コーチング」するのがCareoの役割です。" } },
-        { "@type": "Question", "name": "無料で使えますか？", "acceptedAnswer": { "@type": "Answer", "text": "はい、Careoは基本機能を無料で使えます。Pro版（¥980/月）ではES提出前AIチェック・キャリアセンターレポート出力など高度な機能が利用できます。" } },
+        { "@type": "Question", "name": "無料で使えますか？", "acceptedAnswer": { "@type": "Answer", "text": "はい、Careoは全機能が完全無料です。クレジットカード不要で、メールアドレスだけで今すぐ始められます。" } },
         { "@type": "Question", "name": "スマホでも使えますか？", "acceptedAnswer": { "@type": "Answer", "text": "はい、iPhoneでもAndroidでも使えます。ホーム画面に追加するとアプリのように使えます。" } },
       ],
     },
@@ -224,7 +224,7 @@ export function LandingPage() {
                 icon: "📋",
                 title: "ES提出前AIチェック",
                 desc: "自己分析との整合性・AIっぽい文体・過去ESとの重複・企業固有の志望理由を提出前に一括確認",
-                tag: "Pro機能",
+                tag: "AI機能",
               },
               {
                 icon: "📈",
@@ -251,7 +251,7 @@ export function LandingPage() {
               {
                 icon: "🎓",
                 title: "キャリアセンターレポート出力",
-                desc: "就活の全データを1枚のPDFにまとめ、大学のキャリアセンターに持参できる（Pro機能）。大学側との連携をCareoが架け橋に。",
+                desc: "就活の全データを1枚のPDFにまとめ、大学のキャリアセンターに持参できる。大学側との連携をCareoが架け橋に。",
                 tag: "大学連携",
               },
               {

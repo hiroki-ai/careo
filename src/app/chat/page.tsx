@@ -50,7 +50,7 @@ const SUGGESTIONS = [
 ];
 
 export default function ChatPage() {
-  const { profile, patchSelfAnalysis } = useProfile();
+  const { profile, patchSelfAnalysis, saveAiSelfAnalysis } = useProfile();
   const { companies, addCompany } = useCompanies();
   const { esList } = useEs();
   const { interviews } = useInterviews();
@@ -230,18 +230,18 @@ export default function ChatPage() {
         shouldRefreshPdca: boolean;
       };
 
-      // 自己分析フィールドの自動保存
+      // AIが生成した自己分析をai_self_analysisに保存（ユーザー入力は上書きしない）
       const saFields = Object.entries(result.selfAnalysis).filter(([, v]) => v && String(v).trim());
       if (saFields.length > 0) {
         const patch = Object.fromEntries(saFields.map(([k, v]) => [k, String(v).trim()]));
-        const ok = await patchSelfAnalysis(patch as Parameters<typeof patchSelfAnalysis>[0]);
+        const ok = await saveAiSelfAnalysis(patch as Parameters<typeof saveAiSelfAnalysis>[0]);
         if (ok) {
           const labels: Record<string, string> = {
             careerAxis: "就活の軸", gakuchika: "ガクチカ", selfPr: "自己PR",
             strengths: "強み", weaknesses: "弱み",
           };
           const fieldNames = saFields.map(([k]) => labels[k] ?? k).join("・");
-          showToast(`${fieldNames}を自己分析に自動保存しました`, "success");
+          showToast(`${fieldNames}のAIメモを保存しました`, "success");
         }
       }
 
@@ -367,9 +367,9 @@ export default function ChatPage() {
   };
 
   const handleSaveSelfAnalysis = async (msgIndex: number, suggestion: SelfAnalysisSuggestion) => {
-    const ok = await patchSelfAnalysis({ [suggestion.field]: suggestion.content });
+    const ok = await saveAiSelfAnalysis({ [suggestion.field]: suggestion.content });
     if (ok) {
-      showToast(`${SELF_ANALYSIS_LABELS[suggestion.field]}を自己分析に保存しました`, "success");
+      showToast(`${SELF_ANALYSIS_LABELS[suggestion.field]}のAIメモを保存しました（自己分析ページで確認できます）`, "success");
       // 保存済みフィールドをメッセージに記録してボタンを変化させる
       setLocalMessages((prev) => prev.map((m, i) =>
         i === msgIndex

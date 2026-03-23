@@ -143,12 +143,20 @@ export interface UserProfile {
   targetJobs: string[];
   jobSearchStage: JobSearchStage;
   plan?: UserPlan; // DB追加後にデフォルト'free'
-  // 自己分析
+  // 自己分析（ユーザー入力）
   careerAxis?: string;
   gakuchika?: string;
   selfPr?: string;
   strengths?: string;
   weaknesses?: string;
+  // AIがチャットから生成した自己分析（ユーザー入力とは別管理）
+  aiSelfAnalysis?: {
+    careerAxis?: string;
+    gakuchika?: string;
+    selfPr?: string;
+    strengths?: string;
+    weaknesses?: string;
+  };
   createdAt: string;
   updatedAt: string;
 }
