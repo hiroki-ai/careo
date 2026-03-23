@@ -22,19 +22,19 @@ const jsonLd = {
     {
       "@type": "Organization",
       "name": "Careo",
-      "url": "https://careo-sigma.vercel.app",
-      "logo": { "@type": "ImageObject", "url": "https://careo-sigma.vercel.app/icon-new.svg" },
+      "url": "https://careoai.jp",
+      "logo": { "@type": "ImageObject", "url": "https://careoai.jp/icon-new.svg" },
     },
     {
       "@type": "WebSite",
       "name": "Careo",
-      "url": "https://careo-sigma.vercel.app",
+      "url": "https://careoai.jp",
       "publisher": { "@type": "Organization", "name": "Careo" },
     },
     {
       "@type": "WebApplication",
       "name": "Careo",
-      "url": "https://careo-sigma.vercel.app",
+      "url": "https://careoai.jp",
       "description": "ES締切・面接日程・企業研究・OB訪問・筆記試験をAIが横断分析。就活のPDCAを自動で回す、28卒向けAI就活コーチアプリ。",
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "Web, iOS, Android",
@@ -101,7 +101,7 @@ function AppMockup() {
             <div className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
           </div>
           <div className="flex-1 bg-white rounded-md px-3 py-0.5 text-[10px] text-gray-400 border border-gray-200 text-center truncate">
-            careo-sigma.vercel.app
+            careoai.jp
           </div>
         </div>
         {/* Dashboard content */}

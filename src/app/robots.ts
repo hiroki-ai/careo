@@ -23,6 +23,6 @@ export default function robots(): MetadataRoute.Robots {
         "/reset-password",
       ],
     },
-    sitemap: "https://careo-sigma.vercel.app/sitemap.xml",
+    sitemap: "https://careoai.jp/sitemap.xml",
   };
 }

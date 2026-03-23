@@ -458,7 +458,9 @@ export default function RootPage() {
     createClient().auth.getUser().then(({ data }) => setIsAuth(!!data.user));
   }, []);
 
-  if (isAuth === null) return null;
+  if (isAuth === null) return (
+    <div className="min-h-screen bg-gradient-to-br from-[#0D0B21] via-[#1a2f4e] to-[#0D0B21]" />
+  );
   if (!isAuth) return <LandingPage />;
   return <DashboardContent />;
 }
