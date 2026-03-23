@@ -318,9 +318,9 @@ function DashboardContent() {
                     <p className="text-[11px] text-gray-500 hidden md:block">{item.reason}</p>
                   </div>
                   {item.link && (
-                    <Link href={item.link} className="shrink-0 ml-1 text-[10px] font-bold text-[#00a87e] bg-[#00c896]/10 hover:bg-[#00c896]/20 border border-[#00c896]/30 px-2 py-1 rounded-lg transition-colors whitespace-nowrap">
-                      やる →
-                    </Link>
+                    item.link.external
+                      ? <a href={item.link.href} target="_blank" rel="noopener noreferrer" className="shrink-0 ml-1 text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2 py-1 rounded-lg transition-colors whitespace-nowrap">{item.link.label}</a>
+                      : <Link href={item.link.href} className="shrink-0 ml-1 text-[10px] font-bold text-[#00a87e] bg-[#00c896]/10 hover:bg-[#00c896]/20 border border-[#00c896]/30 px-2 py-1 rounded-lg transition-colors whitespace-nowrap">{item.link.label}</Link>
                   )}
                 </div>
               ))}
@@ -346,9 +346,9 @@ function DashboardContent() {
                     <p className="text-[11px] text-gray-500">{item.reason}</p>
                   </div>
                   {item.link && (
-                    <Link href={item.link} className="shrink-0 ml-1 text-[10px] font-bold text-[#00a87e] bg-[#00c896]/10 hover:bg-[#00c896]/20 border border-[#00c896]/30 px-2 py-1 rounded-lg transition-colors whitespace-nowrap">
-                      やる →
-                    </Link>
+                    item.link.external
+                      ? <a href={item.link.href} target="_blank" rel="noopener noreferrer" className="shrink-0 ml-1 text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2 py-1 rounded-lg transition-colors whitespace-nowrap">{item.link.label}</a>
+                      : <Link href={item.link.href} className="shrink-0 ml-1 text-[10px] font-bold text-[#00a87e] bg-[#00c896]/10 hover:bg-[#00c896]/20 border border-[#00c896]/30 px-2 py-1 rounded-lg transition-colors whitespace-nowrap">{item.link.label}</Link>
                   )}
                 </div>
               ))}

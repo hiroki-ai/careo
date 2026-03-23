@@ -9,24 +9,68 @@ export interface ActionItem {
   reason: string;
   priority: "high" | "medium" | "low";
   isCompleted: boolean;
-  link?: string;
+  link?: ActionLink;
   createdAt: string;
   completedAt?: string;
 }
 
-// アクション文言からアプリ内リンクを推定
-export function inferActionLink(action: string): string | undefined {
+export interface ActionLink {
+  href: string;
+  label: string;
+  external: boolean;
+}
+
+// アクション文言からリンクを推定。外部サービスが適切なものは外部URLを返す
+export function inferActionLink(action: string): ActionLink | undefined {
   const a = action;
-  if (/ES|エントリーシート|提出/.test(a)) return "/es";
-  if (/面接|インタビュー|面談/.test(a)) return "/interviews";
-  if (/OB|OG|訪問|OBOG/.test(a)) return "/ob-visits";
-  if (/SPI|筆記|適性|テスト|検査/.test(a)) return "/tests";
-  if (/企業|応募|リサーチ|調べ|登録|受験/.test(a)) return "/companies";
-  if (/自己分析|ガクチカ|自己PR|強み|弱み|就活の軸/.test(a)) return "/career";
-  if (/コーチ|チャット|相談|カレオ|話/.test(a)) return "/chat";
-  if (/PDCA|振り返り|レポート|分析/.test(a)) return "/report";
-  if (/締切|スケジュール|カレンダー/.test(a)) return "/calendar";
-  if (/プロフィール|設定|登録/.test(a)) return "/settings";
+
+  // ── 外部サービスが適切なアクション ──
+  if (/マイナビ/i.test(a))
+    return { href: "https://job.mynavi.jp/", label: "マイナビ →", external: true };
+  if (/リクナビ/i.test(a))
+    return { href: "https://job.rikunabi.com/", label: "リクナビ →", external: true };
+  if (/キャリタス/i.test(a))
+    return { href: "https://job.career-tasu.jp/", label: "キャリタス →", external: true };
+  if (/OfferBox|オファーボックス/i.test(a))
+    return { href: "https://offerbox.jp/", label: "OfferBox →", external: true };
+  if (/Wantedly|ウォンテッドリー/i.test(a))
+    return { href: "https://www.wantedly.com/explore", label: "Wantedly →", external: true };
+  if (/就活会議/i.test(a))
+    return { href: "https://syukatsu-kaigi.jp/", label: "就活会議 →", external: true };
+  if (/OpenWork|オープンワーク/i.test(a))
+    return { href: "https://www.openwork.jp/", label: "OpenWork →", external: true };
+  if (/LinkedIn|リンクトイン/i.test(a))
+    return { href: "https://www.linkedin.com/", label: "LinkedIn →", external: true };
+  if (/Gmail|就活用メール|就活メール/i.test(a))
+    return { href: "https://mail.google.com/mail/u/0/#create", label: "Gmail →", external: true };
+  if (/SPI|適性検査.*対策|筆記.*対策|対策.*SPI/.test(a))
+    return { href: "https://www.amazon.co.jp/s?k=SPI+就活+問題集&tag=careo-22", label: "Amazon →", external: true };
+  if (/スーツ|ビジネスカジュアル|服装|ジャケット/i.test(a))
+    return { href: "https://px.a8.net/svt/ejp?a8mat=4AZIOB+402X6A+537A+5YJRM", label: "ORIHICA →", external: true };
+  if (/証明写真/i.test(a))
+    return { href: "https://www.kitamura.co.jp/", label: "キタムラ →", external: true };
+
+  // ── CareoのAI機能で対応できるアクション ──
+  if (/ES|エントリーシート|提出/.test(a))
+    return { href: "/es", label: "やる →", external: false };
+  if (/面接|インタビュー|面談/.test(a))
+    return { href: "/interviews", label: "やる →", external: false };
+  if (/OB|OG|訪問|OBOG/.test(a))
+    return { href: "/ob-visits", label: "やる →", external: false };
+  if (/筆記試験|SPI|テスト|適性/.test(a))
+    return { href: "/tests", label: "記録 →", external: false };
+  if (/企業|応募|リサーチ|調べ|受験/.test(a))
+    return { href: "/companies", label: "やる →", external: false };
+  if (/自己分析|ガクチカ|自己PR|強み|弱み|就活の軸/.test(a))
+    return { href: "/career", label: "やる →", external: false };
+  if (/コーチ|チャット|相談|カレオ|話/.test(a))
+    return { href: "/chat", label: "やる →", external: false };
+  if (/PDCA|振り返り|レポート/.test(a))
+    return { href: "/report", label: "やる →", external: false };
+  if (/締切|スケジュール|カレンダー/.test(a))
+    return { href: "/calendar", label: "やる →", external: false };
+  if (/プロフィール|設定/.test(a))
+    return { href: "/settings", label: "やる →", external: false };
   return undefined;
 }
 
