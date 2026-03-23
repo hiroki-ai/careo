@@ -179,13 +179,22 @@ function DashboardContent() {
     }
   };
 
-  // データが揃ったら一度だけ自動フェッチ（profileがnullでも動かす）
+  // データが揃ったら自動フェッチ：
+  // ① アイテムが一件もない場合
+  // ② 最後の自動フェッチが今日でない場合（毎日リフレッシュ）
   useEffect(() => {
     if (itemsLoading) return;
     if (hasFetched.current) return;
     hasFetched.current = true;
+    const today = new Date().toDateString();
+    const lastFetch = localStorage.getItem("careo_last_action_fetch");
+    const isStale = lastFetch !== today;
     if (pendingItems.length === 0 && completedItems.length === 0) {
+      localStorage.setItem("careo_last_action_fetch", today);
       fetchAiAdvice([]);
+    } else if (isStale) {
+      localStorage.setItem("careo_last_action_fetch", today);
+      fetchAiAdvice(completedItems.map(i => i.action));
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [itemsLoading]);
