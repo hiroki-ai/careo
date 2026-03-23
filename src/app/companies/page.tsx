@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useCompanies } from "@/hooks/useCompanies";
+import { useProfile } from "@/hooks/useProfile";
 import { CompanyForm } from "@/components/companies/CompanyForm";
 import { StatusBadge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -10,8 +11,27 @@ import { Modal } from "@/components/ui/Modal";
 import { useToast } from "@/components/ui/Toast";
 import { CompanyStatus, COMPANY_STATUS_LABELS, COMPANY_STATUS_ORDER } from "@/types";
 
+const SUGGEST_CACHE_KEY = "careo_company_suggestions";
+const SUGGEST_CACHE_TTL = 24 * 60 * 60 * 1000; // 24h
+
+interface Suggestion {
+  name: string;
+  industry: string;
+  reason: string;
+  tag: string;
+}
+
+const TAG_STYLES: Record<string, string> = {
+  "類似企業": "bg-blue-50 text-blue-700",
+  "代替候補": "bg-orange-50 text-orange-700",
+  "軸にマッチ": "bg-[#00c896]/10 text-[#00a87e]",
+  "成長企業": "bg-purple-50 text-purple-700",
+  "穴場": "bg-yellow-50 text-yellow-700",
+};
+
 export default function CompaniesPage() {
   const { companies, addCompany } = useCompanies();
+  const { profile } = useProfile();
   const { showToast } = useToast();
   const hasIntern = companies.some(c => c.status === "INTERN" || c.status === "INTERN_APPLYING");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,6 +40,63 @@ export default function CompaniesPage() {
   const [importing, setImporting] = useState(false);
   const [filterStatus, setFilterStatus] = useState<CompanyStatus | "ALL">("ALL");
   const [searchQuery, setSearchQuery] = useState("");
+
+  // AI企業提案
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [suggestOpen, setSuggestOpen] = useState(false);
+  const [suggestLoading, setSuggestLoading] = useState(false);
+  const [addedNames, setAddedNames] = useState<Set<string>>(new Set());
+
+  const hasRejected = companies.some(c => c.status === "REJECTED");
+  const showSuggestBanner = companies.length < 8 || hasRejected;
+
+  // キャッシュから読み込み
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem(SUGGEST_CACHE_KEY);
+      if (cached) {
+        const { data, ts } = JSON.parse(cached) as { data: Suggestion[]; ts: number };
+        if (Date.now() - ts < SUGGEST_CACHE_TTL) {
+          setSuggestions(data);
+        }
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  const fetchSuggestions = useCallback(async () => {
+    setSuggestLoading(true);
+    setSuggestOpen(true);
+    try {
+      const res = await fetch("/api/ai/company-suggest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          profile: {
+            careerAxis: profile?.careerAxis,
+            targetIndustries: profile?.targetIndustries,
+            targetJobs: profile?.targetJobs,
+            selfPr: profile?.selfPr,
+            strengths: profile?.strengths,
+          },
+          companies: companies.map(c => ({ name: c.name, industry: c.industry, status: c.status })),
+        }),
+      });
+      if (!res.ok) return;
+      const json = await res.json() as { suggestions?: Suggestion[] };
+      const data = json.suggestions ?? [];
+      setSuggestions(data);
+      localStorage.setItem(SUGGEST_CACHE_KEY, JSON.stringify({ data, ts: Date.now() }));
+    } finally {
+      setSuggestLoading(false);
+    }
+  }, [profile, companies]);
+
+  const handleAddSuggestion = useCallback(async (s: Suggestion) => {
+    await addCompany({ name: s.name, status: "WISHLIST", industry: s.industry, notes: "" });
+    setAddedNames(prev => new Set([...prev, s.name]));
+    // キャッシュを無効化（追加した企業が次回提案に含まれないよう）
+    localStorage.removeItem(SUGGEST_CACHE_KEY);
+  }, [addCompany]);
 
   const handleBulkImport = async () => {
     const lines = importText
@@ -126,6 +203,83 @@ export default function CompaniesPage() {
           );
         })}
       </div>
+
+      {/* AI企業提案バナー */}
+      {showSuggestBanner && (
+        <div className="mb-6 rounded-2xl border border-[#00c896]/30 bg-gradient-to-r from-[#00c896]/5 to-emerald-50 p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-lg shrink-0">✨</span>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-gray-800">
+                  {hasRejected ? "不採用を踏まえたおすすめ企業を提案します" : "もっと受けるべき企業を提案します"}
+                </p>
+                <p className="text-xs text-gray-500 mt-0.5">自己分析・選考状況をもとにAIが分析</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={suggestOpen ? () => setSuggestOpen(false) : fetchSuggestions}
+              className="shrink-0 text-xs font-bold text-[#00a87e] border border-[#00c896]/50 hover:bg-[#00c896]/10 px-3 py-1.5 rounded-lg transition-colors"
+            >
+              {suggestOpen ? "閉じる" : suggestions.length > 0 ? "提案を見る" : "分析する"}
+            </button>
+          </div>
+
+          {suggestOpen && (
+            <div className="mt-4">
+              {suggestLoading ? (
+                <div className="flex items-center gap-2 text-sm text-gray-500 py-3">
+                  <svg className="animate-spin w-4 h-4 text-[#00c896]" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                  </svg>
+                  AIが企業を分析中...
+                </div>
+              ) : suggestions.length > 0 ? (
+                <div className="space-y-2 mt-2">
+                  {suggestions.map((s) => {
+                    const alreadyAdded = addedNames.has(s.name) || companies.some(c => c.name === s.name);
+                    return (
+                      <div key={s.name} className="flex items-start gap-3 bg-white rounded-xl border border-gray-100 p-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap mb-1">
+                            <p className="text-sm font-semibold text-gray-900">{s.name}</p>
+                            {s.industry && <span className="text-xs text-gray-400">{s.industry}</span>}
+                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${TAG_STYLES[s.tag] ?? "bg-gray-100 text-gray-600"}`}>
+                              {s.tag}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-500 leading-relaxed">{s.reason}</p>
+                        </div>
+                        <button
+                          type="button"
+                          disabled={alreadyAdded}
+                          onClick={() => handleAddSuggestion(s)}
+                          className={`shrink-0 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors ${
+                            alreadyAdded
+                              ? "bg-gray-100 text-gray-400 cursor-default"
+                              : "bg-[#00c896] text-white hover:bg-[#00a87e]"
+                          }`}
+                        >
+                          {alreadyAdded ? "追加済" : "+ 追加"}
+                        </button>
+                      </div>
+                    );
+                  })}
+                  <button
+                    type="button"
+                    onClick={fetchSuggestions}
+                    className="w-full text-xs text-gray-400 hover:text-gray-600 py-2 transition-colors"
+                  >
+                    再分析する →
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* 企業一覧 */}
       {sorted.length === 0 ? (
