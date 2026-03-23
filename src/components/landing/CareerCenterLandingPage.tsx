@@ -19,15 +19,15 @@ const faqItems = [
   },
   {
     q: "何人の学生から導入できますか？",
-    a: "1人からでも利用可能です。提携後は大学のドメイン（@xxx.ac.jp）の学生が自動的に連携対象になります。",
+    a: "1人からでも利用可能です。提携後は大学名・学籍番号・氏名で本人確認を行い、連携対象の学生を特定します。就活用など大学メール以外のアドレスで登録した学生も対象にできるよう、メールドメインではなく在籍情報で管理します。",
   },
   {
     q: "キャリアセンター側に特別な操作は必要ですか？",
     a: "初期設定（大学登録・担当者アカウント作成）のみです。その後は学生が自分でCareoを使い始め、同意した情報が自動的に共有されます。担当者の方には専用ダッシュボードをご提供します。",
   },
   {
-    q: "学生へのCareo利用促進は大学側が行う必要がありますか？",
-    a: "Careoは学生が自然に使いたいと思えるサービスとして設計されています。ご希望があれば大学のガイダンス資料・説明会での紹介をサポートします。",
+    q: "学生へのCareo利用促進は大学側にお願いできますか？",
+    a: "はい、ぜひお力添えをお願いしています。ガイダンスや説明会でのご紹介、掲示物の掲示など、大学側からの周知が学生への普及に大きく貢献します。紹介用の資料・スライドはCareo側でご用意します。",
   },
 ];
 
@@ -120,7 +120,7 @@ const steps = [
 
 export default function CareerCenterLandingPage() {
   const [scrolled, setScrolled] = useState(false);
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [openFaqs, setOpenFaqs] = useState<Set<number>>(new Set());
   const [form, setForm] = useState({ name: "", email: "", university: "", message: "" });
   const [formState, setFormState] = useState<"idle" | "sending" | "done" | "error">("idle");
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -607,24 +607,24 @@ export default function CareerCenterLandingPage() {
               <div
                 key={i}
                 className={`border rounded-xl overflow-hidden transition-colors duration-200 reveal reveal-delay-${(i % 4) + 1} ${
-                  openFaq === i ? "border-[#00c896]/30" : "border-gray-100"
+                  openFaqs.has(i) ? "border-[#00c896]/30" : "border-gray-100"
                 }`}
               >
                 <button
                   type="button"
                   className="w-full text-left px-5 py-4 flex items-center justify-between gap-4"
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  onClick={() => setOpenFaqs(prev => { const next = new Set(prev); next.has(i) ? next.delete(i) : next.add(i); return next; })}
                 >
                   <span className="font-semibold text-[#0D0B21] text-sm">{item.q}</span>
                   <span
                     className={`text-[#00c896] text-xl transition-transform duration-200 flex-shrink-0 ${
-                      openFaq === i ? "rotate-180" : ""
+                      openFaqs.has(i) ? "rotate-180" : ""
                     }`}
                   >
                     ↓
                   </span>
                 </button>
-                {openFaq === i && (
+                {openFaqs.has(i) && (
                   <div className="px-5 pb-5">
                     <p className="text-gray-500 text-sm leading-relaxed">{item.a}</p>
                   </div>
