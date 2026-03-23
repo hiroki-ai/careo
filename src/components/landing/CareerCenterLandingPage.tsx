@@ -393,7 +393,20 @@ export default function CareerCenterLandingPage() {
                 <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-xs text-gray-300 font-medium mb-5">
                   🇺🇸 アメリカ・就活プラットフォーム
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-3">Handshake</h3>
+                <div className="flex items-center gap-3 mb-3">
+                  <h3 className="text-2xl font-bold text-white">Handshake</h3>
+                  <a
+                    href="https://joinhandshake.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-[#00c896] transition-colors border border-white/10 hover:border-[#00c896]/30 px-2.5 py-1 rounded-full"
+                  >
+                    公式サイト
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                </div>
                 <p className="text-gray-300 text-sm leading-relaxed mb-6">
                   2014年創業。「大学キャリアセンターと学生と企業をつなぐ」プラットフォームとして急成長。
                   学生は無料、大学・企業が課金するビジネスモデルで、全米トップ大学の90%以上が導入。

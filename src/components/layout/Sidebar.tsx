@@ -124,9 +124,6 @@ const navItems = [
       </svg>
     ),
   },
-];
-
-const bottomItems = [
   {
     href: "/career-center",
     label: "キャリアセンター",
@@ -136,6 +133,9 @@ const bottomItems = [
       </svg>
     ),
   },
+];
+
+const bottomItems = [
   {
     href: "/import",
     label: "データインポート",

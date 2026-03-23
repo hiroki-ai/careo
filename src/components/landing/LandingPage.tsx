@@ -367,7 +367,7 @@ export function LandingPage() {
   const [badgeText, setBadgeText] = useState(DEFAULT_BADGE);
   const [heroSubtext, setHeroSubtext] = useState(DEFAULT_HERO_SUBTEXT);
   const [afterItems, setAfterItems] = useState<string[]>(DEFAULT_AFTER_ITEMS);
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [openFaqs, setOpenFaqs] = useState<Set<number>>(new Set());
   const [scrolled, setScrolled] = useState(false);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
@@ -1063,21 +1063,21 @@ export function LandingPage() {
             {faqItems.map((item, i) => (
               <div
                 key={i}
-                className={`bg-white border rounded-2xl overflow-hidden transition-all duration-200 ${openFaq === i ? "border-[#00c896]/40 shadow-sm" : "border-gray-100 hover:border-gray-200"}`}
+                className={`bg-white border rounded-2xl overflow-hidden transition-all duration-200 ${openFaqs.has(i) ? "border-[#00c896]/40 shadow-sm" : "border-gray-100 hover:border-gray-200"}`}
               >
                 <button
                   type="button"
                   className="w-full text-left px-6 py-4 flex items-center justify-between gap-4"
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  onClick={() => setOpenFaqs(prev => { const next = new Set(prev); next.has(i) ? next.delete(i) : next.add(i); return next; })}
                 >
                   <span className="font-semibold text-[#0D0B21] text-sm">{item.q}</span>
-                  <span className={`text-[#00c896] shrink-0 transition-transform duration-200 ${openFaq === i ? "rotate-180" : ""}`}>
+                  <span className={`text-[#00c896] shrink-0 transition-transform duration-200 ${openFaqs.has(i) ? "rotate-180" : ""}`}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
                     </svg>
                   </span>
                 </button>
-                <div className={`overflow-hidden transition-all duration-300 ${openFaq === i ? "max-h-48" : "max-h-0"}`}>
+                <div className={`overflow-hidden transition-all duration-300 ${openFaqs.has(i) ? "max-h-48" : "max-h-0"}`}>
                   <div className="px-6 pb-5 text-sm text-gray-600 leading-relaxed border-t border-gray-50 pt-3">
                     {item.a}
                   </div>
