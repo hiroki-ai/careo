@@ -66,8 +66,27 @@ export default function ChatPage() {
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
+
+  // iOS キーボード表示時にコンテナ高さを動的調整
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const handler = () => {
+      if (containerRef.current) {
+        containerRef.current.style.height = `${vv.height}px`;
+      }
+    };
+    vv.addEventListener("resize", handler);
+    vv.addEventListener("scroll", handler);
+    handler();
+    return () => {
+      vv.removeEventListener("resize", handler);
+      vv.removeEventListener("scroll", handler);
+    };
+  }, []);
 
   // 保存済み履歴を読み込む（初回のみ）
   useEffect(() => {
@@ -409,9 +428,10 @@ export default function ChatPage() {
   // カレオが知っているデータ数
   const dataCount = companies.length + esList.length + interviews.length + visits.length + tests.length;
   const showSuggestions = localMessages.length <= 1 && !isStreaming;
+  const [showQuickReplies, setShowQuickReplies] = useState(false);
 
   return (
-    <div className="flex flex-col flex-1 overflow-hidden">
+    <div ref={containerRef} className="flex flex-col overflow-hidden chat-container">
       {/* ヘッダー */}
       <div className="flex items-center gap-3 px-4 md:px-6 py-3 border-b border-gray-100 bg-white shrink-0">
         <KAREO_AVATAR />
@@ -612,8 +632,36 @@ export default function ChatPage() {
       </div>
 
       {/* 入力エリア */}
-      <div className="px-4 py-3 bg-white border-t border-gray-100 shrink-0">
-        <div className="flex items-end gap-2 bg-gray-50 rounded-2xl border border-gray-200 px-3 py-2 focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-200 transition-all">
+      <div className="bg-white border-t border-gray-100 shrink-0">
+        {/* クイック返信チップス */}
+        {showQuickReplies && !isStreaming && (
+          <div className="px-4 pt-2 pb-1 flex gap-2 overflow-x-auto scrollbar-hide">
+            {SUGGESTIONS.map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => { sendMessage(s); setShowQuickReplies(false); }}
+                className="text-xs bg-[#00c896]/10 border border-[#00c896]/30 text-[#00a87e] rounded-full px-3 py-1.5 whitespace-nowrap font-medium hover:bg-[#00c896]/20 transition-colors shrink-0"
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        )}
+        <div className="px-4 py-3 flex items-end gap-2 bg-gray-50 mx-3 mb-3 rounded-2xl border border-gray-200 focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-200 transition-all">
+          {/* クイック返信トグル */}
+          <button
+            type="button"
+            onClick={() => setShowQuickReplies(v => !v)}
+            title="よく使うフレーズ"
+            className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mb-0.5 transition-colors ${
+              showQuickReplies ? "bg-[#00c896]/20 text-[#00a87e]" : "text-gray-400 hover:text-[#00c896] hover:bg-[#00c896]/10"
+            }`}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </button>
           {/* 音声入力ボタン */}
           <button
             onClick={toggleRecording}
@@ -650,7 +698,7 @@ export default function ChatPage() {
             </svg>
           </button>
         </div>
-        <p className="text-[10px] text-gray-300 text-center mt-1.5">
+        <p className="text-[10px] text-gray-300 text-center mt-1 mb-1">
           相談内容はあなた専用のAI分析に活かされます
         </p>
       </div>

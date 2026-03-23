@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { QuickAddModal } from "./QuickAddModal";
 
 function hasChatToday(): boolean {
   try {
@@ -23,14 +24,15 @@ const mainItems = [
     ),
   },
   {
-    href: "/companies",
-    label: "企業",
+    href: "/deadlines",
+    label: "締切",
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
       </svg>
     ),
   },
+  // center: QuickAdd FAB (rendered separately)
   {
     href: "/chat",
     label: "コーチ",
@@ -40,18 +42,11 @@ const mainItems = [
       </svg>
     ),
   },
-  {
-    href: "/report",
-    label: "PDCA",
-    icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-      </svg>
-    ),
-  },
 ];
 
 const moreItems = [
+  { href: "/companies", label: "企業管理", emoji: "🏢" },
+  { href: "/report", label: "PDCA", emoji: "📊" },
   { href: "/calendar", label: "カレンダー", emoji: "📅" },
   { href: "/career-center", label: "キャリアセンター", emoji: "🖨️" },
   { href: "/es", label: "ES管理", emoji: "📄" },
@@ -59,7 +54,6 @@ const moreItems = [
   { href: "/ob-visits", label: "OB/OG訪問", emoji: "🤝" },
   { href: "/tests", label: "筆記試験", emoji: "📝" },
   { href: "/career", label: "自己分析", emoji: "💡" },
-  { href: "/deadlines", label: "締切一覧", emoji: "📅" },
   { href: "/groups", label: "友達と就活", emoji: "👫" },
   { href: "/settings", label: "設定", emoji: "⚙️" },
 ];
@@ -68,6 +62,7 @@ export function BottomNav() {
   const pathname = usePathname();
   const [isAuth, setIsAuth] = useState(false);
   const [showMore, setShowMore] = useState(false);
+  const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [chatBadge, setChatBadge] = useState(false);
 
   useEffect(() => {
@@ -93,6 +88,10 @@ export function BottomNav() {
 
   return (
     <>
+      {/* QuickAdd モーダル */}
+      <QuickAddModal isOpen={showQuickAdd} onClose={() => setShowQuickAdd(false)} />
+
+      {/* More メニュー オーバーレイ */}
       {showMore && (
         <div
           className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
@@ -100,6 +99,7 @@ export function BottomNav() {
         />
       )}
 
+      {/* More メニュー シート */}
       {showMore && (
         <div className="fixed bottom-16 left-0 right-0 z-50 bg-white border-t border-gray-100 rounded-t-3xl shadow-2xl md:hidden">
           <div className="flex justify-center pt-3 pb-1">
@@ -130,10 +130,46 @@ export function BottomNav() {
         </div>
       )}
 
+      {/* ボトムナビ本体 */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-gray-100 md:hidden safe-area-padding-bottom">
         <div className="flex items-center justify-around h-16 px-1">
-          {mainItems.map((item) => {
+          {/* ホーム・締切 */}
+          {mainItems.slice(0, 2).map((item) => {
             const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-2 rounded-xl transition-colors relative ${
+                  isActive ? "text-[#00c896]" : "text-gray-400"
+                }`}
+              >
+                {isActive && (
+                  <span className="absolute top-0.5 left-1/2 -translate-x-1/2 w-5 h-0.5 bg-[#00c896] rounded-full" />
+                )}
+                {item.icon}
+                <span className="text-[10px] font-medium">{item.label}</span>
+              </Link>
+            );
+          })}
+
+          {/* 中央 FAB（クイック追加） */}
+          <button
+            type="button"
+            onClick={() => setShowQuickAdd(true)}
+            className="relative flex flex-col items-center justify-center flex-1"
+          >
+            <span className="w-12 h-12 bg-[#00c896] rounded-2xl flex items-center justify-center shadow-lg shadow-[#00c896]/40 -mt-4 active:scale-95 transition-transform">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+              </svg>
+            </span>
+            <span className="text-[10px] font-medium text-gray-400 mt-0.5">記録</span>
+          </button>
+
+          {/* コーチ */}
+          {mainItems.slice(2).map((item) => {
+            const isActive = pathname.startsWith(item.href);
             const showBadge = item.href === "/chat" && chatBadge && !isActive;
             return (
               <Link
@@ -157,6 +193,7 @@ export function BottomNav() {
             );
           })}
 
+          {/* もっと */}
           <button
             type="button"
             onClick={() => setShowMore((v) => !v)}

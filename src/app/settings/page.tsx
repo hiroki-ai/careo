@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useProfile } from "@/hooks/useProfile";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { Button } from "@/components/ui/Button";
 import { createClient } from "@/lib/supabase/client";
@@ -11,6 +12,7 @@ import { JOB_SEARCH_STAGE_LABELS } from "@/types";
 export default function SettingsPage() {
   const router = useRouter();
   const { profile, loading, saveProfile } = useProfile();
+  const { permission, isSubscribed, isSupported, loading: pushLoading, subscribe, unsubscribe } = usePushNotifications();
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -109,6 +111,33 @@ export default function SettingsPage() {
           </div>
         </div>
       </section>
+
+      {/* 通知設定 */}
+      {isSupported && (
+        <section className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
+          <h2 className="font-semibold text-gray-900 mb-1">プッシュ通知</h2>
+          <p className="text-xs text-gray-400 mb-4">ES締切・面接前日にお知らせします</p>
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <p className="text-sm font-medium text-gray-700">締切・面接リマインダー</p>
+              <p className="text-xs text-gray-400">
+                {permission === "denied" ? "ブラウザの設定から通知を許可してください" : isSubscribed ? "オン" : "オフ"}
+              </p>
+            </div>
+            {permission !== "denied" && (
+              <button
+                type="button"
+                title={isSubscribed ? "通知をオフにする" : "通知をオンにする"}
+                disabled={pushLoading}
+                onClick={isSubscribed ? unsubscribe : subscribe}
+                className={`relative w-12 h-6 rounded-full transition-colors ${isSubscribed ? "bg-[#00c896]" : "bg-gray-200"} disabled:opacity-60`}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${isSubscribed ? "translate-x-6" : ""}`} />
+              </button>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* アカウント */}
       <section className="bg-white rounded-xl border border-gray-100 p-6">
