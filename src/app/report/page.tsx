@@ -8,6 +8,7 @@ import { useInterviews } from "@/hooks/useInterviews";
 import { useObVisits } from "@/hooks/useObVisits";
 import { useAptitudeTests } from "@/hooks/useAptitudeTests";
 import { useActionItems } from "@/hooks/useActionItems";
+import { useToast } from "@/components/ui/Toast";
 
 interface PdcaResult {
   plan: { weeklyGoal: string; taskCompletion: string };
@@ -16,26 +17,15 @@ interface PdcaResult {
   act: { improvements: string[]; nextWeekFocus: string; encouragement: string };
 }
 
-async function fetchAI<T>(url: string, body: unknown, retries = 1): Promise<T | null> {
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    try {
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const text = await res.text();
-      try {
-        return JSON.parse(text);
-      } catch {
-        if (attempt === retries) return null;
-      }
-    } catch {
-      if (attempt === retries) return null;
-      await new Promise(r => setTimeout(r, 2000));
-    }
-  }
-  return null;
+async function fetchAI<T>(url: string, body: unknown): Promise<T | null> {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const text = await res.text();
+  if (!text) return null;
+  return JSON.parse(text) as T;
 }
 
 function ScoreRing({ score }: { score: number }) {
@@ -71,6 +61,7 @@ export default function ReportPage() {
   const { visits } = useObVisits();
   const { tests } = useAptitudeTests();
   const { pendingItems, completedItems } = useActionItems();
+  const { showToast } = useToast();
 
   const [pdca, setPdca] = useState<PdcaResult | null>(null);
   const [pdcaLoading, setPdcaLoading] = useState(false);
@@ -87,24 +78,34 @@ export default function ReportPage() {
   const runPdca = async () => {
     setPdcaLoading(true);
     setPdcaError(false);
-    const esListSlim = esList.map(({ questions: _q, ...rest }) => rest);
-    const result = await fetchAI<PdcaResult>("/api/ai/pdca", {
-      companies,
-      esList: esListSlim,
-      interviews,
-      profile,
-      pendingActions: pendingItems,
-      completedActions: completedItems,
-      obVisits: visits,
-      aptitudeTests: tests,
-    });
-    if (result && result.check) {
-      setPdca(result);
-      try { localStorage.setItem("careo_last_pdca", JSON.stringify(result)); } catch { /* ignore */ }
-    } else {
+    try {
+      const esListSlim = esList.map(({ questions: _q, ...rest }) => rest);
+      const result = await fetchAI<PdcaResult & { error?: string }>("/api/ai/pdca", {
+        companies,
+        esList: esListSlim,
+        interviews,
+        profile,
+        pendingActions: pendingItems,
+        completedActions: completedItems,
+        obVisits: visits,
+        aptitudeTests: tests,
+      });
+      if (result?.error) {
+        showToast(result.error.includes("多すぎ") ? result.error : "分析に失敗しました。しばらく後に再試行してください。", "error");
+        setPdcaError(true);
+      } else if (result?.check) {
+        setPdca(result);
+        try { localStorage.setItem("careo_last_pdca", JSON.stringify(result)); } catch { /* ignore */ }
+      } else {
+        setPdcaError(true);
+      }
+    } catch (err) {
+      console.error("[pdca]", err);
+      showToast("分析に失敗しました。しばらく後に再試行してください。", "error");
       setPdcaError(true);
+    } finally {
+      setPdcaLoading(false);
     }
-    setPdcaLoading(false);
   };
 
   if (profileLoading) {
