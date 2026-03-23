@@ -1327,6 +1327,16 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* ── キャリアセンター向けフローティングボタン ─────────────────────────── */}
+      <Link
+        href="/for-career-center"
+        className="fixed bottom-6 right-6 z-40 flex items-center gap-2 bg-white text-[#0D0B21] text-xs font-bold px-4 py-2.5 rounded-full border border-gray-200 shadow-lg hover:border-[#00c896]/40 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
+      >
+        <span className="text-base">🏫</span>
+        <span className="hidden sm:inline">大学・キャリアセンターの方へ</span>
+        <span className="sm:hidden">大学の方へ</span>
+      </Link>
+
       {/* ── Footer ─────────────────────────────────────────────────────────── */}
       <footer className="px-6 py-8 border-t border-gray-100">
         <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
