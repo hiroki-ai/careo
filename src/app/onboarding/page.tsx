@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useProfile } from "@/hooks/useProfile";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { CsvImportModal } from "@/components/companies/CsvImportModal";
-import { createClient } from "@/lib/supabase/client";
 import { UserProfile } from "@/types";
 
 type Step = 1 | 2 | 3;
@@ -16,8 +15,6 @@ export default function OnboardingPage() {
   const router = useRouter();
   const { saveProfile } = useProfile();
   const [step, setStep] = useState<Step>(1);
-  const [companyName, setCompanyName] = useState("");
-  const [saving, setSaving] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [importedCount, setImportedCount] = useState(0);
 
@@ -26,20 +23,6 @@ export default function OnboardingPage() {
     setStep(2);
   };
 
-  const handleCompanySave = async () => {
-    if (companyName.trim()) {
-      setSaving(true);
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      await supabase.from("companies").insert({
-        name: companyName.trim(),
-        status: "WISHLIST",
-        user_id: user!.id,
-      });
-      setSaving(false);
-    }
-    setStep(3);
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -76,52 +59,34 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {/* Step 2: 最初の企業登録 */}
+        {/* Step 2: データインポート */}
         {step === 2 && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
             <div className="text-center mb-8">
               <div className="w-12 h-12 bg-[#00c896]/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                <span className="text-2xl">🏢</span>
+                <span className="text-2xl">📥</span>
               </div>
-              <p className="text-gray-900 font-semibold">企業を登録しよう</p>
-              <p className="text-sm text-gray-400 mt-1">後でいくらでも追加・変更できます</p>
+              <p className="text-gray-900 font-semibold">今まで管理していたデータを取り込もう</p>
+              <p className="text-sm text-gray-400 mt-1">NotionやスプレッドシートのデータをそのままCareoに移行できます</p>
             </div>
             <div className="space-y-4">
-              {/* CSV/PDF インポート */}
               <button
                 type="button"
                 onClick={() => setImportOpen(true)}
-                className="w-full py-3.5 rounded-xl font-semibold border-2 border-[#00c896] text-[#00c896] hover:bg-[#00c896]/5 transition-colors flex items-center justify-center gap-2"
+                className="w-full py-4 rounded-xl font-semibold border-2 border-[#00c896] text-[#00c896] hover:bg-[#00c896]/5 transition-colors flex items-center justify-center gap-2 text-base"
               >
-                <span>📥</span>
-                NotionやスプレッドシートからCSV・PDFでインポート
+                <span>📂</span>
+                CSV・PDFでインポートする
               </button>
-              <p className="text-xs text-gray-400 text-center -mt-2">
+              <p className="text-xs text-gray-400 text-center">
                 AIが企業名・ステータス・OB訪問・筆記試験を自動で読み取ります
               </p>
-
-              {/* 区切り */}
-              <div className="flex items-center gap-3">
-                <div className="flex-1 h-px bg-gray-200" />
-                <span className="text-xs text-gray-400">または1社だけ入力</span>
-                <div className="flex-1 h-px bg-gray-200" />
-              </div>
-
-              <input
-                type="text"
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-                placeholder="例: Google Japan, 株式会社サイバーエージェント"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896]"
-                onKeyDown={(e) => e.key === "Enter" && handleCompanySave()}
-              />
               <button
-                onClick={handleCompanySave}
-                disabled={saving}
-                className="w-full py-3 rounded-xl font-semibold text-white transition-colors"
-                style={{ backgroundColor: "#00c896" }}
+                type="button"
+                onClick={() => setStep(3)}
+                className="w-full py-3 rounded-xl text-sm text-gray-400 hover:text-gray-600 transition-colors"
               >
-                {saving ? "登録中..." : companyName.trim() ? "登録して次へ →" : "スキップ →"}
+                スキップして後で追加する →
               </button>
             </div>
           </div>
@@ -155,9 +120,7 @@ export default function OnboardingPage() {
                   <p className="text-sm text-gray-700 leading-relaxed">
                     {importedCount > 0
                       ? `${importedCount}社をインポートしましたね。データがそろったので、すぐにAI分析を始められます。ダッシュボードで「今週何をすべきか」を確認しましょう。`
-                      : companyName
-                      ? `${companyName}を目標に登録しましたね。まずはダッシュボードで今週のアクションプランを確認しましょう。AIが選考状況を分析して、「今何をすべきか」を具体的に教えます。`
-                      : `登録ありがとうございます！ダッシュボードで企業を登録したら、AIが選考状況を分析して「今週何をすべきか」を具体的に教えます。まずは気になる企業を追加してみましょう。`
+                      : `登録ありがとうございます！ダッシュボードで企業を追加したら、AIが選考状況を分析して「今週何をすべきか」を具体的に教えます。まずは気になる企業を追加してみましょう。`
                     }
                   </p>
                 </div>
