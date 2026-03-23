@@ -11,10 +11,8 @@ import { useActionItems } from "@/hooks/useActionItems";
 import { useChat } from "@/hooks/useChat";
 import { useToast } from "@/components/ui/Toast";
 import { useDeadlineNotifications } from "@/hooks/useDeadlineNotifications";
-import { StatusBadge, Badge } from "@/components/ui/Badge";
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { MiniCalendar } from "@/components/dashboard/MiniCalendar";
-import { KareoWidget } from "@/components/dashboard/KareoWidget";
 import { InsightsWidget } from "@/components/dashboard/InsightsWidget";
 import { PostOfferWidget } from "@/components/dashboard/PostOfferWidget";
 import { createClient } from "@/lib/supabase/client";
@@ -100,7 +98,7 @@ function DashboardContent() {
     return acc;
   }, {} as Record<string, number>);
 
-  // カレンダーイベント
+  // 締切・面接イベント
   const calendarEvents = [
     ...esList
       .filter((e) => e.deadline && e.status === "DRAFT")
@@ -129,7 +127,6 @@ function DashboardContent() {
     .sort((a, b) => a.days - b.days)
     .slice(0, 3);
 
-  // ブラウザ通知（締切3日以内）
   useDeadlineNotifications(calendarEvents.filter(e => {
     const d = daysUntil(e.date);
     return d >= 0 && d <= 3;
@@ -212,9 +209,9 @@ function DashboardContent() {
   const hasItems = pendingItems.length > 0 || completedItems.length > 0;
 
   return (
-    <div className="p-4 md:p-6 min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
+    <div className="p-4 md:p-5 bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
       {/* ページヘッダー */}
-      <div className="flex items-center justify-between mb-4 md:mb-5">
+      <div className="flex items-center justify-between mb-3">
         <div>
           <h1 className="text-xl md:text-2xl font-bold text-gray-900">ダッシュボード</h1>
           {profile && (
@@ -232,16 +229,16 @@ function DashboardContent() {
       </div>
 
       {/* ステータスサマリー */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 mb-4 md:mb-5">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
         {[
-          { label: "選考中", count: companies.filter(c => !["OFFERED","REJECTED","WISHLIST"].includes(c.status)).length, gradient: "from-teal-500 to-emerald-500", bg: "bg-gradient-to-br from-teal-50/60 to-emerald-50/40", border: "border-teal-100", text: "text-teal-600" },
-          { label: "内定", count: statusCounts["OFFERED"] ?? 0, gradient: "from-emerald-500 to-green-500", bg: "bg-gradient-to-br from-emerald-50 to-green-50", border: "border-emerald-100", text: "text-emerald-600" },
-          { label: "ES提出待ち", count: esList.filter(e => e.status === "DRAFT").length, gradient: "from-amber-500 to-orange-500", bg: "bg-gradient-to-br from-amber-50 to-orange-50", border: "border-amber-100", text: "text-amber-600" },
-          { label: "気になる", count: statusCounts["WISHLIST"] ?? 0, gradient: "from-gray-400 to-slate-500", bg: "bg-gradient-to-br from-gray-50 to-slate-50", border: "border-gray-200", text: "text-gray-600" },
+          { label: "選考中", count: companies.filter(c => !["OFFERED","REJECTED","WISHLIST"].includes(c.status)).length, gradient: "from-teal-500 to-emerald-500", bg: "bg-gradient-to-br from-teal-50/60 to-emerald-50/40", border: "border-teal-100" },
+          { label: "内定", count: statusCounts["OFFERED"] ?? 0, gradient: "from-emerald-500 to-green-500", bg: "bg-gradient-to-br from-emerald-50 to-green-50", border: "border-emerald-100" },
+          { label: "ES提出待ち", count: esList.filter(e => e.status === "DRAFT").length, gradient: "from-amber-500 to-orange-500", bg: "bg-gradient-to-br from-amber-50 to-orange-50", border: "border-amber-100" },
+          { label: "気になる", count: statusCounts["WISHLIST"] ?? 0, gradient: "from-gray-400 to-slate-500", bg: "bg-gradient-to-br from-gray-50 to-slate-50", border: "border-gray-200" },
         ].map((item) => (
-          <div key={item.label} className={`${item.bg} border ${item.border} rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow`}>
-            <p className="text-xs font-medium text-gray-500 mb-1">{item.label}</p>
-            <p className={`text-3xl font-bold bg-gradient-to-r ${item.gradient} bg-clip-text text-transparent`}>{item.count}</p>
+          <div key={item.label} className={`${item.bg} border ${item.border} rounded-xl p-3 shadow-sm`}>
+            <p className="text-xs font-medium text-gray-500 mb-0.5">{item.label}</p>
+            <p className={`text-2xl font-bold bg-gradient-to-r ${item.gradient} bg-clip-text text-transparent`}>{item.count}</p>
           </div>
         ))}
       </div>
@@ -249,25 +246,25 @@ function DashboardContent() {
       {/* 今日のカレオコーチ CTA */}
       <DailyCoachBanner profile={profile} />
 
-      {/* メインコンテンツ: 3列 */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
+      {/* メインコンテンツ: 2列 */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
 
         {/* 左: Next Action チェックリスト */}
-        <div className="md:col-span-4">
-          <div className="flex items-center justify-between mb-3">
+        <div className="md:col-span-7">
+          <div className="flex items-center justify-between mb-2">
             <h2 className="font-semibold text-gray-900 text-sm flex items-center gap-1.5">🎯 <span>Next Action</span></h2>
             <Button variant="ghost" size="sm" onClick={() => fetchAiAdvice()} disabled={aiLoading}>
               {aiLoading ? "分析中..." : "再分析"}
             </Button>
           </div>
           {aiSummary && (
-            <p className="text-xs text-gray-400 mb-3 px-1">{aiSummary}</p>
+            <p className="text-xs text-gray-400 mb-2 px-1">{aiSummary}</p>
           )}
 
           {(aiLoading || itemsLoading) && (
             <div className="space-y-2">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-14 bg-gray-100 rounded-xl animate-pulse" />
+                <div key={i} className="h-12 bg-gray-100 rounded-xl animate-pulse" />
               ))}
             </div>
           )}
@@ -297,12 +294,12 @@ function DashboardContent() {
                 </label>
               ))}
               {completedItems.length > 0 && (
-                <div className="mt-2">
-                  <p className="text-[10px] text-gray-400 mb-1.5 px-1">完了済み</p>
+                <div className="mt-1">
+                  <p className="text-[10px] text-gray-400 mb-1 px-1">完了済み</p>
                   {completedItems.map((item) => (
                     <label
                       key={item.id}
-                      className="flex items-center gap-2.5 border-l-4 border-l-gray-200 bg-gray-50 rounded-r-xl p-2.5 mb-1.5 cursor-pointer opacity-60"
+                      className="flex items-center gap-2.5 border-l-4 border-l-gray-200 bg-gray-50 rounded-r-xl p-2 mb-1 cursor-pointer opacity-60"
                     >
                       <input
                         type="checkbox"
@@ -319,32 +316,26 @@ function DashboardContent() {
           )}
 
           {!aiLoading && !itemsLoading && !hasItems && (
-            <div className="text-center py-8 text-gray-400">
+            <div className="text-center py-6 text-gray-400">
               <p className="text-xs mb-3">プロフィールを設定するとAIがアドバイスします</p>
               <Button size="sm" onClick={() => fetchAiAdvice([])}>AIアドバイスを取得</Button>
             </div>
           )}
         </div>
 
-        {/* 中: カレンダー + 締切（モバイルは締切のみ） */}
-        <div className="md:col-span-4">
-          {/* カレンダーはPCのみ */}
-          <div className="hidden md:block">
-            <h2 className="font-semibold text-gray-900 text-sm mb-3">📅 カレンダー</h2>
-            <MiniCalendar events={calendarEvents} />
-          </div>
-
-          {/* 締切 */}
-          <div className="md:mt-3">
+        {/* 右: 直近の締切 + 気づき */}
+        <div className="md:col-span-5 space-y-4">
+          {/* 直近の締切 */}
+          <div>
             <div className="flex items-center justify-between mb-2">
               <h2 className="font-semibold text-gray-900 text-sm">📅 直近の締切</h2>
-              <Link href="/deadlines" className="text-[10px] text-[#00c896] hover:underline">すべて見る</Link>
+              <Link href="/calendar" className="text-[10px] text-[#00c896] hover:underline">カレンダーを見る</Link>
             </div>
             {upcomingDeadlines.length > 0 ? (
               <div className="space-y-1.5">
                 {upcomingDeadlines.map((d) => (
                   <Link key={`${d.type}-${d.id}`} href={d.link}>
-                    <div className={`flex items-center justify-between bg-white rounded-xl border p-3 hover:bg-gray-50 transition-colors ${d.days <= 3 ? "border-red-200" : "border-gray-100"}`}>
+                    <div className={`flex items-center justify-between bg-white rounded-xl border p-2.5 hover:bg-gray-50 transition-colors ${d.days <= 3 ? "border-red-200" : "border-gray-100"}`}>
                       <div className="flex items-center gap-2 min-w-0">
                         <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0 ${d.type === "ES" ? "bg-[#00c896]/10 text-[#00a87e]" : "bg-purple-100 text-purple-700"}`}>
                           {d.type}
@@ -359,42 +350,24 @@ function DashboardContent() {
                 ))}
               </div>
             ) : (
-              <div className="bg-white border border-gray-100 rounded-xl p-4 text-center">
+              <div className="bg-white border border-gray-100 rounded-xl p-3 text-center">
                 <p className="text-xs text-gray-400">直近7日に締切はありません</p>
-                <Link href="/deadlines" className="text-xs text-[#00c896] hover:underline mt-1 block">締切一覧を見る</Link>
+                <Link href="/calendar" className="text-xs text-[#00c896] hover:underline mt-1 block">カレンダーを見る</Link>
               </div>
             )}
           </div>
-        </div>
 
-        {/* 右: カレオ ウィジェット (PC のみ) */}
-        <div className="md:col-span-4 hidden md:block" style={{ height: "480px" }}>
-          <KareoWidget />
+          {/* カレオからの気づき */}
+          <InsightsWidget />
         </div>
       </div>
 
-      {/* 内定後コンテンツ（戦略6）または内定シェア */}
+      {/* 内定後コンテンツ */}
       {companies.filter(c => c.status === "OFFERED").length > 0 && (
-        <PostOfferWidget offeredCompanies={companies.filter(c => c.status === "OFFERED")} />
+        <div className="mt-4">
+          <PostOfferWidget offeredCompanies={companies.filter(c => c.status === "OFFERED")} />
+        </div>
       )}
-
-
-      {/* カレオからの気づき（クロスデータ・インサイト通知）*/}
-      <InsightsWidget />
-
-      {/* PDCAレポートへのリンク */}
-      <div className="mb-4">
-        <Link href="/report" className="flex items-center justify-between bg-white border border-gray-100 rounded-xl px-4 py-3 hover:border-[#00c896]/30 hover:shadow-sm transition-all group">
-          <div className="flex items-center gap-2">
-            <span className="text-base">📊</span>
-            <div>
-              <p className="text-sm font-semibold text-gray-900">週次PDCAレポート</p>
-              <p className="text-xs text-gray-400">AIが就活全体を分析・スコアリング</p>
-            </div>
-          </div>
-          <span className="text-gray-300 group-hover:text-[#00c896] transition-colors">→</span>
-        </Link>
-      </div>
     </div>
   );
 }

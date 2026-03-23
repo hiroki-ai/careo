@@ -52,6 +52,7 @@ const mainItems = [
 ];
 
 const moreItems = [
+  { href: "/calendar", label: "カレンダー", emoji: "📅" },
   { href: "/career-center", label: "キャリアセンター", emoji: "🖨️" },
   { href: "/es", label: "ES管理", emoji: "📄" },
   { href: "/interviews", label: "面接ログ", emoji: "👥" },
