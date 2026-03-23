@@ -194,6 +194,12 @@ export default function CareerCenterLandingPage() {
             </a>
             <a
               href="#contact"
+              className="text-sm font-bold text-[#00c896] border border-[#00c896] px-4 py-2 rounded-xl hover:bg-[#00c896]/10 transition-all hidden md:block"
+            >
+              資料請求
+            </a>
+            <a
+              href="#contact"
               className="lp-btn-primary text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all hover:scale-105"
             >
               提携を検討する
@@ -644,7 +650,7 @@ export default function CareerCenterLandingPage() {
           <div className="text-center mb-12 reveal">
             <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3">Get Started</p>
             <h2 className="text-3xl md:text-4xl font-bold text-[#0D0B21] tracking-tight mb-4">
-              まず、お気軽に<span className="text-[#00c896]">ご相談ください</span>
+              お問い合わせ・<span className="text-[#00c896]">資料請求</span>
             </h2>
             <p className="text-gray-500 text-sm leading-relaxed">
               初回ヒアリングは無料です。30分のオンラインミーティングで、

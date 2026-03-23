@@ -171,11 +171,16 @@ export async function GET(req: NextRequest) {
     messages: [{ role: "user", content: team.prompt(userCount) }],
   });
 
-  const raw = (response.content[0] as { type: string; text: string }).text
+  const rawText = (response.content[0] as { type: string; text: string }).text
     .replace(/```(?:json)?\n?/g, "")
     .replace(/```/g, "")
     .trim();
-  const result = JSON.parse(raw.match(/\{[\s\S]*\}/)?.[0] ?? raw);
+  const jsonStr = rawText.match(/\{[\s\S]*\}/)?.[0] ?? rawText;
+  // 文字列値内の改行をエスケープしてJSONパースエラーを防ぐ
+  const sanitized = jsonStr.replace(/("(?:[^"\\]|\\.)*")/g, (m) =>
+    m.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t")
+  );
+  const result = JSON.parse(sanitized);
 
   const today = new Date().toLocaleDateString("ja-JP", {
     timeZone: "Asia/Tokyo",
