@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useProfile } from "@/hooks/useProfile";
 import { useCompanies } from "@/hooks/useCompanies";
 import { useEs } from "@/hooks/useEs";
@@ -8,6 +9,7 @@ import { useInterviews } from "@/hooks/useInterviews";
 import { useObVisits } from "@/hooks/useObVisits";
 import { useAptitudeTests } from "@/hooks/useAptitudeTests";
 import { useActionItems } from "@/hooks/useActionItems";
+import { inferActionLink } from "@/hooks/useActionItems";
 import { useToast } from "@/components/ui/Toast";
 
 interface PdcaResult {
@@ -230,12 +232,28 @@ export default function ReportPage() {
                 <p className="text-sm font-bold text-[#0D0B21]">{pdca.act.nextWeekFocus}</p>
               </div>
               <ul className="space-y-2">
-                {pdca.act.improvements.map((imp, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                    <span className="w-5 h-5 rounded-full bg-[#00c896]/20 text-[#00a87e] flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">{i + 1}</span>
-                    {imp}
-                  </li>
-                ))}
+                {pdca.act.improvements.map((imp, i) => {
+                  const link = inferActionLink(imp);
+                  return (
+                    <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                      <span className="w-5 h-5 rounded-full bg-[#00c896]/20 text-[#00a87e] flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">{i + 1}</span>
+                      <span className="flex-1">{imp}</span>
+                      {link && (
+                        link.external ? (
+                          <a href={link.href} target="_blank" rel="noopener noreferrer"
+                            className="shrink-0 text-xs font-semibold text-[#00a87e] bg-[#00c896]/10 px-2.5 py-1 rounded-lg hover:bg-[#00c896]/20 transition-colors whitespace-nowrap">
+                            {link.label}
+                          </a>
+                        ) : (
+                          <Link href={link.href}
+                            className="shrink-0 text-xs font-semibold text-[#00a87e] bg-[#00c896]/10 px-2.5 py-1 rounded-lg hover:bg-[#00c896]/20 transition-colors whitespace-nowrap">
+                            {link.label}
+                          </Link>
+                        )
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </div>
