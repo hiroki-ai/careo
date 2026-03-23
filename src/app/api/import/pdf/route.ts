@@ -4,7 +4,6 @@ import { cookies } from "next/headers";
 import Anthropic from "@anthropic-ai/sdk";
 
 export async function POST(request: NextRequest) {
-  // 認証チェック
   const cookieStore = await cookies();
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -35,38 +34,55 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "PDFからテキストを抽出できませんでした。スキャン画像のみのPDFは非対応です。" }, { status: 400 });
   }
 
-  // Claude でデータ抽出
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
 
-  const prompt = `以下は就活生のPDFから抽出したテキストです。このテキストから企業の就活管理情報を抽出してJSON形式で返してください。
+  const prompt = `以下は就活生のPDFから抽出したテキストです。就活管理に関わる情報をすべて抽出して、以下のJSON形式で返してください。
 
-抽出するフィールド：
-- name: 企業名（必須）
-- industry: 業界・業種（わかる場合）
-- status: 選考ステータス（以下から最も近いものを選ぶ）
-  WISHLIST=気になる/未応募, APPLIED=応募済み, DOCUMENT=書類選考中,
-  INTERVIEW_1=1次面接, INTERVIEW_2=2次面接, FINAL=最終面接,
-  OFFERED=内定, REJECTED=不採用,
-  INTERN_APPLYING=インターン応募, INTERN=インターン中
-  （ステータス不明の場合は WISHLIST）
-- notes: メモ・備考（面接日程・気づき・重要情報など。簡潔に）
+抽出対象：
+1. companies（企業・選考）
+   - name: 企業名（必須）
+   - industry: 業界（わかれば）
+   - status: WISHLIST/APPLIED/DOCUMENT/INTERVIEW_1/INTERVIEW_2/FINAL/OFFERED/REJECTED/INTERN_APPLYING/INTERN（不明はWISHLIST）
+   - notes: 締切・メモ等
+
+2. obVisits（OB訪問・会社説明会・インターン参加記録）
+   - companyName: 企業名（必須）
+   - purpose: ob_visit/info_session/internship（不明はob_visit）
+   - visitedAt: 日付（YYYY-MM-DD、不明は""）
+   - personName: 訪問した人の名前（わかれば）
+   - insights: 気づき・メモ
+   - impression: positive/neutral/negative（不明は"neutral"）
+
+3. tests（筆記試験・適性検査）
+   - companyName: 企業名（必須）
+   - testType: SPI/TG-WEB/玉手箱/CAB/GAB/SCOA/その他
+   - testDate: 日付（YYYY-MM-DD、不明は""）
+   - result: PASS/FAIL/PENDING（不明はPENDING）
+   - notes: メモ
+
+4. interviews（面接記録）
+   - companyName: 企業名（必須）
+   - round: 面接回数（数値、不明は1）
+   - scheduledAt: 日付（YYYY-MM-DD、不明は""）
+   - result: PASS/FAIL/PENDING（不明はPENDING）
+   - notes: 質問・フィードバック等のメモ
 
 ルール：
-- 企業名が明確でないものは含めない
-- 同じ企業の重複は除く
-- 企業名以外のテキスト（学校名・個人名・サービス名等）は含めない
-- 就活と無関係な情報（住所・電話番号等）はnotesに入れない
+- 企業名が不明確なものは含めない
+- 同一情報の重複は除く
+- 就活と無関係な情報は含めない
+- 情報がない項目は空配列 []
 
-PDFテキスト：
+PDFテキスト（先頭6000文字）：
 ${pdfText.slice(0, 6000)}
 
-以下の形式でJSONのみを返してください（他の説明文は不要）：
-{"companies":[{"name":"...","industry":"...","status":"WISHLIST","notes":"..."}]}`;
+JSON形式のみで返答（説明文不要）：
+{"companies":[...],"obVisits":[...],"tests":[...],"interviews":[...]}`;
 
   try {
     const message = await anthropic.messages.create({
       model: "claude-haiku-4-5-20251001",
-      max_tokens: 2048,
+      max_tokens: 3000,
       messages: [{ role: "user", content: prompt }],
     });
 
@@ -75,10 +91,20 @@ ${pdfText.slice(0, 6000)}
     const match = raw.match(/\{[\s\S]*\}/);
     if (!match) throw new Error("JSON not found");
 
-    const parsed = JSON.parse(match[0]) as { companies: { name: string; industry: string; status: string; notes: string }[] };
-    const companies = (parsed.companies ?? []).filter(c => c.name?.trim());
+    const parsed = JSON.parse(match[0]) as {
+      companies?: unknown[];
+      obVisits?: unknown[];
+      tests?: unknown[];
+      interviews?: unknown[];
+    };
 
-    return NextResponse.json({ companies, extractedChars: pdfText.length });
+    return NextResponse.json({
+      companies: parsed.companies ?? [],
+      obVisits: parsed.obVisits ?? [],
+      tests: parsed.tests ?? [],
+      interviews: parsed.interviews ?? [],
+      extractedChars: pdfText.length,
+    });
   } catch {
     return NextResponse.json({ error: "AI解析に失敗しました。もう一度お試しください。" }, { status: 500 });
   }

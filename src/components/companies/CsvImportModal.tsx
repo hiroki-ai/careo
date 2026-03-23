@@ -3,35 +3,32 @@
 import { useState, useRef, useCallback } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
-import { Company, CompanyStatus, COMPANY_STATUS_LABELS } from "@/types";
+import { Company, CompanyStatus } from "@/types";
+import { ImportReviewModal, ImportData, ImportCompany } from "./ImportReviewModal";
 
 // ─── ステータス自動変換マップ ─────────────────────────────────────────────────
 
 const STATUS_ALIASES: Record<string, CompanyStatus> = {
-  // 気になる
-  気になる: "WISHLIST", wishlist: "WISHLIST", "want to apply": "WISHLIST", 検討中: "WISHLIST", 未応募: "WISHLIST",
-  // インターン系
+  気になる: "WISHLIST", wishlist: "WISHLIST", 検討中: "WISHLIST", 未応募: "WISHLIST",
   インターン応募: "INTERN_APPLYING", インターン選考: "INTERN_APPLYING", intern_applying: "INTERN_APPLYING",
   インターン書類: "INTERN_DOCUMENT", intern_document: "INTERN_DOCUMENT",
   "インターン1次": "INTERN_INTERVIEW_1", "インターン一次": "INTERN_INTERVIEW_1",
   "インターン2次": "INTERN_INTERVIEW_2", "インターン二次": "INTERN_INTERVIEW_2",
   インターン最終: "INTERN_FINAL", intern_final: "INTERN_FINAL",
   インターン中: "INTERN", インターン合格: "INTERN", intern: "INTERN",
-  // 本選考
   応募済み: "APPLIED", 応募: "APPLIED", エントリー済み: "APPLIED", applied: "APPLIED",
   書類選考中: "DOCUMENT", 書類: "DOCUMENT", 書類選考: "DOCUMENT", document: "DOCUMENT",
-  "1次面接": "INTERVIEW_1", 一次面接: "INTERVIEW_1", "1次": "INTERVIEW_1", interview1: "INTERVIEW_1", interview_1: "INTERVIEW_1",
-  "2次面接": "INTERVIEW_2", 二次面接: "INTERVIEW_2", "2次": "INTERVIEW_2", interview2: "INTERVIEW_2", interview_2: "INTERVIEW_2",
+  "1次面接": "INTERVIEW_1", 一次面接: "INTERVIEW_1", "1次": "INTERVIEW_1", interview1: "INTERVIEW_1",
+  "2次面接": "INTERVIEW_2", 二次面接: "INTERVIEW_2", "2次": "INTERVIEW_2", interview2: "INTERVIEW_2",
   最終面接: "FINAL", 最終: "FINAL", final: "FINAL",
-  内定: "OFFERED", 内定承諾: "OFFERED", 承諾: "OFFERED", offered: "OFFERED",
-  不採用: "REJECTED", ng: "REJECTED", "NG": "REJECTED", rejected: "REJECTED", 落選: "REJECTED",
+  内定: "OFFERED", 内定承諾: "OFFERED", offered: "OFFERED",
+  不採用: "REJECTED", ng: "REJECTED", rejected: "REJECTED", 落選: "REJECTED",
 };
 
 const parseStatus = (raw: string): CompanyStatus => {
-  const normalized = raw.trim().toLowerCase().replace(/\s+/g, "");
-  // 完全一致（大文字小文字区別なし）
+  const n = raw.trim().toLowerCase().replace(/\s+/g, "");
   for (const [key, val] of Object.entries(STATUS_ALIASES)) {
-    if (normalized === key.toLowerCase()) return val;
+    if (n === key.toLowerCase()) return val;
   }
   return "WISHLIST";
 };
@@ -66,18 +63,14 @@ function parseCsv(text: string): string[][] {
   for (const line of lines) {
     if (!line.trim()) continue;
     const cells: string[] = [];
-    let cur = "";
-    let inQuote = false;
+    let cur = "", inQuote = false;
     for (let i = 0; i < line.length; i++) {
       const ch = line[i];
       if (ch === '"') {
         if (inQuote && line[i + 1] === '"') { cur += '"'; i++; }
         else inQuote = !inQuote;
-      } else if (ch === "," && !inQuote) {
-        cells.push(cur); cur = "";
-      } else {
-        cur += ch;
-      }
+      } else if (ch === "," && !inQuote) { cells.push(cur); cur = ""; }
+      else cur += ch;
     }
     cells.push(cur);
     rows.push(cells.map(c => c.trim()));
@@ -94,78 +87,73 @@ const TEMPLATE_CSV =
   "楽天グループ,IT・通信,書類選考中,,\n";
 
 const downloadTemplate = () => {
-  const bom = "\uFEFF"; // Excel で文字化けしないよう BOM 付き
+  const bom = "\uFEFF";
   const blob = new Blob([bom + TEMPLATE_CSV], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = url;
-  a.download = "careo_企業リスト_テンプレート.csv";
-  a.click();
+  a.href = url; a.download = "careo_企業リスト_テンプレート.csv"; a.click();
   URL.revokeObjectURL(url);
 };
 
-// ─── Props / コンポーネント ───────────────────────────────────────────────────
+// ─── Props ───────────────────────────────────────────────────────────────────
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onImport: (rows: Omit<Company, "id" | "createdAt" | "updatedAt">[]) => Promise<void>;
+  onImportComplete: (counts: Record<string, number>) => void;
 }
 
-type Step = "input" | "map" | "preview";
+type Step = "input" | "map";
 
-export function CsvImportModal({ isOpen, onClose, onImport }: Props) {
+export function CsvImportModal({ isOpen, onClose, onImportComplete }: Props) {
   const [tab, setTab] = useState<"csv" | "pdf" | "text">("csv");
   const [step, setStep] = useState<Step>("input");
   const [rawRows, setRawRows] = useState<string[][]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
   const [mapping, setMapping] = useState<CareoField[]>([]);
-  const [preview, setPreview] = useState<Omit<Company, "id" | "createdAt" | "updatedAt">[]>([]);
-  const [importing, setImporting] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [error, setError] = useState("");
   const [textInput, setTextInput] = useState("");
+  const [reviewData, setReviewData] = useState<ImportData | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const pdfRef = useRef<HTMLInputElement>(null);
 
   const reset = () => {
-    setStep("input");
-    setRawRows([]);
-    setHeaders([]);
-    setMapping([]);
-    setPreview([]);
-    setError("");
-    setTextInput("");
+    setStep("input"); setRawRows([]); setHeaders([]); setMapping([]);
+    setError(""); setTextInput(""); setReviewData(null);
     if (fileRef.current) fileRef.current.value = "";
     if (pdfRef.current) pdfRef.current.value = "";
   };
+  const handleClose = () => { reset(); onClose(); };
 
+  // ─ PDF ─
   const handlePdfFile = useCallback(async (file: File) => {
-    setError("");
-    setPdfLoading(true);
+    setError(""); setPdfLoading(true);
     try {
       const form = new FormData();
       form.append("file", file);
       const res = await fetch("/api/import/pdf", { method: "POST", body: form });
-      const json = await res.json() as { companies?: { name: string; industry: string; status: string; notes: string }[]; error?: string };
+      const json = await res.json() as {
+        companies?: ImportCompany[];
+        obVisits?: ImportData["obVisits"];
+        tests?: ImportData["tests"];
+        interviews?: ImportData["interviews"];
+        error?: string;
+      };
       if (!res.ok || json.error) { setError(json.error ?? "解析に失敗しました"); return; }
-      const rows = (json.companies ?? []).map(c => ({
-        name: c.name,
-        industry: c.industry ?? "",
-        status: (c.status as CompanyStatus) ?? "WISHLIST",
-        notes: c.notes || undefined,
-        url: undefined,
-      }));
-      if (!rows.length) { setError("企業情報が見つかりませんでした。別のPDFをお試しください。"); return; }
-      setPreview(rows);
-      setStep("preview");
-    } finally {
-      setPdfLoading(false);
-    }
+      const total = (json.companies?.length ?? 0) + (json.obVisits?.length ?? 0) +
+        (json.tests?.length ?? 0) + (json.interviews?.length ?? 0);
+      if (!total) { setError("就活情報が見つかりませんでした。別のPDFをお試しください。"); return; }
+      setReviewData({
+        companies: (json.companies ?? []).map(c => ({ name: c.name ?? "", industry: c.industry ?? "", status: (c.status as CompanyStatus) ?? "WISHLIST", notes: c.notes ?? "", url: c.url })),
+        obVisits: json.obVisits ?? [],
+        tests: json.tests ?? [],
+        interviews: json.interviews ?? [],
+      });
+    } finally { setPdfLoading(false); }
   }, []);
 
-  const handleClose = () => { reset(); onClose(); };
-
+  // ─ CSV ─
   const handleFile = useCallback((file: File) => {
     setError("");
     const reader = new FileReader();
@@ -173,66 +161,31 @@ export function CsvImportModal({ isOpen, onClose, onImport }: Props) {
       const text = e.target?.result as string;
       const rows = parseCsv(text);
       if (rows.length < 2) { setError("データ行が見つかりません。ヘッダー行 + 1行以上が必要です。"); return; }
-      const hdrs = rows[0];
-      const dataRows = rows.slice(1).filter(r => r.some(c => c.trim()));
-      setHeaders(hdrs);
-      setRawRows(dataRows);
-      setMapping(hdrs.map(detectField));
-      setStep("map");
+      setHeaders(rows[0]); setRawRows(rows.slice(1).filter(r => r.some(c => c.trim())));
+      setMapping(rows[0].map(detectField)); setStep("map");
     };
     reader.readAsText(file, "UTF-8");
   }, []);
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (file) handleFile(file);
-  };
-
-  const buildPreview = useCallback(() => {
+  const buildReviewFromCsv = useCallback(() => {
     const nameIdx = mapping.findIndex(m => m === "name");
     if (nameIdx === -1) { setError("「企業名」にマッピングされたカラムが必要です。"); return; }
     setError("");
-    const rows = rawRows
+    const companies: ImportCompany[] = rawRows
       .filter(r => r[nameIdx]?.trim())
       .map(r => {
-        const get = (field: CareoField) => {
-          const idx = mapping.findIndex(m => m === field);
-          return idx >= 0 ? (r[idx] ?? "").trim() : "";
-        };
-        const rawStatus = get("status");
-        return {
-          name: get("name"),
-          industry: get("industry"),
-          status: rawStatus ? parseStatus(rawStatus) : "WISHLIST" as CompanyStatus,
-          url: get("url") || undefined,
-          notes: get("notes") || undefined,
-        };
+        const get = (f: CareoField) => { const i = mapping.findIndex(m => m === f); return i >= 0 ? (r[i] ?? "").trim() : ""; };
+        const raw = get("status");
+        return { name: get("name"), industry: get("industry"), status: raw ? parseStatus(raw) : "WISHLIST", url: get("url") || undefined, notes: get("notes") };
       });
-    setPreview(rows);
-    setStep("preview");
+    setReviewData({ companies, obVisits: [], tests: [], interviews: [] });
   }, [mapping, rawRows]);
 
-  const handleTextImport = async () => {
+  // ─ テキスト ─
+  const buildReviewFromText = () => {
     const lines = textInput.split(/\n/).map(l => l.trim()).filter(Boolean);
     if (!lines.length) { setError("企業名を入力してください"); return; }
-    setImporting(true);
-    try {
-      await onImport(lines.map(name => ({ name, status: "WISHLIST", industry: "", notes: "" })));
-      handleClose();
-    } finally {
-      setImporting(false);
-    }
-  };
-
-  const handleConfirmImport = async () => {
-    setImporting(true);
-    try {
-      await onImport(preview);
-      handleClose();
-    } finally {
-      setImporting(false);
-    }
+    setReviewData({ companies: lines.map(name => ({ name, status: "WISHLIST", industry: "", notes: "" })), obVisits: [], tests: [], interviews: [] });
   };
 
   const careoFields: { value: CareoField; label: string }[] = [
@@ -245,233 +198,145 @@ export function CsvImportModal({ isOpen, onClose, onImport }: Props) {
   ];
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="企業を一括インポート">
-      <div className="space-y-4">
+    <>
+      <Modal isOpen={isOpen && !reviewData} onClose={handleClose} title="企業を一括インポート">
+        <div className="space-y-4">
 
-        {/* タブ */}
-        {step === "input" && (
-          <div className="flex border border-gray-200 rounded-xl overflow-hidden text-sm">
-            <button
-              type="button"
-              onClick={() => { setTab("csv"); setError(""); }}
-              className={`flex-1 py-2.5 font-medium transition-colors ${tab === "csv" ? "bg-[#00c896] text-white" : "bg-white text-gray-500 hover:bg-gray-50"}`}
-            >
-              CSV
-            </button>
-            <button
-              type="button"
-              onClick={() => { setTab("pdf"); setError(""); }}
-              className={`flex-1 py-2.5 font-medium transition-colors ${tab === "pdf" ? "bg-[#00c896] text-white" : "bg-white text-gray-500 hover:bg-gray-50"}`}
-            >
-              PDF
-            </button>
-            <button
-              type="button"
-              onClick={() => { setTab("text"); setError(""); }}
-              className={`flex-1 py-2.5 font-medium transition-colors ${tab === "text" ? "bg-[#00c896] text-white" : "bg-white text-gray-500 hover:bg-gray-50"}`}
-            >
-              テキスト入力
-            </button>
-          </div>
-        )}
-
-        {/* ── Step: input / csv ────────────────────────────── */}
-        {step === "input" && tab === "csv" && (
-          <>
-            {/* テンプレートDL */}
-            <div className="flex items-center justify-between bg-gray-50 rounded-xl p-3 text-xs">
-              <div>
-                <p className="font-semibold text-gray-700">Notion / スプレッドシートから移行</p>
-                <p className="text-gray-400 mt-0.5">テンプレートCSVに合わせてコピーするか、カラムを自由に定義できます</p>
-              </div>
-              <button
-                type="button"
-                onClick={downloadTemplate}
-                className="shrink-0 text-xs text-[#00a87e] font-bold border border-[#00c896]/40 rounded-lg px-3 py-2 hover:bg-[#00c896]/5 transition-colors"
-              >
-                テンプレDL
-              </button>
+          {/* タブ */}
+          {step === "input" && (
+            <div className="flex border border-gray-200 rounded-xl overflow-hidden text-sm">
+              {(["csv", "pdf", "text"] as const).map((t, _, arr) => (
+                <button key={t} type="button" onClick={() => { setTab(t); setError(""); }}
+                  className={`flex-1 py-2.5 font-medium transition-colors ${tab === t ? "bg-[#00c896] text-white" : "bg-white text-gray-500 hover:bg-gray-50"} ${arr.indexOf(t) < arr.length - 1 ? "border-r border-gray-200" : ""}`}>
+                  {t === "csv" ? "CSV" : t === "pdf" ? "PDF" : "テキスト入力"}
+                </button>
+              ))}
             </div>
+          )}
 
-            {/* ドロップゾーン */}
-            <div
-              onDrop={handleDrop}
-              onDragOver={(e) => e.preventDefault()}
-              onClick={() => fileRef.current?.click()}
-              className="border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center cursor-pointer hover:border-[#00c896]/50 hover:bg-[#00c896]/3 transition-all"
-            >
-              <div className="text-3xl mb-2">📂</div>
-              <p className="text-sm font-semibold text-gray-700 mb-1">CSVファイルをドロップ</p>
-              <p className="text-xs text-gray-400">または クリックして選択（.csv）</p>
-              <input
-                ref={fileRef}
-                type="file"
-                accept=".csv,text/csv"
-                className="hidden"
-                onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
-              />
-            </div>
-
-            <div className="text-xs text-gray-400 space-y-1">
-              <p>• Notion（テーブル形式のみ）→ 「...」→「エクスポート」→「CSV」</p>
-              <p>• Google スプレッドシート → 「ファイル」→「ダウンロード」→「CSV」</p>
-              <p>• Excel → 「名前を付けて保存」→「CSV UTF-8」</p>
-              <p className="text-amber-500">※ Notion のテキストページ（箇条書き等）は PDF タブをお使いください</p>
-            </div>
-
-            {error && <p className="text-red-500 text-xs">{error}</p>}
-          </>
-        )}
-
-        {/* ── Step: input / pdf ────────────────────────────── */}
-        {step === "input" && tab === "pdf" && (
-          <>
-            <div className="bg-blue-50 rounded-xl p-3 text-xs text-blue-700 space-y-1 border border-blue-100">
-              <p className="font-semibold">AIがPDFを読んで企業情報を自動抽出します</p>
-              <p className="text-blue-500">Notionの就活ページをPDF出力したもの、キャリアセンターの様式、自作まとめPDFなど何でも対応。スキャン画像のみのPDFは非対応。</p>
-            </div>
-
-            <div
-              onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handlePdfFile(f); }}
-              onDragOver={(e) => e.preventDefault()}
-              onClick={() => !pdfLoading && pdfRef.current?.click()}
-              className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all ${pdfLoading ? "border-blue-200 bg-blue-50/50 cursor-wait" : "border-gray-200 cursor-pointer hover:border-blue-300 hover:bg-blue-50/30"}`}
-            >
-              {pdfLoading ? (
-                <div className="space-y-3">
-                  <div className="text-3xl animate-pulse">🤖</div>
-                  <p className="text-sm font-semibold text-blue-600">AIが解析中...</p>
-                  <p className="text-xs text-gray-400">企業情報を読み取っています。しばらくお待ちください。</p>
+          {/* ── CSV ── */}
+          {step === "input" && tab === "csv" && (
+            <>
+              <div className="flex items-center justify-between bg-gray-50 rounded-xl p-3 text-xs">
+                <div>
+                  <p className="font-semibold text-gray-700">Notion / スプレッドシートから移行</p>
+                  <p className="text-gray-400 mt-0.5">カラム名は自由・自動検出します</p>
                 </div>
-              ) : (
-                <>
-                  <div className="text-3xl mb-2">📄</div>
-                  <p className="text-sm font-semibold text-gray-700 mb-1">PDFファイルをドロップ</p>
-                  <p className="text-xs text-gray-400">または クリックして選択（.pdf・最大10MB）</p>
-                </>
-              )}
-              <input
-                ref={pdfRef}
-                type="file"
-                accept=".pdf,application/pdf"
-                className="hidden"
-                onChange={(e) => e.target.files?.[0] && handlePdfFile(e.target.files[0])}
-              />
-            </div>
+                <button type="button" onClick={downloadTemplate}
+                  className="shrink-0 text-xs text-[#00a87e] font-bold border border-[#00c896]/40 rounded-lg px-3 py-2 hover:bg-[#00c896]/5 transition-colors">
+                  テンプレDL
+                </button>
+              </div>
+              <div onDrop={e => { e.preventDefault(); e.dataTransfer.files[0] && handleFile(e.dataTransfer.files[0]); }}
+                onDragOver={e => e.preventDefault()} onClick={() => fileRef.current?.click()}
+                className="border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center cursor-pointer hover:border-[#00c896]/50 hover:bg-[#00c896]/3 transition-all">
+                <div className="text-3xl mb-2">📂</div>
+                <p className="text-sm font-semibold text-gray-700 mb-1">CSVファイルをドロップ</p>
+                <p className="text-xs text-gray-400">または クリックして選択（.csv）</p>
+                <input ref={fileRef} type="file" accept=".csv,text/csv" className="hidden"
+                  onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])} />
+              </div>
+              <div className="text-xs text-gray-400 space-y-1">
+                <p>• Notion（テーブル形式のみ）→「...」→「エクスポート」→「CSV」</p>
+                <p>• Google スプレッドシート →「ファイル」→「ダウンロード」→「CSV」</p>
+                <p>• Excel →「名前を付けて保存」→「CSV UTF-8」</p>
+                <p className="text-amber-500">※ Notionのテキストページ（箇条書き等）は PDF タブをお使いください</p>
+              </div>
+              {error && <p className="text-red-500 text-xs">{error}</p>}
+            </>
+          )}
 
-            <div className="text-xs text-gray-400 space-y-1">
-              <p>• Notion ページ → 「...」→「エクスポート」→「PDF」</p>
-              <p>• Word / Google Docs → 「ファイル」→「ダウンロード」→「PDF」</p>
-              <p>• キャリアセンターの様式・自作管理シートもそのままOK</p>
-            </div>
-
-            {error && <p className="text-red-500 text-xs">{error}</p>}
-          </>
-        )}
-
-        {/* ── Step: input / text ───────────────────────────── */}
-        {step === "input" && tab === "text" && (
-          <>
-            <p className="text-sm text-gray-500">企業名を1行に1社ずつ入力してください（ステータスはすべて「気になる」で登録されます）。</p>
-            <textarea
-              value={textInput}
-              onChange={(e) => setTextInput(e.target.value)}
-              rows={10}
-              placeholder={"トヨタ自動車\nソニーグループ\n楽天グループ"}
-              className="w-full rounded-xl border border-gray-200 p-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 resize-none"
-            />
-            {error && <p className="text-red-500 text-xs">{error}</p>}
-            <div className="flex gap-3 justify-end">
-              <Button variant="secondary" onClick={handleClose} disabled={importing}>キャンセル</Button>
-              <Button onClick={handleTextImport} disabled={importing}>{importing ? "追加中..." : "追加する"}</Button>
-            </div>
-          </>
-        )}
-
-        {/* ── Step: map ────────────────────────────────────── */}
-        {step === "map" && (
-          <>
-            <div>
-              <p className="text-sm font-semibold text-gray-700 mb-1">カラムのマッピング</p>
-              <p className="text-xs text-gray-400 mb-4">CSVのカラムをCareoのフィールドに対応させてください。自動検出済みです。</p>
-              <div className="space-y-2">
-                {headers.map((h, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <span className="text-sm text-gray-700 w-36 truncate shrink-0 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5">{h}</span>
-                    <span className="text-gray-300 text-xs">→</span>
-                    <select
-                      value={mapping[i]}
-                      onChange={(e) => {
-                        const m = [...mapping];
-                        m[i] = e.target.value as CareoField;
-                        setMapping(m);
-                      }}
-                      className="flex-1 text-sm rounded-lg border border-gray-200 px-3 py-1.5 focus:outline-none focus:border-[#00c896] bg-white"
-                    >
-                      {careoFields.map(f => (
-                        <option key={f.value} value={f.value}>{f.label}</option>
-                      ))}
-                    </select>
+          {/* ── PDF ── */}
+          {step === "input" && tab === "pdf" && (
+            <>
+              <div className="bg-blue-50 rounded-xl p-3 text-xs text-blue-700 space-y-1 border border-blue-100">
+                <p className="font-semibold">AIがPDFを読んで就活情報を自動抽出します</p>
+                <p className="text-blue-500">企業・OB訪問・筆記試験・面接の記録を一括で取り込めます。抽出後に編集も可能。</p>
+              </div>
+              <div
+                onDrop={e => { e.preventDefault(); e.dataTransfer.files[0] && handlePdfFile(e.dataTransfer.files[0]); }}
+                onDragOver={e => e.preventDefault()} onClick={() => !pdfLoading && pdfRef.current?.click()}
+                className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all ${pdfLoading ? "border-blue-200 bg-blue-50/50 cursor-wait" : "border-gray-200 cursor-pointer hover:border-blue-300 hover:bg-blue-50/30"}`}>
+                {pdfLoading ? (
+                  <div className="space-y-3">
+                    <div className="text-3xl animate-pulse">🤖</div>
+                    <p className="text-sm font-semibold text-blue-600">AIが解析中...</p>
+                    <p className="text-xs text-gray-400">企業・OB訪問・筆記試験・面接を読み取っています</p>
                   </div>
-                ))}
+                ) : (
+                  <>
+                    <div className="text-3xl mb-2">📄</div>
+                    <p className="text-sm font-semibold text-gray-700 mb-1">PDFファイルをドロップ</p>
+                    <p className="text-xs text-gray-400">または クリックして選択（.pdf・最大10MB）</p>
+                  </>
+                )}
+                <input ref={pdfRef} type="file" accept=".pdf,application/pdf" className="hidden"
+                  onChange={e => e.target.files?.[0] && handlePdfFile(e.target.files[0])} />
               </div>
-            </div>
-            <p className="text-xs text-gray-400">
-              サンプル行：{rawRows[0]?.join("、")}
-            </p>
-            {error && <p className="text-red-500 text-xs">{error}</p>}
-            <div className="flex gap-3 justify-end">
-              <Button variant="secondary" onClick={() => { setStep("input"); setError(""); }}>戻る</Button>
-              <Button onClick={buildPreview}>プレビューを確認 →</Button>
-            </div>
-          </>
-        )}
+              <div className="text-xs text-gray-400 space-y-1">
+                <p>• Notion → 「...」→「エクスポート」→「PDF」（テキスト・テーブル両方OK）</p>
+                <p>• Word / Google Docs → 「ダウンロード」→「PDF」</p>
+                <p>• キャリアセンターの様式・自作管理シートもそのままOK</p>
+                <p className="text-amber-500">※ スキャン画像のみのPDFは非対応</p>
+              </div>
+              {error && <p className="text-red-500 text-xs">{error}</p>}
+            </>
+          )}
 
-        {/* ── Step: preview ────────────────────────────────── */}
-        {step === "preview" && (
-          <>
-            <div>
-              <p className="text-sm font-semibold text-gray-700 mb-1">{preview.length}社をインポートします</p>
-              <p className="text-xs text-gray-400 mb-3">最初の5件を表示（ステータスが認識できなかった場合は「気になる」になります）</p>
-              <div className="overflow-x-auto border border-gray-200 rounded-xl">
-                <table className="w-full text-xs">
-                  <thead className="bg-gray-50 border-b border-gray-200">
-                    <tr>
-                      <th className="text-left px-3 py-2 font-semibold text-gray-500">企業名</th>
-                      <th className="text-left px-3 py-2 font-semibold text-gray-500">業界</th>
-                      <th className="text-left px-3 py-2 font-semibold text-gray-500">ステータス</th>
-                      <th className="text-left px-3 py-2 font-semibold text-gray-500">メモ</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {preview.slice(0, 5).map((r, i) => (
-                      <tr key={i} className="hover:bg-gray-50/50">
-                        <td className="px-3 py-2 font-medium text-gray-800 max-w-[120px] truncate">{r.name}</td>
-                        <td className="px-3 py-2 text-gray-500 max-w-[80px] truncate">{r.industry || "—"}</td>
-                        <td className="px-3 py-2 text-gray-600">{COMPANY_STATUS_LABELS[r.status]}</td>
-                        <td className="px-3 py-2 text-gray-400 max-w-[120px] truncate">{r.notes || "—"}</td>
-                      </tr>
-                    ))}
-                    {preview.length > 5 && (
-                      <tr>
-                        <td colSpan={4} className="px-3 py-2 text-gray-400 text-center">
-                          ...他{preview.length - 5}社
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+          {/* ── テキスト入力 ── */}
+          {step === "input" && tab === "text" && (
+            <>
+              <p className="text-sm text-gray-500">企業名を1行に1社ずつ入力してください（ステータスはすべて「気になる」で登録）。</p>
+              <textarea value={textInput} onChange={e => setTextInput(e.target.value)} rows={10}
+                placeholder={"トヨタ自動車\nソニーグループ\n楽天グループ"}
+                className="w-full rounded-xl border border-gray-200 p-3 text-sm focus:outline-none focus:border-blue-400 resize-none" />
+              {error && <p className="text-red-500 text-xs">{error}</p>}
+              <div className="flex gap-3 justify-end">
+                <Button variant="secondary" onClick={handleClose}>キャンセル</Button>
+                <Button onClick={buildReviewFromText}>内容を確認する →</Button>
               </div>
-            </div>
-            <div className="flex gap-3 justify-end">
-              <Button variant="secondary" onClick={() => setStep("map")} disabled={importing}>戻る</Button>
-              <Button onClick={handleConfirmImport} disabled={importing}>
-                {importing ? "インポート中..." : `${preview.length}社をインポート`}
-              </Button>
-            </div>
-          </>
-        )}
-      </div>
-    </Modal>
+            </>
+          )}
+
+          {/* ── カラムマッピング ── */}
+          {step === "map" && (
+            <>
+              <div>
+                <p className="text-sm font-semibold text-gray-700 mb-1">カラムのマッピング</p>
+                <p className="text-xs text-gray-400 mb-4">CSVのカラムをCareoのフィールドに対応させてください。</p>
+                <div className="space-y-2">
+                  {headers.map((h, i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <span className="text-sm text-gray-700 w-36 truncate shrink-0 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5">{h}</span>
+                      <span className="text-gray-300 text-xs">→</span>
+                      <select value={mapping[i]} onChange={e => { const m = [...mapping]; m[i] = e.target.value as CareoField; setMapping(m); }}
+                        className="flex-1 text-sm rounded-lg border border-gray-200 px-3 py-1.5 focus:outline-none focus:border-[#00c896] bg-white">
+                        {careoFields.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
+                      </select>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-400 mt-2">サンプル行：{rawRows[0]?.join("、")}</p>
+              </div>
+              {error && <p className="text-red-500 text-xs">{error}</p>}
+              <div className="flex gap-3 justify-end">
+                <Button variant="secondary" onClick={() => { setStep("input"); setError(""); }}>戻る</Button>
+                <Button onClick={buildReviewFromCsv}>内容を確認する →</Button>
+              </div>
+            </>
+          )}
+        </div>
+      </Modal>
+
+      {/* レビューモーダル */}
+      {reviewData && (
+        <ImportReviewModal
+          isOpen={true}
+          onClose={() => setReviewData(null)}
+          data={reviewData}
+          onComplete={(counts) => { onImportComplete(counts); reset(); onClose(); }}
+        />
+      )}
+    </>
   );
 }

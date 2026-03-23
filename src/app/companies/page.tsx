@@ -143,7 +143,7 @@ const TAG_STYLES: Record<string, string> = {
 };
 
 export default function CompaniesPage() {
-  const { companies, addCompany, bulkAddCompanies, deleteCompany, updateStatus } = useCompanies();
+  const { companies, addCompany, deleteCompany, updateStatus } = useCompanies();
   const { profile } = useProfile();
   const { showToast } = useToast();
   const hasIntern = companies.some(c => c.status === "INTERN" || c.status === "INTERN_APPLYING");
@@ -262,16 +262,16 @@ export default function CompaniesPage() {
     }
   }, [companies, profile]);
 
-  const handleBulkImport = useCallback(async (rows: Omit<Company, "id" | "createdAt" | "updatedAt">[]) => {
-    try {
-      await bulkAddCompanies(rows);
-      showToast(`${rows.length}社をインポートしました`, "success");
-    } catch (err) {
-      console.error("[bulkImport]", err);
-      showToast("インポートに失敗しました", "error");
-      throw err;
-    }
-  }, [bulkAddCompanies, showToast]);
+  const handleImportComplete = useCallback((counts: Record<string, number>) => {
+    const parts = [];
+    if (counts.companies) parts.push(`企業${counts.companies}社`);
+    if (counts.obVisits) parts.push(`OB訪問${counts.obVisits}件`);
+    if (counts.tests) parts.push(`筆記試験${counts.tests}件`);
+    if (counts.interviews) parts.push(`面接${counts.interviews}件`);
+    showToast(`${parts.join("・")}をインポートしました`, "success");
+    // 企業リストをリフレッシュ
+    if (counts.companies) window.location.reload();
+  }, [showToast]);
 
   const filtered = companies
     .filter((c) => filterStatus === "ALL" || c.status === filterStatus)
@@ -632,7 +632,7 @@ export default function CompaniesPage() {
       <CsvImportModal
         isOpen={isImportOpen}
         onClose={() => setIsImportOpen(false)}
-        onImport={handleBulkImport}
+        onImportComplete={handleImportComplete}
       />
     </div>
   );
