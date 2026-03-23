@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useCompanies } from "@/hooks/useCompanies";
 import { useProfile } from "@/hooks/useProfile";
 import { CompanyForm } from "@/components/companies/CompanyForm";
+import { CsvImportModal } from "@/components/companies/CsvImportModal";
 import { StatusBadge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
@@ -142,14 +143,12 @@ const TAG_STYLES: Record<string, string> = {
 };
 
 export default function CompaniesPage() {
-  const { companies, addCompany, deleteCompany, updateStatus } = useCompanies();
+  const { companies, addCompany, bulkAddCompanies, deleteCompany, updateStatus } = useCompanies();
   const { profile } = useProfile();
   const { showToast } = useToast();
   const hasIntern = companies.some(c => c.status === "INTERN" || c.status === "INTERN_APPLYING");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
-  const [importText, setImportText] = useState("");
-  const [importing, setImporting] = useState(false);
   const [filterStatus, setFilterStatus] = useState<CompanyStatus | "ALL">("ALL");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -263,32 +262,16 @@ export default function CompaniesPage() {
     }
   }, [companies, profile]);
 
-  const handleBulkImport = async () => {
-    const lines = importText
-      .split(/[\n,]/)
-      .map((l) => l.trim())
-      .filter((l) => l.length > 0);
-
-    if (lines.length === 0) {
-      showToast("企業名を入力してください", "warning");
-      return;
-    }
-
-    setImporting(true);
+  const handleBulkImport = useCallback(async (rows: Omit<Company, "id" | "createdAt" | "updatedAt">[]) => {
     try {
-      for (const name of lines) {
-        await addCompany({ name, status: "WISHLIST", industry: "", notes: "" });
-      }
-      showToast(`${lines.length}社を追加しました`, "success");
-      setImportText("");
-      setIsImportOpen(false);
+      await bulkAddCompanies(rows);
+      showToast(`${rows.length}社をインポートしました`, "success");
     } catch (err) {
       console.error("[bulkImport]", err);
       showToast("インポートに失敗しました", "error");
-    } finally {
-      setImporting(false);
+      throw err;
     }
-  };
+  }, [bulkAddCompanies, showToast]);
 
   const filtered = companies
     .filter((c) => filterStatus === "ALL" || c.status === filterStatus)
@@ -646,26 +629,11 @@ export default function CompaniesPage() {
         />
       </Modal>
 
-      <Modal isOpen={isImportOpen} onClose={() => setIsImportOpen(false)} title="企業を一括インポート">
-        <div className="space-y-4">
-          <p className="text-sm text-gray-500">企業名を1行または1社ずつ入力してください。</p>
-          <textarea
-            value={importText}
-            onChange={(e) => setImportText(e.target.value)}
-            rows={10}
-            placeholder={"企業名を1行に1社ずつ入力してください\n例:\nトヨタ自動車\nソニーグループ\n楽天グループ"}
-            className="w-full rounded-xl border border-gray-200 p-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 resize-none"
-          />
-          <div className="flex gap-3 justify-end">
-            <Button variant="secondary" onClick={() => setIsImportOpen(false)} disabled={importing}>
-              キャンセル
-            </Button>
-            <Button onClick={handleBulkImport} disabled={importing}>
-              {importing ? "追加中..." : "追加する"}
-            </Button>
-          </div>
-        </div>
-      </Modal>
+      <CsvImportModal
+        isOpen={isImportOpen}
+        onClose={() => setIsImportOpen(false)}
+        onImport={handleBulkImport}
+      />
     </div>
   );
 }

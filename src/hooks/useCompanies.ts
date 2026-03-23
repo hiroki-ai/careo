@@ -52,5 +52,15 @@ export function useCompanies() {
 
   const getCompanyById = useCallback((id: string) => companies.find((c) => c.id === id), [companies]);
 
-  return { companies, loading, addCompany, updateCompany, deleteCompany, updateStatus, getCompanyById };
+  const bulkAddCompanies = useCallback(async (rows: Omit<Company, "id" | "createdAt" | "updatedAt">[]) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    const { data: inserted } = await supabase
+      .from("companies")
+      .insert(rows.map(r => ({ ...r, user_id: user!.id })))
+      .select();
+    if (inserted) setCompanies((prev) => [...(inserted as Company[]), ...prev]);
+    return inserted as Company[];
+  }, []);
+
+  return { companies, loading, addCompany, updateCompany, deleteCompany, updateStatus, getCompanyById, bulkAddCompanies };
 }
