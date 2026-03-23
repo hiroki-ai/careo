@@ -620,6 +620,14 @@ export function LandingPage() {
           <p className="text-center text-xs text-gray-400 mt-4">
             ※ △: 部分的に対応。各サービスは目的が異なるため、組み合わせて使うのがベストです。
           </p>
+          <div className="text-center mt-6">
+            <Link
+              href="/compare"
+              className="inline-flex items-center gap-2 text-sm text-[#00c896] font-semibold hover:underline"
+            >
+              他サービスとの詳細比較・Careoが選ばれる理由を見る →
+            </Link>
+          </div>
         </div>
       </section>
 

@@ -29,8 +29,8 @@ export async function middleware(request: NextRequest) {
     const isAuthRoute = authRoutes.includes(pathname);
     const isOnboarding = pathname === "/onboarding";
 
-    const publicRoutes = ["/", "/terms", "/privacy"];
-    const isPublicRoute = publicRoutes.includes(pathname);
+    const publicRoutes = ["/", "/terms", "/privacy", "/features", "/compare"];
+    const isPublicRoute = publicRoutes.some(r => pathname === r || pathname.startsWith(r + "/"));
 
     if (!user && !isAuthRoute && !isPublicRoute) {
       return NextResponse.redirect(new URL("/login", request.url));
@@ -41,6 +41,18 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/", request.url));
     }
 
+    // 管理者専用ルートのサーバーサイド保護
+    const adminRoutes = ["/admin", "/insights", "/honbu"];
+    const isAdminRoute = adminRoutes.some(r => pathname === r || pathname.startsWith(r + "/"));
+    if (isAdminRoute) {
+      if (!user) {
+        return NextResponse.redirect(new URL("/login", request.url));
+      }
+      const adminEmail = process.env.ADMIN_EMAIL;
+      if (!adminEmail || user.email !== adminEmail) {
+        return NextResponse.redirect(new URL("/", request.url));
+      }
+    }
 
     if (user && !isOnboarding && !isAuthRoute) {
       const { data: profile } = await supabase
@@ -59,8 +71,8 @@ export async function middleware(request: NextRequest) {
     // エラー時は安全のためログインページへリダイレクト
     const { pathname } = request.nextUrl;
     const authRoutes = ["/login", "/signup", "/forgot-password", "/reset-password"];
-    const publicRoutes2 = ["/", "/terms", "/privacy"];
-    if (authRoutes.includes(pathname) || publicRoutes2.includes(pathname)) return NextResponse.next();
+    const publicRoutes2 = ["/", "/terms", "/privacy", "/features", "/compare"];
+    if (authRoutes.includes(pathname) || publicRoutes2.some(r => pathname === r || pathname.startsWith(r + "/"))) return NextResponse.next();
     return NextResponse.redirect(new URL("/login", request.url));
   }
 }
