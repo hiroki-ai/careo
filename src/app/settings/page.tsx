@@ -7,17 +7,18 @@ import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { Button } from "@/components/ui/Button";
 import { createClient } from "@/lib/supabase/client";
-import { JOB_SEARCH_STAGE_LABELS } from "@/types";
+import { JOB_SEARCH_STAGE_LABELS, CareerCenterVisibility, DEFAULT_CAREER_CENTER_VISIBILITY } from "@/types";
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { profile, loading, saveProfile } = useProfile();
+  const { profile, loading, saveProfile, saveCareerCenterVisibility } = useProfile();
   const { permission, isSubscribed, isSupported, loading: pushLoading, subscribe, unsubscribe } = usePushNotifications();
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [saved, setSaved] = useState(false);
   const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
   const [deleteInput, setDeleteInput] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [visibilitySaving, setVisibilitySaving] = useState(false);
 
   const handleLogout = async () => {
     const supabase = createClient();
@@ -156,6 +157,53 @@ export default function SettingsPage() {
           </div>
         </section>
       )}
+
+      {/* キャリアセンターへの公開設定 */}
+      <section className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
+        <h2 className="font-semibold text-gray-900 mb-1">キャリアセンターへの公開設定</h2>
+        <p className="text-xs text-gray-400 mb-1">提携大学のキャリアセンターに公開する情報を選択できます</p>
+        <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-4 text-xs text-amber-700">
+          現在、提携大学は準備中です。提携成立後に有効になります。
+        </div>
+        {(() => {
+          const visibility: CareerCenterVisibility = profile?.careerCenterVisibility ?? DEFAULT_CAREER_CENTER_VISIBILITY;
+          const items: { key: keyof CareerCenterVisibility; label: string; desc: string }[] = [
+            { key: "targetIndustriesJobs", label: "志望業界・職種", desc: "志望している業界・職種" },
+            { key: "companies", label: "選考状況", desc: "選考中の企業名・選考フェーズ" },
+            { key: "esSelfAnalysis", label: "ES・自己分析", desc: "ESの内容・自己分析テキスト" },
+            { key: "obVisits", label: "OB/OG訪問", desc: "訪問件数・訪問先業界" },
+            { key: "aptitudeTests", label: "筆記試験スコア", desc: "SPI等のスコア・結果" },
+            { key: "offerStatus", label: "内定の有無", desc: "内定企業情報" },
+          ];
+          const toggle = async (key: keyof CareerCenterVisibility) => {
+            const next = { ...visibility, [key]: !visibility[key] };
+            setVisibilitySaving(true);
+            await saveCareerCenterVisibility(next);
+            setVisibilitySaving(false);
+          };
+          return (
+            <div className="space-y-1">
+              {items.map(({ key, label, desc }) => (
+                <div key={key} className="flex items-center justify-between py-2.5 border-b border-gray-50 last:border-0">
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">{label}</p>
+                    <p className="text-xs text-gray-400">{desc}</p>
+                  </div>
+                  <button
+                    type="button"
+                    title={visibility[key] ? "非公開にする" : "公開にする"}
+                    disabled={visibilitySaving}
+                    onClick={() => toggle(key)}
+                    className={`relative w-12 h-6 rounded-full transition-colors shrink-0 ${visibility[key] ? "bg-[#00c896]" : "bg-gray-200"} disabled:opacity-60`}
+                  >
+                    <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${visibility[key] ? "translate-x-6" : ""}`} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          );
+        })()}
+      </section>
 
       {/* アカウント */}
       <section className="bg-white rounded-xl border border-gray-100 p-6">

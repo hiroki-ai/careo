@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { UserProfile, JobSearchStage, UserPlan } from "@/types";
+import { UserProfile, JobSearchStage, UserPlan, CareerCenterVisibility, DEFAULT_CAREER_CENTER_VISIBILITY } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 
 function rowToProfile(row: Record<string, unknown>): UserProfile {
@@ -21,6 +21,7 @@ function rowToProfile(row: Record<string, unknown>): UserProfile {
     strengths: (row.strengths as string) ?? "",
     weaknesses: (row.weaknesses as string) ?? "",
     aiSelfAnalysis: (row.ai_self_analysis as UserProfile["aiSelfAnalysis"]) ?? {},
+    careerCenterVisibility: (row.career_center_visibility as CareerCenterVisibility) ?? DEFAULT_CAREER_CENTER_VISIBILITY,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
   };
@@ -119,5 +120,18 @@ export function useProfile() {
     return !!saved;
   }, []);
 
-  return { profile, loading, saveProfile, patchSelfAnalysis, saveAiSelfAnalysis, refetch: fetch };
+  const saveCareerCenterVisibility = useCallback(async (visibility: CareerCenterVisibility): Promise<boolean> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return false;
+    const { data: saved } = await supabase
+      .from("user_profiles")
+      .update({ career_center_visibility: visibility })
+      .eq("id", user.id)
+      .select()
+      .single();
+    if (saved) setProfile(rowToProfile(saved as Record<string, unknown>));
+    return !!saved;
+  }, []);
+
+  return { profile, loading, saveProfile, patchSelfAnalysis, saveAiSelfAnalysis, saveCareerCenterVisibility, refetch: fetch };
 }

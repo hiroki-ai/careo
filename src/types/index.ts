@@ -145,6 +145,24 @@ export const GRADES = [
 
 export type UserPlan = "free" | "pro";
 
+export interface CareerCenterVisibility {
+  targetIndustriesJobs: boolean; // 志望業界・職種
+  companies: boolean;            // 選考中の企業名・選考フェーズ
+  esSelfAnalysis: boolean;       // ES・自己分析の内容
+  obVisits: boolean;             // OB/OG訪問の実施件数・訪問先業界
+  aptitudeTests: boolean;        // 筆記試験スコア
+  offerStatus: boolean;          // 内定の有無
+}
+
+export const DEFAULT_CAREER_CENTER_VISIBILITY: CareerCenterVisibility = {
+  targetIndustriesJobs: true,
+  companies: true,
+  esSelfAnalysis: true,
+  obVisits: true,
+  aptitudeTests: true,
+  offerStatus: true,
+};
+
 export interface UserProfile {
   id: string;
   university: string;
@@ -169,6 +187,8 @@ export interface UserProfile {
     strengths?: string;
     weaknesses?: string;
   };
+  // キャリアセンターへの公開設定（デフォルト全公開）
+  careerCenterVisibility?: CareerCenterVisibility;
   createdAt: string;
   updatedAt: string;
 }
