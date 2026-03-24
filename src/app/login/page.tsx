@@ -27,6 +27,16 @@ export default function LoginPage() {
       }
       setLoading(false);
     } else {
+      // Chrome拡張機能にトークンを送信（インストール済みの場合のみ動作）
+      try {
+        const supabase2 = createClient();
+        const { data: { session } } = await supabase2.auth.getSession();
+        if (session?.access_token) {
+          window.postMessage({ type: "CAREO_AUTH_TOKEN", token: session.access_token }, window.location.origin);
+        }
+      } catch {
+        // 拡張機能未インストール時は無視
+      }
       router.push("/");
       router.refresh();
     }

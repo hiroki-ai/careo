@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "Careo - 就活企業クイック追加",
+  "version": "1.0.0",
+  "description": "マイナビ・リクナビ等の就活サイトからCareoに企業情報をワンクリックで追加",
+  "permissions": ["activeTab", "storage", "cookies"],
+  "host_permissions": [
+    "https://job.mynavi.jp/*",
+    "https://job.rikunabi.com/*",
+    "https://www.onecareer.jp/*",
+    "https://www.wantedly.com/*",
+    "https://offerbox.jp/*",
+    "https://careoai.jp/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://job.mynavi.jp/*",
+        "https://job.rikunabi.com/*",
+        "https://www.onecareer.jp/*",
+        "https://www.wantedly.com/*",
+        "https://offerbox.jp/*"
+      ],
+      "js": ["content.js"]
+    },
+    {
+      "matches": ["https://careoai.jp/*"],
+      "js": ["auth_relay.js"]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
+}

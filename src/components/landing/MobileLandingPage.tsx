@@ -136,6 +136,14 @@ const faqs = [
     q: "BaseMeやSmartESとの違いは？",
     a: "BaseMe・SmartESは特定機能（スカウト・ES生成）に特化しています。Careoは就活全体のデータを把握したAIコーチが、横断した気づきを届けます。組み合わせて使うのがベスト。",
   },
+  {
+    q: "ChatGPTと何が違うんですか？",
+    a: "ChatGPTはあなたの就活データを知りません。Careoは今まで書いた全てのES、面接記録、OB訪問の内容、企業のステータスを把握した上でアドバイスします。「あなたがA社に書いたガクチカと、今書いているB社のESで矛盾がある」ような指摘はCareoにしかできません。",
+  },
+  {
+    q: "マイナビやリクナビを使っていても使えますか？",
+    a: "はい、Careoはマイナビ・リクナビの代替ではなく補完ツールです。就活サイトで企業を見つけて、管理・AI分析はCareoで。Chrome拡張機能（β）を使えば、就活サイト閲覧中にワンクリックでCareoに企業を追加できます。",
+  },
 ];
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -215,7 +223,7 @@ export function MobileLandingPage() {
         {/* badge */}
         <div className="inline-flex items-center gap-2 bg-[#00c896]/10 border border-[#00c896]/20 rounded-full px-3 py-1.5 mb-6 w-fit">
           <span className="w-1.5 h-1.5 rounded-full bg-[#00c896] animate-pulse" />
-          <span className="text-[#00c896] text-xs font-semibold tracking-wide">AI就活コーチ「カレオ」</span>
+          <span className="text-[#00c896] text-xs font-semibold tracking-wide">あなたの就活を丸ごと知るAIコーチ「カレオ」</span>
         </div>
 
         {/* headline */}
@@ -227,7 +235,8 @@ export function MobileLandingPage() {
         </h1>
 
         <p className="text-gray-400 text-sm leading-relaxed mb-8">
-          企業・ES・面接・OB訪問・締切——全部Careoに預けると、AIが整理して「今週やること」を教えてくれる。
+          企業・ES・面接・OB訪問・筆記試験をすべて一か所に。<br />
+          あなたのデータを全て把握したAIコーチ「カレオ」が、点と点を繋ぎ、ChatGPTにはできない個人化アドバイスを届ける。
         </p>
 
         <Link

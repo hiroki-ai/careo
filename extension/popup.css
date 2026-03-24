@@ -1,0 +1,248 @@
+/* ===========================
+   Careo Chrome Extension Popup
+   Brand color: #00c896
+   =========================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 320px;
+  min-height: 200px;
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic UI",
+    "Meiryo", sans-serif;
+  font-size: 13px;
+  color: #1a1a1a;
+  background: #ffffff;
+}
+
+/* ---- ヘッダー ---- */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #00c896;
+  color: #ffffff;
+}
+
+.header-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+}
+
+.header-title {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* ---- ビュー共通 ---- */
+.view {
+  padding: 16px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ---- 未ログイン ---- */
+.login-prompt {
+  text-align: center;
+  padding: 8px 0;
+}
+
+.login-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+
+.login-message {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #1a1a1a;
+}
+
+.login-sub {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+/* ---- サイトバッジ ---- */
+.site-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #e8faf4;
+  color: #00a87c;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 99px;
+  margin-bottom: 14px;
+  border: 1px solid #b3ead8;
+}
+
+/* ---- フォーム ---- */
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 4px;
+}
+
+.required {
+  color: #e53e3e;
+  margin-left: 2px;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #1a1a1a;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  border-color: #00c896;
+  box-shadow: 0 0 0 2px rgba(0, 200, 150, 0.12);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 60px;
+  line-height: 1.5;
+}
+
+.form-select {
+  cursor: pointer;
+  appearance: auto;
+}
+
+.form-error {
+  color: #e53e3e;
+  font-size: 12px;
+  padding: 6px 10px;
+  background: #fff5f5;
+  border: 1px solid #fed7d7;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+/* ---- ボタン ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border: none;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity 0.15s, background 0.15s;
+}
+
+.btn:hover {
+  opacity: 0.88;
+}
+
+.btn:active {
+  opacity: 0.75;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: #00c896;
+  color: #ffffff;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: #555;
+  border: 1px solid #d1d5db;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+/* ---- ローディング ---- */
+.loading-dots::after {
+  content: "";
+  animation: dots 1.2s steps(3, end) infinite;
+}
+
+@keyframes dots {
+  0%   { content: ""; }
+  33%  { content: "."; }
+  66%  { content: ".."; }
+  100% { content: "..."; }
+}
+
+/* ---- 成功画面 ---- */
+.success-content {
+  text-align: center;
+  padding: 4px 0;
+}
+
+.success-icon {
+  width: 48px;
+  height: 48px;
+  background: #00c896;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+}
+
+.success-message {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+}
+
+.success-company {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 16px;
+  word-break: break-all;
+}
+
+#add-another-btn {
+  margin-top: 8px;
+}

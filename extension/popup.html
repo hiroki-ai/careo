@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Careo</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+
+  <!-- ヘッダー -->
+  <header class="header">
+    <img src="icons/icon48.png" alt="Careo" class="header-icon" onerror="this.style.display='none'">
+    <span class="header-title">Careo</span>
+  </header>
+
+  <!-- 未ログイン状態 -->
+  <div id="view-not-logged-in" class="view hidden">
+    <div class="login-prompt">
+      <div class="login-icon">🔒</div>
+      <p class="login-message">Careoにログインしてください</p>
+      <p class="login-sub">ログイン後、拡張機能と自動で連携されます</p>
+      <a href="https://careoai.jp/login" target="_blank" class="btn btn-primary login-link">
+        Careoにログイン
+      </a>
+    </div>
+  </div>
+
+  <!-- フォーム（就活サイト上 / その他サイト 共通） -->
+  <div id="view-form" class="view hidden">
+    <div id="site-badge" class="site-badge hidden"></div>
+
+    <form id="add-form">
+      <div class="form-group">
+        <label for="company-name" class="form-label">企業名 <span class="required">*</span></label>
+        <input
+          type="text"
+          id="company-name"
+          class="form-input"
+          placeholder="例: 株式会社〇〇"
+          required
+          maxlength="100"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="industry" class="form-label">業界</label>
+        <select id="industry" class="form-select">
+          <option value="">選択してください</option>
+          <option value="IT">IT</option>
+          <option value="コンサル">コンサル</option>
+          <option value="メーカー">メーカー</option>
+          <option value="金融">金融</option>
+          <option value="商社">商社</option>
+          <option value="広告">広告</option>
+          <option value="マスコミ">マスコミ</option>
+          <option value="公務員">公務員</option>
+          <option value="その他">その他</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="notes" class="form-label">メモ</label>
+        <textarea
+          id="notes"
+          class="form-textarea"
+          placeholder="気になった点や志望動機のメモ..."
+          rows="3"
+          maxlength="500"
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="status" class="form-label">追加先ステータス</label>
+        <select id="status" class="form-select">
+          <option value="WISHLIST">気になる</option>
+          <option value="APPLIED">応募済み</option>
+        </select>
+      </div>
+
+      <div id="form-error" class="form-error hidden"></div>
+
+      <button type="submit" id="submit-btn" class="btn btn-primary btn-full">
+        <span id="submit-text">Careoに追加</span>
+        <span id="submit-loading" class="loading-dots hidden">追加中</span>
+      </button>
+    </form>
+  </div>
+
+  <!-- 追加成功状態 -->
+  <div id="view-success" class="view hidden">
+    <div class="success-content">
+      <div class="success-icon">✓</div>
+      <p class="success-message">追加しました！</p>
+      <p id="success-company-name" class="success-company"></p>
+      <a href="https://careoai.jp/companies" target="_blank" class="btn btn-primary btn-full">
+        企業一覧を確認する
+      </a>
+      <button id="add-another-btn" class="btn btn-ghost btn-full">
+        続けて追加する
+      </button>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

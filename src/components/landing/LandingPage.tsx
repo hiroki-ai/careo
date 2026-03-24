@@ -5,15 +5,16 @@ import Link from "next/link";
 import Script from "next/script";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
-const DEFAULT_BADGE = "AI就活コーチ「カレオ」";
+const DEFAULT_BADGE = "あなたの就活を丸ごと知るAIコーチ「カレオ」";
 const DEFAULT_HERO_SUBTEXT =
-  "企業・ES・面接・OB訪問・筆記試験をすべて一か所に。\nAIコーチ「カレオ」が全データを把握し、点と点を繋ぐ気づきを届ける。";
+  "企業・ES・面接・OB訪問・筆記試験をすべて一か所に。\nあなたのデータを全て把握したAIコーチ「カレオ」が、点と点を繋ぎ、ChatGPTにはできない個人化アドバイスを届ける。";
 const DEFAULT_AFTER_ITEMS = [
   "企業・ES・面接・OB訪問・筆記試験がすべて一か所。全体像が常に見える",
   "締切3日前に自動通知。見落としゼロ",
   "毎週AIがPDCAを自動分析。「今週何をすべきか」が即わかる",
   "ES提出前にAIが自己分析との整合性・文体・具体性を一括チェック",
   "面接・OB訪問・ESを横断した「点と点を繋ぐ気づき」をカレオが自動通知",
+  "マイナビ・リクナビはそのまま使いながら、Chrome拡張でCareoに一発追加。乗り換え不要",
 ];
 
 const jsonLd = {
@@ -45,6 +46,9 @@ const jsonLd = {
         "PDCA自動分析", "内定予測", "OB/OG訪問管理", "筆記試験管理",
         "クロスデータ気づき通知", "進捗ベンチマーク", "キャリアセンターレポート出力",
         "就活仲間グループ機能", "自己分析充実度トラッキング",
+        "Chrome拡張機能（マイナビ・リクナビ連携）",
+        "面接AIフィードバック（回答品質スコアリング）",
+        "就活進捗異常検知",
       ],
       "publisher": { "@type": "Organization", "name": "Careo" },
     },
@@ -85,6 +89,14 @@ const faqItems = [
   {
     q: "27卒・28卒・29卒でも使えますか？",
     a: "はい、27卒・28卒・29卒・30卒など卒業予定年度を問わずご利用いただけます。登録時に卒業予定年度を設定すると、その年度・フェーズに合わせたAIコーチングが受けられます。",
+  },
+  {
+    q: "ChatGPTと何が違うんですか？",
+    a: "ChatGPTはあなたの就活データを知りません。Careoは今まで書いた全てのES、面接記録、OB訪問の内容、企業のステータスを把握した上でアドバイスします。「あなたがA社に書いたガクチカと、今書いているB社のESで矛盾がある」ような指摘はCareoにしかできません。",
+  },
+  {
+    q: "マイナビやリクナビを使っていても使えますか？",
+    a: "はい、Careoはマイナビ・リクナビの代替ではなく補完ツールです。就活サイトで企業を見つけて、管理・AI分析はCareoで。Chrome拡張機能（β）を使えば、就活サイト閲覧中にワンクリックでCareoに企業を追加できます。",
   },
 ];
 
@@ -532,6 +544,63 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* ── ChatGPT差別化セクション ─────────────────────────────────────────── */}
+      <section className="px-6 py-16 bg-white reveal">
+        <div className="max-w-3xl mx-auto">
+          <div className="rounded-2xl border border-[#00c896]/25 bg-gradient-to-br from-[#00c896]/5 to-emerald-50/60 p-8">
+            <div className="text-center mb-8">
+              <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3">Why Not ChatGPT?</p>
+              <h2 className="text-2xl md:text-3xl font-bold text-[#0D0B21] tracking-tight leading-snug">
+                ChatGPTとは違う、<br />
+                <span className="text-[#00c896]">「記憶するAIコーチ」</span>
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div className="bg-white/70 border border-gray-200 rounded-xl p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-base font-bold text-gray-400">ChatGPT</span>
+                  <span className="text-xs bg-gray-100 text-gray-500 font-semibold px-2 py-0.5 rounded-full">汎用AI</span>
+                </div>
+                <ul className="space-y-2.5">
+                  {[
+                    "あなたの就活データを知らない",
+                    "毎回ゼロから説明し直しが必要",
+                    "「あなたのA社のES」を参照できない",
+                    "就活全体の矛盾に気づけない",
+                  ].map((t) => (
+                    <li key={t} className="flex gap-2 text-sm text-gray-500">
+                      <span className="text-gray-300 shrink-0 font-bold mt-0.5">✕</span>{t}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="bg-gradient-to-br from-[#00c896]/8 to-emerald-50 border border-[#00c896]/25 rounded-xl p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-base font-bold text-[#0D0B21]">Careo カレオ</span>
+                  <span className="text-xs bg-[#00c896]/15 text-[#00a87e] font-semibold px-2 py-0.5 rounded-full">就活専用AI</span>
+                </div>
+                <ul className="space-y-2.5">
+                  {[
+                    "全就活データを把握して個人化提案",
+                    "ES・面接・OB訪問を横断して記憶",
+                    "過去のESを参照して矛盾を指摘",
+                    "「あなたの場合」に最適化したアドバイス",
+                  ].map((t) => (
+                    <li key={t} className="flex gap-2 text-sm text-[#0D0B21]">
+                      <span className="text-[#00c896] shrink-0 font-bold mt-0.5">✓</span>{t}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <p className="text-center text-xs text-gray-500 leading-relaxed">
+              過去のES・面接記録・OB訪問情報を横断して、<br className="hidden md:block" />
+              「あなたの場合」に最適化したアドバイスを生成
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ── How it works ───────────────────────────────────────────────────── */}
       <section id="features" className="px-6 py-24 bg-gray-50/60 reveal">
         <div className="max-w-4xl mx-auto">
@@ -759,6 +828,7 @@ export function LandingPage() {
                   { label: "ES提出前AIチェック", careo: true, base: false, smart: false, riku: false, notion: false },
                   { label: "データ横断の気づき通知", careo: true, base: false, smart: false, riku: false, notion: false },
                   { label: "全データを把握したAIコーチ", careo: true, base: "△", smart: false, riku: false, notion: false },
+                  { label: "ChatGPT連携（就活データを知ったAI）", careo: true, base: false, smart: false, riku: false, notion: false },
                   { label: "キャリアセンターレポート出力", careo: true, base: false, smart: false, riku: false, notion: false },
                   { label: "学生は完全無料", careo: true, base: true, smart: "△制限あり", riku: true, notion: true },
                   { label: "広告・スカウト電話なし", careo: true, base: false, smart: true, riku: false, notion: true },
