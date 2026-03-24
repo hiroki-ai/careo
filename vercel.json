@@ -1,6 +1,14 @@
 {
   "crons": [
     {
+      "path": "/api/cron/blog-post",
+      "schedule": "0 23 * * *"
+    },
+    {
+      "path": "/api/cron/blog-pdca",
+      "schedule": "0 23 * * 0"
+    },
+    {
       "path": "/api/cron/team-report",
       "schedule": "0 22 * * *"
     },

@@ -29,7 +29,7 @@ export async function middleware(request: NextRequest) {
     const isAuthRoute = authRoutes.includes(pathname);
     const isOnboarding = pathname === "/onboarding";
 
-    const publicRoutes = ["/", "/terms", "/privacy", "/features", "/compare", "/for-career-center", "/career-portal/login", "/career-portal/setup"];
+    const publicRoutes = ["/", "/terms", "/privacy", "/features", "/compare", "/for-career-center", "/career-portal/login", "/career-portal/setup", "/blog"];
     const isPublicRoute = publicRoutes.some(r => pathname === r || pathname.startsWith(r + "/"));
 
     if (!user && !isAuthRoute && !isPublicRoute) {
@@ -89,7 +89,7 @@ export async function middleware(request: NextRequest) {
     // エラー時は安全のためログインページへリダイレクト
     const { pathname } = request.nextUrl;
     const authRoutes = ["/login", "/signup", "/forgot-password", "/reset-password"];
-    const publicRoutes2 = ["/", "/terms", "/privacy", "/features", "/compare", "/for-career-center", "/career-portal/login", "/career-portal/setup"];
+    const publicRoutes2 = ["/", "/terms", "/privacy", "/features", "/compare", "/for-career-center", "/career-portal/login", "/career-portal/setup", "/blog"];
     if (authRoutes.includes(pathname) || publicRoutes2.some(r => pathname === r || pathname.startsWith(r + "/"))) return NextResponse.next();
     return NextResponse.redirect(new URL("/login", request.url));
   }
