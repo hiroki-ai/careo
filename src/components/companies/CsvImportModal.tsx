@@ -133,18 +133,30 @@ export function CsvImportModal({ isOpen, onClose, onImportComplete, defaultTab =
     try {
       const form = new FormData();
       form.append("file", file);
-      const res = await fetch("/api/import/pdf", { method: "POST", body: form });
-      const json = await res.json() as {
+      let res: Response;
+      try {
+        res = await fetch("/api/import/pdf", { method: "POST", body: form });
+      } catch {
+        setError("ネットワークエラーが発生しました。接続を確認してもう一度お試しください。");
+        return;
+      }
+      let json: {
         companies?: ImportCompany[];
         obVisits?: ImportData["obVisits"];
         tests?: ImportData["tests"];
         interviews?: ImportData["interviews"];
         error?: string;
       };
+      try {
+        json = await res.json() as typeof json;
+      } catch {
+        setError("サーバーからの応答が不正です。もう一度お試しください。");
+        return;
+      }
       if (!res.ok || json.error) { setError(json.error ?? "解析に失敗しました"); return; }
       const total = (json.companies?.length ?? 0) + (json.obVisits?.length ?? 0) +
         (json.tests?.length ?? 0) + (json.interviews?.length ?? 0);
-      if (!total) { setError("就活情報が見つかりませんでした。別のPDFをお試しください。"); return; }
+      if (!total) { setError("就活情報が見つかりませんでした。企業名・選考状況などが含まれるPDFをお試しください。"); return; }
       setReviewData({
         companies: (json.companies ?? []).map(c => ({ name: c.name ?? "", industry: c.industry ?? "", status: (c.status as CompanyStatus) ?? "WISHLIST", notes: c.notes ?? "", url: c.url })),
         obVisits: json.obVisits ?? [],
@@ -234,7 +246,7 @@ export function CsvImportModal({ isOpen, onClose, onImportComplete, defaultTab =
                 <div className="text-3xl mb-2">📂</div>
                 <p className="text-sm font-semibold text-gray-700 mb-1">CSVファイルをドロップ</p>
                 <p className="text-xs text-gray-400">または クリックして選択（.csv）</p>
-                <input ref={fileRef} type="file" accept=".csv,text/csv" className="hidden"
+                <input ref={fileRef} type="file" accept=".csv,text/csv" className="hidden" title="CSVファイルを選択"
                   onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])} />
               </div>
               <div className="text-xs text-gray-400 space-y-1">
@@ -271,7 +283,7 @@ export function CsvImportModal({ isOpen, onClose, onImportComplete, defaultTab =
                     <p className="text-xs text-gray-400">または クリックして選択（.pdf・最大10MB）</p>
                   </>
                 )}
-                <input ref={pdfRef} type="file" accept=".pdf,application/pdf" className="hidden"
+                <input ref={pdfRef} type="file" accept=".pdf,application/pdf" className="hidden" title="PDFファイルを選択"
                   onChange={e => e.target.files?.[0] && handlePdfFile(e.target.files[0])} />
               </div>
               <div className="text-xs text-gray-400 space-y-1">
@@ -311,6 +323,7 @@ export function CsvImportModal({ isOpen, onClose, onImportComplete, defaultTab =
                       <span className="text-sm text-gray-700 w-36 truncate shrink-0 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5">{h}</span>
                       <span className="text-gray-300 text-xs">→</span>
                       <select value={mapping[i]} onChange={e => { const m = [...mapping]; m[i] = e.target.value as CareoField; setMapping(m); }}
+                        title={`「${h}」のマッピング先`}
                         className="flex-1 text-sm rounded-lg border border-gray-200 px-3 py-1.5 focus:outline-none focus:border-[#00c896] bg-white">
                         {careoFields.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
                       </select>

@@ -19,15 +19,25 @@ export async function POST(request: NextRequest) {
   if (file.size > 10 * 1024 * 1024) return NextResponse.json({ error: "ファイルサイズは10MB以下にしてください" }, { status: 400 });
 
   // PDF テキスト抽出
+  // pdf-parse v2 のテストファイル読み込み問題を回避するため lib 直下を require
   let pdfText = "";
   try {
     const buffer = Buffer.from(await file.arrayBuffer());
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const pdfParse = require("pdf-parse") as (buf: Buffer) => Promise<{ text: string }>;
+    const pdfParse = require("pdf-parse/lib/pdf-parse") as (buf: Buffer) => Promise<{ text: string }>;
     const data = await pdfParse(buffer);
     pdfText = data.text;
   } catch {
-    return NextResponse.json({ error: "PDFの読み込みに失敗しました。テキストが含まれているPDFか確認してください。" }, { status: 400 });
+    // フォールバック: 通常パスで再試行
+    try {
+      const buffer = Buffer.from(await file.arrayBuffer());
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const pdfParse = require("pdf-parse") as (buf: Buffer) => Promise<{ text: string }>;
+      const data = await pdfParse(buffer);
+      pdfText = data.text;
+    } catch {
+      return NextResponse.json({ error: "PDFの読み込みに失敗しました。テキストが含まれているPDFか確認してください。" }, { status: 400 });
+    }
   }
 
   if (!pdfText.trim()) {
@@ -36,16 +46,23 @@ export async function POST(request: NextRequest) {
 
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
 
-  const prompt = `以下は就活生のPDFから抽出したテキストです。就活管理に関わる情報をすべて抽出して、以下のJSON形式で返してください。
+  // Notion PDF はヘッダー・ナビゲーション等のノイズが多いため前処理でクリーニング
+  const cleanedText = pdfText
+    .replace(/\f/g, "\n")                        // ページ区切りを改行に
+    .replace(/[ \t]{3,}/g, "  ")                 // 連続スペースを圧縮
+    .replace(/\n{4,}/g, "\n\n\n")                // 連続改行を圧縮
+    .trim();
+
+  const prompt = `以下はPDFから抽出したテキストです。就活・インターン・企業研究に関連する情報をすべて抽出して、JSON形式で返してください。
 
 抽出対象：
-1. companies（企業・選考）
+1. companies（企業・選考・インターン・気になる企業）
    - name: 企業名（必須）
    - industry: 業界（わかれば）
    - status: WISHLIST/APPLIED/DOCUMENT/INTERVIEW_1/INTERVIEW_2/FINAL/OFFERED/REJECTED/INTERN_APPLYING/INTERN（不明はWISHLIST）
    - notes: 締切・メモ等
 
-2. obVisits（OB訪問・会社説明会・インターン参加記録）
+2. obVisits（OB訪問・OGOG訪問・会社説明会・インターン参加記録）
    - companyName: 企業名（必須）
    - purpose: ob_visit/info_session/internship（不明はob_visit）
    - visitedAt: 日付（YYYY-MM-DD、不明は""）
@@ -53,14 +70,14 @@ export async function POST(request: NextRequest) {
    - insights: 気づき・メモ
    - impression: positive/neutral/negative（不明は"neutral"）
 
-3. tests（筆記試験・適性検査）
+3. tests（筆記試験・適性検査・Webテスト）
    - companyName: 企業名（必須）
    - testType: SPI/TG-WEB/玉手箱/CAB/GAB/SCOA/その他
    - testDate: 日付（YYYY-MM-DD、不明は""）
    - result: PASS/FAIL/PENDING（不明はPENDING）
    - notes: メモ
 
-4. interviews（面接記録）
+4. interviews（面接・選考記録）
    - companyName: 企業名（必須）
    - round: 面接回数（数値、不明は1）
    - scheduledAt: 日付（YYYY-MM-DD、不明は""）
@@ -68,13 +85,14 @@ export async function POST(request: NextRequest) {
    - notes: 質問・フィードバック等のメモ
 
 ルール：
-- 企業名が不明確なものは含めない
+- 企業名が明確なものだけ含める（略称・通称も可）
 - 同一情報の重複は除く
-- 就活と無関係な情報は含めない
+- 就活・インターン・企業研究と無関係な情報は含めない
 - 情報がない項目は空配列 []
+- 企業名リストだけ書かれていてもcompaniesに全て含める（status: WISHLIST）
 
-PDFテキスト（先頭6000文字）：
-${pdfText.slice(0, 6000)}
+PDFテキスト（先頭15000文字）：
+${cleanedText.slice(0, 15000)}
 
 JSON形式のみで返答（説明文不要）：
 {"companies":[...],"obVisits":[...],"tests":[...],"interviews":[...]}`;
