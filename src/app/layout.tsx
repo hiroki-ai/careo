@@ -57,9 +57,75 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${APP_URL}/#website`,
+      "url": APP_URL,
+      "name": "Careo（カレオ）",
+      "description": "AI就活コーチアプリ。選考・ES・面接・OB訪問を一元管理。",
+      "inLanguage": "ja",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": `${APP_URL}/companies?q={search_term_string}`,
+        },
+        "query-input": "required name=search_term_string",
+      },
+    },
+    {
+      "@type": "ItemList",
+      "name": "Careo メインメニュー",
+      "itemListElement": [
+        {
+          "@type": "SiteLinksSearchBox",
+          "url": APP_URL,
+        },
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "学生ログイン",
+          "url": `${APP_URL}/login`,
+          "description": "就活管理アプリCareoに学生としてログイン",
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "新規登録（無料）",
+          "url": `${APP_URL}/signup`,
+          "description": "Careoに無料で新規登録する",
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "キャリアセンター担当者ログイン",
+          "url": `${APP_URL}/login?next=/career-portal`,
+          "description": "大学キャリアセンター担当者向けポータルにログイン",
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "大学キャリアセンター向けサービス",
+          "url": `${APP_URL}/for-career-center`,
+          "description": "大学キャリアセンターとの提携・連携について",
+        },
+      ],
+    },
+  ],
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ja">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className={`${geist.variable} font-sans antialiased bg-gray-50`}>
         <ToastProvider>
           <PwaInstallBanner />

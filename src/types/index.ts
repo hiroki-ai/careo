@@ -238,6 +238,83 @@ export const APTITUDE_TEST_TYPES: AptitudeTest["testType"][] = [
   "SPI", "TG-WEB", "玉手箱", "CAB", "GAB", "SCOA", "その他",
 ];
 
+// ============================================================
+// キャリアセンターポータル（スタッフ側）型定義
+// ============================================================
+
+export interface CareerCenterStaff {
+  id: string;
+  userId: string;
+  university: string;
+  name: string;
+  role: "staff" | "manager";
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CareerCenterAnnouncement {
+  id: string;
+  staffId: string;
+  university: string;
+  title: string;
+  body: string;
+  targetGrade?: string | null;
+  targetGradYear?: number | null;
+  isPublished: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ポータル学生一覧用サマリー型
+export interface StudentSummary {
+  userId: string;
+  name?: string; // user_profiles に name がない場合は email から
+  email: string;
+  university: string;
+  faculty: string;
+  grade: string;
+  graduationYear: number;
+  jobSearchStage: JobSearchStage;
+  targetIndustries: string[];
+  targetJobs: string[];
+  careerCenterVisibility: CareerCenterVisibility;
+  // 集計
+  companiesCount: number;
+  offeredCount: number;
+  interviewCount: number;
+  obVisitCount: number;
+  createdAt: string;
+}
+
+// 学生詳細用型（visibility を考慮した表示データ）
+export interface StudentDetail extends StudentSummary {
+  careerAxis?: string;
+  selfPr?: string;
+  strengths?: string;
+  weaknesses?: string;
+  companies: {
+    id: string;
+    name: string;
+    industry: string;
+    status: CompanyStatus;
+  }[];
+  obVisits: {
+    id: string;
+    companyName: string;
+    visitedAt: string;
+    purpose: string;
+    impression?: string;
+  }[];
+  aptitudeTests: {
+    id: string;
+    companyName: string;
+    testType: string;
+    result: string;
+    scoreVerbal?: number;
+    scoreNonverbal?: number;
+  }[];
+}
+
 export const COMPANY_STATUS_COLORS: Record<CompanyStatus, string> = {
   WISHLIST: "bg-gray-100 text-gray-700",
   INTERN_APPLYING: "bg-teal-50 text-teal-600",

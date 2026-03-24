@@ -1,13 +1,17 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextPath = searchParams.get("next") ?? "/";
+  const isStaffLogin = nextPath.startsWith("/career-portal");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -27,30 +31,39 @@ export default function LoginPage() {
       }
       setLoading(false);
     } else {
-      // Chrome拡張機能にトークンを送信（インストール済みの場合のみ動作）
-      try {
-        const supabase2 = createClient();
-        const { data: { session } } = await supabase2.auth.getSession();
-        if (session?.access_token) {
-          window.postMessage({ type: "CAREO_AUTH_TOKEN", token: session.access_token }, window.location.origin);
+      if (!isStaffLogin) {
+        // Chrome拡張機能にトークンを送信（インストール済みの場合のみ動作）
+        try {
+          const supabase2 = createClient();
+          const { data: { session } } = await supabase2.auth.getSession();
+          if (session?.access_token) {
+            window.postMessage({ type: "CAREO_AUTH_TOKEN", token: session.access_token }, window.location.origin);
+          }
+        } catch {
+          // 拡張機能未インストール時は無視
         }
-      } catch {
-        // 拡張機能未インストール時は無視
       }
-      router.push("/");
+      router.push(nextPath);
       router.refresh();
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0a1628] flex items-center justify-center p-4">
+    <div className={`min-h-screen flex items-center justify-center p-4 ${isStaffLogin ? "bg-[#0d1b2a]" : "bg-[#0a1628]"}`}>
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-2">
             <img src="/icon-new.svg" alt="Careo" className="w-8 h-8 rounded-xl" />
             <h1 className="text-2xl font-bold text-[#0a1628]">Careo</h1>
           </div>
-          <p className="text-sm text-gray-400">ログイン</p>
+          {isStaffLogin ? (
+            <div>
+              <p className="text-sm font-medium text-gray-700">キャリアセンター担当者ログイン</p>
+              <p className="text-xs text-gray-400 mt-1">ポータル管理画面にアクセスします</p>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-400">ログイン</p>
+          )}
         </div>
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
@@ -95,5 +108,17 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#0a1628] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white" />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

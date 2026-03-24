@@ -192,6 +192,18 @@ export default function CareerCenterLandingPage() {
             >
               お問い合わせ
             </a>
+            <Link
+              href="/login"
+              className="text-sm text-gray-500 hover:text-gray-800 transition-colors hidden md:block"
+            >
+              学生ログイン
+            </Link>
+            <Link
+              href="/login?next=/career-portal"
+              className="text-sm text-gray-500 hover:text-gray-800 transition-colors hidden md:block"
+            >
+              担当者ログイン
+            </Link>
             <a
               href="#contact"
               className="text-sm font-bold text-[#00c896] border border-[#00c896] px-4 py-2 rounded-xl hover:bg-[#00c896]/10 transition-all hidden md:block"
@@ -1117,6 +1129,8 @@ export default function CareerCenterLandingPage() {
           </div>
           <div className="flex items-center gap-5">
             <Link href="/" className="hover:text-[#00c896] transition-colors">学生向けLP</Link>
+            <Link href="/login" className="hover:text-[#00c896] transition-colors">学生ログイン</Link>
+            <Link href="/login?next=/career-portal" className="hover:text-[#00c896] transition-colors">担当者ログイン</Link>
             <Link href="/terms" className="hover:text-[#00c896] transition-colors">利用規約</Link>
             <Link href="/privacy" className="hover:text-[#00c896] transition-colors">プライバシーポリシー</Link>
           </div>
