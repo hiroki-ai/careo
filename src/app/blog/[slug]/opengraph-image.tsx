@@ -56,47 +56,48 @@ export default async function Image({ params }: Props) {
         style={{
           width: "1200px",
           height: "630px",
-          background: "#0D0B21",
+          background: `linear-gradient(135deg, #0D0B21 0%, #111028 40%, ${gradFrom}55 100%)`,
           display: "flex",
           flexDirection: "column",
           position: "relative",
           overflow: "hidden",
         }}
       >
-        {/* 背景グラデーション装飾 */}
+        {/* 右上の大きな光彩 */}
         <div
           style={{
             position: "absolute",
-            top: "-120px",
-            right: "-120px",
-            width: "500px",
-            height: "500px",
+            top: "-160px",
+            right: "-160px",
+            width: "640px",
+            height: "640px",
             borderRadius: "50%",
-            background: `radial-gradient(circle, ${gradFrom}22, transparent 70%)`,
+            background: `radial-gradient(circle, ${gradFrom}55 0%, ${gradTo}22 50%, transparent 75%)`,
             display: "flex",
           }}
         />
+        {/* 左下の補助光彩 */}
         <div
           style={{
             position: "absolute",
-            bottom: "-80px",
+            bottom: "-120px",
             left: "-80px",
-            width: "400px",
-            height: "400px",
+            width: "500px",
+            height: "500px",
             borderRadius: "50%",
-            background: `radial-gradient(circle, ${gradTo}18, transparent 70%)`,
+            background: `radial-gradient(circle, ${gradTo}33 0%, transparent 65%)`,
             display: "flex",
           }}
         />
 
-        {/* 上部アクセントライン */}
+        {/* 上部アクセントライン（太め） */}
         <div
           style={{
             position: "absolute",
             top: 0,
             left: 0,
             right: 0,
-            height: "5px",
+            height: "8px",
             background: `linear-gradient(90deg, ${gradFrom}, ${gradTo})`,
             display: "flex",
           }}
