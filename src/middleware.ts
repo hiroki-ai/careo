@@ -29,7 +29,7 @@ export async function middleware(request: NextRequest) {
     const isAuthRoute = authRoutes.includes(pathname);
     const isOnboarding = pathname === "/onboarding";
 
-    const publicRoutes = ["/", "/terms", "/privacy", "/features", "/compare", "/for-career-center"];
+    const publicRoutes = ["/", "/terms", "/privacy", "/features", "/compare", "/for-career-center", "/career-portal/login"];
     const isPublicRoute = publicRoutes.some(r => pathname === r || pathname.startsWith(r + "/"));
 
     if (!user && !isAuthRoute && !isPublicRoute) {
