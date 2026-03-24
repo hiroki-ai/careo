@@ -2,6 +2,8 @@ import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "就活ブログ | Careo — ES・面接・OB訪問・自己分析の実践ガイド",
   description:

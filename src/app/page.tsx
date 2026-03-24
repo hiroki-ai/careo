@@ -1,6 +1,8 @@
 import { headers } from "next/headers";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
+
+export const revalidate = 3600; // 1時間ごとに再取得（ブログ新着を反映）
 import { LandingPage } from "@/components/landing/LandingPage";
 import { MobileLandingPage } from "@/components/landing/MobileLandingPage";
 import { DashboardContent } from "@/components/dashboard/DashboardContent";
