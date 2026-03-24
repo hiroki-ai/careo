@@ -31,7 +31,9 @@ async function getPost(slug: string): Promise<Post | null> {
   return data ?? null;
 }
 
-async function getRelated(post: Post): Promise<Post[]> {
+type RelatedPost = Omit<Post, "body">;
+
+async function getRelated(post: Post): Promise<RelatedPost[]> {
   if (!post.tags.length) return [];
   const { data } = await supabaseServer()
     .from("blog_posts")
@@ -87,7 +89,7 @@ export default async function BlogPostPage({ params }: Props) {
   const post = await getPost(slug);
   if (!post) notFound();
 
-  const related = await getRelated(post);
+  const related: RelatedPost[] = await getRelated(post);
 
   const jsonLd = {
     "@context": "https://schema.org",
