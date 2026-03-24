@@ -149,6 +149,8 @@ export default function EsDetailPage({ params }: { params: Promise<{ id: string 
   const [isCheckOpen, setIsCheckOpen] = useState(false);
   const [checkResult, setCheckResult] = useState<EsCheckResult | null>(null);
   const [checkLoading, setCheckLoading] = useState(false);
+  const [reviewRequesting, setReviewRequesting] = useState(false);
+  const [reviewSent, setReviewSent] = useState(false);
 
   const es = esList.find((e) => e.id === id);
   const company = es ? companies.find((c) => c.id === es.companyId) : null;
@@ -209,6 +211,20 @@ export default function EsDetailPage({ params }: { params: Promise<{ id: string 
     setIsCheckOpen(false);
   };
 
+  const handleReviewRequest = async () => {
+    setReviewRequesting(true);
+    try {
+      await fetch("/api/es-review", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ esEntryId: id }),
+      });
+      setReviewSent(true);
+    } finally {
+      setReviewRequesting(false);
+    }
+  };
+
   return (
     <div className="p-4 md:p-8 max-w-3xl">
       <Link href="/es" className="text-sm text-gray-400 hover:text-gray-600 mb-3 inline-block">← ES一覧</Link>
@@ -238,6 +254,18 @@ export default function EsDetailPage({ params }: { params: Promise<{ id: string 
               className="bg-indigo-600 hover:bg-indigo-700 text-white"
             >
               📋 提出前チェック
+            </Button>
+          )}
+          {reviewSent ? (
+            <span className="text-xs text-emerald-600 font-medium self-center">✓ 添削依頼済み</span>
+          ) : (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleReviewRequest}
+              disabled={reviewRequesting}
+            >
+              {reviewRequesting ? "送信中..." : "📝 添削依頼"}
             </Button>
           )}
           <Button variant="secondary" size="sm" onClick={() => setIsEditOpen(true)}>編集</Button>

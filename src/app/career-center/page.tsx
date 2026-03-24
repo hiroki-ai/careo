@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useProfile } from "@/hooks/useProfile";
 import { useCompanies } from "@/hooks/useCompanies";
 import { useEs } from "@/hooks/useEs";
@@ -10,8 +10,32 @@ import { useAptitudeTests } from "@/hooks/useAptitudeTests";
 import { COMPANY_STATUS_LABELS } from "@/types";
 import { formatDate } from "@/lib/utils";
 
+interface Message {
+  id: string;
+  body: string;
+  isRead: boolean;
+  sentAt: string;
+}
+
 export default function CareerCenterPage() {
   const { profile, loading: profileLoading } = useProfile();
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  useEffect(() => {
+    fetch("/api/messages")
+      .then((r) => r.json())
+      .then((data) => setMessages(Array.isArray(data) ? data : []))
+      .catch(() => {});
+  }, []);
+
+  const markRead = (id: string) => {
+    fetch("/api/messages", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    setMessages((prev) => prev.map((m) => m.id === id ? { ...m, isRead: true } : m));
+  };
   const { companies } = useCompanies();
   const { esList } = useEs();
   const { interviews } = useInterviews();
@@ -33,13 +57,52 @@ export default function CareerCenterPage() {
   return (
     <div className="p-4 md:p-8 max-w-3xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">キャリアセンターレポート</h1>
-        <p className="text-sm text-gray-400 mt-0.5">就活の全データを1枚のレポートにまとめて印刷・提出</p>
+        <h1 className="text-2xl font-bold text-gray-900">キャリアセンター</h1>
+        <p className="text-sm text-gray-400 mt-0.5">メッセージ確認・就活レポートの印刷・提出</p>
       </div>
+
+      {/* キャリアセンターからのメッセージ */}
+      {messages.length > 0 && (
+        <div className="mb-6">
+          <h2 className="text-sm font-semibold text-gray-700 mb-3">
+            📬 キャリアセンターからのメッセージ
+            {messages.some((m) => !m.isRead) && (
+              <span className="ml-2 inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-500 text-white text-[10px] font-bold">
+                {messages.filter((m) => !m.isRead).length}
+              </span>
+            )}
+          </h2>
+          <div className="space-y-2">
+            {messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`rounded-xl border p-4 ${msg.isRead ? "bg-white border-gray-100" : "bg-blue-50 border-blue-200"}`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <p className="text-sm text-gray-800 whitespace-pre-wrap flex-1">{msg.body}</p>
+                  {!msg.isRead && (
+                    <button
+                      type="button"
+                      onClick={() => markRead(msg.id)}
+                      className="shrink-0 text-xs text-blue-600 hover:underline"
+                    >
+                      既読にする
+                    </button>
+                  )}
+                </div>
+                <p className="text-[11px] text-gray-400 mt-2">
+                  {new Date(msg.sentAt).toLocaleDateString("ja-JP", { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div>
           <div className="flex items-center justify-between mb-6 print:hidden">
-            <p className="text-sm text-gray-500">キャリアセンター提出用 · {today}時点</p>
+            <p className="text-sm font-semibold text-gray-700">就活レポート（印刷・提出用）</p>
+            <p className="text-sm text-gray-500">{today}時点</p>
             <button
               type="button"
               onClick={() => window.print()}

@@ -315,6 +315,113 @@ export interface StudentDetail extends StudentSummary {
   }[];
 }
 
+// ── Phase 2 新規型定義 ───────────────────────────────────────────
+
+export type MeetingOutcome = "positive" | "neutral" | "followup_needed";
+
+export interface CareerCenterMeeting {
+  id: string;
+  staffId: string;
+  studentUserId: string;
+  university: string;
+  metAt: string;
+  notes?: string | null;
+  outcome: MeetingOutcome;
+  createdAt: string;
+}
+
+export type EsReviewStatus = "pending" | "ai_done" | "staff_done" | "closed";
+
+export interface EsReviewRequest {
+  id: string;
+  studentUserId: string;
+  university: string;
+  esEntryId: string;
+  esSnapshot: {
+    title: string;
+    questions: { question: string; answer: string }[];
+  };
+  companyName?: string | null;
+  studentMessage?: string | null;
+  aiComment?: {
+    score: number;
+    readyToSubmit: boolean;
+    checks: { passed: boolean; label: string; detail: string }[];
+    summary: string;
+    suggestions: string[];
+  } | null;
+  aiGeneratedAt?: string | null;
+  staffFeedback?: string | null;
+  staffId?: string | null;
+  status: EsReviewStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type AlertType = "inactive_30d" | "no_companies_late" | "consecutive_rejections";
+
+export interface CareerCenterAlert {
+  id: string;
+  university: string;
+  studentUserId: string;
+  alertType: AlertType;
+  alertDetail?: Record<string, unknown> | null;
+  isResolved: boolean;
+  resolvedBy?: string | null;
+  resolvedAt?: string | null;
+  createdAt: string;
+}
+
+export interface CareerCenterMessage {
+  id: string;
+  staffId: string;
+  studentUserId: string;
+  university: string;
+  body: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
+export type EventType = "guidance" | "briefing" | "workshop" | "other";
+
+export interface CareerCenterEvent {
+  id: string;
+  staffId: string;
+  university: string;
+  title: string;
+  eventType: EventType;
+  heldAt: string;
+  description?: string | null;
+  createdAt: string;
+}
+
+export interface EventAttendance {
+  id: string;
+  eventId: string;
+  studentUserId: string;
+  university: string;
+  attendedAt: string;
+}
+
+export const EVENT_TYPE_LABELS: Record<EventType, string> = {
+  guidance: "就活ガイダンス",
+  briefing: "企業説明会",
+  workshop: "ワークショップ",
+  other: "その他",
+};
+
+export const MEETING_OUTCOME_LABELS: Record<MeetingOutcome, string> = {
+  positive: "良好",
+  neutral: "通常",
+  followup_needed: "フォローアップ必要",
+};
+
+export const ALERT_TYPE_LABELS: Record<AlertType, string> = {
+  inactive_30d: "30日以上未ログイン",
+  no_companies_late: "企業登録なし（時期遅れ）",
+  consecutive_rejections: "連続不合格",
+};
+
 export const COMPANY_STATUS_COLORS: Record<CompanyStatus, string> = {
   WISHLIST: "bg-gray-100 text-gray-700",
   INTERN_APPLYING: "bg-teal-50 text-teal-600",

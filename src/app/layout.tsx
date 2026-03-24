@@ -4,6 +4,7 @@ import "./globals.css";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { PwaInstallBanner } from "@/components/layout/PwaInstallBanner";
+import { ActivityTracker } from "@/components/layout/ActivityTracker";
 import { ToastProvider } from "@/components/ui/Toast";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
@@ -128,6 +129,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={`${geist.variable} font-sans antialiased bg-gray-50`}>
         <ToastProvider>
+          <ActivityTracker />
           <PwaInstallBanner />
           <div className="flex min-h-screen">
             <Sidebar />

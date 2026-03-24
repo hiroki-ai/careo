@@ -2,7 +2,14 @@
 
 import { useEffect, useState, use } from "react";
 import Link from "next/link";
-import { COMPANY_STATUS_LABELS, COMPANY_STATUS_COLORS } from "@/types";
+import { COMPANY_STATUS_LABELS, COMPANY_STATUS_COLORS, MEETING_OUTCOME_LABELS, MeetingOutcome } from "@/types";
+
+interface Meeting {
+  id: string;
+  metAt: string;
+  notes: string | null;
+  outcome: MeetingOutcome;
+}
 
 interface StudentDetail {
   userId: string;
@@ -72,15 +79,61 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
+  // 面談記録
+  const [meetings, setMeetings] = useState<Meeting[]>([]);
+  const [showMeetingForm, setShowMeetingForm] = useState(false);
+  const [meetingForm, setMeetingForm] = useState({ metAt: new Date().toISOString().split("T")[0], notes: "", outcome: "neutral" as MeetingOutcome });
+  const [savingMeeting, setSavingMeeting] = useState(false);
+
+  // メッセージ送信
+  const [messageBody, setMessageBody] = useState("");
+  const [sendingMsg, setSendingMsg] = useState(false);
+  const [msgSent, setMsgSent] = useState(false);
+
   useEffect(() => {
-    fetch(`/api/career-portal/students/${id}`)
-      .then(async (r) => {
-        if (r.status === 404) { setNotFound(true); return; }
-        const d = await r.json();
-        setStudent(d.student);
-      })
-      .finally(() => setLoading(false));
+    Promise.all([
+      fetch(`/api/career-portal/students/${id}`),
+      fetch(`/api/career-portal/meetings?studentId=${id}`),
+    ]).then(async ([studentRes, meetingsRes]) => {
+      if (studentRes.status === 404) { setNotFound(true); return; }
+      const sd = await studentRes.json();
+      const md = await meetingsRes.json();
+      setStudent(sd.student);
+      setMeetings(md.meetings ?? []);
+    }).finally(() => setLoading(false));
   }, [id]);
+
+  const saveMeeting = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingMeeting(true);
+    const res = await fetch("/api/career-portal/meetings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ studentUserId: id, ...meetingForm }),
+    });
+    if (res.ok) {
+      const { meeting } = await res.json();
+      setMeetings((prev) => [meeting, ...prev]);
+      setShowMeetingForm(false);
+      setMeetingForm({ metAt: new Date().toISOString().split("T")[0], notes: "", outcome: "neutral" });
+    }
+    setSavingMeeting(false);
+  };
+
+  const sendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!messageBody.trim()) return;
+    setSendingMsg(true);
+    await fetch("/api/career-portal/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ studentUserId: id, body: messageBody }),
+    });
+    setMessageBody("");
+    setMsgSent(true);
+    setSendingMsg(false);
+    setTimeout(() => setMsgSent(false), 3000);
+  };
 
   if (loading) {
     return (
@@ -243,6 +296,118 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
                 </div>
               </div>
             ))}
+          </div>
+        )}
+      </SectionCard>
+
+      {/* メッセージ送信 */}
+      <SectionCard title="学生へメッセージを送る">
+        <form onSubmit={sendMessage} className="space-y-3">
+          <textarea
+            value={messageBody}
+            onChange={(e) => setMessageBody(e.target.value)}
+            placeholder="Careoアプリ内で学生に届きます。面談の案内や声かけにご活用ください。"
+            className="w-full border border-gray-200 rounded-lg p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            rows={3}
+          />
+          <div className="flex items-center gap-3">
+            <button
+              type="submit"
+              disabled={sendingMsg || !messageBody.trim()}
+              className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            >
+              {sendingMsg ? "送信中..." : "送信"}
+            </button>
+            {msgSent && <span className="text-sm text-green-600">✓ 送信しました</span>}
+          </div>
+        </form>
+      </SectionCard>
+
+      {/* 面談記録 */}
+      <SectionCard title="面談記録">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-xs text-gray-400">{meetings.length}件の記録</p>
+          <button
+            type="button"
+            onClick={() => setShowMeetingForm(!showMeetingForm)}
+            className="text-xs px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg font-medium transition-colors"
+          >
+            + 面談を記録
+          </button>
+        </div>
+
+        {showMeetingForm && (
+          <form onSubmit={saveMeeting} className="mb-4 p-4 bg-blue-50 rounded-xl space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label htmlFor="meeting-date" className="text-xs text-gray-500 mb-1 block">面談日</label>
+                <input
+                  id="meeting-date"
+                  type="date"
+                  value={meetingForm.metAt}
+                  onChange={(e) => setMeetingForm({ ...meetingForm, metAt: e.target.value })}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label htmlFor="meeting-outcome" className="text-xs text-gray-500 mb-1 block">アウトカム</label>
+                <select
+                  id="meeting-outcome"
+                  value={meetingForm.outcome}
+                  onChange={(e) => setMeetingForm({ ...meetingForm, outcome: e.target.value as MeetingOutcome })}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {Object.entries(MEETING_OUTCOME_LABELS).map(([k, v]) => (
+                    <option key={k} value={k}>{v}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block">メモ（任意）</label>
+              <textarea
+                value={meetingForm.notes}
+                onChange={(e) => setMeetingForm({ ...meetingForm, notes: e.target.value })}
+                placeholder="面談の内容・学生の状況・次回フォロー事項など"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                rows={3}
+              />
+            </div>
+            <div className="flex gap-2">
+              <button type="submit" disabled={savingMeeting} className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50">
+                {savingMeeting ? "保存中..." : "保存"}
+              </button>
+              <button type="button" onClick={() => setShowMeetingForm(false)} className="px-3 py-2 bg-white text-gray-600 text-sm rounded-lg hover:bg-gray-100">
+                キャンセル
+              </button>
+            </div>
+          </form>
+        )}
+
+        {meetings.length === 0 ? (
+          <p className="text-sm text-gray-400">まだ面談記録がありません</p>
+        ) : (
+          <div className="space-y-2">
+            {meetings.map((m) => {
+              const outcomeColors: Record<MeetingOutcome, string> = {
+                positive: "bg-green-100 text-green-700",
+                neutral: "bg-gray-100 text-gray-600",
+                followup_needed: "bg-amber-100 text-amber-700",
+              };
+              return (
+                <div key={m.id} className="p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm font-medium text-gray-700">
+                      {new Date(m.metAt).toLocaleDateString("ja-JP")}
+                    </span>
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${outcomeColors[m.outcome]}`}>
+                      {MEETING_OUTCOME_LABELS[m.outcome]}
+                    </span>
+                  </div>
+                  {m.notes && <p className="text-xs text-gray-600 leading-relaxed">{m.notes}</p>}
+                </div>
+              );
+            })}
           </div>
         )}
       </SectionCard>
