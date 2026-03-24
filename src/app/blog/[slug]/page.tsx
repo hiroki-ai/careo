@@ -132,7 +132,7 @@ export default async function BlogPostPage({ params }: Props) {
       <div className="min-h-screen bg-gray-50">
         {/* ─── ヘッダー ─────────────────────────────── */}
         <header className="border-b border-gray-200 bg-white/80 backdrop-blur-md sticky top-0 z-50">
-          <div className="max-w-3xl mx-auto px-5 h-14 flex items-center justify-between">
+          <div className="max-w-4xl mx-auto px-4 md:px-8 h-14 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
               <img src="/icon-new.svg" alt="Careo" className="w-6 h-6" />
               <span className="font-bold text-[#0D0B21] text-sm">Careo</span>
@@ -147,20 +147,20 @@ export default async function BlogPostPage({ params }: Props) {
         </header>
 
         {/* ─── パンくず ─────────────────────────────── */}
-        <div className="max-w-3xl mx-auto px-5 pt-6 pb-0">
+        <div className="max-w-4xl mx-auto px-4 md:px-8 pt-5 pb-0">
           <nav className="flex items-center gap-1.5 text-xs text-gray-400">
             <Link href="/" className="hover:text-gray-600 transition-colors">Careo</Link>
             <span>/</span>
             <Link href="/blog" className="hover:text-gray-600 transition-colors">ブログ</Link>
             <span>/</span>
-            <span className="text-gray-600 truncate max-w-[200px]">{post.title}</span>
+            <span className="text-gray-600 truncate max-w-[180px] md:max-w-xs">{post.title}</span>
           </nav>
         </div>
 
         {/* ─── 記事本体 ─────────────────────────────── */}
-        <article className="max-w-3xl mx-auto px-5 py-8">
+        <article className="max-w-4xl mx-auto px-4 md:px-8 py-6 md:py-10">
           {/* タグ */}
-          <div className="flex flex-wrap gap-1.5 mb-4">
+          <div className="flex flex-wrap gap-1.5 mb-3 md:mb-4">
             {post.tags.map((tag) => (
               <span
                 key={tag}
@@ -172,12 +172,12 @@ export default async function BlogPostPage({ params }: Props) {
           </div>
 
           {/* タイトル */}
-          <h1 className="text-2xl md:text-3xl font-bold text-[#0D0B21] tracking-tight leading-snug mb-4">
+          <h1 className="text-[1.35rem] leading-snug md:text-[2rem] md:leading-tight font-bold text-[#0D0B21] tracking-tight mb-4">
             {post.title}
           </h1>
 
           {/* メタ情報 */}
-          <div className="flex items-center gap-4 text-xs text-gray-400 mb-8 pb-6 border-b border-gray-200">
+          <div className="flex flex-wrap items-center gap-3 md:gap-5 text-xs text-gray-400 mb-6 md:mb-10 pb-5 md:pb-7 border-b border-gray-200">
             <div className="flex items-center gap-1.5">
               <img src="/icon-new.svg" alt="" className="w-4 h-4" />
               <span className="font-semibold text-gray-600">Careo編集部</span>
@@ -198,19 +198,19 @@ export default async function BlogPostPage({ params }: Props) {
           />
 
           {/* ─── 記事末尾CTA ───────────────────────── */}
-          <div className="mt-12 bg-gradient-to-br from-[#0D0B21] to-[#1a1830] rounded-3xl px-8 py-10 text-center">
-            <div className="inline-flex items-center gap-2 border border-[#00c896]/40 bg-[#00c896]/10 text-[#00c896] text-xs font-semibold px-3 py-1.5 rounded-full mb-5">
+          <div className="mt-10 md:mt-14 bg-gradient-to-br from-[#0D0B21] to-[#1a1830] rounded-2xl md:rounded-3xl px-6 md:px-10 py-8 md:py-12 text-center">
+            <div className="inline-flex items-center gap-2 border border-[#00c896]/40 bg-[#00c896]/10 text-[#00c896] text-xs font-semibold px-3 py-1.5 rounded-full mb-4 md:mb-5">
               完全無料・クレカ不要
             </div>
-            <h2 className="text-white font-bold text-xl tracking-tight mb-3">
+            <h2 className="text-white font-bold text-lg md:text-xl tracking-tight mb-3">
               この記事で学んだことを、実践しよう。
             </h2>
-            <p className="text-white/60 text-sm mb-7 max-w-sm mx-auto">
+            <p className="text-white/60 text-sm mb-6 md:mb-7 max-w-sm mx-auto">
               CareoのAIコーチ「カレオ」が、あなたのES・面接・OB訪問データをすべて把握して、次の一手を教えてくれます。
             </p>
             <Link
               href="/signup"
-              className="inline-flex items-center gap-2 bg-[#00c896] hover:bg-[#00a87e] text-white font-bold px-7 py-3.5 rounded-full text-sm transition-all hover:scale-105"
+              className="inline-flex items-center gap-2 bg-[#00c896] hover:bg-[#00a87e] text-white font-bold px-6 md:px-8 py-3 md:py-4 rounded-full text-sm transition-all hover:scale-105"
             >
               Careoを無料で始める
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -222,30 +222,32 @@ export default async function BlogPostPage({ params }: Props) {
 
         {/* ─── 関連記事 ─────────────────────────────── */}
         {related.length > 0 && (
-          <section className="max-w-3xl mx-auto px-5 pb-16">
-            <h2 className="font-bold text-[#0D0B21] text-lg mb-5">関連記事</h2>
-            <div className="grid md:grid-cols-3 gap-4">
+          <section className="max-w-4xl mx-auto px-4 md:px-8 pb-16">
+            <h2 className="font-bold text-[#0D0B21] text-lg mb-4 md:mb-5">関連記事</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
               {related.map((r) => (
                 <Link
                   key={r.id}
                   href={`/blog/${r.slug}`}
-                  className="group bg-white rounded-2xl border border-gray-200 p-5 hover:border-[#00c896]/40 hover:shadow-md transition-all"
+                  className="group bg-white rounded-xl md:rounded-2xl border border-gray-200 p-4 md:p-5 hover:border-[#00c896]/40 hover:shadow-md transition-all flex md:flex-col gap-3 md:gap-0"
                 >
-                  <div className="flex flex-wrap gap-1 mb-2">
-                    {r.tags.slice(0, 1).map((tag) => (
-                      <span key={tag} className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${tagStyle(tag)}`}>
-                        {tag}
-                      </span>
-                    ))}
+                  <div className="flex-1">
+                    <div className="flex flex-wrap gap-1 mb-1.5 md:mb-2">
+                      {r.tags.slice(0, 1).map((tag) => (
+                        <span key={tag} className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${tagStyle(tag)}`}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <p className="text-xs md:text-sm font-bold text-[#0D0B21] line-clamp-3 group-hover:text-[#00a87e] transition-colors leading-snug">
+                      {r.title}
+                    </p>
+                    <p className="text-[10px] text-gray-400 mt-1.5 md:mt-2">{formatDate(r.published_at)}</p>
                   </div>
-                  <p className="text-xs font-bold text-[#0D0B21] line-clamp-3 group-hover:text-[#00a87e] transition-colors leading-snug">
-                    {r.title}
-                  </p>
-                  <p className="text-[10px] text-gray-400 mt-2">{formatDate(r.published_at)}</p>
                 </Link>
               ))}
             </div>
-            <div className="text-center mt-8">
+            <div className="text-center mt-7 md:mt-9">
               <Link href="/blog" className="text-sm font-semibold text-[#00a87e] hover:underline">
                 記事一覧をすべて見る →
               </Link>
@@ -256,38 +258,41 @@ export default async function BlogPostPage({ params }: Props) {
 
       {/* ─── ブログ本文スタイル ──────────────────────── */}
       <style>{`
+        /* ── モバイル基本（〜767px） ── */
         .blog-body h2 {
-          font-size: 1.25rem;
-          font-weight: 700;
-          color: #0D0B21;
-          margin-top: 2.5rem;
-          margin-bottom: 1rem;
-          padding-bottom: 0.5rem;
-          border-bottom: 2px solid #00c896;
-          letter-spacing: -0.01em;
-        }
-        .blog-body h3 {
-          font-size: 1rem;
+          font-size: 1.15rem;
           font-weight: 700;
           color: #0D0B21;
           margin-top: 2rem;
-          margin-bottom: 0.75rem;
+          margin-bottom: 0.875rem;
+          padding-bottom: 0.4rem;
+          border-bottom: 2px solid #00c896;
+          letter-spacing: -0.01em;
+          line-height: 1.5;
+        }
+        .blog-body h3 {
+          font-size: 0.975rem;
+          font-weight: 700;
+          color: #0D0B21;
+          margin-top: 1.75rem;
+          margin-bottom: 0.625rem;
+          line-height: 1.55;
         }
         .blog-body p {
           font-size: 0.9375rem;
           color: #374151;
-          line-height: 1.9;
-          margin-bottom: 1.25rem;
+          line-height: 1.95;
+          margin-bottom: 1.125rem;
         }
         .blog-body ul, .blog-body ol {
-          padding-left: 1.5rem;
-          margin-bottom: 1.25rem;
+          padding-left: 1.375rem;
+          margin-bottom: 1.125rem;
         }
         .blog-body li {
           font-size: 0.9375rem;
           color: #374151;
-          line-height: 1.8;
-          margin-bottom: 0.4rem;
+          line-height: 1.85;
+          margin-bottom: 0.35rem;
         }
         .blog-body ul li { list-style-type: disc; }
         .blog-body ol li { list-style-type: decimal; }
@@ -295,51 +300,57 @@ export default async function BlogPostPage({ params }: Props) {
         .blog-body em { font-style: italic; color: #4B5563; }
         .blog-body blockquote {
           border-left: 3px solid #00c896;
-          padding: 0.75rem 1.25rem;
+          padding: 0.7rem 1rem;
           background: #f0fdf9;
           border-radius: 0 0.75rem 0.75rem 0;
-          margin-bottom: 1.25rem;
+          margin-bottom: 1.125rem;
           color: #1f6b59;
-          font-size: 0.9375rem;
+          font-size: 0.9rem;
         }
         .blog-body table {
+          display: block;
           width: 100%;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          min-width: 400px;
           border-collapse: collapse;
+          font-size: 0.8125rem;
           margin-bottom: 1.5rem;
-          font-size: 0.875rem;
         }
         .blog-body th {
           background: #0D0B21;
           color: white;
           font-weight: 700;
-          padding: 0.6rem 1rem;
+          padding: 0.55rem 0.75rem;
           text-align: left;
-          font-size: 0.8125rem;
+          font-size: 0.75rem;
+          white-space: nowrap;
         }
         .blog-body td {
-          padding: 0.6rem 1rem;
+          padding: 0.55rem 0.75rem;
           border-bottom: 1px solid #e5e7eb;
           color: #374151;
           vertical-align: top;
+          font-size: 0.8125rem;
         }
         .blog-body tr:nth-child(even) td { background: #f9fafb; }
         .blog-body tr:hover td { background: #f0fdf9; }
         .blog-stat-bar {
           background: #f9fafb;
           border-radius: 0.75rem;
-          padding: 1rem 1.25rem;
-          margin-bottom: 1.25rem;
+          padding: 0.875rem 1rem;
+          margin-bottom: 1.125rem;
         }
         .blog-stat-bar-item {
           display: flex;
           align-items: center;
-          gap: 0.75rem;
+          gap: 0.5rem;
           margin-bottom: 0.5rem;
         }
-        .blog-stat-bar-label { font-size: 0.8125rem; color: #374151; min-width: 120px; }
+        .blog-stat-bar-label { font-size: 0.75rem; color: #374151; min-width: 90px; }
         .blog-stat-bar-track { flex: 1; background: #e5e7eb; border-radius: 9999px; height: 8px; overflow: hidden; }
         .blog-stat-bar-fill { height: 100%; background: linear-gradient(90deg, #00c896, #0ea5e9); border-radius: 9999px; }
-        .blog-stat-bar-value { font-size: 0.8125rem; font-weight: 700; color: #0D0B21; min-width: 40px; text-align: right; }
+        .blog-stat-bar-value { font-size: 0.75rem; font-weight: 700; color: #0D0B21; min-width: 36px; text-align: right; }
         .blog-cite { font-size: 0.8125rem; color: #6b7280; border-top: 1px solid #e5e7eb; padding-top: 0.5rem; margin-top: 1rem; }
         .blog-cite a { color: #00a87e; text-decoration: underline; }
         .blog-cta-link {
@@ -356,6 +367,58 @@ export default async function BlogPostPage({ params }: Props) {
           transition: background 0.2s;
         }
         .blog-cta-link:hover { background: #00a87e; }
+
+        /* ── デスクトップ（768px〜） ── */
+        @media (min-width: 768px) {
+          .blog-body h2 {
+            font-size: 1.375rem;
+            margin-top: 3rem;
+            margin-bottom: 1.125rem;
+            padding-bottom: 0.55rem;
+          }
+          .blog-body h3 {
+            font-size: 1.1rem;
+            margin-top: 2.25rem;
+            margin-bottom: 0.75rem;
+          }
+          .blog-body p {
+            font-size: 1rem;
+            line-height: 2;
+            margin-bottom: 1.375rem;
+          }
+          .blog-body ul, .blog-body ol {
+            padding-left: 1.75rem;
+            margin-bottom: 1.375rem;
+          }
+          .blog-body li {
+            font-size: 1rem;
+            line-height: 1.9;
+            margin-bottom: 0.45rem;
+          }
+          .blog-body blockquote {
+            padding: 0.875rem 1.5rem;
+            font-size: 0.9375rem;
+            margin-bottom: 1.375rem;
+          }
+          .blog-body table {
+            min-width: unset;
+            font-size: 0.9rem;
+          }
+          .blog-body th {
+            padding: 0.65rem 1.125rem;
+            font-size: 0.875rem;
+            white-space: normal;
+          }
+          .blog-body td {
+            padding: 0.65rem 1.125rem;
+            font-size: 0.9rem;
+          }
+          .blog-stat-bar {
+            padding: 1.125rem 1.5rem;
+          }
+          .blog-stat-bar-label { font-size: 0.875rem; min-width: 130px; }
+          .blog-stat-bar-value { font-size: 0.875rem; min-width: 44px; }
+        }
       `}</style>
     </>
   );

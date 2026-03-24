@@ -37,12 +37,15 @@ export default async function Image({ params }: Props) {
   const [gradFrom, gradTo] = TAG_GRADIENTS[tag] ?? ["#00c896", "#0ea5e9"];
 
   // Noto Sans JP (Bold) を取得
+  // 旧UAでリクエストするとGoogle FontsがSatoriで使えるTTF形式で返す
   let fontData: ArrayBuffer | null = null;
   try {
-    const fontRes = await fetch(
-      "https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-jp@5.0.21/files/noto-sans-jp-japanese-700-normal.woff"
-    );
-    if (fontRes.ok) fontData = await fontRes.arrayBuffer();
+    const css = await fetch(
+      "https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&display=block",
+      { headers: { "User-Agent": "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)" } }
+    ).then((r) => r.text());
+    const fontUrl = css.match(/src:\s*url\(([^)]+)\)/)?.[1];
+    if (fontUrl) fontData = await fetch(fontUrl).then((r) => r.arrayBuffer());
   } catch { /* フォント取得失敗時はシステムフォントで続行 */ }
 
   const fontSize = title.length > 35 ? 42 : title.length > 25 ? 48 : 54;
