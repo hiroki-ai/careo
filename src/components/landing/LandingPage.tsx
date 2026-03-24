@@ -427,26 +427,37 @@ function BlogPreviewSection({ posts }: { posts: RecentPost[] }) {
             <Link
               key={post.id}
               href={`/blog/${post.slug}`}
-              className="group bg-white rounded-2xl border border-gray-200 p-6 hover:border-[#00c896]/40 hover:shadow-md transition-all duration-200 flex flex-col"
+              className="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:border-[#00c896]/40 hover:shadow-md transition-all duration-200 flex flex-col"
             >
-              <div className="flex flex-wrap gap-1.5 mb-3">
-                {post.tags.slice(0, 2).map((tag) => (
-                  <span key={tag} className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${tagStyle(tag)}`}>
-                    {tag}
-                  </span>
-                ))}
-                {i === 0 && (
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-[#00c896]/10 text-[#00a87e] border-[#00c896]/20">
-                    NEW
-                  </span>
-                )}
+              {/* サムネイル */}
+              <div className="relative w-full aspect-[1200/630] overflow-hidden bg-[#0D0B21]">
+                <img
+                  src={`/blog/${post.slug}/opengraph-image`}
+                  alt={post.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
+                />
               </div>
-              <p className="font-bold text-[#0D0B21] text-sm leading-snug mb-3 group-hover:text-[#00a87e] transition-colors line-clamp-3 flex-1">
-                {post.title}
-              </p>
-              <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                <span className="text-xs text-gray-400">{formatDate(post.published_at)}</span>
-                <span className="text-xs text-gray-400">{post.reading_time_min}分</span>
+              <div className="p-5 flex flex-col flex-1">
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {post.tags.slice(0, 2).map((tag) => (
+                    <span key={tag} className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${tagStyle(tag)}`}>
+                      {tag}
+                    </span>
+                  ))}
+                  {i === 0 && (
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-[#00c896]/10 text-[#00a87e] border-[#00c896]/20">
+                      NEW
+                    </span>
+                  )}
+                </div>
+                <p className="font-bold text-[#0D0B21] text-sm leading-snug mb-3 group-hover:text-[#00a87e] transition-colors line-clamp-3 flex-1">
+                  {post.title}
+                </p>
+                <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                  <span className="text-xs text-gray-400">{formatDate(post.published_at)}</span>
+                  <span className="text-xs text-gray-400">{post.reading_time_min}分</span>
+                </div>
               </div>
             </Link>
           ))}

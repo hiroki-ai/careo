@@ -539,20 +539,31 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
               <Reveal key={post.id} delay={i * 80}>
                 <Link
                   href={`/blog/${post.slug}`}
-                  className="block bg-gray-50 rounded-2xl border border-gray-100 p-4 active:scale-[0.99] transition-transform"
+                  className="block bg-white rounded-2xl border border-gray-100 overflow-hidden active:scale-[0.99] transition-transform"
                 >
-                  <div className="flex items-center gap-1.5 mb-2">
-                    {post.tags.slice(0, 1).map((tag) => (
-                      <span key={tag} className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${TAG_COLORS[tag] ?? "bg-gray-100 text-gray-600"}`}>
-                        {tag}
-                      </span>
-                    ))}
-                    {i === 0 && (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#00c896]/10 text-[#00a87e]">NEW</span>
-                    )}
+                  {/* サムネイル */}
+                  <div className="w-full aspect-[1200/630] overflow-hidden bg-[#0D0B21]">
+                    <img
+                      src={`/blog/${post.slug}/opengraph-image`}
+                      alt={post.title}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
                   </div>
-                  <p className="text-sm font-bold text-gray-900 leading-snug line-clamp-2">{post.title}</p>
-                  <p className="text-[10px] text-gray-400 mt-1.5">{post.reading_time_min}分で読める</p>
+                  <div className="p-4">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      {post.tags.slice(0, 1).map((tag) => (
+                        <span key={tag} className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${TAG_COLORS[tag] ?? "bg-gray-100 text-gray-600"}`}>
+                          {tag}
+                        </span>
+                      ))}
+                      {i === 0 && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#00c896]/10 text-[#00a87e]">NEW</span>
+                      )}
+                    </div>
+                    <p className="text-sm font-bold text-gray-900 leading-snug line-clamp-2">{post.title}</p>
+                    <p className="text-[10px] text-gray-400 mt-1.5">{post.reading_time_min}分で読める</p>
+                  </div>
                 </Link>
               </Reveal>
             ))}
