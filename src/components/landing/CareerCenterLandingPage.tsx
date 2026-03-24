@@ -516,7 +516,7 @@ export default function CareerCenterLandingPage() {
                 <span className="text-[11px] text-gray-400 bg-white/90 px-2 py-0.5 rounded-full">情報可視性 低</span>
               </div>
               <div className="absolute left-2 top-0 bottom-0 flex items-center justify-center">
-                <span className="text-[10px] text-gray-400 select-none [writing-mode:vertical-rl] rotate-180">← 義務的（強制利用）</span>
+                <span className="text-[10px] text-gray-400 select-none -rotate-90 whitespace-nowrap">← 義務的（強制利用）</span>
               </div>
               <div className="absolute right-2 top-0 bottom-0 flex items-center justify-center">
                 <span className="text-[10px] font-bold text-gray-600 select-none [writing-mode:vertical-rl]">自主利用 →</span>

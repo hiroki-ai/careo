@@ -442,7 +442,7 @@ export default function ComparePage() {
               <span className="text-[11px] text-gray-400 bg-white/90 px-2 py-0.5 rounded-full">AI機能なし</span>
             </div>
             <div className="absolute left-2 top-0 bottom-0 flex items-center justify-center">
-              <span className="text-[10px] text-gray-400 select-none [writing-mode:vertical-rl] rotate-180">← 入口（求人・スカウト）</span>
+              <span className="text-[10px] text-gray-400 select-none -rotate-90 whitespace-nowrap">← 入口（求人・スカウト）</span>
             </div>
             <div className="absolute right-2 top-0 bottom-0 flex items-center justify-center">
               <span className="text-[10px] font-bold text-gray-600 select-none [writing-mode:vertical-rl]">管理・分析 →</span>
