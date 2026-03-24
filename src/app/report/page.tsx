@@ -61,9 +61,9 @@ function ScoreRing({ score }: { score: number }) {
 
 export default function ReportPage() {
   const { profile, loading: profileLoading } = useProfile();
-  const { companies } = useCompanies();
-  const { esList } = useEs();
-  const { interviews } = useInterviews();
+  const { companies, loading: companiesLoading } = useCompanies();
+  const { esList, loading: esLoading } = useEs();
+  const { interviews, loading: interviewsLoading } = useInterviews();
   const { visits } = useObVisits();
   const { tests } = useAptitudeTests();
   const { pendingItems, completedItems } = useActionItems();
@@ -128,15 +128,15 @@ export default function ReportPage() {
     }
   };
 
-  // キャッシュがない場合は自動実行
+  // キャッシュがない場合は自動実行（全データロード完了後）
   useEffect(() => {
-    if (profileLoading) return;
+    if (profileLoading || companiesLoading || esLoading || interviewsLoading) return;
     if (pdca) return; // キャッシュあり
     if (hasAutoRun.current) return;
     hasAutoRun.current = true;
     runPdca();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profileLoading]);
+  }, [profileLoading, companiesLoading, esLoading, interviewsLoading]);
 
   if (profileLoading) {
     return <div className="p-8 text-gray-400 text-sm">読み込み中...</div>;
