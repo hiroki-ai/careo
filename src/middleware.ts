@@ -56,9 +56,10 @@ export async function middleware(request: NextRequest) {
 
     // キャリアセンタースタッフポータル保護
     const isCareerPortal = pathname === "/career-portal" || pathname.startsWith("/career-portal/");
-    if (isCareerPortal) {
+    const isCareerPortalLogin = pathname === "/career-portal/login";
+    if (isCareerPortal && !isCareerPortalLogin) {
       if (!user) {
-        return NextResponse.redirect(new URL("/login", request.url));
+        return NextResponse.redirect(new URL("/career-portal/login", request.url));
       }
       const { data: staff } = await supabase
         .from("career_center_staff")
@@ -66,7 +67,7 @@ export async function middleware(request: NextRequest) {
         .eq("user_id", user.id)
         .single();
       if (!staff) {
-        return NextResponse.redirect(new URL("/", request.url));
+        return NextResponse.redirect(new URL("/career-portal/login", request.url));
       }
       return supabaseResponse; // スタッフはuser_profilesチェックをスキップ
     }
@@ -88,7 +89,7 @@ export async function middleware(request: NextRequest) {
     // エラー時は安全のためログインページへリダイレクト
     const { pathname } = request.nextUrl;
     const authRoutes = ["/login", "/signup", "/forgot-password", "/reset-password"];
-    const publicRoutes2 = ["/", "/terms", "/privacy", "/features", "/compare", "/for-career-center", "/career-portal"];
+    const publicRoutes2 = ["/", "/terms", "/privacy", "/features", "/compare", "/for-career-center", "/career-portal/login"];
     if (authRoutes.includes(pathname) || publicRoutes2.some(r => pathname === r || pathname.startsWith(r + "/"))) return NextResponse.next();
     return NextResponse.redirect(new URL("/login", request.url));
   }

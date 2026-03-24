@@ -60,8 +60,10 @@ export default function CareerPortalLayout({ children }: { children: React.React
   const handleSignOut = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push("/login");
+    router.push("/career-portal/login");
   };
+
+  if (pathname === "/career-portal/login") return <>{children}</>;
 
   return (
     <div className="flex min-h-screen bg-gray-50">

@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Careo × 上智大学キャリアセンター 連携提案</title>
+<style>
+  /* ── Reset & Base ─────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green:   #00c896;
+    --green-d: #00a87e;
+    --green-l: #e6faf5;
+    --dark:    #0f1117;
+    --dark-2:  #1a1d27;
+    --dark-3:  #242736;
+    --text:    #f0f2f8;
+    --muted:   #8b91a8;
+    --border:  rgba(255,255,255,0.08);
+    --slide-w: 1280px;
+    --slide-h: 720px;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif;
+    background: #080a10;
+    overflow: hidden;
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Slide Stage ─────────────────────────────────────── */
+  #stage {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  #deck {
+    position: relative;
+    width: var(--slide-w);
+    height: var(--slide-h);
+    transform-origin: center center;
+  }
+
+  .slide {
+    position: absolute; inset: 0;
+    border-radius: 20px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateX(60px) scale(0.97);
+    transition: opacity 0.55s cubic-bezier(.4,0,.2,1),
+                transform 0.55s cubic-bezier(.4,0,.2,1);
+    pointer-events: none;
+    background: var(--dark-2);
+  }
+  .slide.active {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    pointer-events: auto;
+  }
+  .slide.prev {
+    opacity: 0;
+    transform: translateX(-60px) scale(0.97);
+  }
+
+  /* ── Navigation ──────────────────────────────────────── */
+  #nav {
+    position: fixed; bottom: 28px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; align-items: center; gap: 12px;
+    background: rgba(15,17,23,0.85);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: 40px;
+    padding: 10px 20px;
+    z-index: 100;
+  }
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--muted); cursor: pointer;
+    transition: all 0.3s;
+  }
+  .dot.active { width: 22px; border-radius: 4px; background: var(--green); }
+
+  #nav-btn-prev, #nav-btn-next {
+    background: none; border: none; cursor: pointer;
+    color: var(--muted); font-size: 18px; padding: 4px 8px;
+    transition: color 0.2s;
+  }
+  #nav-btn-prev:hover, #nav-btn-next:hover { color: var(--text); }
+
+  #slide-counter {
+    font-size: 12px; color: var(--muted);
+    min-width: 36px; text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Print btn ───────────────────────────────────────── */
+  #print-btn {
+    position: fixed; top: 20px; right: 20px;
+    background: rgba(15,17,23,0.85);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--muted); font-size: 13px;
+    padding: 8px 16px; cursor: pointer;
+    transition: all 0.2s; z-index: 100;
+  }
+  #print-btn:hover { color: var(--text); border-color: var(--green); }
+
+  /* ── Common Layout Helpers ───────────────────────────── */
+  .slide-inner {
+    width: 100%; height: 100%;
+    padding: 56px 72px;
+    display: flex; flex-direction: column;
+  }
+
+  .chip {
+    display: inline-flex; align-items: center;
+    background: rgba(0,200,150,0.12);
+    border: 1px solid rgba(0,200,150,0.3);
+    color: var(--green);
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 4px 12px; border-radius: 20px;
+  }
+
+  .slide-title {
+    font-size: 38px; font-weight: 700;
+    line-height: 1.2; letter-spacing: -0.02em;
+    margin-top: 16px;
+  }
+  .slide-title span { color: var(--green); }
+
+  .slide-sub {
+    font-size: 15px; color: var(--muted);
+    margin-top: 10px; line-height: 1.7;
+  }
+
+  /* Grid backgrounds */
+  .grid-bg {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+
+  .glow {
+    position: absolute; border-radius: 50%;
+    filter: blur(80px); pointer-events: none; opacity: 0.18;
+  }
+
+  /* ════════════════════════════════════════════════════════
+     SLIDE 1 — Cover
+  ════════════════════════════════════════════════════════ */
+  #s1 { background: var(--dark); }
+  #s1 .grid-bg { opacity: 0.6; }
+  #s1 .glow-1 { width: 560px; height: 560px; top: -160px; right: -100px; background: var(--green); }
+  #s1 .glow-2 { width: 320px; height: 320px; bottom: -80px; left: -60px; background: #6366f1; }
+
+  #s1 .slide-inner {
+    justify-content: center; align-items: flex-start;
+  }
+
+  .logo-mark {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 22px; font-weight: 800; letter-spacing: -0.03em;
+    color: var(--text);
+  }
+  .logo-mark .dot-c {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--green), #00e6ac);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 900; color: #fff;
+  }
+
+  #s1 .cover-headline {
+    font-size: 52px; font-weight: 800;
+    line-height: 1.15; letter-spacing: -0.03em;
+    margin-top: 28px; max-width: 720px;
+  }
+  #s1 .cover-headline .accent { color: var(--green); }
+
+  #s1 .cover-sub {
+    font-size: 18px; color: var(--muted);
+    margin-top: 20px; line-height: 1.7; max-width: 580px;
+  }
+
+  #s1 .meta-row {
+    display: flex; align-items: center; gap: 24px;
+    margin-top: 48px;
+  }
+  #s1 .meta-item {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--muted);
+  }
+  #s1 .meta-item .badge {
+    background: rgba(0,200,150,0.15);
+    border: 1px solid rgba(0,200,150,0.25);
+    color: var(--green); font-size: 12px;
+    font-weight: 600; padding: 3px 10px; border-radius: 6px;
+  }
+
+  #s1 .side-visual {
+    position: absolute; right: 72px; top: 50%;
+    transform: translateY(-50%);
+    width: 420px; height: 420px;
+  }
+  .app-card {
+    background: var(--dark-3);
+    border: 1px solid var(--border);
+    border-radius: 16px; padding: 20px;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+  }
+  .app-card-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px;
+  }
+  .app-card-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--green), #00e6ac);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .app-card-title { font-size: 14px; font-weight: 600; }
+  .app-card-sub { font-size: 11px; color: var(--muted); }
+
+  .stat-row { display: flex; gap: 12px; margin-bottom: 12px; }
+  .stat-box {
+    flex: 1; background: rgba(0,200,150,0.06);
+    border: 1px solid rgba(0,200,150,0.15);
+    border-radius: 10px; padding: 12px 14px;
+  }
+  .stat-num { font-size: 22px; font-weight: 800; color: var(--green); }
+  .stat-label { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  .progress-item { margin-bottom: 10px; }
+  .progress-label {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--muted); margin-bottom: 4px;
+  }
+  .progress-track {
+    height: 5px; background: rgba(255,255,255,0.07);
+    border-radius: 99px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; border-radius: 99px;
+    background: linear-gradient(90deg, var(--green), #00e6ac);
+  }
+
+  /* ════════════════════════════════════════════════════════
+     SLIDE 2 — 課題
+  ════════════════════════════════════════════════════════ */
+  #s2 .slide-inner { gap: 0; }
+
+  .pain-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 20px; margin-top: 36px; flex: 1;
+  }
+  .pain-card {
+    background: var(--dark-3);
+    border: 1px solid var(--border);
+    border-radius: 16px; padding: 28px 24px;
+    display: flex; flex-direction: column; gap: 14px;
+    transition: border-color 0.3s;
+    position: relative; overflow: hidden;
+  }
+  .pain-card::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--green), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .pain-card:hover::before { opacity: 1; }
+  .pain-card:hover { border-color: rgba(0,200,150,0.3); }
+
+  .pain-tag {
+    display: inline-flex;
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.25);
+    color: #f87171;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+    padding: 3px 10px; border-radius: 20px;
+    align-self: flex-start;
+  }
+  .pain-icon { font-size: 32px; line-height: 1; }
+  .pain-title { font-size: 17px; font-weight: 700; line-height: 1.4; }
+  .pain-desc { font-size: 13px; color: var(--muted); line-height: 1.75; }
+
+  /* ════════════════════════════════════════════════════════
+     SLIDE 3 — Careoとは
+  ════════════════════════════════════════════════════════ */
+  #s3 .content-row {
+    display: flex; gap: 48px;
+    margin-top: 32px; flex: 1; align-items: center;
+  }
+  #s3 .left { flex: 1; }
+  #s3 .right { width: 460px; }
+
+  .feature-list { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
+  .feature-item {
+    display: flex; gap: 14px; align-items: flex-start;
+    background: var(--dark-3);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 18px;
+    transition: border-color 0.25s;
+  }
+  .feature-item:hover { border-color: rgba(0,200,150,0.3); }
+  .feature-num {
+    min-width: 28px; height: 28px; border-radius: 8px;
+    background: rgba(0,200,150,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800; color: var(--green);
+  }
+  .feature-text { }
+  .feature-ttl { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .feature-dsc { font-size: 12px; color: var(--muted); line-height: 1.65; }
+
+  .mock-screen {
+    background: var(--dark-3);
+    border: 1px solid var(--border);
+    border-radius: 16px; overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+  }
+  .mock-topbar {
+    background: var(--dark);
+    padding: 14px 16px;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .mock-topbar-dots { display: flex; gap: 5px; }
+  .mock-topbar-dots span {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+  .mock-body { padding: 16px; }
+
+  .mock-company-row {
+    display: flex; align-items: center;
+    padding: 10px 12px; border-radius: 10px;
+    margin-bottom: 6px; gap: 10px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .mock-co-logo {
+    width: 28px; height: 28px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800;
+  }
+  .mock-co-info { flex: 1; }
+  .mock-co-name { font-size: 12px; font-weight: 600; }
+  .mock-co-status { font-size: 10px; margin-top: 2px; }
+  .status-badge {
+    padding: 2px 8px; border-radius: 20px;
+    font-size: 10px; font-weight: 600;
+  }
+  .s-interview { background: rgba(99,102,241,0.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.25); }
+  .s-doc      { background: rgba(245,158,11,0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.25); }
+  .s-offered  { background: rgba(0,200,150,0.15);  color: var(--green); border: 1px solid rgba(0,200,150,0.25); }
+  .s-es       { background: rgba(239,68,68,0.1);   color: #fca5a5; border: 1px solid rgba(239,68,68,0.2); }
+
+  .mock-ai-box {
+    margin-top: 10px;
+    background: rgba(0,200,150,0.06);
+    border: 1px solid rgba(0,200,150,0.2);
+    border-radius: 10px; padding: 12px 14px;
+  }
+  .mock-ai-label {
+    font-size: 10px; font-weight: 600; color: var(--green);
+    letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px;
+  }
+  .mock-ai-text { font-size: 11px; color: var(--muted); line-height: 1.65; }
+
+  /* ════════════════════════════════════════════════════════
+     SLIDE 4 — キャリアセンター機能
+  ════════════════════════════════════════════════════════ */
+  #s4 .func-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 16px; margin-top: 28px; flex: 1;
+  }
+  .func-card {
+    background: var(--dark-3);
+    border: 1px solid var(--border);
+    border-radius: 14px; padding: 22px 20px;
+    transition: all 0.25s;
+    position: relative; overflow: hidden;
+  }
+  .func-card:hover {
+    border-color: rgba(0,200,150,0.3);
+    transform: translateY(-2px);
+  }
+  .func-card-icon {
+    font-size: 24px; margin-bottom: 12px;
+  }
+  .func-card-tag {
+    position: absolute; top: 16px; right: 16px;
+    background: rgba(0,200,150,0.1);
+    border: 1px solid rgba(0,200,150,0.2);
+    color: var(--green);
+    font-size: 10px; font-weight: 600;
+    padding: 2px 8px; border-radius: 20px;
+  }
+  .func-card-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+  .func-card-desc { font-size: 12px; color: var(--muted); line-height: 1.7; }
+
+  /* ════════════════════════════════════════════════════════
+     SLIDE 5 — パイロット提案
+  ════════════════════════════════════════════════════════ */
+  #s5 .pilot-layout {
+    display: flex; gap: 28px; margin-top: 32px; flex: 1;
+  }
+  .pilot-main { flex: 1; display: flex; flex-direction: column; gap: 16px; }
+  .pilot-side  { width: 340px; display: flex; flex-direction: column; gap: 16px; }
+
+  .pilot-hero {
+    background: linear-gradient(135deg, rgba(0,200,150,0.12), rgba(0,200,150,0.04));
+    border: 1px solid rgba(0,200,150,0.25);
+    border-radius: 16px; padding: 28px;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .pilot-free-badge {
+    background: linear-gradient(135deg, var(--green), #00e6ac);
+    border-radius: 12px; padding: 12px 16px;
+    text-align: center; min-width: 90px;
+  }
+  .pilot-free-badge .free-num { font-size: 28px; font-weight: 900; color: #fff; line-height: 1; }
+  .pilot-free-badge .free-unit { font-size: 12px; color: rgba(255,255,255,0.8); margin-top: 3px; }
+  .pilot-hero-text .pilot-hero-title { font-size: 20px; font-weight: 800; }
+  .pilot-hero-text .pilot-hero-sub { font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+
+  .cond-card {
+    background: var(--dark-3);
+    border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px 22px;
+  }
+  .cond-card-title {
+    font-size: 12px; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 14px;
+  }
+  .cond-list { display: flex; flex-direction: column; gap: 10px; }
+  .cond-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 13px; line-height: 1.6;
+  }
+  .cond-item .cond-icon {
+    width: 20px; height: 20px; border-radius: 6px; flex-shrink: 0;
+    margin-top: 1px;
+    display: flex; align-items: center; justify-content: center; font-size: 11px;
+  }
+  .cond-icon.ask  { background: rgba(245,158,11,0.15); }
+  .cond-icon.give { background: rgba(0,200,150,0.12); }
+
+  .timeline-card {
+    background: var(--dark-3);
+    border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px 22px;
+  }
+  .timeline-title { font-size: 12px; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px; }
+  .tl-step {
+    display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px;
+  }
+  .tl-step:last-child { margin-bottom: 0; }
+  .tl-dot-wrap { display: flex; flex-direction: column; align-items: center; }
+  .tl-dot {
+    width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+    background: rgba(0,200,150,0.12);
+    border: 1px solid rgba(0,200,150,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800; color: var(--green);
+  }
+  .tl-line { width: 1px; flex: 1; min-height: 10px; background: var(--border); margin: 4px 0; }
+  .tl-info { padding-top: 4px; }
+  .tl-label { font-size: 13px; font-weight: 700; }
+  .tl-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  /* ════════════════════════════════════════════════════════
+     SLIDE 6 — Next Steps
+  ════════════════════════════════════════════════════════ */
+  #s6 .slide-inner { justify-content: center; align-items: center; text-align: center; }
+  #s6 .glow-1 { width: 500px; height: 500px; top: -100px; left: 50%; transform: translateX(-50%); background: var(--green); opacity: 0.12; }
+
+  #s6 .next-logo { margin-bottom: 28px; }
+
+  #s6 .next-title {
+    font-size: 44px; font-weight: 800; letter-spacing: -0.03em;
+    line-height: 1.15;
+  }
+  #s6 .next-title span { color: var(--green); }
+  #s6 .next-sub {
+    font-size: 16px; color: var(--muted); margin-top: 14px; line-height: 1.7;
+  }
+
+  #s6 .steps-row {
+    display: flex; gap: 16px; margin-top: 44px;
+    justify-content: center;
+  }
+  .step-card {
+    background: var(--dark-3);
+    border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px 28px;
+    text-align: left; min-width: 200px;
+    transition: all 0.25s;
+  }
+  .step-card:hover { border-color: rgba(0,200,150,0.3); transform: translateY(-3px); }
+  .step-num {
+    font-size: 11px; font-weight: 700; color: var(--green);
+    letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px;
+  }
+  .step-action { font-size: 15px; font-weight: 700; line-height: 1.4; }
+  .step-detail { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+
+  #s6 .contact-row {
+    display: flex; gap: 32px; margin-top: 40px;
+    justify-content: center;
+  }
+  .contact-item {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--muted);
+  }
+  .contact-item .ci-label {
+    font-size: 11px; font-weight: 600; color: var(--green);
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .contact-item .ci-value { font-size: 14px; font-weight: 600; color: var(--text); }
+
+  #s6 .url-chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(0,200,150,0.08);
+    border: 1px solid rgba(0,200,150,0.2);
+    border-radius: 10px; padding: 10px 20px;
+    margin-top: 24px; font-size: 14px; color: var(--green); font-weight: 600;
+  }
+
+  /* ── Print ───────────────────────────────────────────── */
+  @media print {
+    html, body { overflow: visible; background: #fff; }
+    #stage { position: static; display: block; }
+    #nav, #print-btn { display: none !important; }
+    #deck {
+      width: 100%; height: auto;
+      transform: none !important;
+    }
+    .slide {
+      position: static; opacity: 1 !important;
+      transform: none !important;
+      page-break-after: always;
+      height: 100vh; border-radius: 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <div id="deck">
+
+    <!-- ═══════════════════════════════════════════════════
+         SLIDE 1 — カバー
+    ═══════════════════════════════════════════════════ -->
+    <section class="slide active" id="s1">
+      <div class="grid-bg"></div>
+      <div class="glow glow-1"></div>
+      <div class="glow glow-2"></div>
+
+      <div class="slide-inner">
+        <div class="logo-mark">
+          <div class="dot-c">C</div>
+          Careo
+        </div>
+
+        <div class="cover-headline">
+          上智大学の学生が作った<br>
+          <span class="accent">AI就活管理アプリ</span>を<br>
+          一緒に届けませんか
+        </div>
+
+        <div class="cover-sub">
+          上智大学キャリアセンター様へ<br>
+          無償パイロット提携のご提案 — 2026年3月
+        </div>
+
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="badge">上智大学在籍</span>
+            <span>学生が開発・運営</span>
+          </div>
+          <div class="meta-item">
+            <span class="badge">完全無償</span>
+            <span>パイロット期間 3〜6ヶ月</span>
+          </div>
+          <div class="meta-item">
+            <span class="badge">careoai.jp</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Side app mockup -->
+      <div class="side-visual">
+        <div class="app-card">
+          <div class="app-card-header">
+            <div class="app-card-icon">🎯</div>
+            <div>
+              <div class="app-card-title">就活ダッシュボード</div>
+              <div class="app-card-sub">田中 花子さんの選考状況</div>
+            </div>
+          </div>
+
+          <div class="stat-row">
+            <div class="stat-box">
+              <div class="stat-num">12</div>
+              <div class="stat-label">応募企業</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-num">3</div>
+              <div class="stat-label">選考中</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-num">1</div>
+              <div class="stat-label">内定</div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px;">
+            <div class="mock-company-row">
+              <div class="mock-co-logo" style="background:rgba(99,102,241,0.2);color:#a5b4fc;">S</div>
+              <div class="mock-co-info">
+                <div class="mock-co-name">ソニーグループ</div>
+                <div class="mock-co-status"><span class="status-badge s-interview">最終面接</span></div>
+              </div>
+            </div>
+            <div class="mock-company-row">
+              <div class="mock-co-logo" style="background:rgba(245,158,11,0.2);color:#fcd34d;">T</div>
+              <div class="mock-co-info">
+                <div class="mock-co-name">トヨタ自動車</div>
+                <div class="mock-co-status"><span class="status-badge s-doc">書類選考</span></div>
+              </div>
+            </div>
+            <div class="mock-company-row">
+              <div class="mock-co-logo" style="background:rgba(0,200,150,0.15);color:#00c896;">R</div>
+              <div class="mock-co-info">
+                <div class="mock-co-name">楽天グループ</div>
+                <div class="mock-co-status"><span class="status-badge s-offered">内定</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mock-ai-box">
+            <div class="mock-ai-label">🤖 AIインサイト</div>
+            <div class="mock-ai-text">最終面接が2社重なっています。対策の優先度を整理しましょう。面接練習の予約を推奨します。</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════
+         SLIDE 2 — 課題
+    ═══════════════════════════════════════════════════ -->
+    <section class="slide" id="s2">
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <div class="chip">Problem</div>
+        <div class="slide-title">キャリアセンターが<span>抱える</span>3つの課題</div>
+        <div class="slide-sub">懸命に支援しているのに、届かない。見えない。証明できない。</div>
+
+        <div class="pain-grid">
+          <div class="pain-card">
+            <div class="pain-tag">情報不足</div>
+            <div class="pain-icon">😶</div>
+            <div class="pain-title">面談まで<br>学生の状況がわからない</div>
+            <div class="pain-desc">「何社受けているの？」「ESは書いた？」——相談に来て初めて把握する状況。深いアドバイスができないまま面談が終わってしまう。</div>
+          </div>
+          <div class="pain-card">
+            <div class="pain-tag">リーチ困難</div>
+            <div class="pain-icon">🚪</div>
+            <div class="pain-title">困っている学生ほど<br>来談しない</div>
+            <div class="pain-desc">就活が上手くいっていない学生ほど孤立しがち。キャリアセンターには「うまくいっている学生」しか来ない、という本末転倒な現実。</div>
+          </div>
+          <div class="pain-card">
+            <div class="pain-tag">成果測定</div>
+            <div class="pain-icon">📊</div>
+            <div class="pain-title">支援の成果が<br>数字で見えない</div>
+            <div class="pain-desc">毎日懸命に支援しているのに効果を証明できない。予算交渉にも改善にも、データが必要なのに可視化できない。</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════
+         SLIDE 3 — Careoとは
+    ═══════════════════════════════════════════════════ -->
+    <section class="slide" id="s3">
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <div class="chip">Solution</div>
+        <div class="slide-title">就活生が「本当に使いたい」<span>アプリ</span>を作りました</div>
+        <div class="slide-sub">開発者自身が上智大学の就活生。リアルな課題から生まれたCareo。</div>
+
+        <div class="content-row">
+          <div class="left">
+            <div class="feature-list">
+              <div class="feature-item">
+                <div class="feature-num">01</div>
+                <div class="feature-text">
+                  <div class="feature-ttl">志望企業・選考の一元管理</div>
+                  <div class="feature-dsc">応募企業数、選考フェーズ、ES提出状況、面接日程をすべてCareoで管理。バラバラだった情報が1画面に集約されます。</div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-num">02</div>
+                <div class="feature-text">
+                  <div class="feature-ttl">AIによる面接練習・ESフィードバック</div>
+                  <div class="feature-dsc">AIが面接官として質問し、回答に個別フィードバック。ESの文章品質もAIが即時チェックします。</div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-num">03</div>
+                <div class="feature-text">
+                  <div class="feature-ttl">AI就活コーチ（チャット）</div>
+                  <div class="feature-dsc">学生の選考状況を把握したAIが、次に何をすべきかを提案。24時間いつでも相談できる就活パートナーです。</div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-num">04</div>
+                <div class="feature-text">
+                  <div class="feature-ttl">PDCA・週次アクション提案</div>
+                  <div class="feature-dsc">選考データをもとにAIが現状を分析し、今週やるべきアクションを自動提案。就活の「やること迷子」を解消します。</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="right">
+            <div class="mock-screen">
+              <div class="mock-topbar">
+                <div class="mock-topbar-dots">
+                  <span style="background:#ef4444;"></span>
+                  <span style="background:#f59e0b;"></span>
+                  <span style="background:#22c55e;"></span>
+                </div>
+                <div style="font-size:12px;color:var(--muted);margin-left:8px;">Careo — AI就活コーチ</div>
+              </div>
+              <div class="mock-body">
+                <!-- Chat bubbles -->
+                <div style="display:flex;gap:8px;margin-bottom:12px;">
+                  <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--green),#00e6ac);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">🤖</div>
+                  <div style="background:rgba(0,200,150,0.08);border:1px solid rgba(0,200,150,0.15);border-radius:12px 12px 12px 4px;padding:10px 12px;font-size:12px;color:var(--text);line-height:1.6;max-width:280px;">
+                    現在12社に応募中ですね。ソニーの最終面接まで残り3日です。逆質問の準備はできていますか？
+                  </div>
+                </div>
+                <div style="display:flex;gap:8px;flex-direction:row-reverse;margin-bottom:12px;">
+                  <div style="width:28px;height:28px;border-radius:8px;background:rgba(99,102,241,0.2);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">😅</div>
+                  <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:12px 12px 4px 12px;padding:10px 12px;font-size:12px;color:var(--text);line-height:1.6;max-width:260px;">
+                    まだあまり準備できていないです…
+                  </div>
+                </div>
+                <div style="display:flex;gap:8px;margin-bottom:12px;">
+                  <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--green),#00e6ac);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">🤖</div>
+                  <div style="background:rgba(0,200,150,0.08);border:1px solid rgba(0,200,150,0.15);border-radius:12px 12px 12px 4px;padding:10px 12px;font-size:12px;color:var(--text);line-height:1.6;max-width:280px;">
+                    大丈夫です！あなたの志望軸「チームで成果を出す環境」から逆算して、3つの質問を一緒に作りましょう。
+                  </div>
+                </div>
+
+                <div class="mock-ai-box" style="margin-top:4px;">
+                  <div class="mock-ai-label">今週のアクション（AI提案）</div>
+                  <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px;">
+                    <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);">
+                      <span style="color:var(--green);">✓</span> ソニー面接 逆質問3問を作成
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);">
+                      <span style="color:var(--muted);">○</span> トヨタES 締切まで2日
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);">
+                      <span style="color:var(--muted);">○</span> OB訪問の感謝メール送付
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════
+         SLIDE 4 — キャリアセンター機能
+    ═══════════════════════════════════════════════════ -->
+    <section class="slide" id="s4">
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <div class="chip">For Career Center</div>
+        <div class="slide-title">キャリアセンター担当者に届ける<span>6つの機能</span></div>
+        <div class="slide-sub">学生の同意のもと、支援に必要な情報をリアルタイムで把握できます。</div>
+
+        <div class="func-grid">
+          <div class="func-card">
+            <div class="func-card-tag">リアルタイム</div>
+            <div class="func-card-icon">📱</div>
+            <div class="func-card-title">学生の就活ダッシュボード共有</div>
+            <div class="func-card-desc">応募企業数・選考フェーズ・ES状況を面談前に把握。「何社受けてるの？」と聞く必要がなくなります。</div>
+          </div>
+          <div class="func-card">
+            <div class="func-card-tag">AIインサイト</div>
+            <div class="func-card-icon">🤖</div>
+            <div class="func-card-title">AI分析インサイトの事前確認</div>
+            <div class="func-card-desc">「この学生が今抱えているリスク・課題」をAIが自動生成。面談前に深掘りすべきポイントが一目でわかります。</div>
+          </div>
+          <div class="func-card">
+            <div class="func-card-tag">プロアクティブ</div>
+            <div class="func-card-icon">💬</div>
+            <div class="func-card-title">孤立学生への個別メッセージ</div>
+            <div class="func-card-desc">来談しない学生へもCareo経由でメッセージを届けられます。困っている学生に手を差し伸べられます。</div>
+          </div>
+          <div class="func-card">
+            <div class="func-card-tag">データ分析</div>
+            <div class="func-card-icon">📈</div>
+            <div class="func-card-title">大学全体の就活状況を集計</div>
+            <div class="func-card-desc">応募社数・選考通過率・内定獲得状況を集計。例年比較や学部間差異など、支援優先度が数字で見えます。</div>
+          </div>
+          <div class="func-card">
+            <div class="func-card-tag">面談効率化</div>
+            <div class="func-card-icon">📄</div>
+            <div class="func-card-title">キャリアセンターレポート</div>
+            <div class="func-card-desc">学生が就活データを1枚レポートにまとめて面談持参。事前情報収集の手間を大幅に削減します。</div>
+          </div>
+          <div class="func-card">
+            <div class="func-card-tag">情報配信</div>
+            <div class="func-card-icon">🎯</div>
+            <div class="func-card-title">大学独自のお知らせ配信</div>
+            <div class="func-card-desc">説明会・OB訪問受付など、就活中の学生が使うCareo内でお知らせを配信。開封率が高い直接リーチが可能です。</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════
+         SLIDE 5 — パイロット提案
+    ═══════════════════════════════════════════════════ -->
+    <section class="slide" id="s5">
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <div class="chip">Pilot Proposal</div>
+        <div class="slide-title">まず<span>無償パイロット</span>から始めましょう</div>
+        <div class="slide-sub">リスクゼロで試せます。上智の学生が作ったサービスを、上智の学生に届けてください。</div>
+
+        <div class="pilot-layout">
+          <div class="pilot-main">
+            <div class="pilot-hero">
+              <div class="pilot-free-badge">
+                <div class="free-num">¥0</div>
+                <div class="free-unit">完全無償</div>
+              </div>
+              <div class="pilot-hero-text">
+                <div class="pilot-hero-title">3〜6ヶ月間の無償パイロット</div>
+                <div class="pilot-hero-sub">上智大学での成功事例を一緒に作りたいと考えています。在学生が開発したサービスとして、まず上智の学生に届けることが最初のゴールです。</div>
+              </div>
+            </div>
+
+            <div class="cond-card">
+              <div class="cond-card-title">センター側にお願いしたいこと</div>
+              <div class="cond-list">
+                <div class="cond-item">
+                  <div class="cond-icon ask">📢</div>
+                  <div>学内メール・掲示板・ガイダンスでのCareo紹介（資料はCareo側でご用意します）</div>
+                </div>
+                <div class="cond-item">
+                  <div class="cond-icon ask">🏷️</div>
+                  <div>「上智大学キャリアセンター公認ツール」としての肩書き付与</div>
+                </div>
+                <div class="cond-item">
+                  <div class="cond-icon ask">🤝</div>
+                  <div>パイロット期間中の月1回フィードバックMTG（30分程度）</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="cond-card">
+              <div class="cond-card-title">Careo側が提供するもの</div>
+              <div class="cond-list">
+                <div class="cond-item">
+                  <div class="cond-icon give">📊</div>
+                  <div>月次利用レポート（利用学生数・機能別利用率・就活進捗サマリー）</div>
+                </div>
+                <div class="cond-item">
+                  <div class="cond-icon give">🎓</div>
+                  <div>キャリアセンター担当者専用ダッシュボードアカウント</div>
+                </div>
+                <div class="cond-item">
+                  <div class="cond-icon give">⚡</div>
+                  <div>学生からのフィードバックを即時反映・機能改善</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pilot-side">
+            <div class="timeline-card">
+              <div class="timeline-title">導入ステップ</div>
+              <div class="tl-step">
+                <div class="tl-dot-wrap">
+                  <div class="tl-dot">1</div>
+                  <div class="tl-line"></div>
+                </div>
+                <div class="tl-info">
+                  <div class="tl-label">ヒアリングMTG</div>
+                  <div class="tl-sub">課題・規模・既存システムの確認（30分）</div>
+                </div>
+              </div>
+              <div class="tl-step">
+                <div class="tl-dot-wrap">
+                  <div class="tl-dot">2</div>
+                  <div class="tl-line"></div>
+                </div>
+                <div class="tl-info">
+                  <div class="tl-label">提携合意・設定</div>
+                  <div class="tl-sub">大学登録・担当者アカウント作成（1週間）</div>
+                </div>
+              </div>
+              <div class="tl-step">
+                <div class="tl-dot-wrap">
+                  <div class="tl-dot">3</div>
+                  <div class="tl-line"></div>
+                </div>
+                <div class="tl-info">
+                  <div class="tl-label">学内周知・開始</div>
+                  <div class="tl-sub">メール配信・ガイダンスでの案内</div>
+                </div>
+              </div>
+              <div class="tl-step">
+                <div class="tl-dot-wrap">
+                  <div class="tl-dot">4</div>
+                </div>
+                <div class="tl-info">
+                  <div class="tl-label">効果検証・継続判断</div>
+                  <div class="tl-sub">3〜6ヶ月後にパイロット結果を共有</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="background:rgba(0,200,150,0.06);border:1px solid rgba(0,200,150,0.2);border-radius:14px;padding:20px 22px;">
+              <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:10px;">なぜ上智から始めるのか</div>
+              <div style="font-size:13px;color:var(--muted);line-height:1.75;">開発者が在籍する大学だからこそ、学生目線での課題把握・改善が最速でできます。上智での成功事例が他大学への展開の入口になると考えています。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════
+         SLIDE 6 — Next Steps
+    ═══════════════════════════════════════════════════ -->
+    <section class="slide" id="s6">
+      <div class="grid-bg"></div>
+      <div class="glow glow-1"></div>
+
+      <div class="slide-inner">
+        <div class="next-logo">
+          <div class="logo-mark" style="justify-content:center;">
+            <div class="dot-c">C</div>
+            Careo
+          </div>
+        </div>
+
+        <div class="next-title">
+          まずは<span>30分</span>、<br>お話を聞かせてください
+        </div>
+        <div class="next-sub">
+          売り込みではなく、貴センターの課題を聞かせていただく場にしたいと思っています。<br>
+          ご都合に合わせて日程を調整いたします。
+        </div>
+
+        <div class="steps-row">
+          <div class="step-card">
+            <div class="step-num">Step 01</div>
+            <div class="step-action">メールでご連絡</div>
+            <div class="step-detail">本資料へのご返信、またはメールにてお気軽にご連絡ください</div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">Step 02</div>
+            <div class="step-action">30分ヒアリング</div>
+            <div class="step-detail">現状の課題・ニーズをお聞かせください。デモもご覧いただけます</div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">Step 03</div>
+            <div class="step-action">パイロット開始</div>
+            <div class="step-detail">合意後1週間以内に設定完了。すぐに始められます</div>
+          </div>
+        </div>
+
+        <div class="contact-row">
+          <div class="contact-item">
+            <div>
+              <div class="ci-label">Web</div>
+              <div class="ci-value">careoai.jp/for-career-center</div>
+            </div>
+          </div>
+          <div style="width:1px;background:var(--border);height:40px;"></div>
+          <div class="contact-item">
+            <div>
+              <div class="ci-label">Careo</div>
+              <div class="ci-value">上智大学在籍 学生開発チーム</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /deck -->
+</div><!-- /stage -->
+
+<!-- Navigation -->
+<div id="nav">
+  <button id="nav-btn-prev">←</button>
+  <div id="dots"></div>
+  <span id="slide-counter">1 / 6</span>
+  <button id="nav-btn-next">→</button>
+</div>
+
+<button id="print-btn" onclick="window.print()">🖨 PDF保存</button>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const dotsEl = document.getElementById('dots');
+  const counter = document.getElementById('slide-counter');
+  const total = slides.length;
+  let cur = 0;
+
+  // Build dots
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => goTo(i));
+    dotsEl.appendChild(d);
+  }
+
+  function goTo(n) {
+    slides[cur].classList.remove('active');
+    slides[cur].classList.add('prev');
+    setTimeout(() => slides[cur < n ? cur : cur].classList.remove('prev'), 600);
+
+    const prev = cur;
+    cur = (n + total) % total;
+
+    // Remove prev class from old
+    slides[prev].classList.remove('active');
+    setTimeout(() => slides[prev].classList.remove('prev'), 600);
+    slides[prev].classList.add('prev');
+
+    slides[cur].classList.remove('prev');
+    slides[cur].classList.add('active');
+
+    // Update dots
+    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === cur));
+    counter.textContent = `${cur + 1} / ${total}`;
+  }
+
+  document.getElementById('nav-btn-prev').addEventListener('click', () => goTo(cur - 1));
+  document.getElementById('nav-btn-next').addEventListener('click', () => goTo(cur + 1));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); goTo(cur + 1); }
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                    { e.preventDefault(); goTo(cur - 1); }
+  });
+
+  // Scale deck to fit viewport
+  function scaleDeck() {
+    const deck = document.getElementById('deck');
+    const sw = window.innerWidth  - 40;
+    const sh = window.innerHeight - 100;
+    const scale = Math.min(sw / 1280, sh / 720);
+    deck.style.transform = `scale(${scale})`;
+  }
+  scaleDeck();
+  window.addEventListener('resize', scaleDeck);
+</script>
+</body>
+</html>
