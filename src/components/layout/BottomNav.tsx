@@ -83,7 +83,7 @@ export function BottomNav() {
     setShowMore(false);
   }, [pathname]);
 
-  if (!isAuth) return null;
+  if (!isAuth || pathname.startsWith("/career-portal")) return null;
 
   const isMoreActive = moreItems.some(item => pathname.startsWith(item.href));
 

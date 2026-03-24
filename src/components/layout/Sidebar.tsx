@@ -187,7 +187,7 @@ export function Sidebar() {
     });
   };
 
-  if (!isAuth || isMobile) return null;
+  if (!isAuth || isMobile || pathname.startsWith("/career-portal")) return null;
 
   return (
     <aside

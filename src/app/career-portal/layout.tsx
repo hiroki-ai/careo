@@ -5,6 +5,68 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
+function PasswordSetupBanner() {
+  const [show, setShow] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    if (!localStorage.getItem("portal_pw_set")) setShow(true);
+  }, []);
+
+  if (!show) return null;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    if (password.length < 8) { setError("8文字以上で設定してください"); return; }
+    if (password !== confirm) { setError("パスワードが一致しません"); return; }
+    setLoading(true);
+    const supabase = createClient();
+    const { error: err } = await supabase.auth.updateUser({ password });
+    if (err) { setError(err.message); setLoading(false); return; }
+    localStorage.setItem("portal_pw_set", "1");
+    setDone(true);
+    setTimeout(() => setShow(false), 2000);
+    setLoading(false);
+  };
+
+  return (
+    <div className="mb-5 bg-amber-50 border border-amber-200 rounded-xl p-4">
+      {done ? (
+        <p className="text-sm text-green-600 font-medium">パスワードを設定しました！</p>
+      ) : (
+        <>
+          <div className="flex items-start justify-between gap-2 mb-3">
+            <div>
+              <p className="text-sm font-semibold text-amber-800">パスワードを設定してください</p>
+              <p className="text-xs text-amber-600 mt-0.5">次回以降のログインに使用します</p>
+            </div>
+            <button type="button" onClick={() => { localStorage.setItem("portal_pw_set", "1"); setShow(false); }}
+              className="text-amber-400 hover:text-amber-600 text-xs">スキップ</button>
+          </div>
+          <form onSubmit={handleSubmit} className="flex flex-wrap gap-2 items-end">
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)}
+              placeholder="新しいパスワード（8文字以上）"
+              className="border border-amber-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300 w-52" />
+            <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)}
+              placeholder="確認用パスワード"
+              className="border border-amber-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300 w-44" />
+            <button type="submit" disabled={loading}
+              className="bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 text-white text-sm font-medium px-4 py-1.5 rounded-lg transition-colors">
+              {loading ? "設定中..." : "設定する"}
+            </button>
+            {error && <p className="w-full text-xs text-red-500">{error}</p>}
+          </form>
+        </>
+      )}
+    </div>
+  );
+}
+
 const navItems = [
   {
     href: "/career-portal",
@@ -127,6 +189,7 @@ export default function CareerPortalLayout({ children }: { children: React.React
 
       {/* メインコンテンツ */}
       <main className="flex-1 min-w-0 p-6 overflow-auto">
+        <PasswordSetupBanner />
         {children}
       </main>
     </div>
