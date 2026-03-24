@@ -15,8 +15,12 @@ export const metadata: Metadata = {
   description: "AI就活コーチ「カレオ」が選考・ES・面接・OB訪問を全部把握。就活のPDCAを自動で回すAI就活アプリ。無料・登録5分。",
   manifest: "/manifest.json",
   icons: {
-    icon: [{ url: "/icon-new.svg", type: "image/svg+xml" }],
-    apple: "/icon-new.svg",
+    icon: [
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-new.svg", type: "image/svg+xml" },
+    ],
+    apple: "/icon-192.png",
   },
   verification: {
     google: "2kjrzj66CrgHoAlDoUYL7CzhahsRlfXmZSyK7v2QBVc",
