@@ -12,6 +12,7 @@ type Post = {
   tags: string[];
   reading_time_min: number;
   published_at: string;
+  focus_keyphrase?: string;
 };
 
 type Props = { params: Promise<{ slug: string }> };
@@ -52,6 +53,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${post.title} | Careo就活ブログ`,
     description: post.description,
+    keywords: [
+      ...(post.focus_keyphrase ? [post.focus_keyphrase] : []),
+      ...post.tags,
+      "就活", "Careo", "就活管理",
+    ].join(", "),
     openGraph: {
       title: post.title,
       description: post.description,
@@ -60,6 +66,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       locale: "ja_JP",
       type: "article",
       publishedTime: post.published_at,
+      images: [{ url: `https://careoai.jp/blog/${post.slug}/opengraph-image`, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.description,
+      images: [`https://careoai.jp/blog/${post.slug}/opengraph-image`],
     },
     alternates: { canonical: `https://careoai.jp/blog/${post.slug}` },
   };
@@ -289,6 +302,46 @@ export default async function BlogPostPage({ params }: Props) {
           color: #1f6b59;
           font-size: 0.9375rem;
         }
+        .blog-body table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-bottom: 1.5rem;
+          font-size: 0.875rem;
+        }
+        .blog-body th {
+          background: #0D0B21;
+          color: white;
+          font-weight: 700;
+          padding: 0.6rem 1rem;
+          text-align: left;
+          font-size: 0.8125rem;
+        }
+        .blog-body td {
+          padding: 0.6rem 1rem;
+          border-bottom: 1px solid #e5e7eb;
+          color: #374151;
+          vertical-align: top;
+        }
+        .blog-body tr:nth-child(even) td { background: #f9fafb; }
+        .blog-body tr:hover td { background: #f0fdf9; }
+        .blog-stat-bar {
+          background: #f9fafb;
+          border-radius: 0.75rem;
+          padding: 1rem 1.25rem;
+          margin-bottom: 1.25rem;
+        }
+        .blog-stat-bar-item {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          margin-bottom: 0.5rem;
+        }
+        .blog-stat-bar-label { font-size: 0.8125rem; color: #374151; min-width: 120px; }
+        .blog-stat-bar-track { flex: 1; background: #e5e7eb; border-radius: 9999px; height: 8px; overflow: hidden; }
+        .blog-stat-bar-fill { height: 100%; background: linear-gradient(90deg, #00c896, #0ea5e9); border-radius: 9999px; }
+        .blog-stat-bar-value { font-size: 0.8125rem; font-weight: 700; color: #0D0B21; min-width: 40px; text-align: right; }
+        .blog-cite { font-size: 0.8125rem; color: #6b7280; border-top: 1px solid #e5e7eb; padding-top: 0.5rem; margin-top: 1rem; }
+        .blog-cite a { color: #00a87e; text-decoration: underline; }
         .blog-cta-link {
           display: inline-flex;
           align-items: center;

@@ -117,7 +117,7 @@ export default async function BlogPage() {
           <div className="max-w-5xl mx-auto">
             <div className="inline-flex items-center gap-2 border border-[#00c896]/30 bg-[#00c896]/5 text-[#00a87e] text-xs font-semibold px-3 py-1.5 rounded-full mb-5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#00c896] animate-pulse" />
-              毎朝8時に新記事を更新中
+              毎日新記事を更新中
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-[#0D0B21] tracking-tight mb-3">
               就活ブログ
@@ -157,8 +157,19 @@ export default async function BlogPage() {
                 <Link
                   key={post.id}
                   href={`/blog/${post.slug}`}
-                  className="group bg-white rounded-2xl border border-gray-200 p-6 hover:border-[#00c896]/40 hover:shadow-md transition-all duration-200 flex flex-col"
+                  className="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:border-[#00c896]/40 hover:shadow-md transition-all duration-200 flex flex-col"
                 >
+                  {/* サムネイル */}
+                  <div className="relative w-full aspect-[1200/630] overflow-hidden bg-[#0D0B21]">
+                    <img
+                      src={`/blog/${post.slug}/opengraph-image`}
+                      alt={post.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                    />
+                  </div>
+
+                  <div className="p-5 flex flex-col flex-1">
                   {/* タグ */}
                   <div className="flex flex-wrap gap-1.5 mb-3">
                     {post.tags.slice(0, 2).map((tag) => (
@@ -196,6 +207,7 @@ export default async function BlogPage() {
                       {post.reading_time_min}分で読める
                     </div>
                   </div>
+                  </div>{/* /p-5 */}
                 </Link>
               ))}
             </div>
