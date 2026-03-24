@@ -19,25 +19,15 @@ export async function POST(request: NextRequest) {
   if (file.size > 10 * 1024 * 1024) return NextResponse.json({ error: "ファイルサイズは10MB以下にしてください" }, { status: 400 });
 
   // PDF テキスト抽出
-  // pdf-parse v2 のテストファイル読み込み問題を回避するため lib 直下を require
   let pdfText = "";
   try {
     const buffer = Buffer.from(await file.arrayBuffer());
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const pdfParse = require("pdf-parse/lib/pdf-parse") as (buf: Buffer) => Promise<{ text: string }>;
+    const pdfParse = require("pdf-parse") as (buf: Buffer) => Promise<{ text: string }>;
     const data = await pdfParse(buffer);
     pdfText = data.text;
   } catch {
-    // フォールバック: 通常パスで再試行
-    try {
-      const buffer = Buffer.from(await file.arrayBuffer());
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const pdfParse = require("pdf-parse") as (buf: Buffer) => Promise<{ text: string }>;
-      const data = await pdfParse(buffer);
-      pdfText = data.text;
-    } catch {
-      return NextResponse.json({ error: "PDFの読み込みに失敗しました。テキストが含まれているPDFか確認してください。" }, { status: 400 });
-    }
+    return NextResponse.json({ error: "PDFの読み込みに失敗しました。テキストが含まれているPDFか確認してください。" }, { status: 400 });
   }
 
   if (!pdfText.trim()) {
