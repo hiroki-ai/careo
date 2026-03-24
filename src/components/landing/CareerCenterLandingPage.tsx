@@ -478,6 +478,372 @@ export default function CareerCenterLandingPage() {
         </div>
       </section>
 
+      {/* ── 競合比較・差別化 ───────────────────────────────────────────────── */}
+      <section className="py-24 px-6 bg-gray-50/50">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16 reveal">
+            <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3">Differentiation</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#0D0B21] tracking-tight mb-4">
+              既存のツールとは、<span className="text-[#00c896]">何が違うのか</span>
+            </h2>
+            <p className="text-gray-500 text-sm max-w-2xl mx-auto leading-relaxed">
+              「今あるツールで十分では？」——この疑問に正面から答えます。
+            </p>
+          </div>
+
+          {/* ポジショニングマップ */}
+          <div className="mb-16 reveal">
+            <h3 className="text-base font-bold text-gray-400 uppercase tracking-widest text-center mb-8">就活支援ツールのポジショニングマップ</h3>
+
+            <div className="relative mx-auto max-w-[560px] h-[400px]">
+              {/* 外枠 */}
+              <div className="absolute inset-0 rounded-3xl border border-gray-200 overflow-hidden bg-white shadow-sm">
+                <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
+                  <div className="bg-gray-50/60" />
+                  <div className="bg-[#00c896]/5" />
+                  <div className="bg-gray-50/80" />
+                  <div className="bg-gray-50/60" />
+                </div>
+                <div className="absolute top-1/2 left-0 right-0 h-px bg-gray-200" />
+                <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gray-200" />
+              </div>
+
+              {/* 軸ラベル */}
+              <div className="absolute top-2 w-full flex justify-center">
+                <span className="text-[11px] font-bold text-[#00c896] bg-white/90 px-2 py-0.5 rounded-full border border-[#00c896]/20">情報可視性 高 ↑</span>
+              </div>
+              <div className="absolute bottom-2 w-full flex justify-center">
+                <span className="text-[11px] text-gray-400 bg-white/90 px-2 py-0.5 rounded-full">情報可視性 低</span>
+              </div>
+              <div className="absolute left-2 top-0 bottom-0 flex items-center justify-center">
+                <span className="text-[10px] text-gray-400 select-none [writing-mode:vertical-rl] rotate-180">← 義務的（強制利用）</span>
+              </div>
+              <div className="absolute right-2 top-0 bottom-0 flex items-center justify-center">
+                <span className="text-[10px] font-bold text-gray-600 select-none [writing-mode:vertical-rl]">自主利用 →</span>
+              </div>
+
+              {/* ゾーンラベル */}
+              <div className="absolute top-7 right-7 text-[9px] text-[#00c896]/50 font-bold select-none">Careoゾーン（空白地帯）</div>
+
+              {/* 従来の就職支援システム */}
+              <div className="absolute left-[18%] top-[28%] -translate-x-1/2 -translate-y-1/2">
+                <div className="bg-gray-100 border border-gray-300 rounded-xl px-3 py-2 text-center shadow-sm whitespace-nowrap">
+                  <p className="text-[10px] font-bold text-gray-600">従来の就職支援システム</p>
+                </div>
+              </div>
+
+              {/* Google Forms / アンケート */}
+              <div className="absolute left-[24%] top-[68%] -translate-x-1/2 -translate-y-1/2">
+                <div className="bg-gray-100 border border-gray-300 rounded-xl px-3 py-2 text-center shadow-sm whitespace-nowrap">
+                  <p className="text-[10px] font-bold text-gray-500">アンケート / Forms</p>
+                </div>
+              </div>
+
+              {/* LINE / メール */}
+              <div className="absolute left-[38%] top-[74%] -translate-x-1/2 -translate-y-1/2">
+                <div className="bg-yellow-50 border border-yellow-200 rounded-xl px-3 py-2 text-center shadow-sm">
+                  <p className="text-[10px] font-bold text-yellow-700">LINE / メール</p>
+                </div>
+              </div>
+
+              {/* リクナビ / マイナビ */}
+              <div className="absolute left-[75%] top-[78%] -translate-x-1/2 -translate-y-1/2">
+                <div className="bg-red-50 border border-red-200 rounded-xl px-3 py-2 text-center shadow-sm whitespace-nowrap">
+                  <p className="text-[10px] font-bold text-red-600">リクナビ / マイナビ</p>
+                </div>
+              </div>
+
+              {/* Careo（強調） */}
+              <div className="absolute left-[80%] top-[18%] -translate-x-1/2 -translate-y-1/2">
+                <div className="bg-[#00c896] rounded-xl px-3.5 py-2.5 text-center shadow-lg shadow-[#00c896]/40 ring-2 ring-[#00c896]/30">
+                  <p className="text-[11px] font-bold text-white">✦ Careo</p>
+                  <p className="text-[9px] text-white/80">自主利用×高可視性</p>
+                </div>
+              </div>
+            </div>
+
+            <p className="text-center text-xs text-gray-400 mt-4">
+              ※ ポジションはCareoの主観的評価に基づくイメージです。
+            </p>
+          </div>
+
+          {/* 比較テーブル */}
+          <div className="reveal">
+            <h3 className="text-base font-bold text-gray-400 uppercase tracking-widest text-center mb-8">各ツールとの比較</h3>
+            <div className="overflow-x-auto -mx-2 rounded-2xl border border-gray-200 shadow-sm bg-white">
+              <table className="w-full text-xs min-w-[620px]">
+                <thead>
+                  <tr className="border-b border-gray-100 bg-gray-50/80">
+                    <th scope="col" className="text-left py-4 px-5 text-gray-400 font-medium w-[28%]">比較軸</th>
+                    <th className="py-4 px-3 text-center text-gray-400 font-medium">従来の<br />就職支援システム</th>
+                    <th className="py-4 px-3 text-center text-gray-400 font-medium">リクナビ<br />マイナビ</th>
+                    <th className="py-4 px-3 text-center text-gray-400 font-medium">LINE/<br />メール</th>
+                    <th className="py-4 px-3 text-center text-gray-400 font-medium">アンケート/<br />Forms</th>
+                    <th className="py-4 px-3 text-center">
+                      <span className="bg-[#00c896] text-white text-xs font-bold px-3 py-1.5 rounded-lg">Careo</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {[
+                    {
+                      label: "学生が自主的に使う",
+                      note: "義務でなく自分のために使う",
+                      old: false, riku: true, line: "△", form: false, careo: true,
+                    },
+                    {
+                      label: "リアルタイムで状況把握",
+                      note: "面談前に学生の今を知れる",
+                      old: "△", riku: false, line: false, form: false, careo: true,
+                    },
+                    {
+                      label: "AI分析・インサイト付き",
+                      note: "単なるデータではなく示唆",
+                      old: false, riku: false, line: false, form: false, careo: true,
+                    },
+                    {
+                      label: "孤立学生へのリーチ",
+                      note: "来談しない学生にも届く",
+                      old: false, riku: false, line: "△", form: false, careo: true,
+                    },
+                    {
+                      label: "既存システムと共存できる",
+                      note: "置き換えではなく補完",
+                      old: "—", riku: true, line: true, form: true, careo: true,
+                    },
+                    {
+                      label: "支援成果の可視化",
+                      note: "データで効果を証明できる",
+                      old: "△", riku: false, line: false, form: "△", careo: true,
+                    },
+                    {
+                      label: "学生側の費用",
+                      note: "学生の負担",
+                      old: "無料", riku: "無料", line: "無料", form: "無料", careo: "完全無料",
+                    },
+                  ].map(row => {
+                    const cell = (v: boolean | string) =>
+                      v === true ? <span className="text-[#00c896] font-bold text-base">✓</span>
+                      : v === false ? <span className="text-gray-200 text-base">—</span>
+                      : <span className="text-amber-500 text-[10px] font-semibold">{v}</span>;
+                    const careoCell = (v: boolean | string) =>
+                      v === true ? <span className="text-[#00c896] font-bold text-base">✓</span>
+                      : v === false ? <span className="text-gray-300 text-base">—</span>
+                      : <span className="text-[#00c896] text-[10px] font-bold">{v}</span>;
+                    return (
+                      <tr key={row.label} className="hover:bg-gray-50/50 transition-colors">
+                        <td className="py-3.5 px-5 text-gray-700 font-medium text-xs">
+                          {row.label}
+                          {row.note && <span className="block text-[10px] text-gray-400 font-normal mt-0.5">{row.note}</span>}
+                        </td>
+                        <td className="py-3.5 px-3 text-center">{cell(row.old)}</td>
+                        <td className="py-3.5 px-3 text-center">{cell(row.riku)}</td>
+                        <td className="py-3.5 px-3 text-center">{cell(row.line)}</td>
+                        <td className="py-3.5 px-3 text-center">{cell(row.form)}</td>
+                        <td className="py-3.5 px-3 text-center bg-[#00c896]/3">{careoCell(row.careo)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-center text-xs text-gray-400 mt-3">
+              ※ △: 部分的に対応 / 条件あり。2026年現在の情報をもとに作成。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 立ち位置と発展戦略 ─────────────────────────────────────────────── */}
+      <section className="py-24 px-6 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16 reveal">
+            <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3">Strategy</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#0D0B21] tracking-tight mb-4">
+              Careoはどこを目指すのか
+            </h2>
+            <p className="text-gray-500 text-sm max-w-2xl mx-auto leading-relaxed">
+              学生のツールとして始まり、大学キャリアセンターのインフラへ。<br className="hidden md:block" />
+              段階的に価値を積み上げる、Careoの発展戦略です。
+            </p>
+          </div>
+
+          {/* 3層エコシステム図 */}
+          <div className="mb-16 reveal">
+            <h3 className="text-base font-bold text-gray-400 uppercase tracking-widest text-center mb-8">就活エコシステムにおける立ち位置</h3>
+            <div className="space-y-2 max-w-2xl mx-auto">
+              {/* Layer 1: 学生 */}
+              <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="bg-blue-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">LAYER 1</span>
+                  <h4 className="font-bold text-blue-800 text-sm">学生</h4>
+                </div>
+                <p className="text-sm text-blue-700 mb-3">自主的にCareoを使って就活を管理。AIコーチング・ES管理・選考PDCA。</p>
+                <div className="flex gap-1.5 flex-wrap">
+                  {["ES管理", "面接ログ", "OB/OG訪問", "PDCA分析", "AIコーチ「カレオ」"].map(tag => (
+                    <span key={tag} className="bg-white text-blue-600 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-blue-200">{tag}</span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex justify-center py-1">
+                <span className="text-[#00c896] text-xs font-semibold">↕ 学生が同意した情報をリアルタイムで連携</span>
+              </div>
+
+              {/* Layer 2: Careo */}
+              <div className="bg-gradient-to-r from-[#00c896]/10 to-[#059669]/8 border border-[#00c896]/30 rounded-2xl p-5">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="bg-[#00c896] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">LAYER 2</span>
+                  <h4 className="font-bold text-[#0D0B21] text-sm">Careo（データハブ＋AIエンジン）</h4>
+                </div>
+                <p className="text-sm text-gray-600 mb-3">学生データを集約・AIで分析し、学生とキャリアセンターの両方に価値を提供。</p>
+                <div className="flex gap-1.5 flex-wrap">
+                  {["AIインサイト生成", "週次PDCA自動化", "プライバシー管理", "データ集計", "キャリアセンターレポート"].map(tag => (
+                    <span key={tag} className="bg-white text-[#00a87e] text-[10px] font-semibold px-2 py-0.5 rounded-full border border-[#00c896]/30">{tag}</span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex justify-center py-1">
+                <span className="text-[#00c896] text-xs font-semibold">↓ ダッシュボードで可視化・支援強化</span>
+              </div>
+
+              {/* Layer 3: キャリアセンター */}
+              <div className="bg-purple-50 border border-purple-200 rounded-2xl p-5">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="bg-purple-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">LAYER 3</span>
+                  <h4 className="font-bold text-purple-800 text-sm">キャリアセンター（提携大学）</h4>
+                </div>
+                <p className="text-sm text-purple-700 mb-3">学生の就活状況をリアルタイムで把握。面談の質向上・孤立学生へのリーチ・支援効果の可視化。</p>
+                <div className="flex gap-1.5 flex-wrap">
+                  {["ダッシュボード閲覧", "個別メッセージ送信", "集計レポート", "AI面談準備サポート"].map(tag => (
+                    <span key={tag} className="bg-white text-purple-600 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-purple-200">{tag}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <p className="text-center text-xs text-gray-400 mt-5">
+              既存の就職支援システムの置き換えではなく、「学生の実態データ」という新しいレイヤーを追加します。
+            </p>
+          </div>
+
+          {/* 発展ロードマップ */}
+          <div className="reveal">
+            <h3 className="text-base font-bold text-gray-400 uppercase tracking-widest text-center mb-8">Careoの発展ロードマップ</h3>
+            <div className="grid md:grid-cols-3 gap-5">
+              {[
+                {
+                  phase: "Phase 1",
+                  title: "学生への普及・信頼構築",
+                  status: "現在進行中",
+                  statusCls: "bg-[#00c896] text-white",
+                  desc: "就活AIアプリとして学生に使われること。AIコーチング・ES管理・PDCA分析を通じて「手放せないツール」になる。",
+                  items: ["AIコーチ「カレオ」", "週次PDCA分析", "ES管理・AIチェック", "OB/OG訪問・筆記試験管理"],
+                  borderCls: "border-[#00c896]/40",
+                  bgCls: "bg-[#00c896]/5",
+                },
+                {
+                  phase: "Phase 2",
+                  title: "大学キャリアセンターとの連携",
+                  status: "提携募集中",
+                  statusCls: "bg-blue-500 text-white",
+                  desc: "普及した学生データをキャリアセンターへ橋渡し。面談の質向上・孤立学生へのリーチ・支援効果の可視化を実現。",
+                  items: ["キャリアセンターダッシュボード", "学生への個別メッセージ", "大学全体の集計分析", "面談前AIインサイト"],
+                  borderCls: "border-blue-200",
+                  bgCls: "bg-blue-50/50",
+                },
+                {
+                  phase: "Phase 3",
+                  title: "就活データインフラへ",
+                  status: "将来ビジョン",
+                  statusCls: "bg-purple-500 text-white",
+                  desc: "学生・大学・企業をつなぐ就活データプラットフォームへ。日本のHandshakeとして、就職支援の中核インフラとなる。",
+                  items: ["企業との採用データ連携", "複数大学間の比較分析", "就活トレンド・予測レポート", "キャリアセンター間の知見共有"],
+                  borderCls: "border-purple-200",
+                  bgCls: "bg-purple-50/50",
+                },
+              ].map((phase, i) => (
+                <div key={phase.phase} className={`border ${phase.borderCls} ${phase.bgCls} rounded-2xl p-6 reveal reveal-delay-${i + 1}`}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-xs font-bold text-gray-400">{phase.phase}</span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${phase.statusCls}`}>{phase.status}</span>
+                  </div>
+                  <h4 className="font-bold text-[#0D0B21] text-base mb-3 leading-snug">{phase.title}</h4>
+                  <p className="text-gray-500 text-xs leading-relaxed mb-4">{phase.desc}</p>
+                  <ul className="space-y-1.5">
+                    {phase.items.map(item => (
+                      <li key={item} className="flex items-start gap-1.5 text-xs text-gray-600">
+                        <span className="text-[#00c896] mt-0.5 shrink-0">✓</span>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 開発者ストーリー ─────────────────────────────────────────────────── */}
+      <section className="bg-[#0D0B21] py-24 px-6 relative overflow-hidden">
+        <div className="lp-dark-grid absolute inset-0 opacity-30" />
+        <div className="absolute top-1/3 right-0 w-[400px] h-[400px] bg-[#00c896]/4 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative max-w-3xl mx-auto">
+          <div className="text-center mb-12 reveal">
+            <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3">Our Story</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight mb-4">
+              なぜCareoを作ったのか
+            </h2>
+          </div>
+
+          <div className="lp-story-card rounded-2xl p-8 md:p-10 reveal">
+            <div className="flex items-center gap-4 mb-7">
+              <div className="w-12 h-12 rounded-2xl bg-[#00c896]/20 border border-[#00c896]/30 flex items-center justify-center text-2xl shrink-0">
+                🎓
+              </div>
+              <div>
+                <p className="text-white font-bold text-base">上智大学 在学中の学生が開発</p>
+                <p className="text-gray-400 text-sm">開発者自身が、就活をしながらCareoを作り続けている</p>
+              </div>
+            </div>
+
+            <div className="space-y-5 text-gray-300 text-sm leading-relaxed">
+              <p>
+                Careoの開発者は、自分自身が就活をする中で「なぜこんなに管理が大変なんだろう」と感じたことがきっかけで開発を始めました。
+              </p>
+              <p>
+                ESの締切を見落としそうになったり、面接の振り返りをしようにもどこに書いたかわからなくなったり。
+                Notionでテンプレートを作ってみても、管理するための管理が増えるだけ。
+                自分で使うために作り始めたCareoが、気づけば「全部AIがやってくれるツール」になっていました。
+              </p>
+              <p>
+                就活を進める中で、もうひとつ気づいたことがあります。
+                <span className="text-white font-semibold">キャリアセンターに相談できたらどれほど楽だったか</span>——でも、何を相談すればいいかわからない。自分の状況を言語化する前に、面談の時間が来てしまう。
+              </p>
+              <p>
+                そこから、学生が自分で使うツールと、キャリアセンターの支援をつなぐという構想が生まれました。
+                <span className="text-[#00c896] font-semibold">学生が自然に使い続けることで、キャリアセンターに価値あるデータが流れる</span>——押しつけではなく、学生が「使いたい」と思えるツールだからこそ成り立つモデルです。
+              </p>
+            </div>
+
+            <div className="mt-8 pt-7 border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <p className="text-gray-400 text-xs leading-relaxed max-w-lg">
+                開発者自身がユーザーであるため、学生目線の改善が常に行われています。<br />
+                「使ってもらえるツール」にこだわり続けることが、Careoの競争優位です。
+              </p>
+              <a
+                href="#contact"
+                className="shrink-0 inline-flex items-center gap-2 lp-btn-primary text-white font-bold px-6 py-3 rounded-xl transition-all hover:scale-105 text-sm"
+              >
+                提携を検討する →
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── Features ───────────────────────────────────────────────────────── */}
       <section id="features" className="py-24 px-6 bg-white">
         <div className="max-w-5xl mx-auto">

@@ -406,6 +406,118 @@ export default function ComparePage() {
         </div>
       </section>
 
+      {/* ── 競合ポジショニングマップ ──────────────────────────────────────── */}
+      <section className="px-6 py-20 bg-white">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">Market Position</p>
+          <h2 className="text-2xl md:text-4xl font-bold text-center mb-4 tracking-tight">
+            就活サービスの中で、<span className="text-[#00c896]">Careoはここにいる</span>
+          </h2>
+          <p className="text-gray-500 text-center text-sm mb-12 max-w-xl mx-auto">
+            横軸は「役割（入口ツール ←→ 管理ツール）」、縦軸は「AI活用度」。<br />
+            Careoだけが<strong className="text-gray-700">「管理×AI高」</strong>という空白地帯に存在しています。
+          </p>
+
+          {/* 2Dマップ */}
+          <div className="relative mx-auto mb-8 max-w-[560px] h-[420px]">
+            {/* 外枠 + 背景 */}
+            <div className="absolute inset-0 rounded-3xl border border-gray-200 overflow-hidden bg-white shadow-sm">
+              {/* 4象限の背景色 */}
+              <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
+                <div className="bg-blue-50/40" />
+                <div className="bg-[#00c896]/5" />
+                <div className="bg-gray-50/80" />
+                <div className="bg-gray-50/50" />
+              </div>
+              {/* 十字ライン */}
+              <div className="absolute top-1/2 left-0 right-0 h-px bg-gray-200" />
+              <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gray-200" />
+            </div>
+
+            {/* 軸ラベル */}
+            <div className="absolute top-2 w-full flex justify-center">
+              <span className="text-[11px] font-bold text-[#00c896] bg-white/90 px-2 py-0.5 rounded-full border border-[#00c896]/20">AI特化 ↑</span>
+            </div>
+            <div className="absolute bottom-2 w-full flex justify-center">
+              <span className="text-[11px] text-gray-400 bg-white/90 px-2 py-0.5 rounded-full">AI機能なし</span>
+            </div>
+            <div className="absolute left-2 top-0 bottom-0 flex items-center justify-center">
+              <span className="text-[10px] text-gray-400 select-none [writing-mode:vertical-rl] rotate-180">← 入口（求人・スカウト）</span>
+            </div>
+            <div className="absolute right-2 top-0 bottom-0 flex items-center justify-center">
+              <span className="text-[10px] font-bold text-gray-600 select-none [writing-mode:vertical-rl]">管理・分析 →</span>
+            </div>
+
+            {/* ゾーンラベル（背景） */}
+            <div className="absolute top-7 right-7 text-[9px] text-[#00c896]/50 font-bold select-none">Careoゾーン（空白地帯）</div>
+
+            {/* リクナビ/マイナビ */}
+            <div className="absolute left-[16%] top-[73%] -translate-x-1/2 -translate-y-1/2">
+              <div className="bg-red-50 border border-red-200 rounded-xl px-3 py-2 text-center shadow-sm whitespace-nowrap">
+                <p className="text-[10px] font-bold text-red-600">リクナビ</p>
+                <p className="text-[9px] text-red-400">マイナビ</p>
+              </div>
+            </div>
+
+            {/* OfferBox */}
+            <div className="absolute left-[30%] top-[60%] -translate-x-1/2 -translate-y-1/2">
+              <div className="bg-green-50 border border-green-200 rounded-xl px-3 py-2 text-center shadow-sm">
+                <p className="text-[10px] font-bold text-green-700">OfferBox</p>
+              </div>
+            </div>
+
+            {/* BaseMe */}
+            <div className="absolute left-[26%] top-[22%] -translate-x-1/2 -translate-y-1/2">
+              <div className="bg-blue-50 border border-blue-200 rounded-xl px-3 py-2 text-center shadow-sm">
+                <p className="text-[10px] font-bold text-blue-700">BaseMe</p>
+              </div>
+            </div>
+
+            {/* SmartES */}
+            <div className="absolute left-[50%] top-[15%] -translate-x-1/2 -translate-y-1/2">
+              <div className="bg-orange-50 border border-orange-200 rounded-xl px-3 py-2 text-center shadow-sm">
+                <p className="text-[10px] font-bold text-orange-700">SmartES</p>
+              </div>
+            </div>
+
+            {/* Notion/SS */}
+            <div className="absolute left-[76%] top-[70%] -translate-x-1/2 -translate-y-1/2">
+              <div className="bg-gray-100 border border-gray-300 rounded-xl px-3 py-2 text-center shadow-sm whitespace-nowrap">
+                <p className="text-[10px] font-bold text-gray-600">Notion / SS</p>
+              </div>
+            </div>
+
+            {/* Careo（強調） */}
+            <div className="absolute left-[80%] top-[17%] -translate-x-1/2 -translate-y-1/2">
+              <div className="bg-[#00c896] rounded-xl px-3.5 py-2.5 text-center shadow-lg shadow-[#00c896]/40 ring-2 ring-[#00c896]/30">
+                <p className="text-[11px] font-bold text-white">✦ Careo</p>
+                <p className="text-[9px] text-white/80">管理×AI</p>
+              </div>
+            </div>
+          </div>
+
+          {/* 凡例 */}
+          <div className="flex flex-wrap justify-center gap-2 mb-4">
+            {[
+              { name: "リクナビ / マイナビ", role: "求人・エントリー", cls: "bg-red-50 text-red-600 border-red-200" },
+              { name: "OfferBox", role: "スカウト型採用", cls: "bg-green-50 text-green-700 border-green-200" },
+              { name: "BaseMe", role: "スカウト×AI", cls: "bg-blue-50 text-blue-700 border-blue-200" },
+              { name: "SmartES", role: "ES生成AI", cls: "bg-orange-50 text-orange-700 border-orange-200" },
+              { name: "Notion / SS", role: "汎用管理", cls: "bg-gray-100 text-gray-600 border-gray-300" },
+              { name: "Careo", role: "管理×AIコーチング", cls: "bg-[#00c896] text-white border-transparent" },
+            ].map(item => (
+              <div key={item.name} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold border ${item.cls}`}>
+                {item.name}
+                <span className="opacity-60">— {item.role}</span>
+              </div>
+            ))}
+          </div>
+          <p className="text-center text-xs text-gray-400">
+            ※ ポジションはCareoの主観的評価に基づくイメージです（2026年現在）。
+          </p>
+        </div>
+      </section>
+
       {/* ── 共存エコシステム図 ───────────────────────────────────────────────── */}
       <section className="px-6 py-20 bg-gradient-to-br from-[#0D0B21] to-[#1a2f4e] text-white">
         <div className="max-w-4xl mx-auto">
