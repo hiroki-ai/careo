@@ -39,7 +39,21 @@ export async function POST(req: NextRequest) {
 
 【修正ルール】
 1. 文章が途中で切れている場合は、文脈を読んで自然に続きを書き、記事を完結させる
-2. 他社サービス・ツール（StrengthsFinder・Notion・マイナビ・リクナビ・OpenES・OfferBox・キャリアパーク・ビズリーチキャンパス等）が名指しで登場する場合、必ずその公式サイトURLを <a href="https://..." target="_blank" rel="noopener noreferrer">サービス名</a> でリンクする
+2. 【最重要】記事中に他社サービス・ツール・企業名が登場するテキストを探し、必ず実際のURLで <a href="URL" target="_blank" rel="noopener noreferrer">サービス名</a> にリンクせよ。以下は確定URL：
+   - StrengthsFinder/CliftonStrengths → https://www.gallup.com/cliftonstrengths/
+   - Notion → https://www.notion.so/ja-jp
+   - マイナビ就活 → https://job.mynavi.jp/
+   - リクナビ → https://job.rikunabi.com/
+   - OpenES → https://job.rikunabi.com/openes/
+   - OfferBox → https://offerbox.jp/
+   - キャリアパーク → https://careerpark.jp/
+   - ビズリーチキャンパス → https://br-campus.jp/
+   - 適性診断AnalyzeU+ → https://offerbox.jp/
+   - 16Personalities → https://www.16personalities.com/ja
+   - リクルートワークス研究所 → https://www.works-i.com/
+   - マイナビ就職白書 → https://saponet.mynavi.jp/release/student/
+   - 厚生労働省 → https://www.mhlw.go.jp/
+   - 経団連 → https://www.keidanren.or.jp/
 3. リンクが既にある箇所はそのまま維持する
 4. 記事末尾には必ず <a href="https://careoai.jp/signup" class="blog-cta-link">無料で始める →</a> のCTAを置く
 5. HTMLタグ・スタイル・構成はそのまま維持し、必要な修正のみ行う

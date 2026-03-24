@@ -33,11 +33,10 @@ export default async function Image({ params }: Props) {
     .single();
 
   const title = post?.title ?? "就活ブログ | Careo";
-  const tag = post?.tags?.[0] ?? "就活";
+  const tag = post?.tags?.[0] ?? "AI就活";
   const [gradFrom, gradTo] = TAG_GRADIENTS[tag] ?? ["#00c896", "#0ea5e9"];
 
   // Noto Sans JP (Bold) を取得
-  // 旧UAでリクエストするとGoogle FontsがSatoriで使えるTTF形式で返す
   let fontData: ArrayBuffer | null = null;
   try {
     const css = await fetch(
@@ -48,7 +47,7 @@ export default async function Image({ params }: Props) {
     if (fontUrl) fontData = await fetch(fontUrl).then((r) => r.arrayBuffer());
   } catch { /* フォント取得失敗時はシステムフォントで続行 */ }
 
-  const fontSize = title.length > 35 ? 42 : title.length > 25 ? 48 : 54;
+  const fontSize = title.length > 35 ? 44 : title.length > 25 ? 52 : 58;
 
   return new ImageResponse(
     (
@@ -56,49 +55,35 @@ export default async function Image({ params }: Props) {
         style={{
           width: "1200px",
           height: "630px",
-          background: `linear-gradient(135deg, #0D0B21 0%, #111028 40%, ${gradFrom}55 100%)`,
+          background: `linear-gradient(135deg, ${gradFrom} 0%, ${gradTo} 100%)`,
           display: "flex",
           flexDirection: "column",
           position: "relative",
           overflow: "hidden",
         }}
       >
-        {/* 右上の大きな光彩 */}
+        {/* 右上の装飾円 — Satori対応: rgba のみ使用 */}
         <div
           style={{
             position: "absolute",
-            top: "-160px",
-            right: "-160px",
-            width: "640px",
-            height: "640px",
+            top: "-180px",
+            right: "-180px",
+            width: "560px",
+            height: "560px",
             borderRadius: "50%",
-            background: `radial-gradient(circle, ${gradFrom}55 0%, ${gradTo}22 50%, transparent 75%)`,
+            background: "rgba(255,255,255,0.12)",
             display: "flex",
           }}
         />
-        {/* 左下の補助光彩 */}
         <div
           style={{
             position: "absolute",
             bottom: "-120px",
-            left: "-80px",
-            width: "500px",
-            height: "500px",
+            left: "-100px",
+            width: "420px",
+            height: "420px",
             borderRadius: "50%",
-            background: `radial-gradient(circle, ${gradTo}33 0%, transparent 65%)`,
-            display: "flex",
-          }}
-        />
-
-        {/* 上部アクセントライン（太め） */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            height: "8px",
-            background: `linear-gradient(90deg, ${gradFrom}, ${gradTo})`,
+            background: "rgba(255,255,255,0.07)",
             display: "flex",
           }}
         />
@@ -122,12 +107,11 @@ export default async function Image({ params }: Props) {
           >
             <div
               style={{
-                background: `linear-gradient(135deg, ${gradFrom}33, ${gradTo}22)`,
-                border: `1px solid ${gradFrom}55`,
-                color: gradFrom,
-                fontSize: "20px",
+                background: "rgba(255,255,255,0.22)",
+                color: "white",
+                fontSize: "22px",
                 fontWeight: 700,
-                padding: "8px 22px",
+                padding: "8px 24px",
                 borderRadius: "100px",
                 display: "flex",
               }}
@@ -142,11 +126,12 @@ export default async function Image({ params }: Props) {
               color: "white",
               fontSize: `${fontSize}px`,
               fontWeight: 700,
-              lineHeight: 1.35,
+              lineHeight: 1.4,
               flex: 1,
               display: "flex",
               alignItems: "center",
-              letterSpacing: "-0.02em",
+              letterSpacing: "-0.01em",
+              textShadow: "0 2px 8px rgba(0,0,0,0.2)",
             }}
           >
             {title}
@@ -159,30 +144,30 @@ export default async function Image({ params }: Props) {
               alignItems: "center",
               gap: "16px",
               paddingTop: "28px",
-              borderTop: "1px solid rgba(255,255,255,0.1)",
+              borderTop: "1px solid rgba(255,255,255,0.3)",
             }}
           >
             <div
               style={{
-                width: "48px",
-                height: "48px",
-                background: `linear-gradient(135deg, ${gradFrom}, ${gradTo})`,
-                borderRadius: "12px",
+                width: "52px",
+                height: "52px",
+                background: "rgba(255,255,255,0.2)",
+                borderRadius: "14px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 color: "white",
-                fontSize: "24px",
+                fontSize: "26px",
                 fontWeight: 900,
               }}
             >
               C
             </div>
             <div style={{ display: "flex", flexDirection: "column" }}>
-              <div style={{ color: "white", fontSize: "22px", fontWeight: 700, display: "flex" }}>
+              <div style={{ color: "white", fontSize: "24px", fontWeight: 700, display: "flex" }}>
                 Careo
               </div>
-              <div style={{ color: "rgba(255,255,255,0.45)", fontSize: "17px", display: "flex" }}>
+              <div style={{ color: "rgba(255,255,255,0.7)", fontSize: "18px", display: "flex" }}>
                 就活ブログ · careoai.jp
               </div>
             </div>
