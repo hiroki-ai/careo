@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import type { RecentPost } from "@/app/page";
 
 // ─── Reveal wrapper (avoids calling hooks inside .map) ─────────────────────────
 function Reveal({
@@ -174,7 +175,19 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
-export function MobileLandingPage() {
+const TAG_COLORS: Record<string, string> = {
+  "ES対策": "bg-blue-50 text-blue-600",
+  "面接対策": "bg-purple-50 text-purple-600",
+  "自己分析": "bg-orange-50 text-orange-600",
+  "OB/OG訪問": "bg-teal-50 text-teal-600",
+  "インターン": "bg-green-50 text-green-600",
+  "就活管理": "bg-indigo-50 text-indigo-600",
+  "AI就活": "bg-[#00c896]/10 text-[#00a87e]",
+  "筆記試験": "bg-yellow-50 text-yellow-600",
+  "業界研究": "bg-rose-50 text-rose-600",
+};
+
+export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPost[] }) {
   const [scrollY, setScrollY] = useState(0);
   useEffect(() => {
     const h = () => setScrollY(window.scrollY);
@@ -503,6 +516,49 @@ export function MobileLandingPage() {
           ))}
         </div>
       </section>
+
+      {/* ── Blog Preview ───────────────────────────────────────────────────── */}
+      {recentPosts.length > 0 && (
+        <section className="px-5 py-14 bg-white">
+          <Reveal className="mb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="inline-flex items-center gap-1.5 bg-[#00c896]/8 text-[#00a87e] text-[10px] font-bold px-3 py-1 rounded-full mb-2">
+                  <span className="w-1 h-1 bg-[#00c896] rounded-full animate-pulse" />
+                  毎朝8時更新
+                </div>
+                <h2 className="text-2xl font-black text-gray-900">就活ブログ</h2>
+              </div>
+              <Link href="/blog" className="text-xs font-bold text-[#00a87e]">
+                一覧 →
+              </Link>
+            </div>
+          </Reveal>
+          <div className="space-y-3">
+            {recentPosts.map((post, i) => (
+              <Reveal key={post.id} delay={i * 80}>
+                <Link
+                  href={`/blog/${post.slug}`}
+                  className="block bg-gray-50 rounded-2xl border border-gray-100 p-4 active:scale-[0.99] transition-transform"
+                >
+                  <div className="flex items-center gap-1.5 mb-2">
+                    {post.tags.slice(0, 1).map((tag) => (
+                      <span key={tag} className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${TAG_COLORS[tag] ?? "bg-gray-100 text-gray-600"}`}>
+                        {tag}
+                      </span>
+                    ))}
+                    {i === 0 && (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#00c896]/10 text-[#00a87e]">NEW</span>
+                    )}
+                  </div>
+                  <p className="text-sm font-bold text-gray-900 leading-snug line-clamp-2">{post.title}</p>
+                  <p className="text-[10px] text-gray-400 mt-1.5">{post.reading_time_min}分で読める</p>
+                </Link>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ── Final CTA ──────────────────────────────────────────────────────── */}
       <section className="px-6 py-24 bg-[#0D0B21] relative overflow-hidden">

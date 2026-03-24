@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Script from "next/script";
+import type { RecentPost } from "@/app/page";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const DEFAULT_BADGE = "あなたの就活を丸ごと知るAIコーチ「カレオ」";
@@ -374,8 +375,95 @@ function AnimatedCounter({ target, prefix = "", suffix = "", label }: { target: 
   );
 }
 
+// ─── Blog Preview Section ─────────────────────────────────────────────────────
+const TAG_COLORS: Record<string, string> = {
+  "ES対策": "bg-blue-50 text-blue-600 border-blue-100",
+  "面接対策": "bg-purple-50 text-purple-600 border-purple-100",
+  "自己分析": "bg-orange-50 text-orange-600 border-orange-100",
+  "OB/OG訪問": "bg-teal-50 text-teal-600 border-teal-100",
+  "インターン": "bg-green-50 text-green-600 border-green-100",
+  "就活管理": "bg-indigo-50 text-indigo-600 border-indigo-100",
+  "AI就活": "bg-[#00c896]/10 text-[#00a87e] border-[#00c896]/20",
+  "筆記試験": "bg-yellow-50 text-yellow-600 border-yellow-100",
+  "業界研究": "bg-rose-50 text-rose-600 border-rose-100",
+};
+function tagStyle(tag: string) {
+  return TAG_COLORS[tag] ?? "bg-gray-50 text-gray-600 border-gray-200";
+}
+function formatDate(iso: string) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function BlogPreviewSection({ posts }: { posts: RecentPost[] }) {
+  if (posts.length === 0) return null;
+  return (
+    <section className="px-6 py-20 md:py-24 bg-gray-50/60" id="blog">
+      <div className="max-w-5xl mx-auto reveal">
+        <div className="flex items-end justify-between mb-10">
+          <div>
+            <div className="inline-flex items-center gap-2 border border-[#00c896]/30 bg-[#00c896]/6 text-[#00a87e] text-xs font-semibold px-4 py-2 rounded-full mb-4">
+              <span className="w-1.5 h-1.5 bg-[#00c896] rounded-full animate-pulse" />
+              毎朝8時更新
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#0D0B21] tracking-tight">
+              就活ブログ
+            </h2>
+            <p className="text-gray-500 text-sm mt-2">ES・面接・自己分析・OB訪問のノウハウを毎日発信</p>
+          </div>
+          <Link
+            href="/blog"
+            className="hidden md:flex items-center gap-1.5 text-sm font-semibold text-[#00a87e] hover:underline underline-offset-4"
+          >
+            記事一覧
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-4">
+          {posts.map((post, i) => (
+            <Link
+              key={post.id}
+              href={`/blog/${post.slug}`}
+              className="group bg-white rounded-2xl border border-gray-200 p-6 hover:border-[#00c896]/40 hover:shadow-md transition-all duration-200 flex flex-col"
+            >
+              <div className="flex flex-wrap gap-1.5 mb-3">
+                {post.tags.slice(0, 2).map((tag) => (
+                  <span key={tag} className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${tagStyle(tag)}`}>
+                    {tag}
+                  </span>
+                ))}
+                {i === 0 && (
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-[#00c896]/10 text-[#00a87e] border-[#00c896]/20">
+                    NEW
+                  </span>
+                )}
+              </div>
+              <p className="font-bold text-[#0D0B21] text-sm leading-snug mb-3 group-hover:text-[#00a87e] transition-colors line-clamp-3 flex-1">
+                {post.title}
+              </p>
+              <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                <span className="text-xs text-gray-400">{formatDate(post.published_at)}</span>
+                <span className="text-xs text-gray-400">{post.reading_time_min}分</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        <div className="text-center mt-8 md:hidden">
+          <Link href="/blog" className="text-sm font-semibold text-[#00a87e] hover:underline">
+            記事一覧をすべて見る →
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ─── Main Component ───────────────────────────────────────────────────────────
-export function LandingPage() {
+export function LandingPage({ recentPosts = [] }: { recentPosts?: RecentPost[] }) {
   const [badgeText, setBadgeText] = useState(DEFAULT_BADGE);
   const [heroSubtext, setHeroSubtext] = useState(DEFAULT_HERO_SUBTEXT);
   const [afterItems, setAfterItems] = useState<string[]>(DEFAULT_AFTER_ITEMS);
@@ -448,6 +536,9 @@ export function LandingPage() {
                 {label}
               </a>
             ))}
+            <Link href="/blog" className="text-sm text-[#00a87e] hover:text-[#008f6a] font-semibold transition-colors">
+              ブログ
+            </Link>
           </nav>
           <div className="flex items-center gap-3">
             <Link href="/login" className="text-sm text-gray-500 hover:text-gray-900 font-medium transition-colors hidden sm:block">
@@ -1364,6 +1455,9 @@ export function LandingPage() {
 
         </div>
       </section>
+
+      {/* ── Blog Preview ────────────────────────────────────────────────────── */}
+      <BlogPreviewSection posts={recentPosts} />
 
       {/* ── Contact ─────────────────────────────────────────────────────────── */}
       <ContactSection />
