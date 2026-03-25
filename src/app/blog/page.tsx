@@ -42,6 +42,26 @@ const TAG_COLORS: Record<string, string> = {
   "業界研究": "bg-rose-50 text-rose-600 border-rose-100",
 };
 
+// サムネイル用グラデーション（CSS inline styles用）
+const TAG_GRADIENTS: Record<string, [string, string]> = {
+  "ES対策":     ["#3b82f6", "#06b6d4"],
+  "面接対策":   ["#8b5cf6", "#ec4899"],
+  "自己分析":   ["#f97316", "#eab308"],
+  "OB/OG訪問": ["#14b8a6", "#10b981"],
+  "インターン": ["#22c55e", "#16a34a"],
+  "就活管理":   ["#6366f1", "#8b5cf6"],
+  "AI就活":     ["#00c896", "#0ea5e9"],
+  "筆記試験":   ["#eab308", "#f97316"],
+  "業界研究":   ["#f43f5e", "#e11d48"],
+};
+
+function getThumbnailColors(tags: string[]): [string, string] {
+  for (const tag of tags) {
+    if (TAG_GRADIENTS[tag]) return TAG_GRADIENTS[tag];
+  }
+  return ["#6366f1", "#8b5cf6"];
+}
+
 function tagStyle(tag: string) {
   return TAG_COLORS[tag] ?? "bg-gray-50 text-gray-600 border-gray-200";
 }
@@ -153,20 +173,44 @@ export default async function BlogPage() {
             </div>
           ) : (
             <div className="grid md:grid-cols-2 gap-5">
-              {posts.map((post, i) => (
+              {posts.map((post, i) => {
+                const [c1, c2] = getThumbnailColors(post.tags);
+                return (
                 <Link
                   key={post.id}
                   href={`/blog/${post.slug}`}
                   className="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:border-[#00c896]/40 hover:shadow-md transition-all duration-200 flex flex-col"
                 >
-                  {/* サムネイル */}
-                  <div className="relative w-full aspect-[1200/630] overflow-hidden bg-[#0D0B21]">
-                    <img
-                      src={`/blog/${post.slug}/opengraph-image`}
-                      alt={post.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      loading="lazy"
-                    />
+                  {/* CSS生成サムネイル（常に表示可能） */}
+                  <div
+                    className="relative w-full overflow-hidden flex-shrink-0"
+                    style={{
+                      aspectRatio: "1200/630",
+                      background: `linear-gradient(135deg, ${c1} 0%, ${c2} 100%)`,
+                    }}
+                  >
+                    {/* 右上の装飾円 */}
+                    <div style={{ position: "absolute", top: "-30%", right: "-10%", width: "55%", paddingBottom: "55%", borderRadius: "50%", background: "rgba(255,255,255,0.10)" }} />
+                    {/* 左下の装飾円 */}
+                    <div style={{ position: "absolute", bottom: "-25%", left: "-8%", width: "42%", paddingBottom: "42%", borderRadius: "50%", background: "rgba(255,255,255,0.07)" }} />
+                    {/* タグ */}
+                    <div className="absolute top-4 left-4 md:top-5 md:left-6">
+                      <span className="text-[10px] md:text-xs font-bold text-white/90 bg-white/20 px-2.5 py-1 rounded-full backdrop-blur-sm">
+                        {post.tags[0] ?? "就活"}
+                      </span>
+                    </div>
+                    {/* タイトル */}
+                    <div className="absolute inset-0 flex items-center px-4 md:px-6 pt-8 pb-10">
+                      <p className="text-white font-bold text-sm md:text-base leading-snug line-clamp-3 drop-shadow-sm">
+                        {post.title}
+                      </p>
+                    </div>
+                    {/* フッター */}
+                    <div className="absolute bottom-0 left-0 right-0 flex items-center gap-1.5 px-4 md:px-6 py-2.5 border-t border-white/20">
+                      <img src="/icon-new.svg" alt="" className="w-4 h-4 brightness-0 invert opacity-80" />
+                      <span className="text-[10px] text-white/80 font-semibold">Careo</span>
+                      <span className="text-[10px] text-white/50 ml-auto">{post.reading_time_min}分で読める</span>
+                    </div>
                   </div>
 
                   <div className="p-5 flex flex-col flex-1">
@@ -209,7 +253,8 @@ export default async function BlogPage() {
                   </div>
                   </div>{/* /p-5 */}
                 </Link>
-              ))}
+                );
+              })}
             </div>
           )}
 
