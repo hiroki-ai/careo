@@ -18,6 +18,7 @@ export function CompanyForm({ initialData, onSubmit, onCancel, submitLabel = "�
     name: initialData?.name ?? "",
     industry: initialData?.industry ?? "",
     url: initialData?.url ?? "",
+    mypage_url: initialData?.mypage_url ?? "",
     status: initialData?.status ?? "WISHLIST",
     notes: initialData?.notes ?? "",
   });
@@ -51,6 +52,16 @@ export function CompanyForm({ initialData, onSubmit, onCancel, submitLabel = "�
           onChange={(e) => setForm({ ...form, industry: e.target.value })}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="例: IT・ソフトウェア"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">マイページURL</label>
+        <input
+          type="url"
+          value={form.mypage_url}
+          onChange={(e) => setForm({ ...form, mypage_url: e.target.value })}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="https://job.rikunabi.com/2026/mypage/..."
         />
       </div>
       <div>

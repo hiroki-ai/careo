@@ -29,6 +29,7 @@ export interface Company {
   name: string;
   industry: string;
   url?: string;
+  mypage_url?: string;
   status: CompanyStatus;
   notes?: string;
   ai_research?: string | null;

@@ -35,13 +35,14 @@ const parseStatus = (raw: string): CompanyStatus => {
 
 // ─── カラム自動検出 ────────────────────────────────────────────────────────────
 
-type CareoField = "name" | "industry" | "status" | "url" | "notes" | "(skip)";
+type CareoField = "name" | "industry" | "status" | "url" | "mypage_url" | "notes" | "(skip)";
 
 const COLUMN_ALIASES: Record<CareoField, string[]> = {
   name: ["企業名", "会社名", "企業", "会社", "name", "company", "company_name"],
   industry: ["業界", "業種", "industry", "sector"],
   status: ["ステータス", "状態", "進捗", "status", "stage"],
-  url: ["url", "URL", "ウェブサイト", "website", "サイト", "ホームページ"],
+  url: ["url", "URL", "ウェブサイト", "website", "サイト", "ホームページ", "企業URL"],
+  mypage_url: ["マイページURL", "mypage_url", "マイページ", "mypage", "マイページリンク"],
   notes: ["メモ", "備考", "notes", "note", "コメント", "comment", "remarks"],
   "(skip)": [],
 };
@@ -189,7 +190,7 @@ export function CsvImportModal({ isOpen, onClose, onImportComplete, defaultTab =
       .map(r => {
         const get = (f: CareoField) => { const i = mapping.findIndex(m => m === f); return i >= 0 ? (r[i] ?? "").trim() : ""; };
         const raw = get("status");
-        return { name: get("name"), industry: get("industry"), status: raw ? parseStatus(raw) : "WISHLIST", url: get("url") || undefined, notes: get("notes") };
+        return { name: get("name"), industry: get("industry"), status: raw ? parseStatus(raw) : "WISHLIST", url: get("url") || undefined, mypage_url: get("mypage_url") || undefined, notes: get("notes") };
       });
     setReviewData({ companies, obVisits: [], tests: [], interviews: [] });
   }, [mapping, rawRows]);

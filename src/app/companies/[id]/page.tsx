@@ -142,11 +142,20 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{company.name}</h1>
             {company.industry && <p className="text-gray-500 mt-1">{company.industry}</p>}
-            {company.url && (
-              <a href={company.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 text-sm hover:underline mt-1 inline-block">
-                {company.url}
-              </a>
-            )}
+            <div className="flex flex-wrap gap-3 mt-2">
+              {company.mypage_url && (
+                <a href={company.mypage_url} target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 text-white text-sm rounded-full hover:bg-blue-700 font-medium">
+                  マイページを開く →
+                </a>
+              )}
+              {company.url && (
+                <a href={company.url} target="_blank" rel="noopener noreferrer"
+                  className="text-gray-400 text-sm hover:underline">
+                  企業サイト
+                </a>
+              )}
+            </div>
           </div>
           <div className="flex gap-2">
             <Button variant="secondary" size="sm" onClick={() => setIsEditOpen(true)}>編集</Button>

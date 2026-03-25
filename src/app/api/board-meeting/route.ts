@@ -58,7 +58,7 @@ export async function PATCH(request: NextRequest) {
 
   // Goサインかつ CMO/CEO/CDO 担当の会議ならLPコピーを自動生成
   if (status === "approved" && meeting) {
-    const LP_ROLES = ["cmo", "ceo", "cdo"];
+    const LP_ROLES = ["takumi", "mina", "kaitoa"];
     const owner = EXECUTIVES.find(
       (e) => e.name === meeting.topic_owner && LP_ROLES.includes(e.id)
     );

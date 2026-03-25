@@ -14,6 +14,7 @@ export interface ImportCompany {
   status: CompanyStatus;
   notes: string;
   url?: string;
+  mypage_url?: string;
 }
 
 export interface ImportObVisit {
@@ -155,7 +156,7 @@ export function ImportReviewModal({ isOpen, onClose, data: initialData, onComple
       if (validCompanies.length) {
         const { data: inserted } = await supabase
           .from("companies")
-          .insert(validCompanies.map(c => ({ name: c.name, industry: c.industry, status: c.status, notes: c.notes || null, url: c.url || null, user_id: user.id })))
+          .insert(validCompanies.map(c => ({ name: c.name, industry: c.industry, status: c.status, notes: c.notes || null, url: c.url || null, mypage_url: c.mypage_url || null, user_id: user.id })))
           .select("id, name");
         if (inserted) {
           (inserted as { id: string; name: string }[]).forEach(r => { nameToId[r.name] = r.id; });
