@@ -390,6 +390,24 @@ const TAG_COLORS: Record<string, string> = {
 function tagStyle(tag: string) {
   return TAG_COLORS[tag] ?? "bg-gray-50 text-gray-600 border-gray-200";
 }
+
+const TAG_GRADIENTS: Record<string, [string, string]> = {
+  "ES対策":     ["#3b82f6", "#06b6d4"],
+  "面接対策":   ["#8b5cf6", "#ec4899"],
+  "自己分析":   ["#f97316", "#eab308"],
+  "OB\OG訪問": ["#14b8a6", "#10b981"],
+  "インターン": ["#22c55e", "#16a34a"],
+  "就活管理":   ["#6366f1", "#8b5cf6"],
+  "AI就活":     ["#00c896", "#0ea5e9"],
+  "筆記試験":   ["#eab308", "#f97316"],
+  "業界研究":   ["#f43f5e", "#e11d48"],
+};
+function getThumbnailColors(tags: string[]): [string, string] {
+  for (const tag of tags) {
+    if (TAG_GRADIENTS[tag]) return TAG_GRADIENTS[tag];
+  }
+  return ["#6366f1", "#8b5cf6"];
+}
 function formatDate(iso: string) {
   const d = new Date(iso);
   return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}`;
@@ -423,20 +441,34 @@ function BlogPreviewSection({ posts }: { posts: RecentPost[] }) {
         </div>
 
         <div className="grid md:grid-cols-3 gap-4">
-          {posts.map((post, i) => (
+          {posts.map((post, i) => {
+            const [c1, c2] = getThumbnailColors(post.tags);
+            return (
             <Link
               key={post.id}
               href={`/blog/${post.slug}`}
               className="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:border-[#00c896]/40 hover:shadow-md transition-all duration-200 flex flex-col"
             >
-              {/* サムネイル */}
-              <div className="relative w-full aspect-[1200/630] overflow-hidden bg-[#0D0B21]">
-                <img
-                  src={`/blog/${post.slug}/opengraph-image`}
-                  alt={post.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  loading="lazy"
-                />
+              {/* CSS生成サムネイル */}
+              <div
+                className="relative w-full overflow-hidden flex-shrink-0"
+                style={{
+                  aspectRatio: "1200/630",
+                  background: `linear-gradient(135deg, ${c1} 0%, ${c2} 100%)`,
+                }}
+              >
+                <div style={{ position: "absolute", top: "-30%", right: "-10%", width: "55%", paddingBottom: "55%", borderRadius: "50%", background: "rgba(255,255,255,0.10)" }} />
+                <div style={{ position: "absolute", bottom: "-25%", left: "-8%", width: "42%", paddingBottom: "42%", borderRadius: "50%", background: "rgba(255,255,255,0.07)" }} />
+                <div className="absolute top-3 left-3">
+                  <span className="text-[10px] font-bold text-white/90 bg-white/20 px-2 py-0.5 rounded-full backdrop-blur-sm">
+                    {post.tags[0] ?? "就活"}
+                  </span>
+                </div>
+                <div className="absolute inset-0 flex items-center px-4 pt-7 pb-8">
+                  <p className="text-white font-bold text-xs leading-snug line-clamp-3 drop-shadow-sm">
+                    {post.title}
+                  </p>
+                </div>
               </div>
               <div className="p-5 flex flex-col flex-1">
                 <div className="flex flex-wrap gap-1.5 mb-3">
@@ -460,7 +492,8 @@ function BlogPreviewSection({ posts }: { posts: RecentPost[] }) {
                 </div>
               </div>
             </Link>
-          ))}
+            );
+          })}
         </div>
 
         <div className="text-center mt-8 md:hidden">
