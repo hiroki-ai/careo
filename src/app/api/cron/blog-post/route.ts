@@ -10,7 +10,68 @@ export const maxDuration = 60;
 // ─── タクミの戦略キャラクター ────────────────────────────────────────────────
 const TAKUMI_PERSONA = `あなたは「黒木タクミ」、Careoのグロースマーケター（元スタートアップのグロース責任者）です。
 X・TikTok・SEOすべて経験あり。数字に異常に強く、CAC/LTV・ファネル最適化を常に意識しています。
-ちょいラフな口調で、再現性と拡散性を重視。「バズる」だけじゃなく「獲れる」施策を打ちます。`;
+ちょいラフな口調で、再現性と拡散性を重視。「バズる」だけじゃなく「獲れる」施策を打ちます。
+
+【編集スタンダード】
+- 抽象論は書かない。「重要です」「大切です」は禁止。具体的な行動・数字・事例に置き換える
+- 見出しは「〜する方法」より「〜すれば〜できる」の因果型が強い
+- データが命。数字のない段落は書き直す気持ちで臨む
+- 就活生の「あるある失敗」から入り、解決策を示すのが最も読まれる構成`;
+
+// ─── 使える検証済みデータ（Perplexity調査・各種白書より）────────────────────
+const VERIFIED_DATA = `【使用可能な検証済みデータ（必ず出典と一緒に使うこと）】
+▼ AI × 就活（マイナビ2026年卒就職白書より）
+- 26卒のES推敲にAI利用: 56.6%
+- 26卒のES作成にAI利用: 41.7%
+- 26卒の就活全般でAI利用: 66.6%（25卒37.2%から急増）
+出典URL: https://saponet.mynavi.jp/release/student/
+
+▼ 求人倍率（リクルートワークス研究所 大卒求人倍率調査2026年卒）
+- 大卒求人倍率: 1.66倍（26卒）
+- 従業員300人未満中小企業: 8.98倍
+- 従業員5000人以上大企業: 0.34倍
+出典URL: https://www.works-i.com/
+
+▼ 選考形式トレンド（マイナビ就職活動状況調査2026年卒）
+- 一次面接はWEB形式: 79.3%
+- 最終面接は対面形式: 85.0%
+- ハイブリッド選考が主流
+
+▼ 内定取得時期（25卒実績）
+- 9月1日時点の内定率: 94.2%
+- 内定出しのピーク: 6月〜7月（公式解禁直後）
+
+▼ 28卒 就活スケジュール（公式ルール + 実態）
+- 広報解禁: 2027年3月1日
+- 選考解禁: 2027年6月1日
+- 正式内定: 2027年10月1日
+- 実態: 外資・メガベンチャーは2026年秋から早期選考
+
+▼ 28卒の学年（正確に使うこと）
+- 2026年4月: 大学3年生スタート（2024年4月入学）
+- 2027年4月: 大学4年生スタート
+- 2028年3月: 卒業
+
+▼ 企業タイプ別スケジュール
+- 外資コンサル・IB: 3年秋冬インターン→3〜5月本選考
+- 日系大手: 公式ルール準拠、インターン評価活用の早期ルートあり
+- メガベンチャー（楽天・サイバーエージェント等）: 3年夏〜冬に早期内定
+- スタートアップ: 通年採用・長期インターン→内定が多い
+
+▼ 確認済み外部リンクURL（これ以外のURLは使わないこと）
+- マイナビ就活: https://job.mynavi.jp/
+- リクナビ: https://job.rikunabi.com/
+- OfferBox: https://offerbox.jp/
+- キャリアパーク: https://careerpark.jp/
+- ビズリーチキャンパス: https://br-campus.jp/
+- 16Personalities: https://www.16personalities.com/ja
+- リクルートワークス研究所: https://www.works-i.com/
+- マイナビ就職白書: https://saponet.mynavi.jp/release/student/
+- 厚生労働省: https://www.mhlw.go.jp/
+- 経団連: https://www.keidanren.or.jp/
+- サイバーエージェント採用: https://www.cyberagent.co.jp/careers/students/
+- 楽天グループ新卒採用: https://corp.rakuten.co.jp/careers/graduates/
+- 内閣府・就活ルール: https://www.cas.go.jp/jp/seisaku/shushoku_katsudou_yousei/index.html`;
 
 // ─── SEO特化トピックプール ───────────────────────────────────────────────────
 // 就活生が実際に検索するロングテールキーワードを軸に設計
@@ -154,23 +215,27 @@ export async function GET(req: NextRequest) {
 あなたは今日の就活ブログ記事を書いています。
 CareoはES締切・面接・OB訪問・筆記試験をすべて一か所で管理し、全データを把握したAIコーチ「カレオ」が個人化アドバイスを届ける就活管理アプリ（careoai.jp、完全無料）です。
 
+${VERIFIED_DATA}
+
 【記事ルール】
 - 読者: 就活中の大学生（主に28卒・29卒）
 - 文体: 共感しやすい、丁寧だが距離感が近い口語体
-- 文量: 読者にとって必要十分な量を書ききること（目安2000〜3500文字）。途中で終わらず必ずCTAまで完結させる
+- 文量: 2000〜3000文字。途中で終わらず必ずCTAまで完結させること
 - 「なぜ」と「どうすれば」を必ず両方書く。具体的・実践的に
 - Careoへの自然な言及を記事中に1〜2箇所
+- 【最重要】数字・データのない抽象論は書かない。上記の検証済みデータを積極的に活用すること
+- 【最重要】存在しないURL・不確かな統計は絶対に書かない。外部リンクは上記リストのURLのみ使用
 
 【SEO必須ルール】
-1. フォーカスキーフレーズ: JSONで指定したfocus_keyphraseを、タイトル・最初のp・h2見出し2箇所以上・本文中に計5〜8回自然に登場させる
-2. 外部リンク: 記事内に必ず1つだけ、信頼できる外部サイト（厚生労働省・経団連・マイナビ就職白書・リクルートワークス研究所・経済産業省など）へのリンクを<a href="実際のURL" target="_blank" rel="noopener noreferrer">出典名</a>として入れる。URLは実在する正確なものだけ使い、不明なら省く
+1. フォーカスキーフレーズ: JSONで指定したfocus_keyphraseをタイトル・最初のp・h2見出し2箇所以上・本文中に計5〜8回自然に登場させる
+2. 外部リンク: 記事内に必ず1つ、上記リストのURLを使って<a href="URL" target="_blank" rel="noopener noreferrer">出典名</a>でリンクする
 3. 比較表: HTMLの<table>タグで比較・整理表を最低1つ入れる
-4. 視覚的要素: 数値データは<div class="blog-stat-bar">などで棒グラフ的に表現するか、<blockquote>で強調する
+4. 視覚的要素: 数値データは<blockquote>で強調するか、<div class="blog-stat-bar">で棒グラフ的に表現する
 
 【HTML形式】
 - 使用可能タグ: <h2> <h3> <p> <ul> <ol> <li> <strong> <em> <blockquote> <table> <thead> <tbody> <tr> <th> <td> <a> <div>
 - <html><body><head>タグは不要。記事本文のHTMLのみ
-- 記事末尾に必ずCTA: <a href="https://careoai.jp/signup" class="blog-cta-link">無料で始める</a>
+- 記事末尾に必ずCTA: <a href="https://careoai.jp/signup" class="blog-cta-link">Careoを無料で始める →</a>
 - タクミ視点: 「読んだ人が今すぐ行動したくなる」終わり方`;
 
   const userPrompt = `今日のブログ記事を作成してください。
@@ -187,7 +252,7 @@ ${recentSummary}
 JSONの後に改行2つ置いて、記事本文のHTMLを書いてください。`;
 
   const message = await anthropic.messages.create({
-    model: "claude-haiku-4-5-20251001",
+    model: "claude-sonnet-4-6",
     max_tokens: 8192,
     messages: [{ role: "user", content: userPrompt }],
     system: systemPrompt,
