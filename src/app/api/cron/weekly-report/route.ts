@@ -151,7 +151,8 @@ function buildWeeklyEmailHtml(
 }
 
 export async function GET(req: NextRequest) {
-  const secret = req.headers.get("x-cron-secret") ?? new URL(req.url).searchParams.get("secret");
+  const auth = req.headers.get("authorization");
+  const secret = (auth?.startsWith("Bearer ") ? auth.slice(7) : null) ?? req.headers.get("x-cron-secret") ?? new URL(req.url).searchParams.get("secret");
   if (secret !== process.env.CRON_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
