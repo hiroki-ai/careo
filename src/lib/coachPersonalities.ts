@@ -18,7 +18,7 @@ export function getRandomThinkingMessage(coach: CoachPersonality): string {
 export const COACH_PERSONALITIES: CoachPersonality[] = [
   {
     id: "kareo",
-    name: "カレオコーチ",
+    name: "カレオ",
     tagline: "頼れる先輩×落ち着いたメンター",
     avatarGradient: "from-teal-400 to-emerald-600",
     avatarLabel: "コ",

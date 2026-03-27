@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 const COACHES = [
-  { id: "kareo", name: "カレオコーチ", tagline: "頼れる先輩×落ち着いたメンター", gradient: "from-teal-400 to-emerald-500", emoji: "🌿" },
+  { id: "kareo", name: "カレオ", tagline: "頼れる先輩×落ち着いたメンター", gradient: "from-teal-400 to-emerald-500", emoji: "🌿" },
   { id: "nagoma", name: "なごま", tagline: "覚悟を決める！エセ関西弁コーチ", gradient: "from-orange-400 to-pink-500", emoji: "🔥" },
   { id: "yamato", name: "やまと", tagline: "ちょっと頼りないけど一緒に頑張る系", gradient: "from-yellow-400 to-lime-500", emoji: "🌱" },
   { id: "jun", name: "じゅん", tagline: "毒舌ドS・核心だけを突く鬼コーチ", gradient: "from-purple-500 to-slate-600", emoji: "⚡" },
@@ -101,6 +101,7 @@ export function TutorialModal() {
               <p className="text-white/70 text-xs">就活AIアシスタント</p>
             </div>
             <button
+              type="button"
               onClick={close}
               className="ml-auto text-white/60 hover:text-white text-lg leading-none p-1"
               aria-label="閉じる"
@@ -166,6 +167,7 @@ export function TutorialModal() {
           <div className="flex items-center gap-2">
             {step > 0 && (
               <button
+                type="button"
                 onClick={prev}
                 className="px-4 py-2.5 text-sm text-gray-500 hover:text-gray-700 border border-gray-200 rounded-xl transition-colors"
               >
@@ -175,12 +177,13 @@ export function TutorialModal() {
             <div className="flex-1" />
             {isLast ? (
               <Link href="/chat" onClick={close}>
-                <button className="px-5 py-2.5 bg-gradient-to-r from-[#00c896] to-[#00a87e] text-white text-sm font-bold rounded-xl hover:opacity-90 transition-opacity shadow-sm">
+                <button type="button" className="px-5 py-2.5 bg-gradient-to-r from-[#00c896] to-[#00a87e] text-white text-sm font-bold rounded-xl hover:opacity-90 transition-opacity shadow-sm">
                   コーチと話す →
                 </button>
               </Link>
             ) : (
               <button
+                type="button"
                 onClick={next}
                 className="px-5 py-2.5 bg-gradient-to-r from-[#00c896] to-[#00a87e] text-white text-sm font-bold rounded-xl hover:opacity-90 transition-opacity shadow-sm"
               >
@@ -189,7 +192,7 @@ export function TutorialModal() {
             )}
           </div>
           {!isLast && (
-            <button onClick={close} className="w-full mt-2 text-xs text-gray-400 hover:text-gray-600 transition-colors py-1">
+            <button type="button" onClick={close} className="w-full mt-2 text-xs text-gray-400 hover:text-gray-600 transition-colors py-1">
               スキップ
             </button>
           )}
