@@ -21,7 +21,13 @@ export default function SignupPage() {
     setLoading(true);
     setError("");
     const supabase = createClient();
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/`,
+      },
+    });
     if (error) {
       setError(error.message);
       setLoading(false);
@@ -86,6 +92,9 @@ export default function SignupPage() {
               placeholder="you@example.com"
               required
             />
+            <p className="mt-1.5 text-xs text-[#00c896] font-medium">
+              大学のメールアドレス（〜.ac.jp）での登録を推奨します
+            </p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">パスワード（6文字以上）</label>

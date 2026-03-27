@@ -143,7 +143,7 @@ const TAG_STYLES: Record<string, string> = {
 };
 
 export default function CompaniesPage() {
-  const { companies, addCompany, deleteCompany, updateStatus } = useCompanies();
+  const { companies, addCompany, deleteCompany, updateStatus, updateCompany } = useCompanies();
   const { profile } = useProfile();
   const { showToast } = useToast();
   const hasIntern = companies.some(c => c.status === "INTERN" || c.status === "INTERN_APPLYING");
@@ -620,9 +620,25 @@ export default function CompaniesPage() {
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="企業を追加">
         <CompanyForm
-          onSubmit={(data) => {
-            addCompany(data);
+          onSubmit={async (data) => {
+            const inserted = await addCompany(data);
             setIsModalOpen(false);
+            // バックグラウンドで選考日程を自動取得
+            if (inserted) {
+              void fetch("/api/ai/selection-schedule", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  companyName: data.name,
+                  industry: data.industry,
+                  graduationYear: profile?.graduationYear,
+                }),
+              }).then(async (res) => {
+                if (!res.ok) return;
+                const schedule = await res.json();
+                await updateCompany(inserted.id, { selection_schedule: JSON.stringify(schedule) });
+              }).catch(() => { /* 失敗は無視 */ });
+            }
           }}
           onCancel={() => setIsModalOpen(false)}
           submitLabel="追加する"

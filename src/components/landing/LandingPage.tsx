@@ -769,7 +769,7 @@ export function LandingPage({ recentPosts = [] }: { recentPosts?: RecentPost[] }
                   step: "03",
                   icon: "🤖",
                   title: "AIがすべてを整理",
-                  desc: "カレオコーチが全データを把握し「今週何をすべきか」を自動提案。データを横断した気づきを自動通知。",
+                  desc: "AIコーチが全データを把握し「今週何をすべきか」を自動提案。4種類のコーチキャラクターから選べるので、自分に合ったスタイルで就活を伴走してもらえる。",
                   tag: "自動で毎週",
                 },
               ].map((item, i) => (
@@ -1142,13 +1142,13 @@ export function LandingPage({ recentPosts = [] }: { recentPosts?: RecentPost[] }
           </div>
 
           {/* 仕組みの図 */}
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-12">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-6">
             {[
-              { icon: "🎓", label: "学生", desc: "就活データをCareoに記録" },
+              { icon: "🎓", label: "学生", desc: "就活データをCareoに記録・相談予約もCareoから" },
               { icon: "↔", label: "", desc: "", isArrow: true },
               { icon: "📱", label: "Careo", desc: "プラットフォームで安全に連携" },
               { icon: "↔", label: "", desc: "", isArrow: true },
-              { icon: "🏫", label: "キャリアセンター", desc: "学生の状況を把握してサポート" },
+              { icon: "🏫", label: "キャリアセンター", desc: "学生の状況を把握してサポート（月額SaaS）" },
             ].map((item, i) =>
               item.isArrow ? (
                 <div key={i} className="text-2xl text-gray-300 hidden md:block">→</div>
@@ -1160,6 +1160,14 @@ export function LandingPage({ recentPosts = [] }: { recentPosts?: RecentPost[] }
                 </div>
               )
             )}
+          </div>
+
+          {/* 将来的な企業連携への示唆 */}
+          <div className="flex items-center justify-center mb-8">
+            <div className="inline-flex items-center gap-2 text-xs text-gray-400 bg-gray-50 border border-gray-100 px-4 py-2 rounded-full">
+              <span className="text-gray-300">↓</span>
+              <span>将来的には<span className="font-semibold text-gray-600">企業</span>も加わり、採用インフラへと発展予定</span>
+            </div>
           </div>
 
           {/* 特徴3点 */}

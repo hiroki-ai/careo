@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useCompanies } from "@/hooks/useCompanies";
@@ -12,7 +12,7 @@ import { CompanyForm } from "@/components/companies/CompanyForm";
 import { StatusBadge, Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
-import { COMPANY_STATUS_ORDER, COMPANY_STATUS_LABELS } from "@/types";
+import { COMPANY_STATUS_ORDER, COMPANY_STATUS_LABELS, SelectionSchedule } from "@/types";
 import { formatDate, formatDateTime } from "@/lib/utils";
 import { useToast } from "@/components/ui/Toast";
 
@@ -41,6 +41,10 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
   const [aiDetected, setAiDetected] = useState<{ isInternOffer: boolean | null; reason: string } | null>(null);
   const { showToast } = useToast();
 
+  // 選考日程
+  const [schedule, setSchedule] = useState<SelectionSchedule | null>(null);
+  const [scheduleLoading, setScheduleLoading] = useState(false);
+
   // 企業研究
   const [research, setResearch] = useState<ResearchResult | null>(() => {
     // ai_researchフィールドが既存ならパース
@@ -62,6 +66,60 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
     try { return JSON.parse(company.ai_research) as ResearchResult; } catch { return null; }
   })();
   const displayResearch = research ?? savedResearch;
+
+  // 選考日程の初期化
+  const savedSchedule = (() => {
+    if (!company?.selection_schedule) return null;
+    try { return JSON.parse(company.selection_schedule) as SelectionSchedule; } catch { return null; }
+  })();
+  const displaySchedule = schedule ?? savedSchedule;
+
+  // 企業登録後にDBに保存されるまでの間、まだ未取得なら自動フェッチ
+  useEffect(() => {
+    if (!company || company.selection_schedule || scheduleLoading) return;
+    setScheduleLoading(true);
+    void fetch("/api/ai/selection-schedule", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        companyName: company.name,
+        industry: company.industry,
+        graduationYear: profile?.graduationYear,
+      }),
+    }).then(async (res) => {
+      if (!res.ok) return;
+      const data = await res.json() as SelectionSchedule;
+      setSchedule(data);
+      await updateCompany(id, { selection_schedule: JSON.stringify(data) });
+    }).catch(() => { /* 失敗は無視 */ })
+      .finally(() => setScheduleLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [company?.id]);
+
+  const runSchedule = async () => {
+    if (!company) return;
+    setScheduleLoading(true);
+    try {
+      const res = await fetch("/api/ai/selection-schedule", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          companyName: company.name,
+          industry: company.industry,
+          graduationYear: profile?.graduationYear,
+        }),
+      });
+      if (!res.ok) throw new Error("failed");
+      const data = await res.json() as SelectionSchedule;
+      setSchedule(data);
+      await updateCompany(id, { selection_schedule: JSON.stringify(data) });
+      showToast("選考日程を更新しました", "success");
+    } catch {
+      showToast("選考日程の取得に失敗しました", "error");
+    } finally {
+      setScheduleLoading(false);
+    }
+  };
 
   const runResearch = async () => {
     if (!company) return;
@@ -246,6 +304,91 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
             </button>
           </div>
         </div>
+      </div>
+
+      {/* 選考日程 */}
+      <div className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="font-semibold text-gray-900">選考日程</h2>
+            {displaySchedule && <p className="text-xs text-gray-400 mt-0.5">AIによる推定（要公式確認）</p>}
+          </div>
+          <button
+            type="button"
+            onClick={runSchedule}
+            disabled={scheduleLoading}
+            className="flex items-center gap-1.5 text-sm font-medium bg-[#00c896] hover:bg-[#00b586] disabled:opacity-50 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            {scheduleLoading ? (
+              <>
+                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                </svg>
+                取得中...
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                {displaySchedule ? "再取得" : "日程を取得"}
+              </>
+            )}
+          </button>
+        </div>
+
+        {scheduleLoading && !displaySchedule && (
+          <div className="text-center py-8 bg-gray-50 rounded-xl">
+            <div className="flex items-center justify-center gap-2 text-gray-500 text-sm">
+              <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+              </svg>
+              選考日程を自動取得中...
+            </div>
+          </div>
+        )}
+
+        {!displaySchedule && !scheduleLoading && (
+          <div className="text-center py-8 bg-gray-50 rounded-xl">
+            <p className="text-gray-500 text-sm">AIがES・面接・最終面接などの選考スケジュールを推定します</p>
+          </div>
+        )}
+
+        {displaySchedule && (
+          <div className="space-y-4">
+            {displaySchedule.overallTimeline && (
+              <p className="text-sm text-gray-700 bg-gray-50 rounded-lg px-4 py-2.5">
+                <span className="font-medium">全体感：</span>{displaySchedule.overallTimeline}
+              </p>
+            )}
+            <div className="relative">
+              <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-gray-100" />
+              <div className="space-y-3">
+                {displaySchedule.stages.map((stage, i) => (
+                  <div key={i} className="flex gap-4 pl-8 relative">
+                    <div className="absolute left-1.5 top-1.5 w-3 h-3 rounded-full bg-[#00c896] border-2 border-white ring-1 ring-[#00c896]/30" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-baseline gap-2 flex-wrap">
+                        <span className="font-medium text-sm text-gray-900">{stage.name}</span>
+                        <span className="text-xs text-[#00a87e] font-medium">{stage.timing}</span>
+                      </div>
+                      {stage.notes && <p className="text-xs text-gray-500 mt-0.5">{stage.notes}</p>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {displaySchedule.tips && (
+              <div className="bg-amber-50 border border-amber-100 rounded-lg px-4 py-2.5">
+                <p className="text-xs font-bold text-amber-600 mb-0.5">ポイント</p>
+                <p className="text-sm text-gray-700">{displaySchedule.tips}</p>
+              </div>
+            )}
+            <p className="text-xs text-gray-400">{displaySchedule.disclaimer}</p>
+          </div>
+        )}
       </div>
 
       {/* 企業研究 */}

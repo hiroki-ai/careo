@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { getShukatsuContext } from "@/lib/shukatsuSchedule";
 import { requireAuth, checkDailyChatLimit } from "@/lib/apiAuth";
+import { getCoachPersonality } from "@/lib/coachPersonalities";
 
 async function moderateMessages(
   messages: { role: "user" | "assistant"; content: string }[]
@@ -82,8 +83,9 @@ export async function POST(req: NextRequest) {
   if (limitError) return limitError;
 
   try {
-    const { messages, context }: {
+    const { messages, context, coachId }: {
       messages: { role: "user" | "assistant"; content: string }[];
+      coachId?: string;
       context?: {
         profile?: {
           university?: string;
@@ -255,21 +257,10 @@ export async function POST(req: NextRequest) {
     // 未入力情報のリスト（自然な会話で引き出すためのヒント）
     const allMissing = [...missingProfile, ...missingAnalysis];
 
+    const coach = getCoachPersonality(coachId);
     const systemPrompt = `あなたはユーザーの就活データを全て把握している専属AIコーチです。ユーザーが質問するとき、以下に示す過去のデータを積極的に参照し、「あなたの場合は〜」という形で個人化した回答を行ってください。
 
-あなたはCareoの就活AIアシスタント「カレオ」です。
-
-【キャラクター】
-- 明るく親しみやすい就活の先輩みたいな存在
-- 就活を頑張る大学生の最強の味方
-- 共感力が高く、不安な気持ちにも寄り添える
-- たまにユーモアもある、でも真剣なときは真剣に
-
-【話し方】
-- 「〜だよ」「〜だね」「〜してみよう」温かいトーン
-- 絵文字は1メッセージに1〜2個まで
-- 200字以内を目安（聞かれた内容によっては長くてもOK）
-- 質問には具体的かつ実践的に答える
+${coach.characterPrompt}
 
 【就活スケジュール知識】
 現在: ${new Date().getFullYear()}年${new Date().getMonth() + 1}月

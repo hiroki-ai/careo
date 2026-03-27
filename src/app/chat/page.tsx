@@ -11,6 +11,7 @@ import { useAptitudeTests } from "@/hooks/useAptitudeTests";
 import { useChat } from "@/hooks/useChat";
 import { useToast } from "@/components/ui/Toast";
 import { parseCompanySuggestions, parseSelfAnalysis, SELF_ANALYSIS_LABELS, SelfAnalysisSuggestion } from "@/lib/chatUtils";
+import { COACH_PERSONALITIES, getCoachPersonality, DEFAULT_COACH_ID } from "@/lib/coachPersonalities";
 
 interface CalendarEvent {
   type: "interview" | "deadline" | "other";
@@ -23,21 +24,20 @@ interface LocalMessage {
   role: "user" | "assistant";
   content: string;
   streaming?: boolean;
+  isWelcome?: boolean;
   suggestedCompanies?: string[];
   selfAnalysisSuggestions?: SelfAnalysisSuggestion[];
   savedFields?: string[]; // 保存済みフィールドを追跡
   calendarEvents?: CalendarEvent[];
 }
 
-const KAREO_AVATAR = () => (
-  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shrink-0 shadow-sm">
-    <span className="text-white text-sm font-bold">K</span>
-  </div>
-);
-
-const WELCOME_MESSAGE: LocalMessage = {
-  role: "assistant",
-  content: "やあ！カレオだよ👋 就活のことなら何でも相談してね。\nES・面接対策・自己分析・業界研究・悩み相談、なんでもOK！",
+const CoachAvatar = ({ coachId }: { coachId: string }) => {
+  const coach = getCoachPersonality(coachId);
+  return (
+    <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${coach.avatarGradient} flex items-center justify-center shrink-0 shadow-sm`}>
+      <span className="text-white text-sm font-bold">{coach.avatarLabel}</span>
+    </div>
+  );
 };
 
 const SUGGESTIONS = [
@@ -65,6 +65,8 @@ export default function ChatPage() {
   const [initialized, setInitialized] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [coachId, setCoachId] = useState<string>(DEFAULT_COACH_ID);
+  const [showCoachSelector, setShowCoachSelector] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -88,18 +90,26 @@ export default function ChatPage() {
     };
   }, []);
 
+  // localStorageからコーチIDを読み込む
+  useEffect(() => {
+    const saved = localStorage.getItem("careo_coach_id");
+    if (saved) setCoachId(saved);
+  }, []);
+
   // 保存済み履歴を読み込む（初回のみ）
   useEffect(() => {
     if (!historyLoading && !initialized) {
       if (savedMessages.length > 0) {
         setLocalMessages(savedMessages.map((m) => ({ role: m.role, content: m.content })));
       } else {
-        // 新規チャット：PDCAがあればそれに言及したウェルカムメッセージ
+        // 新規チャット：PDCAがあればカレオ用のウェルカムメッセージを使用
         const pdca = getLastPdca();
-        const welcomeContent = pdca?.check
+        const savedCoachId = localStorage.getItem("careo_coach_id") ?? DEFAULT_COACH_ID;
+        const coach = getCoachPersonality(savedCoachId);
+        const welcomeContent = pdca?.check && savedCoachId === DEFAULT_COACH_ID
           ? `やあ！カレオだよ👋\n前回のPDCA分析を見たんだけど、スコアが${pdca.check.score}点だったね。${pdca.act?.nextWeekFocus ? `「${pdca.act.nextWeekFocus}」が今週の最重要テーマだよ。` : ""}一緒に課題を解決していこう！\n\n何か相談したいことある？`
-          : WELCOME_MESSAGE.content;
-        setLocalMessages([{ role: "assistant", content: welcomeContent }]);
+          : coach.welcomeMessage;
+        setLocalMessages([{ role: "assistant", content: welcomeContent, isWelcome: true }]);
       }
       setInitialized(true);
     }
@@ -351,14 +361,14 @@ export default function ChatPage() {
       const historyForApi = localMessages
         .filter((m) => !m.streaming)
         .concat(userMsg)
-        .filter((m) => !(m.role === "assistant" && m.content === WELCOME_MESSAGE.content))
+        .filter((m) => !m.isWelcome)
         .slice(-20)
         .map((m) => ({ role: m.role, content: m.content }));
 
       const res = await fetch("/api/ai/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: historyForApi, context: buildContext() }),
+        body: JSON.stringify({ messages: historyForApi, context: buildContext(), coachId }),
       });
 
       // レート制限 or コンテンツモデレーション
@@ -456,9 +466,24 @@ export default function ChatPage() {
   const handleClear = async () => {
     if (!confirm("チャット履歴を全て削除しますか？")) return;
     await clearHistory();
-    setLocalMessages([WELCOME_MESSAGE]);
+    const coach = getCoachPersonality(coachId);
+    setLocalMessages([{ role: "assistant", content: coach.welcomeMessage, isWelcome: true }]);
     setInitialized(false);
     setTimeout(() => setInitialized(true), 0);
+  };
+
+  const handleSelectCoach = (id: string) => {
+    setCoachId(id);
+    localStorage.setItem("careo_coach_id", id);
+    const coach = getCoachPersonality(id);
+    // ウェルカムメッセージのみの場合は差し替え
+    setLocalMessages((prev) => {
+      if (prev.length === 1 && prev[0].isWelcome) {
+        return [{ role: "assistant", content: coach.welcomeMessage, isWelcome: true }];
+      }
+      return prev;
+    });
+    setShowCoachSelector(false);
   };
 
   // カレオが知っているデータ数
@@ -470,9 +495,26 @@ export default function ChatPage() {
     <div ref={containerRef} className="flex flex-col overflow-hidden chat-container">
       {/* ヘッダー */}
       <div className="flex items-center gap-3 px-4 md:px-6 py-3 border-b border-gray-100 bg-white shrink-0">
-        <KAREO_AVATAR />
+        <button
+          type="button"
+          onClick={() => setShowCoachSelector(true)}
+          className="shrink-0 group relative"
+          title="コーチを変更"
+        >
+          <CoachAvatar coachId={coachId} />
+          <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <span className="w-2 h-2 bg-gray-400 rounded-full text-[5px] flex items-center justify-center">▼</span>
+          </span>
+        </button>
         <div className="min-w-0">
-          <h1 className="font-semibold text-gray-900">カレオコーチ</h1>
+          <button
+            type="button"
+            onClick={() => setShowCoachSelector(true)}
+            className="flex items-center gap-1 hover:opacity-70 transition-opacity"
+          >
+            <h1 className="font-semibold text-gray-900">{getCoachPersonality(coachId).name}コーチ</h1>
+            <span className="text-gray-400 text-xs">▾</span>
+          </button>
           <p className="text-xs text-gray-400 truncate">
             {dataCount > 0 ? `${dataCount}件のデータを把握中 · ` : ""}相談内容はAI分析に反映されます
           </p>
@@ -523,7 +565,7 @@ export default function ChatPage() {
             {localMessages.map((msg, i) => (
               <div key={i}>
                 <div className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
-                  {msg.role === "assistant" && <KAREO_AVATAR />}
+                  {msg.role === "assistant" && <CoachAvatar coachId={coachId} />}
                   {msg.role === "user" && (
                     <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center shrink-0">
                       <span className="text-gray-600 text-sm">👤</span>
@@ -738,6 +780,66 @@ export default function ChatPage() {
           相談内容はあなた専用のAI分析に活かされます
         </p>
       </div>
+
+      {/* コーチ選択パネル */}
+      {showCoachSelector && (
+        <div
+          className="fixed inset-0 z-50 flex items-end md:items-center justify-center"
+          onClick={() => setShowCoachSelector(false)}
+        >
+          <div className="absolute inset-0 bg-black/40" />
+          <div
+            className="relative bg-white rounded-t-2xl md:rounded-2xl w-full md:max-w-sm p-5 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-bold text-gray-900 text-base">コーチを選ぶ</h2>
+              <button
+                type="button"
+                onClick={() => setShowCoachSelector(false)}
+                className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors"
+              title="閉じる"
+              aria-label="閉じる"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="space-y-2">
+              {COACH_PERSONALITIES.map((coach) => {
+                const isSelected = coachId === coach.id;
+                return (
+                  <button
+                    key={coach.id}
+                    type="button"
+                    onClick={() => handleSelectCoach(coach.id)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all text-left ${
+                      isSelected
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-100 bg-gray-50 hover:border-gray-200 hover:bg-white"
+                    }`}
+                  >
+                    <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${coach.avatarGradient} flex items-center justify-center shrink-0 shadow-sm`}>
+                      <span className="text-white text-sm font-bold">{coach.avatarLabel}</span>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className={`font-semibold text-sm ${isSelected ? "text-blue-700" : "text-gray-900"}`}>{coach.name}</p>
+                      <p className="text-xs text-gray-500 truncate">{coach.tagline}</p>
+                    </div>
+                    {isSelected && (
+                      <svg className="w-4 h-4 text-blue-500 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+                      </svg>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-[11px] text-gray-400 text-center mt-4">コーチを変えても今後のメッセージから反映されます</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

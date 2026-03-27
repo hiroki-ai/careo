@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { UserProfile, JobSearchStage, JOB_SEARCH_STAGE_LABELS, INDUSTRIES, JOB_TYPES, GRADES } from "@/types";
 import { Button } from "@/components/ui/Button";
+import { UNIVERSITIES, UNIVERSITY_NAMES } from "@/data/universities";
 
 type FormData = Omit<UserProfile, "id" | "createdAt" | "updatedAt">;
 
@@ -10,13 +11,57 @@ interface ProfileFormProps {
   initialData?: Partial<FormData>;
   onSubmit: (data: FormData) => void;
   submitLabel?: string;
-  showSelfAnalysis?: boolean; // オンボーディングでは就活軸も聞く
+  showSelfAnalysis?: boolean;
 }
 
 const currentYear = new Date().getFullYear();
 const graduationYears = [currentYear, currentYear + 1, currentYear + 2, currentYear + 3];
 
+// "経済学部 経済学科" → { faculty: "経済学部", department: "経済学科" }
+function parseFaculty(value: string) {
+  const parts = value.split(" ");
+  if (parts.length >= 2) return { faculty: parts[0], department: parts.slice(1).join(" ") };
+  return { faculty: value, department: "" };
+}
+
 export function ProfileForm({ initialData, onSubmit, submitLabel = "保存", showSelfAnalysis = false }: ProfileFormProps) {
+  const parsed = parseFaculty(initialData?.faculty ?? "");
+  const [university, setUniversity] = useState(initialData?.university ?? "");
+  const [selectedFaculty, setSelectedFaculty] = useState(parsed.faculty);
+  const [selectedDepartment, setSelectedDepartment] = useState(parsed.department);
+  const [universityInput, setUniversityInput] = useState(initialData?.university ?? "");
+  const [fetchedFaculties, setFetchedFaculties] = useState<Record<string, string[]>>({});
+  const [fetchingFaculties, setFetchingFaculties] = useState(false);
+  const fetchedRef = useRef<string>("");
+
+  const knownFacultyMap = UNIVERSITIES[university];
+  const facultyMap: Record<string, string[]> = knownFacultyMap ?? fetchedFaculties;
+  const facultyNames = Object.keys(facultyMap);
+  const departments = (facultyMap[selectedFaculty] ?? []).filter(Boolean);
+
+  // リスト外の大学が入力されたらAPIで学部・学科を取得
+  useEffect(() => {
+    if (!university || UNIVERSITIES[university] || fetchedRef.current === university) return;
+    fetchedRef.current = university;
+    setFetchingFaculties(true);
+    setFetchedFaculties({});
+    setSelectedFaculty("");
+    setSelectedDepartment("");
+    fetch(`/api/university-faculties?university=${encodeURIComponent(university)}`)
+      .then((r) => r.json())
+      .then((data) => setFetchedFaculties(data.faculties ?? {}))
+      .finally(() => setFetchingFaculties(false));
+  }, [university]);
+
+  // 学部が変わったら学科をリセット
+  useEffect(() => {
+    setSelectedDepartment("");
+  }, [selectedFaculty]);
+
+  const facultyValue = departments.length > 0 && selectedDepartment
+    ? `${selectedFaculty} ${selectedDepartment}`
+    : selectedFaculty;
+
   const [form, setForm] = useState<FormData>({
     university: initialData?.university ?? "",
     faculty: initialData?.faculty ?? "",
@@ -44,42 +89,100 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存", sho
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.grade) return;
-    onSubmit(form);
+    onSubmit({ ...form, university, faculty: facultyValue });
   };
+
+  const selectClass = "w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896]";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">大学名</label>
-          <input
-            type="text"
-            value={form.university}
-            onChange={(e) => setForm({ ...form, university: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896]"
-            placeholder="例: 東京大学"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">学部・研究科</label>
-          <input
-            type="text"
-            value={form.faculty}
-            onChange={(e) => setForm({ ...form, faculty: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896]"
-            placeholder="例: 工学部情報工学科"
-          />
-        </div>
+      {/* 大学名 */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">大学名</label>
+        <input
+          list="university-list"
+          type="text"
+          value={universityInput}
+          onChange={(e) => {
+            setUniversityInput(e.target.value);
+            setSelectedFaculty("");
+            setSelectedDepartment("");
+          }}
+          onBlur={() => setUniversity(universityInput.trim())}
+          className={selectClass}
+          placeholder="例: 上智大学（リストから選ぶか直接入力）"
+        />
+        <datalist id="university-list">
+          {UNIVERSITY_NAMES.map((u) => <option key={u} value={u} />)}
+        </datalist>
       </div>
+
+      {/* 学部 */}
+      {university && (
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">学部・研究科</label>
+            {fetchingFaculties ? (
+              <div className={`${selectClass} text-gray-400`}>学部を取得中...</div>
+            ) : facultyNames.length > 0 ? (
+              <select
+                title="学部・研究科"
+                value={selectedFaculty}
+                onChange={(e) => setSelectedFaculty(e.target.value)}
+                className={selectClass}
+              >
+                <option value="">選択してください</option>
+                {facultyNames.map((f) => <option key={f} value={f}>{f}</option>)}
+              </select>
+            ) : (
+              <input
+                type="text"
+                value={selectedFaculty}
+                onChange={(e) => setSelectedFaculty(e.target.value)}
+                className={selectClass}
+                placeholder="例: 経済学部"
+              />
+            )}
+          </div>
+
+          {/* 学科 */}
+          {selectedFaculty && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">学科</label>
+              {departments.length > 0 ? (
+                <select
+                  title="学科"
+                  value={selectedDepartment}
+                  onChange={(e) => setSelectedDepartment(e.target.value)}
+                  className={selectClass}
+                >
+                  <option value="">選択してください</option>
+                  {departments.map((d) => <option key={d} value={d}>{d}</option>)}
+                </select>
+              ) : (
+                <input
+                  type="text"
+                  value={selectedDepartment}
+                  onChange={(e) => setSelectedDepartment(e.target.value)}
+                  className={selectClass}
+                  placeholder="例: 経済学科（任意）"
+                />
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             学年 <span className="text-red-500">*</span>
           </label>
           <select
+            title="学年"
             value={form.grade}
             onChange={(e) => setForm({ ...form, grade: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896]"
+            className={selectClass}
             required
           >
             <option value="">選択してください</option>
@@ -89,9 +192,10 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存", sho
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">卒業予定年度</label>
           <select
+            title="卒業予定年度"
             value={form.graduationYear}
             onChange={(e) => setForm({ ...form, graduationYear: Number(e.target.value) })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896]"
+            className={selectClass}
           >
             {graduationYears.map((y) => <option key={y} value={y}>{y}年卒</option>)}
           </select>

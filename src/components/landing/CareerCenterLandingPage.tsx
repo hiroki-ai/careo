@@ -34,16 +34,22 @@ const faqItems = [
 // ─── Pain Points データ ───────────────────────────────────────────────────────
 const painPoints = [
   {
-    icon: "😶",
-    title: "面談まで学生の状況がわからない",
-    desc: "「何社受けているの？」「ESは書いた？」——相談に来た時点で初めて把握する状況。深いアドバイスができないまま面談が終わってしまう。",
-    tag: "情報不足",
+    icon: "📣",
+    title: "学生を集める仕組みがない",
+    desc: "キャリアセンターの存在を知らない学生、使い方がわからない学生が多い。担当者の64%が「人手不足」を訴える中、周知や呼び込みに割けるリソースがない。",
+    tag: "集客・周知（61%が課題）",
   },
   {
-    icon: "🚪",
-    title: "困っている学生ほど来談しない",
-    desc: "就活が上手くいっていない学生ほど孤立しがち。キャリアセンターには「うまくいっている学生」しか来ない、という本末転倒な現状。",
-    tag: "リーチ困難",
+    icon: "😶",
+    title: "学生の就活状況が把握できない",
+    desc: "「何社受けているの？」「ESは書いた？」——相談に来た時点で初めて把握する状況。学生の75%の就活実態がブラックボックスのまま支援が始まる。",
+    tag: "情報不足（75%が課題）",
+  },
+  {
+    icon: "🚨",
+    title: "未内定学生を早期に発見できない",
+    desc: "困っている学生ほど孤立しがち。支援が必要な学生の66%は来談せず、手遅れになってから初めて状況が判明するケースが後を絶たない。",
+    tag: "早期発見（66%が課題）",
   },
   {
     icon: "📊",
@@ -108,6 +114,12 @@ const features = [
     title: "大学独自のお知らせ配信",
     desc: "「説明会スケジュール」「OB/OG訪問受付開始」——大学からのお知らせをCareo経由で就活中の学生にリーチ。開封率が高い、使用中のツール内での配信が可能です。",
     tag: "情報配信",
+  },
+  {
+    icon: "📅",
+    title: "相談予約システム",
+    desc: "学生がCareoアプリから相談枠を予約・キャンセルできます。職員は空き枠を設定・管理でき、予約リマインダーを自動送信。来談率の向上と予約管理の効率化を同時に実現します。",
+    tag: "新機能",
   },
   {
     icon: "🤝",
@@ -258,7 +270,7 @@ export default function CareerCenterLandingPage() {
           <p className="text-gray-500 text-base md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-up delay-200">
             Careoは学生が自主的に使う就活管理アプリです。<br className="hidden md:block" />
             大学と連携することで、面談の質が上がり、孤立した学生に届き、<br className="hidden md:block" />
-            支援の成果が可視化されます。まずは<span className="font-semibold text-[#0D0B21]">無料ヒアリング</span>からお気軽にご相談ください。
+            支援の成果が可視化されます。<span className="font-semibold text-[#0D0B21]">相談予約もCareoで完結</span>。まずは<span className="font-semibold text-[#0D0B21]">無料ヒアリング</span>からお気軽にご相談ください。
           </p>
 
           {/* CTAボタン */}
@@ -304,14 +316,14 @@ export default function CareerCenterLandingPage() {
           <div className="text-center mb-14 reveal">
             <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3">The Problem</p>
             <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight mb-4">
-              キャリアセンターが抱える、<span className="lp-gradient-text-dark bg-clip-text text-transparent">3つの課題</span>
+              キャリアセンターが抱える、<span className="lp-gradient-text-dark bg-clip-text text-transparent">4つの課題</span>
             </h2>
             <p className="text-gray-400 text-sm max-w-xl mx-auto">
-              担当者の方が感じているこの課題は、情報の非対称性から生まれています。
+              調査では担当者の60〜75%がこれらを課題と回答。情報の非対称性が根本原因です。
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {painPoints.map((item, i) => (
               <div
                 key={item.title}
@@ -768,21 +780,21 @@ export default function CareerCenterLandingPage() {
                 },
                 {
                   phase: "Phase 2",
-                  title: "大学キャリアセンターとの連携",
+                  title: "大学連携 × SaaS提供",
                   status: "提携募集中",
                   statusCls: "bg-blue-500 text-white",
-                  desc: "普及した学生データをキャリアセンターへ橋渡し。面談の質向上・孤立学生へのリーチ・支援効果の可視化を実現。",
-                  items: ["キャリアセンターダッシュボード", "学生への個別メッセージ", "大学全体の集計分析", "面談前AIインサイト"],
+                  desc: "普及した学生データをキャリアセンターへ橋渡し。月額SaaSとして提供し、相談予約システム・ダッシュボード・AI分析インサイトを一体で導入できます（詳細はヒアリングにて）。",
+                  items: ["キャリアセンターダッシュボード", "相談予約システム", "学生への個別メッセージ", "大学全体の集計分析", "面談前AIインサイト"],
                   borderCls: "border-blue-200",
                   bgCls: "bg-blue-50/50",
                 },
                 {
                   phase: "Phase 3",
-                  title: "就活データインフラへ",
+                  title: "企業マッチング × 採用インフラ化",
                   status: "将来ビジョン",
                   statusCls: "bg-purple-500 text-white",
-                  desc: "学生・大学・企業をつなぐ就活データプラットフォームへ。日本のHandshakeとして、就職支援の中核インフラとなる。",
-                  items: ["企業との採用データ連携", "複数大学間の比較分析", "就活トレンド・予測レポート", "キャリアセンター間の知見共有"],
+                  desc: "学生・大学・企業の3者をつなぐ就活データプラットフォームへ。就活過程データを活用した高精度マッチングで、日本の採用インフラを変える。",
+                  items: ["企業との採用データ連携", "就活過程データを使った高精度マッチング", "複数大学間の比較分析", "就活トレンド・予測レポート"],
                   borderCls: "border-purple-200",
                   bgCls: "bg-purple-50/50",
                 },
@@ -874,7 +886,7 @@ export default function CareerCenterLandingPage() {
           <div className="text-center mb-16 reveal">
             <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3">Features</p>
             <h2 className="text-3xl md:text-4xl font-bold text-[#0D0B21] tracking-tight mb-4">
-              提携で使えるようになる<span className="text-[#00c896]">7つの機能</span>
+              提携で使えるようになる<span className="text-[#00c896]">主要機能</span>
             </h2>
             <p className="text-gray-500 text-sm max-w-xl mx-auto">
               提携プランに含まれる機能一覧です。詳細はヒアリングにてご説明します。
@@ -1044,7 +1056,8 @@ export default function CareerCenterLandingPage() {
             </h2>
             <p className="text-gray-500 text-sm leading-relaxed">
               初回ヒアリングは無料です。30分のオンラインミーティングで、
-              貴大学の課題と最適な活用方法をご提案します。料金はその後ご相談ください。
+              貴大学の課題と最適な活用方法をご提案します。<br className="hidden md:block" />
+              キャリアセンター向けは月額SaaSモデルでの提供を予定しています。具体的な料金は大学の規模・利用範囲に応じてヒアリングにてご案内します。
             </p>
           </div>
 

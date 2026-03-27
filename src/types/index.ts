@@ -24,6 +24,19 @@ export interface QAPair {
   answer: string;
 }
 
+export interface SelectionStage {
+  name: string;
+  timing: string;
+  notes?: string;
+}
+
+export interface SelectionSchedule {
+  stages: SelectionStage[];
+  overallTimeline: string;
+  tips?: string;
+  disclaimer: string;
+}
+
 export interface Company {
   id: string;
   name: string;
@@ -33,6 +46,7 @@ export interface Company {
   status: CompanyStatus;
   notes?: string;
   ai_research?: string | null;
+  selection_schedule?: string | null;
   is_intern_offer?: boolean | null;
   createdAt: string;
   updatedAt: string;
