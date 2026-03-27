@@ -21,6 +21,13 @@ export async function GET(
 
   if (error || !data) return NextResponse.json({ error: "見つかりません" }, { status: 404 });
 
+  // アクセスログ記録（非同期・失敗しても無視）
+  void supabase.from("career_center_access_logs").insert({
+    staff_id: staff.id,
+    student_user_id: data.student_user_id,
+    university: staff.university,
+  });
+
   return NextResponse.json({ review: data });
 }
 

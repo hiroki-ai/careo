@@ -8,8 +8,9 @@ export const maxDuration = 60;
 // 既存記事の本文に外部リンクを追加し、オプションで公開日を変更する
 
 export async function POST(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get("secret");
-  if (secret !== process.env.CRON_SECRET) {
+  const auth = req.headers.get("authorization");
+  const secret = auth?.startsWith("Bearer ") ? auth.slice(7) : null;
+  if (!secret || secret !== process.env.CRON_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

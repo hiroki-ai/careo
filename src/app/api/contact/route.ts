@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { z } from "zod";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -10,26 +11,28 @@ const CATEGORIES: Record<string, string> = {
   other: "その他",
 };
 
+const contactSchema = z.object({
+  name: z.string().min(1, "お名前は必須です").max(100),
+  email: z.string().email("メールアドレスの形式が正しくありません"),
+  category: z.enum(["feature", "bug", "question", "other"]).optional(),
+  message: z.string().min(1, "メッセージは必須です").max(2000, "メッセージは2000文字以内で入力してください"),
+});
+
 export async function POST(req: NextRequest) {
-  const { name, email, category, message } = await req.json();
-
-  if (!name || !email || !message) {
-    return NextResponse.json({ error: "必須項目が不足しています" }, { status: 400 });
+  const body = await req.json();
+  const result = contactSchema.safeParse(body);
+  if (!result.success) {
+    const firstError = result.error.issues[0]?.message ?? "入力内容が正しくありません";
+    return NextResponse.json({ error: firstError }, { status: 400 });
   }
+  const { name, email, category, message } = result.data;
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return NextResponse.json({ error: "メールアドレスの形式が正しくありません" }, { status: 400 });
-  }
-
-  if (message.length > 2000) {
-    return NextResponse.json({ error: "メッセージは2000文字以内で入力してください" }, { status: 400 });
-  }
-
-  const categoryLabel = CATEGORIES[category] ?? "その他";
+  const categoryLabel = CATEGORIES[category ?? "other"] ?? "その他";
+  const contactEmail = process.env.CONTACT_EMAIL ?? process.env.ADMIN_EMAIL;
 
   const { error } = await resend.emails.send({
     from: "Careo お問い合わせ <onboarding@resend.dev>",
-    to: ["hiroki.a0625@gmail.com"],
+    to: contactEmail ? [contactEmail] : [],
     replyTo: email,
     subject: `[Careo お問い合わせ] ${categoryLabel}｜${name}`,
     text: `【Careo お問い合わせ】\n\nカテゴリ: ${categoryLabel}\nお名前: ${name}\nメールアドレス: ${email}\n\n【メッセージ】\n${message}`,

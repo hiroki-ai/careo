@@ -7,8 +7,9 @@ export const maxDuration = 60;
 // 指定スラッグの記事を削除してから /api/cron/blog-post?force=1 を呼び出す
 
 export async function POST(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get("secret");
-  if (secret !== process.env.CRON_SECRET) {
+  const auth = req.headers.get("authorization");
+  const secret = auth?.startsWith("Bearer ") ? auth.slice(7) : null;
+  if (!secret || secret !== process.env.CRON_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -32,8 +33,8 @@ export async function POST(req: NextRequest) {
   // 削除後に新記事を生成
   const origin = req.nextUrl.origin;
   const cronRes = await fetch(
-    `${origin}/api/cron/blog-post?secret=${process.env.CRON_SECRET}&force=1`,
-    { headers: { "x-cron-secret": process.env.CRON_SECRET! } }
+    `${origin}/api/cron/blog-post?force=1`,
+    { headers: { "authorization": `Bearer ${process.env.CRON_SECRET}` } }
   );
   const cronJson = await cronRes.json();
 

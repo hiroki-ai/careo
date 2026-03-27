@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { tavily } from "@tavily/core";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { requireAuth } from "@/lib/apiAuth";
 
@@ -34,7 +35,29 @@ export async function POST(req: NextRequest) {
     ? "インターン選考・本選考両方の日程を含めてください。"
     : "本選考の日程を中心にまとめてください。";
 
-  const prompt = `就活生向けに「${companyName}」${industry ? `（${industry}）` : ""}の選考スケジュールを推定してください。${phaseNote}
+  // Tavilyで採用情報を検索（APIキーがない場合はスキップ）
+  let searchContext = "";
+  if (process.env.TAVILY_API_KEY) {
+    try {
+      const client = tavily({ apiKey: process.env.TAVILY_API_KEY });
+      const searchYear = targetYear - 1; // 例: 28卒 → 2027年の情報を検索
+      const result = await client.search(
+        `${companyName} 採用 選考フロー ${searchYear}卒 日程`,
+        { maxResults: 3, searchDepth: "basic" }
+      );
+      if (result.results.length > 0) {
+        searchContext = result.results
+          .map((r) => `【${r.title}】\n${r.content}`)
+          .join("\n\n");
+      }
+    } catch {
+      // 検索失敗はClaudeの知識ベースで補完するため無視
+    }
+  }
+
+  const prompt = `就活生向けに「${companyName}」${industry ? `（${industry}）` : ""}の選考スケジュールをまとめてください。${phaseNote}
+
+${searchContext ? `【最新の採用情報（Web検索結果）】\n${searchContext}\n\n上記の情報を優先して使用し、不明な部分は一般的な就活スケジュールで補完してください。` : "一般的な就活スケジュールと業界特性に基づいて推定してください。"}
 
 以下の構成でJSONのみ返してください（説明文・マークダウン不要）：
 
@@ -44,11 +67,10 @@ export async function POST(req: NextRequest) {
   ],
   "overallTimeline": "全体の流れを1文で（例: 6月エントリー〜10月内定）",
   "tips": "この企業の選考で特に注意すべき点（1〜2文、任意）",
-  "disclaimer": "AIによる推定です。必ず公式採用ページで最新情報をご確認ください。"
+  "disclaimer": "${searchContext ? "Web検索情報をもとにAIが整理しました。" : "AIによる推定です。"}必ず公式採用ページで最新情報をご確認ください。"
 }
 
-- 企業が実在しない・情報が不明な場合は stagesを空配列、overallTimelineに「公式採用サイトをご確認ください」と記載
-- 一般的な就活スケジュールに基づいて推定してください
+- 企業が実在しない・情報が不明な場合はstagesを空配列、overallTimelineに「公式採用サイトをご確認ください」と記載
 - 業界・企業規模・選考形態（総合職/技術職/コース別など）を考慮してください`;
 
   const message = await anthropic.messages.create({

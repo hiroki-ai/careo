@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireCareerCenterStaff } from "@/lib/apiAuth";
 import { createClient } from "@/lib/supabase/server";
+import { z } from "zod";
+
+const messageSchema = z.object({
+  studentUserId: z.string().uuid("無効なユーザーIDです"),
+  body: z.string().min(1, "メッセージは必須です").max(2000, "メッセージは2000文字以内で入力してください"),
+});
 
 export async function GET(req: NextRequest) {
   const auth = await requireCareerCenterStaff();
@@ -39,10 +45,13 @@ export async function POST(req: NextRequest) {
   if (auth.errorResponse) return auth.errorResponse;
   const { staff } = auth;
 
-  const { studentUserId, body } = await req.json();
-  if (!studentUserId || !body?.trim()) {
-    return NextResponse.json({ error: "studentUserId と body が必要です" }, { status: 400 });
+  const rawBody = await req.json();
+  const result = messageSchema.safeParse(rawBody);
+  if (!result.success) {
+    const firstError = result.error.issues[0]?.message ?? "入力内容が正しくありません";
+    return NextResponse.json({ error: firstError }, { status: 400 });
   }
+  const { studentUserId, body } = result.data;
 
   const supabase = await createClient();
 

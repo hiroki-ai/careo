@@ -77,8 +77,12 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // 1日チャット上限チェック（管理者は無制限）
-  const isAdmin = !!process.env.ADMIN_EMAIL && user.email === process.env.ADMIN_EMAIL;
+  // 1日チャット上限チェック（管理者・ホワイトリストは無制限）
+  const unlimitedEmails = [
+    process.env.ADMIN_EMAIL,
+    ...(process.env.CHAT_UNLIMITED_EMAILS?.split(",").map((e) => e.trim()) ?? []),
+  ].filter(Boolean);
+  const isAdmin = !!user.email && unlimitedEmails.includes(user.email);
   const { errorResponse: limitError } = await checkDailyChatLimit(user.id, isAdmin);
   if (limitError) return limitError;
 

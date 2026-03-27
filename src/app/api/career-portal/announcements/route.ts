@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireCareerCenterStaff } from "@/lib/apiAuth";
 import { createClient } from "@/lib/supabase/server";
+import { z } from "zod";
+
+const announcementSchema = z.object({
+  title: z.string().min(1, "タイトルは必須です").max(200, "タイトルは200文字以内で入力してください"),
+  body: z.string().min(1, "本文は必須です").max(5000, "本文は5000文字以内で入力してください"),
+  targetGrade: z.string().max(20).nullable().optional(),
+  targetGradYear: z.number().int().min(2020).max(2040).nullable().optional(),
+});
 
 export async function GET() {
   const auth = await requireCareerCenterStaff();
@@ -37,12 +45,13 @@ export async function POST(req: NextRequest) {
   if (auth.errorResponse) return auth.errorResponse;
   const { staff } = auth;
 
-  const body = await req.json();
-  const { title, body: msgBody, targetGrade, targetGradYear } = body;
-
-  if (!title?.trim() || !msgBody?.trim()) {
-    return NextResponse.json({ error: "タイトルと本文は必須です" }, { status: 400 });
+  const rawBody = await req.json();
+  const result = announcementSchema.safeParse(rawBody);
+  if (!result.success) {
+    const firstError = result.error.issues[0]?.message ?? "入力内容が正しくありません";
+    return NextResponse.json({ error: firstError }, { status: 400 });
   }
+  const { title, body: msgBody, targetGrade, targetGradYear } = result.data;
 
   const supabase = await createClient();
   const { data, error } = await supabase

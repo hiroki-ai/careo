@@ -122,8 +122,8 @@ function buildEmailHtml(team: (typeof TEAMS)[0], result: { headline: string; tas
 
 export async function GET(req: NextRequest) {
   const auth = req.headers.get("authorization");
-  const secret = (auth?.startsWith("Bearer ") ? auth.slice(7) : null) ?? req.headers.get("x-cron-secret") ?? new URL(req.url).searchParams.get("secret");
-  if (secret !== process.env.CRON_SECRET) {
+  const secret = auth?.startsWith("Bearer ") ? auth.slice(7) : null;
+  if (!secret || secret !== process.env.CRON_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -156,9 +156,14 @@ export async function GET(req: NextRequest) {
 
   const html = buildEmailHtml(team, result, userCount, today);
 
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!adminEmail) {
+    return NextResponse.json({ error: "ADMIN_EMAIL not set" }, { status: 500 });
+  }
+
   const { error } = await resend.emails.send({
     from: "Careo チームレポート <onboarding@resend.dev>",
-    to: ["hiroki.a0625@gmail.com"],
+    to: [adminEmail],
     subject: `[Careo] ${team.emoji} ${team.name}の提案 ― ${today}`,
     html,
   });

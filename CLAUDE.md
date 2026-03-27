@@ -189,4 +189,5 @@ NEXT_PUBLIC_SENTRY_DSN                                         # Sentryエラー
 NEXT_PUBLIC_ADMIN_EMAIL                                        # 管理者メール（/admin・/insightsアクセス制御）
 X_API_KEY / X_API_SECRET / X_ACCESS_TOKEN / X_ACCESS_SECRET   # X投稿機能
 CRON_SECRET                                                    # Vercel Cron認証
+TAVILY_API_KEY                                                 # 選考日程の自動収集（未設定の場合はClaudeの知識ベースで代替）
 ```

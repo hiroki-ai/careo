@@ -35,6 +35,15 @@ export async function GET() {
     return NextResponse.json({ students: [] });
   }
 
+  // 学生一覧アクセスログ（最初の学生IDで代表記録）
+  if (profiles[0]) {
+    void supabase.from("career_center_access_logs").insert({
+      staff_id: staff.id,
+      student_user_id: profiles[0].id,
+      university: staff.university,
+    });
+  }
+
   const studentIds = profiles.map((p) => p.id);
 
   // 企業・OB訪問・面接の件数を集計
