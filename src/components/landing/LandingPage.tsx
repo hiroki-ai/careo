@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Script from "next/script";
 import type { RecentPost } from "@/app/page";
+import { LPChatBot } from "@/components/landing/LPChatBot";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const DEFAULT_BADGE = "あなたの就活を丸ごと知るAIコーチ「カレオ」";
@@ -1569,6 +1570,9 @@ export function LandingPage({ recentPosts = [] }: { recentPosts?: RecentPost[] }
           </div>
         </div>
       </footer>
+
+      {/* LP カレオコーチ チャットボット */}
+      <LPChatBot />
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import type { RecentPost } from "@/app/page";
+import { LPChatBot } from "@/components/landing/LPChatBot";
 
 // ─── Reveal wrapper (avoids calling hooks inside .map) ─────────────────────────
 function Reveal({
@@ -616,6 +617,9 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
         </div>
         <p className="text-gray-700 text-[10px]">© 2026 Careo. All rights reserved.</p>
       </footer>
+
+      {/* LP カレオコーチ チャットボット */}
+      <LPChatBot />
     </div>
   );
 }
