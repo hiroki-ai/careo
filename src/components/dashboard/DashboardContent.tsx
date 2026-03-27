@@ -19,6 +19,7 @@ import { createClient } from "@/lib/supabase/client";
 import { daysUntil } from "@/lib/utils";
 import { COMPANY_STATUS_ORDER, JOB_SEARCH_STAGE_LABELS } from "@/types";
 import { useCoach } from "@/hooks/useCoach";
+import { TutorialModal } from "@/components/dashboard/TutorialModal";
 
 // 毎日のコーチCTA（チャット未実施の日は強調表示）
 function DailyCoachBanner({ profile }: { profile: { careerAxis?: string; gakuchika?: string } | null }) {
@@ -219,6 +220,7 @@ export function DashboardContent() {
 
   return (
     <div className="p-3 md:p-5 bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
+      <TutorialModal />
       {/* ページヘッダー */}
       <div className="flex items-center justify-between mb-2 md:mb-3">
         <div>

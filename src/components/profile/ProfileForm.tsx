@@ -88,7 +88,7 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存", sho
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.grade) return;
+    if (!universityInput.trim() || !selectedFaculty || !form.grade) return;
     onSubmit({ ...form, university, faculty: facultyValue });
   };
 
@@ -98,7 +98,7 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存", sho
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* 大学名 */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">大学名</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">大学名 <span className="text-red-500">*</span></label>
         <input
           list="university-list"
           type="text"
@@ -121,7 +121,7 @@ export function ProfileForm({ initialData, onSubmit, submitLabel = "保存", sho
       {university && (
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">学部・研究科</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">学部・研究科 <span className="text-red-500">*</span></label>
             {fetchingFaculties ? (
               <div className={`${selectClass} text-gray-400`}>学部を取得中...</div>
             ) : facultyNames.length > 0 ? (
