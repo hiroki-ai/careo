@@ -5,6 +5,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { Button } from "@/components/ui/Button";
 import { UserProfile } from "@/types";
 import { useToast } from "@/components/ui/Toast";
+import { useCoach } from "@/hooks/useCoach";
 
 type CareerFields = Pick<UserProfile, "careerAxis" | "gakuchika" | "selfPr" | "strengths" | "weaknesses">;
 
@@ -55,6 +56,7 @@ const SECTIONS: {
 export default function CareerPage() {
   const { profile, loading, saveProfile, patchSelfAnalysis } = useProfile();
   const { showToast } = useToast();
+  const { coachName } = useCoach();
   const [editData, setEditData] = useState<CareerFields | null>(null);
   const [saved, setSaved] = useState(false);
   const [applyingField, setApplyingField] = useState<string | null>(null);
@@ -175,7 +177,7 @@ export default function CareerPage() {
                   )}
                   {hasAiContent && (
                     <div className="mt-3 bg-[#00c896]/5 border border-[#00c896]/20 rounded-lg p-3">
-                      <p className="text-[10px] font-bold text-[#00a87e] uppercase tracking-wider mb-1.5">カレオが生成したメモ（参考）</p>
+                      <p className="text-[10px] font-bold text-[#00a87e] uppercase tracking-wider mb-1.5">{coachName}が生成したメモ（参考）</p>
                       <p className="text-xs text-gray-600 whitespace-pre-wrap leading-relaxed mb-2">{aiContent}</p>
                       <button
                         type="button"
@@ -201,7 +203,7 @@ export default function CareerPage() {
                   {hasAiContent && (
                     <div className="mt-4 bg-[#00c896]/5 border border-[#00c896]/20 rounded-xl p-4">
                       <div className="flex items-center justify-between mb-2">
-                        <p className="text-[10px] font-bold text-[#00a87e] uppercase tracking-wider">カレオのAIメモ</p>
+                        <p className="text-[10px] font-bold text-[#00a87e] uppercase tracking-wider">{coachName}のAIメモ</p>
                         <button
                           type="button"
                           disabled={applyingField === section.key}
@@ -225,7 +227,7 @@ export default function CareerPage() {
       {!isEditing && (
         <div className="mt-6 bg-white rounded-xl border border-gray-100 p-5">
           <h3 className="text-sm font-semibold text-gray-800 mb-1">自己分析の充実度</h3>
-          <p className="text-xs text-gray-400 mb-4">カレオとの対話で自己分析が成長するほど、AIのアドバイス精度が上がります</p>
+          <p className="text-xs text-gray-400 mb-4">{coachName}との対話で自己分析が成長するほど、AIのアドバイス精度が上がります</p>
           <div className="space-y-3">
             {SECTIONS.map((section) => {
               const value = current[section.key];
@@ -259,13 +261,13 @@ export default function CareerPage() {
           </div>
           <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
             <p className="text-xs text-gray-500">
-              完成度が高いほどカレオのアドバイスが個別最適化されます
+              完成度が高いほど{coachName}のアドバイスが個別最適化されます
             </p>
             <a
               href="/chat"
               className="text-xs text-indigo-600 hover:underline font-medium"
             >
-              カレオと対話して深める →
+              {coachName}と対話して深める →
             </a>
           </div>
         </div>
@@ -279,7 +281,7 @@ export default function CareerPage() {
             {[
               { icon: "📊", label: "PDCA分析", desc: "就活の軸・強み・弱みを踏まえてAIが週次レポートを個別最適化" },
               { icon: "🎯", label: "Next Action AI", desc: "あなたの強みに合った業界・企業・アクションを具体的に提案" },
-              { icon: "💬", label: "カレオコーチ（AIチャット）", desc: "あなたの自己分析を把握した上で、個別相談・面接対策に対応" },
+              { icon: "💬", label: `${coachName}コーチ（AIチャット）`, desc: "あなたの自己分析を把握した上で、個別相談・面接対策に対応" },
             ].map((item) => (
               <div key={item.label} className="flex gap-3 items-start">
                 <span className="text-lg shrink-0">{item.icon}</span>

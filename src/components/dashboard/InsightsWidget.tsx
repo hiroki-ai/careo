@@ -10,6 +10,7 @@ import { useActionItems } from "@/hooks/useActionItems";
 import { useObVisits } from "@/hooks/useObVisits";
 import { useAptitudeTests } from "@/hooks/useAptitudeTests";
 import type { InsightItem } from "@/app/api/ai/insights/route";
+import { useCoach } from "@/hooks/useCoach";
 
 const CACHE_KEY = "careo_last_insights";
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6時間キャッシュ
@@ -69,6 +70,7 @@ export function InsightsWidget() {
   const { visits: obVisits } = useObVisits();
   const { tests: aptitudeTests } = useAptitudeTests();
 
+  const { coachName } = useCoach();
   const [insights, setInsights] = useState<InsightItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -134,7 +136,7 @@ export function InsightsWidget() {
     return (
       <div className="mb-4">
         <div className="flex items-center gap-2 mb-3">
-          <h2 className="font-semibold text-gray-900 text-sm">🔮 カレオからの気づき</h2>
+          <h2 className="font-semibold text-gray-900 text-sm">🔮 {coachName}からの気づき</h2>
         </div>
         <div className="space-y-2">
           {[...Array(3)].map((_, i) => (
@@ -151,7 +153,7 @@ export function InsightsWidget() {
     <div className="mb-4">
       <div className="flex items-center justify-between mb-3">
         <h2 className="font-semibold text-gray-900 text-sm flex items-center gap-1.5">
-          🔮 <span>カレオからの気づき</span>
+          🔮 <span>{coachName}からの気づき</span>
         </h2>
         <button
           onClick={() => {

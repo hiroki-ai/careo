@@ -18,11 +18,13 @@ import { PostOfferWidget } from "@/components/dashboard/PostOfferWidget";
 import { createClient } from "@/lib/supabase/client";
 import { daysUntil } from "@/lib/utils";
 import { COMPANY_STATUS_ORDER, JOB_SEARCH_STAGE_LABELS } from "@/types";
+import { useCoach } from "@/hooks/useCoach";
 
 // 毎日のコーチCTA（チャット未実施の日は強調表示）
 function DailyCoachBanner({ profile }: { profile: { careerAxis?: string; gakuchika?: string } | null }) {
   const [chatted, setChatted] = useState(true); // サーバーSSRで不一致しないようデフォルトtrue
   const [pdcaIssue, setPdcaIssue] = useState<string | null>(null);
+  const { coachName } = useCoach();
 
   useEffect(() => {
     try {
@@ -40,10 +42,10 @@ function DailyCoachBanner({ profile }: { profile: { careerAxis?: string; gakuchi
   const topic = pdcaIssue
     ? `「${pdcaIssue}」について一緒に考えよう`
     : !profile?.gakuchika
-    ? "ガクチカをカレオコーチと一緒に整理しよう"
+    ? `ガクチカを${coachName}コーチと一緒に整理しよう`
     : !profile?.careerAxis
-    ? "就活の軸をカレオコーチと一緒に言語化しよう"
-    : "今日の就活の進捗をカレオコーチに報告しよう";
+    ? `就活の軸を${coachName}コーチと一緒に言語化しよう`
+    : `今日の就活の進捗を${coachName}コーチに報告しよう`;
 
   if (chatted) return null; // 今日すでに話していれば非表示
 
@@ -54,7 +56,7 @@ function DailyCoachBanner({ profile }: { profile: { careerAxis?: string; gakuchi
           <span className="text-white font-bold text-sm">K</span>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-white font-semibold text-sm">今日のカレオコーチ</p>
+          <p className="text-white font-semibold text-sm">今日の{coachName}コーチ</p>
           <p className="text-white/75 text-xs truncate">{topic}</p>
         </div>
         <span className="text-white text-lg shrink-0">→</span>

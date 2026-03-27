@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useCoach } from "@/hooks/useCoach";
 
 const navItems = [
   {
@@ -160,6 +161,7 @@ const bottomItems = [
 export function Sidebar() {
   const pathname = usePathname();
   const [isAuth, setIsAuth] = useState(false);
+  const { coachName } = useCoach();
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(true);
 
@@ -248,7 +250,7 @@ export function Sidebar() {
               {item.icon}
               {!collapsed && (
                 <span className="flex-1 flex items-center justify-between min-w-0">
-                  <span>{item.label}</span>
+                  <span>{item.href === "/chat" ? `${coachName}コーチ` : item.label}</span>
                   {"badge" in item && item.badge && (
                     <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#00c896]/20 text-[#00c896] leading-none shrink-0">
                       {item.badge}

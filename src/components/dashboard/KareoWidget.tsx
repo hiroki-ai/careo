@@ -10,6 +10,7 @@ import { useInterviews } from "@/hooks/useInterviews";
 import { useActionItems } from "@/hooks/useActionItems";
 import { useToast } from "@/components/ui/Toast";
 import { parseCompanySuggestions } from "@/lib/chatUtils";
+import { useCoach } from "@/hooks/useCoach";
 
 // カレオのキャラクターSVG
 export function KareoCharacter({ size = 56 }: { size?: number }) {
@@ -65,6 +66,7 @@ export function KareoWidget() {
   const { interviews } = useInterviews();
   const { pendingItems } = useActionItems();
   const { showToast } = useToast();
+  const { coachName, coachId } = useCoach();
   const [input, setInput] = useState("");
   const [localMessages, setLocalMessages] = useState<StreamingMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
@@ -126,7 +128,7 @@ export function KareoWidget() {
       const res = await fetch("/api/ai/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: historyForApi, context: buildContext() }),
+        body: JSON.stringify({ messages: historyForApi, context: buildContext(), coachId }),
       });
 
       if (!res.body) throw new Error();
@@ -156,7 +158,7 @@ export function KareoWidget() {
       setLocalMessages((prev) => prev.slice(0, -1));
       const msg = err instanceof Error && err.message.includes("多すぎ")
         ? err.message
-        : "カレオとの通信に失敗しました";
+        : `${coachName}との通信に失敗しました`;
       showToast(msg, "error");
     } finally {
       setIsStreaming(false);
@@ -169,7 +171,7 @@ export function KareoWidget() {
       showToast(`「${name}」はすでに登録されています`, "info");
       return;
     }
-    await addCompany({ name, status: "WISHLIST", industry: "", notes: "カレオとのチャットから追加" });
+    await addCompany({ name, status: "WISHLIST", industry: "", notes: `${coachName}とのチャットから追加` });
     showToast(`「${name}」を企業管理に追加しました`, "success");
   };
 
@@ -184,7 +186,7 @@ export function KareoWidget() {
       <div className="bg-gradient-to-r from-[#00c896] to-[#00a87e] px-4 py-3 flex items-center gap-3">
         <KareoCharacter size={40} />
         <div className="flex-1 min-w-0">
-          <p className="text-white font-bold text-sm">カレオ</p>
+          <p className="text-white font-bold text-sm">{coachName}</p>
           <p className="text-indigo-200 text-[10px]">就活AIアシスタント</p>
         </div>
         <Link
@@ -277,7 +279,7 @@ export function KareoWidget() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") sendMessage(input); }}
-            placeholder="カレオに聞いてみよう..."
+            placeholder={`${coachName}に聞いてみよう...`}
             className="flex-1 bg-transparent text-xs outline-none text-gray-700 placeholder-gray-400"
             disabled={isStreaming || historyLoading}
           />
