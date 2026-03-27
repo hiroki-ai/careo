@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { LPChatBot } from "@/components/landing/LPChatBot";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -743,6 +744,17 @@ export default function ComparePage() {
       </section>
 
       {/* ── フッター ─────────────────────────────────────────────────────────── */}
+      <LPChatBot
+        welcomeMessage={"やあ！比較ページ見てくれてるんだね。\nCareoが他のサービスとどう違うか、何でも聞いてみて。"}
+        subtitle="Careoと他サービスの違いを解説"
+        suggestions={[
+          "Careoって他のアプリの代わりになるの？",
+          "BaseMeやSmartESと一緒に使えるの？",
+          "就活ポータルなしでCareoだけで大丈夫？",
+          "無料で使える範囲を教えて",
+        ]}
+      />
+
       <footer className="bg-[#0D0B21] px-6 py-8 border-t border-white/5">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2">

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { LPChatBot } from "@/components/landing/LPChatBot";
 
 // ─── FAQ データ ──────────────────────────────────────────────────────────────
 const faqItems = [
@@ -1161,6 +1162,17 @@ export default function CareerCenterLandingPage() {
           <p>© 2025 Careo. All rights reserved.</p>
         </div>
       </footer>
+
+      <LPChatBot
+        welcomeMessage={"こんにちは。キャリアセンター担当者の方ですね。\n導入のご相談・費用のこと・学生データの扱いなど、何でもお答えします。"}
+        subtitle="キャリアセンター向け相談窓口"
+        suggestions={[
+          "導入費用はどのくらいですか？",
+          "学生のプライバシーは守られますか？",
+          "既存の支援システムと併用できますか？",
+          "まず何から始めればいいですか？",
+        ]}
+      />
     </div>
   );
 }

@@ -7,7 +7,7 @@ interface Message {
   content: string;
 }
 
-const WELCOME_MESSAGE =
+const DEFAULT_WELCOME_MESSAGE =
   "やあ、来てくれたね。カレオコーチだよ。\nCareoのこと、就活のこと、何でも話してみて。";
 
 const THINKING_MESSAGES = [
@@ -17,14 +17,24 @@ const THINKING_MESSAGES = [
   "あなたのこと、ちゃんと考えてるよ…",
 ];
 
-const SUGGESTIONS = [
+const DEFAULT_SUGGESTIONS = [
   "Careoってどんなアプリ？",
   "ChatGPTと何が違うの？",
   "就活のコツを教えて！",
   "Careoの今後の展望は？",
 ];
 
-export function LPChatBot() {
+interface LPChatBotProps {
+  welcomeMessage?: string;
+  suggestions?: string[];
+  subtitle?: string;
+}
+
+export function LPChatBot({
+  welcomeMessage = DEFAULT_WELCOME_MESSAGE,
+  suggestions = DEFAULT_SUGGESTIONS,
+  subtitle = "Careoの就活AIコーチ",
+}: LPChatBotProps = {}) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -37,10 +47,10 @@ export function LPChatBot() {
   // チャットを開いたとき初回ウェルカムメッセージを表示
   useEffect(() => {
     if (open && !hasGreeted) {
-      setMessages([{ role: "assistant", content: WELCOME_MESSAGE }]);
+      setMessages([{ role: "assistant", content: welcomeMessage }]);
       setHasGreeted(true);
     }
-  }, [open, hasGreeted]);
+  }, [open, hasGreeted, welcomeMessage]);
 
   // 新メッセージが来たらスクロール
   useEffect(() => {
@@ -121,7 +131,7 @@ export function LPChatBot() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-white font-bold text-sm leading-none">カレオコーチ</p>
-              <p className="text-white/80 text-[10px] mt-0.5">Careoの就活AIコーチ</p>
+              <p className="text-white/80 text-[10px] mt-0.5">{subtitle}</p>
             </div>
             <button
               onClick={() => setOpen(false)}
@@ -169,7 +179,7 @@ export function LPChatBot() {
             {/* サジェスションボタン */}
             {showSuggestions && (
               <div className="flex flex-col gap-1.5 pt-1">
-                {SUGGESTIONS.map((s) => (
+                {suggestions.map((s) => (
                   <button
                     key={s}
                     onClick={() => sendMessage(s)}

@@ -872,7 +872,15 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
       </div>
 
       {/* LP カレオコーチ チャットボット */}
-      <LPChatBot />
+      <LPChatBot
+        welcomeMessage={"やあ、Careo見つけてくれてありがとう！\n就活のこと、気軽に何でも聞いてみてね。"}
+        suggestions={[
+          "Careoって無料で使えるの？",
+          "どんなことができるの？",
+          "今すぐ始められる？",
+          "ChatGPTと何が違うの？",
+        ]}
+      />
     </div>
   );
 }
