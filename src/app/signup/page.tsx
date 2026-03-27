@@ -93,7 +93,7 @@ export default function SignupPage() {
               required
             />
             <p className="mt-1.5 text-xs text-[#00c896] font-medium">
-              大学のメールアドレス（〜.ac.jp）での登録を推奨します
+              キャリアセンターと連携するには、大学のメールアドレス（〜.ac.jp）での登録が必要です
             </p>
           </div>
           <div>
