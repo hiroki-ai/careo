@@ -291,8 +291,8 @@ function AppMockup() {
           </div>
           {/* Coach banner */}
           <div className="bg-gradient-to-r from-[#00c896] to-[#00a87e] rounded-xl px-3 py-2.5 flex items-center gap-2 mb-3 lp-coach-shadow">
-            <div className="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center shrink-0">
-              <span className="text-white font-bold text-[9px]">K</span>
+            <div className="w-7 h-7 rounded-full overflow-hidden shrink-0 bg-white/20">
+              <img src="/kareo-coach-avatar.svg" alt="カレオコーチ" className="w-full h-full object-cover" />
             </div>
             <div className="min-w-0">
               <p className="text-white font-semibold text-[9px]">今日のカレオコーチ</p>

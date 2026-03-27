@@ -31,10 +31,19 @@ interface LocalMessage {
   calendarEvents?: CalendarEvent[];
 }
 
-const CoachAvatar = ({ coachId }: { coachId: string }) => {
+const CoachAvatar = ({ coachId, size = 8 }: { coachId: string; size?: number }) => {
   const coach = getCoachPersonality(coachId);
+  const sizeClass = `w-${size} h-${size}`;
+  if (coach.avatarSvg) {
+    return (
+      <div
+        className={`${sizeClass} rounded-full shrink-0 shadow-sm overflow-hidden`}
+        dangerouslySetInnerHTML={{ __html: coach.avatarSvg }}
+      />
+    );
+  }
   return (
-    <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${coach.avatarGradient} flex items-center justify-center shrink-0 shadow-sm`}>
+    <div className={`${sizeClass} rounded-full bg-gradient-to-br ${coach.avatarGradient} flex items-center justify-center shrink-0 shadow-sm`}>
       <span className="text-white text-sm font-bold">{coach.avatarLabel}</span>
     </div>
   );
@@ -820,9 +829,16 @@ export default function ChatPage() {
                         : "border-gray-100 bg-gray-50 hover:border-gray-200 hover:bg-white"
                     }`}
                   >
-                    <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${coach.avatarGradient} flex items-center justify-center shrink-0 shadow-sm`}>
-                      <span className="text-white text-sm font-bold">{coach.avatarLabel}</span>
-                    </div>
+                    {coach.avatarSvg ? (
+                      <div
+                        className="w-10 h-10 rounded-full shrink-0 shadow-sm overflow-hidden"
+                        dangerouslySetInnerHTML={{ __html: coach.avatarSvg }}
+                      />
+                    ) : (
+                      <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${coach.avatarGradient} flex items-center justify-center shrink-0 shadow-sm`}>
+                        <span className="text-white text-sm font-bold">{coach.avatarLabel}</span>
+                      </div>
+                    )}
                     <div className="min-w-0 flex-1">
                       <p className={`font-semibold text-sm ${isSelected ? "text-blue-700" : "text-gray-900"}`}>{coach.name}</p>
                       <p className="text-xs text-gray-500 truncate">{coach.tagline}</p>

@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2dd4bf"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="face" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff7f0"/>
+      <stop offset="100%" stop-color="#ffe8d6"/>
+    </linearGradient>
+    <linearGradient id="hair" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#2d2d42"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#00000020"/>
+    </filter>
+  </defs>
+
+  <!-- 背景円 -->
+  <circle cx="40" cy="40" r="40" fill="url(#bg)"/>
+
+  <!-- 首 -->
+  <rect x="33" y="52" width="14" height="10" rx="4" fill="#ffe8d6"/>
+
+  <!-- 体（コーチジャケット） -->
+  <path d="M14 78 Q14 62 40 60 Q66 62 66 78" fill="#1e5c4a"/>
+  <!-- 衿 -->
+  <path d="M37 60 L40 66 L43 60" fill="#2dd4bf"/>
+  <!-- ジャケットライン -->
+  <path d="M14 78 Q20 68 35 64" stroke="#2dd4bf" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <path d="M66 78 Q60 68 45 64" stroke="#2dd4bf" stroke-width="1.5" fill="none" opacity="0.5"/>
+
+  <!-- 顔 -->
+  <ellipse cx="40" cy="36" rx="16" ry="17" fill="url(#face)" filter="url(#shadow)"/>
+
+  <!-- 髪 -->
+  <ellipse cx="40" cy="22" rx="16" ry="8" fill="url(#hair)"/>
+  <rect x="24" y="22" width="5" height="10" rx="2" fill="url(#hair)"/>
+  <rect x="51" y="22" width="5" height="10" rx="2" fill="url(#hair)"/>
+  <!-- 前髪 -->
+  <path d="M27 24 Q30 19 35 22 Q38 17 40 22 Q43 17 45 22 Q50 19 53 24" fill="url(#hair)"/>
+
+  <!-- 眉毛（落ち着いた印象） -->
+  <path d="M31 31 Q34 29.5 37 31" stroke="#2d2d42" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  <path d="M43 31 Q46 29.5 49 31" stroke="#2d2d42" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+
+  <!-- 目 -->
+  <ellipse cx="34" cy="35" rx="3" ry="3.2" fill="#1a1a2e"/>
+  <ellipse cx="46" cy="35" rx="3" ry="3.2" fill="#1a1a2e"/>
+  <!-- 目のハイライト -->
+  <circle cx="35.2" cy="33.8" r="1" fill="white"/>
+  <circle cx="47.2" cy="33.8" r="1" fill="white"/>
+
+  <!-- 優しい笑み -->
+  <path d="M34 41 Q40 45.5 46 41" stroke="#c0704a" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+  <!-- えくぼ -->
+  <circle cx="30.5" cy="41.5" r="1" fill="#d4a090" opacity="0.6"/>
+  <circle cx="49.5" cy="41.5" r="1" fill="#d4a090" opacity="0.6"/>
+
+  <!-- 耳 -->
+  <ellipse cx="24.5" cy="36" rx="3" ry="4" fill="#ffe0cc"/>
+  <ellipse cx="55.5" cy="36" rx="3" ry="4" fill="#ffe0cc"/>
+</svg>

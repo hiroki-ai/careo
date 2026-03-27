@@ -5,7 +5,7 @@ import Link from "next/link";
 import type { RecentPost } from "@/app/page";
 import { LPChatBot } from "@/components/landing/LPChatBot";
 
-// ─── Reveal wrapper (avoids calling hooks inside .map) ─────────────────────────
+// ─── Reveal wrapper ──────────────────────────────────────────────────────────
 function Reveal({
   children,
   className,
@@ -30,20 +30,140 @@ function Reveal({
     return () => obs.disconnect();
   }, []);
   const translate =
-    from === "left" ? "translateX(-20px)" :
-    from === "right" ? "translateX(20px)" :
-    "translateY(20px)";
+    from === "left" ? "translateX(-24px)" :
+    from === "right" ? "translateX(24px)" :
+    "translateY(24px)";
   return (
     <div
       ref={ref}
       className={className}
       style={{
         opacity: visible ? 1 : 0,
-        transform: visible ? "translate(0,0)" : translate,
-        transition: `opacity 0.55s ease ${delay}ms, transform 0.55s ease ${delay}ms`,
+        transform: visible ? "none" : translate,
+        transition: `opacity 0.6s ease ${delay}ms, transform 0.6s ease ${delay}ms`,
       }}
     >
       {children}
+    </div>
+  );
+}
+
+// ─── FAQ with smooth animation ───────────────────────────────────────────────
+function FaqItem({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={() => setOpen(!open)}
+      className="w-full text-left bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden active:scale-[0.99] transition-transform"
+    >
+      <div className="flex items-center justify-between px-5 py-4 gap-3">
+        <p className="font-semibold text-gray-900 text-sm leading-snug">{q}</p>
+        <span
+          className="text-[#00c896] text-xl shrink-0 transition-transform duration-300"
+          style={{ transform: open ? "rotate(45deg)" : "rotate(0deg)" }}
+        >
+          +
+        </span>
+      </div>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateRows: open ? "1fr" : "0fr",
+          transition: "grid-template-rows 0.32s cubic-bezier(0.4, 0, 0.2, 1)",
+        }}
+      >
+        <div className="overflow-hidden">
+          <div className="px-5 pb-4">
+            <p className="text-sm text-gray-500 leading-relaxed">{a}</p>
+          </div>
+        </div>
+      </div>
+    </button>
+  );
+}
+
+// ─── Phone mockup ────────────────────────────────────────────────────────────
+function PhoneMockup() {
+  return (
+    <div className="relative mx-auto w-[195px]">
+      {/* Phone frame */}
+      <div
+        className="relative rounded-[32px] p-[2px] shadow-2xl shadow-black/50"
+        style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0.04))" }}
+      >
+        <div className="bg-[#0a0820] rounded-[30px] overflow-hidden border border-white/8">
+          {/* Dynamic island */}
+          <div className="flex justify-center pt-3 pb-1">
+            <div className="w-20 h-5 bg-black rounded-full" />
+          </div>
+          {/* App screen */}
+          <div className="px-3 pb-5">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <p className="text-[7px] text-white/40">おはよう 👋</p>
+                <p className="text-[10px] font-bold text-white leading-tight">ダッシュボード</p>
+              </div>
+              <div className="w-6 h-6 rounded-full bg-[#00c896] flex items-center justify-center">
+                <span className="text-white text-[8px] font-black">K</span>
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-2 gap-1.5 mb-3">
+              {[
+                { label: "選考中", value: "8", color: "text-teal-400", bg: "bg-teal-400/10 border border-teal-400/20" },
+                { label: "ES待ち", value: "3", color: "text-amber-400", bg: "bg-amber-400/10 border border-amber-400/20" },
+                { label: "内定", value: "2", color: "text-[#00c896]", bg: "bg-[#00c896]/10 border border-[#00c896]/20" },
+                { label: "気になる", value: "12", color: "text-gray-400", bg: "bg-white/5 border border-white/10" },
+              ].map((item) => (
+                <div key={item.label} className={`${item.bg} rounded-xl p-2 text-center`}>
+                  <p className="text-[6px] text-white/40">{item.label}</p>
+                  <p className={`text-sm font-black ${item.color}`}>{item.value}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Coach */}
+            <div className="bg-gradient-to-r from-[#00c896]/25 to-emerald-400/10 border border-[#00c896]/20 rounded-xl px-2.5 py-2 mb-2.5 flex items-center gap-2">
+              <div className="w-5 h-5 rounded-full bg-[#00c896] flex items-center justify-center shrink-0">
+                <span className="text-white text-[7px] font-black">K</span>
+              </div>
+              <p className="text-[7px] text-white/80 leading-snug">A社・B社のESに共通する強みを発見しました</p>
+            </div>
+
+            {/* Next action */}
+            <div className="border-l-2 border-red-400 bg-red-400/10 rounded-r-xl px-2 py-1.5">
+              <p className="text-[7px] font-black text-red-400 mb-0.5">🔥 緊急</p>
+              <p className="text-[7px] text-white/70 leading-snug">トヨタ自動車 ES提出まで2日</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Floating insight */}
+      <div className="absolute -right-12 top-10 bg-white rounded-2xl px-2.5 py-2 shadow-xl w-28 animate-float">
+        <div className="flex items-start gap-1.5">
+          <span className="text-sm shrink-0">🔮</span>
+          <div>
+            <p className="text-[8px] font-bold text-gray-900 leading-tight">カレオの気づき</p>
+            <p className="text-[7px] text-gray-500 mt-0.5 leading-snug">A社・B社で共通の弱みを発見</p>
+          </div>
+        </div>
+      </div>
+
+      {/* AI badge */}
+      <div
+        className="absolute -left-12 bottom-14 rounded-xl px-2.5 py-1.5 animate-float-slow bg-gradient-to-br from-[#00c896] to-[#0ea5e9]"
+      >
+        <div className="flex items-center gap-1.5">
+          <span className="text-white text-[9px] font-black">✓</span>
+          <div>
+            <p className="text-white text-[8px] font-bold leading-tight">AI分析完了</p>
+            <p className="text-white/80 text-[7px]">週次PDCA更新</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -61,21 +181,73 @@ const steps = [
   {
     icon: "🏢",
     num: "01",
+    tag: "最初の1回だけ",
     title: "企業を登録する",
     desc: "受けたい企業をCareoに追加。5分でセットアップ完了。リクナビ・マイナビで見つけた企業を順次追加していくだけ。",
   },
   {
     icon: "📝",
     num: "02",
+    tag: "就活のたびに",
     title: "ES・面接・OB訪問を記録",
     desc: "書いたES、受けた面接、会ったOBのメモをCareoに。コピペするだけでOK。Notionからの移行もAIが自動でやってくれる。",
   },
   {
     icon: "🤖",
     num: "03",
+    tag: "自動で毎週",
     title: "あとはAIが全部整理する",
     desc: "AIコーチが全データを把握して「今週何をすべきか」を毎週自動提案。4種類のコーチキャラから好みのスタイルで伴走してもらえる。",
   },
+];
+
+const differenceItems = [
+  {
+    icon: "🔮",
+    tag: "今すぐ使える",
+    title: "点と点を繋ぐ気づき通知",
+    desc: "「A社のESで強調した○○と、B社面接での詰められポイントが一致」— ES・面接・OB訪問を横断してカレオが自動通知",
+  },
+  {
+    icon: "📋",
+    tag: "今すぐ使える",
+    title: "ES提出前AIチェック",
+    desc: "自己分析との整合性・AIっぽい文体・過去ESとの重複を提出前に一括確認。内容の矛盾を事前にゼロにする",
+  },
+  {
+    icon: "📈",
+    tag: "近日公開",
+    title: "進捗ベンチマーク",
+    desc: "「同期のCareoユーザー平均応募数は12社。あなたは3社」— 匿名統計でリアルな立ち位置を可視化",
+  },
+  {
+    icon: "🎓",
+    tag: "近日公開",
+    title: "キャリアセンター連携",
+    desc: "就活の全データをPDF1枚にまとめ、大学のキャリアセンターに持参。支援を最大限引き出せる",
+  },
+  {
+    icon: "👥",
+    tag: "近日公開",
+    title: "友達と就活グループ",
+    desc: "就活仲間とグループを作り、お互いの進捗を匿名共有。切磋琢磨しながら就活を乗り越えよう",
+  },
+];
+
+const beforeItems = [
+  "Notion/スプレッドシートがごちゃごちゃ",
+  "ES締切をカレンダーで管理→それでも忘れる",
+  "ChatGPTに毎回ゼロから説明し直し",
+  "面接のフィードバックがどこにあるかわからない",
+  "就活全体が見えなくて漠然と不安",
+];
+
+const afterItems = [
+  "企業・ES・面接・OB訪問が全部一か所",
+  "締切3日前に自動通知。見落としゼロ",
+  "カレオコーチが全データを把握して個人化提案",
+  "面接の振り返りがすぐ呼び出せる",
+  "今週やることが毎週自動で届く",
 ];
 
 const features = [
@@ -109,13 +281,6 @@ const features = [
   },
 ];
 
-const chatMessages = [
-  { from: "ai" as const, text: "A社・B社のESに共通する「チームワーク」の強みを発見しました。C社のESにも活かせそうです。" },
-  { from: "ai" as const, text: "今週の優先タスク：トヨタ自動車のES締切まであと2日です。早めに提出確認を。" },
-  { from: "user" as const, text: "C社の面接、どんな準備をすればいい？" },
-  { from: "ai" as const, text: "OB訪問メモによると、C社はチームワークを重視する文化のようです。「協調しながら主体的に動く」エピソードを軸に準備しましょう。" },
-];
-
 const comparisonRows = [
   { label: "締切自動通知", notion: "❌", careo: "✅" },
   { label: "AIコーチング", notion: "❌", careo: "✅" },
@@ -131,16 +296,20 @@ const faqs = [
     a: "はい、全機能を完全無料でご利用いただけます。クレジットカード不要。メールアドレスだけで今すぐ始められます。学生向けの機能は今後も無料を基本方針とします。将来的に大学キャリアセンターや企業向けのサービスを追加する可能性があります。",
   },
   {
+    q: "スマホでも使えますか？",
+    a: "はい、iPhoneでもAndroidでもブラウザから利用できます。ホーム画面に追加するとアプリのように使えます（PWA対応）。",
+  },
+  {
     q: "NotionのデータをCareoに移せますか？",
     a: "できます。CSVやPDFをアップロードするとAIが自動抽出して一括インポート。手入力ゼロで移行できます。",
   },
   {
-    q: "BaseMeやSmartESとの違いは？",
-    a: "BaseMe・SmartESは特定機能（スカウト・ES生成）に特化しています。Careoは就活全体のデータを把握したAIコーチが、横断した気づきを届けます。組み合わせて使うのがベスト。",
-  },
-  {
     q: "ChatGPTと何が違うんですか？",
     a: "ChatGPTはあなたの就活データを知りません。Careoは今まで書いた全てのES、面接記録、OB訪問の内容、企業のステータスを把握した上でアドバイスします。「あなたがA社に書いたガクチカと、今書いているB社のESで矛盾がある」ような指摘はCareoにしかできません。",
+  },
+  {
+    q: "BaseMeやSmartESとの違いは？",
+    a: "BaseMe・SmartESは特定機能（スカウト・ES生成）に特化しています。Careoは就活全体のデータを把握したAIコーチが、横断した気づきを届けます。組み合わせて使うのがベスト。",
   },
   {
     q: "マイナビやリクナビを使っていても使えますか？",
@@ -148,34 +317,6 @@ const faqs = [
   },
 ];
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
-function FaqItem({ q, a }: { q: string; a: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <button
-      type="button"
-      onClick={() => setOpen(!open)}
-      className="w-full text-left bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden active:scale-[0.99] transition-transform"
-    >
-      <div className="flex items-center justify-between px-5 py-4 gap-3">
-        <p className="font-semibold text-gray-900 text-sm leading-snug">{q}</p>
-        <span
-          className="text-[#00c896] text-xl shrink-0 transition-transform duration-200"
-          style={{ transform: open ? "rotate(45deg)" : "rotate(0deg)" }}
-        >
-          +
-        </span>
-      </div>
-      {open && (
-        <div className="px-5 pb-4">
-          <p className="text-sm text-gray-500 leading-relaxed">{a}</p>
-        </div>
-      )}
-    </button>
-  );
-}
-
-// ─── Main ─────────────────────────────────────────────────────────────────────
 const TAG_COLORS: Record<string, string> = {
   "ES対策": "bg-blue-50 text-blue-600",
   "面接対策": "bg-purple-50 text-purple-600",
@@ -188,10 +329,17 @@ const TAG_COLORS: Record<string, string> = {
   "業界研究": "bg-rose-50 text-rose-600",
 };
 
+// ─── Main ─────────────────────────────────────────────────────────────────────
 export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPost[] }) {
   const [scrollY, setScrollY] = useState(0);
+  const [showCTA, setShowCTA] = useState(false);
+
   useEffect(() => {
-    const h = () => setScrollY(window.scrollY);
+    const h = () => {
+      const sy = window.scrollY;
+      setScrollY(sy);
+      setShowCTA(sy > window.innerHeight * 0.85);
+    };
     window.addEventListener("scroll", h, { passive: true });
     return () => window.removeEventListener("scroll", h);
   }, []);
@@ -228,7 +376,7 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
       </header>
 
       {/* ── Hero ───────────────────────────────────────────────────────────── */}
-      <section className="relative min-h-screen flex flex-col justify-center px-6 pt-28 pb-20 bg-[#0D0B21] overflow-hidden">
+      <section className="relative min-h-screen flex flex-col justify-center px-6 pt-24 pb-20 bg-[#0D0B21] overflow-hidden">
         {/* ambient glows */}
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-[#00c896]/20 blur-[100px] pointer-events-none" />
         <div className="absolute bottom-20 right-0 w-56 h-56 rounded-full bg-indigo-500/10 blur-[70px] pointer-events-none" />
@@ -259,20 +407,15 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
         >
           無料で始める →
         </Link>
-        <p className="text-gray-600 text-xs mb-14">クレジットカード不要・30秒で登録</p>
+        <div className="flex items-center gap-3 text-[11px] text-gray-600 mb-16">
+          <span>📵 広告メール・スカウト電話なし</span>
+          <span>·</span>
+          <span>💳 クレカ不要</span>
+        </div>
 
-        {/* stat cards */}
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { value: "7", unit: "機能" },
-            { value: "完全", unit: "無料" },
-            { value: "AI", unit: "コーチング" },
-          ].map(({ value, unit }) => (
-            <div key={unit} className="bg-white/5 border border-white/10 rounded-2xl p-3 text-center backdrop-blur-sm">
-              <p className="text-[#00c896] text-xl font-black leading-none mb-1">{value}</p>
-              <p className="text-gray-400 text-[9px] font-medium">{unit}</p>
-            </div>
-          ))}
+        {/* Phone mockup */}
+        <div className="px-8">
+          <PhoneMockup />
         </div>
 
         {/* scroll hint */}
@@ -305,7 +448,6 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
           ))}
         </div>
 
-        {/* Bridge card */}
         <Reveal>
           <div className="bg-[#0D0B21] rounded-2xl p-5 relative overflow-hidden">
             <div className="absolute -top-4 -right-4 w-24 h-24 rounded-full bg-[#00c896]/20 blur-xl pointer-events-none" />
@@ -315,8 +457,56 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
         </Reveal>
       </section>
 
+      {/* ── ChatGPT 差別化 ──────────────────────────────────────────────────── */}
+      <section className="px-6 py-14 bg-white">
+        <Reveal>
+          <div className="rounded-2xl border border-[#00c896]/20 bg-gradient-to-br from-[#00c896]/5 to-emerald-50/50 p-6">
+            <p className="text-[#00c896] text-[10px] font-black tracking-widest uppercase mb-3">Why Not ChatGPT?</p>
+            <h2 className="text-2xl font-black text-[#0D0B21] leading-tight mb-6">
+              ChatGPTとは違う、<br /><span className="text-[#00c896]">「記憶するAIコーチ」</span>
+            </h2>
+            <div className="space-y-3">
+              <div className="bg-white/80 border border-gray-200 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-sm font-bold text-gray-400">ChatGPT</span>
+                  <span className="text-[9px] bg-gray-100 text-gray-500 font-bold px-2 py-0.5 rounded-full">汎用AI</span>
+                </div>
+                <ul className="space-y-2">
+                  {[
+                    "あなたの就活データを知らない",
+                    "毎回ゼロから説明し直しが必要",
+                    "就活全体の矛盾に気づけない",
+                  ].map((t) => (
+                    <li key={t} className="flex gap-2 text-xs text-gray-500">
+                      <span className="text-gray-300 shrink-0 font-bold">✕</span>{t}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="bg-gradient-to-br from-[#00c896]/8 to-emerald-50 border border-[#00c896]/25 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-sm font-bold text-[#0D0B21]">Careo カレオ</span>
+                  <span className="text-[9px] bg-[#00c896]/15 text-[#00a87e] font-bold px-2 py-0.5 rounded-full">就活専用AI</span>
+                </div>
+                <ul className="space-y-2">
+                  {[
+                    "全就活データを把握して個人化提案",
+                    "ES・面接・OB訪問を横断して記憶",
+                    "「あなたのA社のES」を参照できる",
+                  ].map((t) => (
+                    <li key={t} className="flex gap-2 text-xs text-[#0D0B21]">
+                      <span className="text-[#00c896] shrink-0 font-bold">✓</span>{t}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </Reveal>
+      </section>
+
       {/* ── How it works ───────────────────────────────────────────────────── */}
-      <section className="px-6 py-16 bg-white">
+      <section className="px-6 py-16 bg-gray-50">
         <Reveal className="mb-10">
           <p className="text-[#00c896] text-[10px] font-black tracking-widest uppercase mb-2">How it works</p>
           <h2 className="text-3xl font-black text-gray-900 leading-tight">
@@ -340,7 +530,10 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
                 </div>
                 {/* right: content */}
                 <div className="pb-8 pt-0.5 flex-1 min-w-0">
-                  <span className="text-[10px] font-black text-[#00c896] tracking-widest">{step.num}</span>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[10px] font-black text-[#00c896] tracking-widest">{step.num}</span>
+                    <span className="text-[9px] bg-[#00c896]/10 text-[#00a87e] font-bold px-2 py-0.5 rounded-full">{step.tag}</span>
+                  </div>
                   <h3 className="font-black text-gray-900 text-lg mt-0.5 mb-1.5 leading-snug">{step.title}</h3>
                   <p className="text-gray-500 text-sm leading-relaxed">{step.desc}</p>
                 </div>
@@ -350,70 +543,47 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
         </div>
       </section>
 
-      {/* ── AI coach mockup ────────────────────────────────────────────────── */}
+      {/* ── The Careo Difference ───────────────────────────────────────────── */}
       <section className="px-6 py-16 bg-[#0D0B21] relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-12 left-1/2 -translate-x-1/2 w-72 h-72 rounded-full bg-[#00c896]/10 blur-[90px]" />
+          <div className="absolute top-0 right-0 w-72 h-72 rounded-full bg-[#00c896]/6 blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full bg-indigo-600/5 blur-3xl" />
         </div>
         <div className="relative">
           <Reveal>
-            <p className="text-[#00c896] text-[10px] font-black tracking-widest uppercase mb-2">AI Coach</p>
-            <h2 className="text-3xl font-black text-white leading-tight mb-2">
-              AIが全部<br />把握してる。
+            <p className="text-[#00c896] text-[10px] font-black tracking-widest uppercase mb-2">The Careo Difference</p>
+            <h2 className="text-3xl font-black text-white leading-tight mb-3">
+              就活AIは「点」を解決する。<br />
+              <span className="text-[#00c896]">Careoは「全体」をコーチする。</span>
             </h2>
             <p className="text-gray-400 text-sm mb-8 leading-relaxed">
-              就活の状況を全部知ったAIが、<br />あなた専用のアドバイスをくれる。
+              SmartESはES生成のみ。REALMEは面接練習のみ。BaseMeはスカウトのみ。<br />
+              全データを知った上でアドバイスするAIは、Careoだけ。
             </p>
           </Reveal>
 
-          {/* Chat UI */}
-          <Reveal delay={100}>
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-5 space-y-3">
-              {/* top bar */}
-              <div className="flex items-center gap-2.5 pb-3 border-b border-white/10">
-                <div className="w-7 h-7 rounded-full bg-[#00c896] flex items-center justify-center">
-                  <span className="text-white text-[9px] font-black">AI</span>
-                </div>
-                <div>
-                  <p className="text-white text-xs font-bold">カレオコーチ</p>
-                  <p className="text-green-400 text-[9px]">● オンライン</p>
-                </div>
-              </div>
-
-              {chatMessages.map((msg, i) => (
-                <div key={i} className={`flex ${msg.from === "user" ? "justify-end" : "justify-start"} items-end gap-2`}>
-                  {msg.from === "ai" && (
-                    <div className="w-5 h-5 rounded-full bg-[#00c896] flex items-center justify-center shrink-0 mb-0.5">
-                      <span className="text-white text-[7px] font-black">AI</span>
-                    </div>
-                  )}
-                  <div
-                    className="text-xs leading-relaxed rounded-2xl px-3.5 py-2.5"
-                    style={{
-                      maxWidth: "82%",
-                      background: msg.from === "ai" ? "rgba(255,255,255,0.08)" : "#00c896",
-                      color: msg.from === "ai" ? "rgba(255,255,255,0.85)" : "#ffffff",
-                      borderRadius: msg.from === "ai" ? "4px 16px 16px 16px" : "16px 4px 16px 16px",
-                    }}
-                  >
-                    {msg.text}
+          <div className="space-y-3">
+            {differenceItems.map((item, i) => (
+              <Reveal key={item.title} delay={i * 70}>
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex gap-3">
+                  <span className="text-2xl shrink-0 mt-0.5">{item.icon}</span>
+                  <div className="min-w-0">
+                    <span
+                      className={`inline-block text-[9px] font-bold px-2 py-0.5 rounded-full mb-1.5 ${
+                        item.tag === "近日公開"
+                          ? "bg-indigo-500/20 text-indigo-300"
+                          : "bg-[#00c896]/20 text-[#00c896]"
+                      }`}
+                    >
+                      {item.tag}
+                    </span>
+                    <h3 className="font-black text-white text-sm mb-1 leading-snug">{item.title}</h3>
+                    <p className="text-gray-400 text-xs leading-relaxed">{item.desc}</p>
                   </div>
                 </div>
-              ))}
-
-              {/* typing indicator */}
-              <div className="flex items-end gap-2">
-                <div className="w-5 h-5 rounded-full bg-[#00c896] flex items-center justify-center shrink-0">
-                  <span className="text-white text-[7px] font-black">AI</span>
-                </div>
-                <div className="bg-white/8 rounded-2xl rounded-tl-sm px-3.5 py-2.5 flex gap-1 items-center" style={{ background: "rgba(255,255,255,0.08)" }}>
-                  <span className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "0ms" }} />
-                  <span className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "150ms" }} />
-                  <span className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "300ms" }} />
-                </div>
-              </div>
-            </div>
-          </Reveal>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -439,8 +609,52 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
         </div>
       </section>
 
+      {/* ── Before / After ─────────────────────────────────────────────────── */}
+      <section className="px-6 py-14 bg-gray-50">
+        <Reveal className="mb-8">
+          <p className="text-[#00c896] text-[10px] font-black tracking-widest uppercase mb-2">Before / After</p>
+          <h2 className="text-3xl font-black text-gray-900 leading-tight">
+            Careoを使うと、<br /><span className="text-[#00c896]">何が変わる？</span>
+          </h2>
+        </Reveal>
+
+        <div className="space-y-3">
+          <Reveal from="left">
+            <div className="bg-white border border-gray-200 rounded-2xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-xl">😮‍💨</span>
+                <p className="font-black text-gray-600 text-sm">今まで</p>
+              </div>
+              <ul className="space-y-2.5">
+                {beforeItems.map((t) => (
+                  <li key={t} className="flex gap-2.5 text-xs text-gray-500">
+                    <span className="text-gray-300 shrink-0 font-bold mt-0.5">−</span>{t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Reveal>
+
+          <Reveal from="right" delay={100}>
+            <div className="bg-gradient-to-br from-[#00c896]/6 to-emerald-50 border border-[#00c896]/20 rounded-2xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-xl">🚀</span>
+                <p className="font-black text-[#0D0B21] text-sm">Careoを使ったら</p>
+              </div>
+              <ul className="space-y-2.5">
+                {afterItems.map((t) => (
+                  <li key={t} className="flex gap-2.5 text-xs text-[#0D0B21]">
+                    <span className="text-[#00c896] shrink-0 font-bold mt-0.5">✓</span>{t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       {/* ── Comparison ─────────────────────────────────────────────────────── */}
-      <section className="px-6 py-16 bg-gray-50">
+      <section className="px-6 py-16 bg-white">
         <Reveal className="mb-8">
           <p className="text-[#00c896] text-[10px] font-black tracking-widest uppercase mb-2">Compare</p>
           <h2 className="text-3xl font-black text-gray-900 leading-tight mb-2">
@@ -453,7 +667,6 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
 
         <Reveal>
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            {/* header */}
             <div className="grid grid-cols-3 bg-gray-50 border-b border-gray-100">
               <div className="p-3" />
               <div className="p-3 text-center border-r border-gray-100">
@@ -487,7 +700,7 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
       </section>
 
       {/* ── Social proof / mini CTA ────────────────────────────────────────── */}
-      <section className="px-6 py-12 bg-white">
+      <section className="px-6 py-12 bg-gray-50">
         <Reveal>
           <div className="bg-gradient-to-br from-[#00c896]/8 to-emerald-50 border border-[#00c896]/15 rounded-3xl p-6 text-center">
             <p className="text-4xl font-black text-[#00c896] mb-1">無料</p>
@@ -505,8 +718,32 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
         </Reveal>
       </section>
 
+      {/* ── Career Center ──────────────────────────────────────────────────── */}
+      <section className="px-6 py-10 bg-white">
+        <Reveal>
+          <div className="rounded-2xl border border-[#00c896]/20 bg-gradient-to-br from-[#00c896]/5 to-emerald-50/40 p-5">
+            <div className="flex items-start gap-3 mb-4">
+              <span className="text-2xl shrink-0">🏫</span>
+              <div>
+                <span className="inline-block text-[9px] bg-indigo-500/15 text-indigo-500 font-bold px-2 py-0.5 rounded-full mb-1">大学・キャリアセンター向け</span>
+                <h3 className="font-black text-[#0D0B21] text-base leading-snug">Careoは大学との連携を準備中</h3>
+              </div>
+            </div>
+            <p className="text-gray-500 text-xs leading-relaxed mb-4">
+              学生のCareoデータをPDF1枚にまとめ、キャリアセンターとの面談を効率化。現在、複数の大学と提携に向けた準備を進めています。
+            </p>
+            <Link
+              href="/for-career-center"
+              className="inline-flex items-center gap-1.5 text-sm font-bold text-[#00a87e] active:opacity-70 transition-opacity"
+            >
+              キャリアセンターご担当者様はこちら →
+            </Link>
+          </div>
+        </Reveal>
+      </section>
+
       {/* ── FAQ ────────────────────────────────────────────────────────────── */}
-      <section className="px-6 py-16 bg-gray-50">
+      <section className="px-6 py-16 bg-white">
         <Reveal className="mb-8">
           <p className="text-[#00c896] text-[10px] font-black tracking-widest uppercase mb-2">FAQ</p>
           <h2 className="text-3xl font-black text-gray-900 leading-tight">よくある質問</h2>
@@ -520,7 +757,7 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
 
       {/* ── Blog Preview ───────────────────────────────────────────────────── */}
       {recentPosts.length > 0 && (
-        <section className="px-5 py-14 bg-white">
+        <section className="px-5 py-14 bg-gray-50">
           <Reveal className="mb-6">
             <div className="flex items-center justify-between">
               <div>
@@ -542,7 +779,6 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
                   href={`/blog/${post.slug}`}
                   className="block bg-white rounded-2xl border border-gray-100 overflow-hidden active:scale-[0.99] transition-transform"
                 >
-                  {/* サムネイル */}
                   <div className="w-full aspect-[1200/630] overflow-hidden bg-[#0D0B21]">
                     <img
                       src={`/blog/${post.slug}/opengraph-image`}
@@ -617,6 +853,23 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
         </div>
         <p className="text-gray-700 text-[10px]">© 2026 Careo. All rights reserved.</p>
       </footer>
+
+      {/* ── Floating CTA (appears after scrolling past hero) ───────────────── */}
+      <div
+        className="fixed bottom-[76px] left-4 right-4 z-40 transition-all duration-300"
+        style={{
+          opacity: showCTA ? 1 : 0,
+          transform: showCTA ? "translateY(0)" : "translateY(12px)",
+          pointerEvents: showCTA ? "auto" : "none",
+        }}
+      >
+        <Link
+          href="/signup"
+          className="flex items-center justify-center gap-2 bg-[#00c896] text-white font-bold py-4 rounded-2xl shadow-2xl shadow-[#00c896]/50 text-sm active:scale-[0.98] transition-transform"
+        >
+          無料で始める →
+        </Link>
+      </div>
 
       {/* LP カレオコーチ チャットボット */}
       <LPChatBot />
