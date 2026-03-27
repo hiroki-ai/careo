@@ -8,7 +8,14 @@ interface Message {
 }
 
 const WELCOME_MESSAGE =
-  "やあ！カレオだよ👋\nCareoのこと、就活のこと、なんでも聞いてね！";
+  "やあ、来てくれたね。カレオコーチだよ。\nCareoのこと、就活のこと、何でも話してみて。";
+
+const THINKING_MESSAGES = [
+  "ちょっと待ってね…",
+  "うーん、整理してるよ…",
+  "なんて言えばいいか考えてる…",
+  "あなたのこと、ちゃんと考えてるよ…",
+];
 
 const SUGGESTIONS = [
   "Careoってどんなアプリ？",
@@ -22,6 +29,7 @@ export function LPChatBot() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const thinkingMsgRef = useRef<string>("");
   const [hasGreeted, setHasGreeted] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -53,6 +61,7 @@ export function LPChatBot() {
     const nextMessages = [...messages, userMsg];
     setMessages(nextMessages);
     setInput("");
+    thinkingMsgRef.current = THINKING_MESSAGES[Math.floor(Math.random() * THINKING_MESSAGES.length)];
     setLoading(true);
 
     try {
@@ -144,10 +153,13 @@ export function LPChatBot() {
                   style={m.role === "user" ? { background: "linear-gradient(135deg, #00c896 0%, #00a87e 100%)" } : {}}
                 >
                   {m.content || (
-                    <span className="flex gap-1 items-center py-0.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-gray-300 animate-bounce" style={{ animationDelay: "0ms" }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-gray-300 animate-bounce" style={{ animationDelay: "150ms" }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-gray-300 animate-bounce" style={{ animationDelay: "300ms" }} />
+                    <span className="flex items-center gap-1.5 text-gray-400 text-xs italic py-0.5">
+                      {thinkingMsgRef.current}
+                      <span className="flex gap-0.5">
+                        <span className="w-1 h-1 rounded-full bg-gray-300 animate-bounce [animation-delay:0ms]" />
+                        <span className="w-1 h-1 rounded-full bg-gray-300 animate-bounce [animation-delay:150ms]" />
+                        <span className="w-1 h-1 rounded-full bg-gray-300 animate-bounce [animation-delay:300ms]" />
+                      </span>
                     </span>
                   )}
                 </div>

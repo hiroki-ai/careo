@@ -11,7 +11,7 @@ import { useAptitudeTests } from "@/hooks/useAptitudeTests";
 import { useChat } from "@/hooks/useChat";
 import { useToast } from "@/components/ui/Toast";
 import { parseCompanySuggestions, parseSelfAnalysis, SELF_ANALYSIS_LABELS, SelfAnalysisSuggestion } from "@/lib/chatUtils";
-import { COACH_PERSONALITIES, getCoachPersonality, DEFAULT_COACH_ID } from "@/lib/coachPersonalities";
+import { COACH_PERSONALITIES, getCoachPersonality, getRandomThinkingMessage, DEFAULT_COACH_ID } from "@/lib/coachPersonalities";
 
 interface CalendarEvent {
   type: "interview" | "deadline" | "other";
@@ -71,6 +71,7 @@ export default function ChatPage() {
   const [localMessages, setLocalMessages] = useState<LocalMessage[]>([]);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
+  const thinkingMessageRef = useRef<string>("");
   const [initialized, setInitialized] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -364,6 +365,7 @@ export default function ChatPage() {
     await saveMessage("user", text);
     // 今日チャットしたことを記録（バッジ消去）
     try { localStorage.setItem("careo_last_chat_date", new Date().toDateString()); } catch { /* ignore */ }
+    thinkingMessageRef.current = getRandomThinkingMessage(getCoachPersonality(coachId));
     setLocalMessages((prev) => [...prev, { role: "assistant", content: "", streaming: true }]);
 
     try {
@@ -590,14 +592,13 @@ export default function ChatPage() {
                     >
                       {msg.content}
                       {msg.streaming && msg.content === "" && (
-                        <span className="inline-flex gap-1 ml-1">
-                          {[...Array(3)].map((_, j) => (
-                            <span
-                              key={j}
-                              className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"
-                              style={{ animationDelay: `${j * 0.15}s` }}
-                            />
-                          ))}
+                        <span className="inline-flex items-center gap-1.5 text-gray-400 text-xs italic">
+                          {thinkingMessageRef.current}
+                          <span className="inline-flex gap-0.5">
+                            <span className="w-1 h-1 bg-gray-300 rounded-full animate-bounce [animation-delay:0ms]" />
+                            <span className="w-1 h-1 bg-gray-300 rounded-full animate-bounce [animation-delay:150ms]" />
+                            <span className="w-1 h-1 bg-gray-300 rounded-full animate-bounce [animation-delay:300ms]" />
+                          </span>
                         </span>
                       )}
                     </div>
