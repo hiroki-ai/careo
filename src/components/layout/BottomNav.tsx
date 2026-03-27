@@ -57,6 +57,7 @@ const moreItems = [
   { href: "/import", label: "インポート", emoji: "📥" },
   { href: "/settings", label: "設定", emoji: "⚙️" },
   { href: "/career-center", label: "キャリアセンター", emoji: "🖨️" },
+  { href: "/appointments", label: "相談予約", emoji: "📅" },
 ];
 
 export function BottomNav() {

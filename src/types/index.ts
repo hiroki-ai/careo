@@ -453,3 +453,53 @@ export const COMPANY_STATUS_COLORS: Record<CompanyStatus, string> = {
   OFFERED: "bg-green-100 text-green-700",
   REJECTED: "bg-red-100 text-red-700",
 };
+
+// ── 相談予約システム ─────────────────────────────────────────────
+
+export type AppointmentStatus = 'confirmed' | 'cancelled_by_student' | 'cancelled_by_staff';
+
+export interface AppointmentSlot {
+  id: string;
+  staffId: string;
+  staffEmail: string;
+  university: string;
+  startsAt: string;
+  durationMinutes: number;
+  maxBookings: number;
+  notes?: string | null;
+  isCancelled: boolean;
+  createdAt: string;
+}
+
+export interface AppointmentBooking {
+  id: string;
+  slotId: string;
+  studentUserId: string;
+  university: string;
+  studentMessage?: string | null;
+  status: AppointmentStatus;
+  cancelledAt?: string | null;
+  cancelledReason?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AppointmentSlotWithBookings extends AppointmentSlot {
+  bookings: (AppointmentBooking & {
+    studentName?: string;
+    studentFaculty?: string;
+    studentGrade?: string;
+  })[];
+  bookingsCount: number;
+}
+
+export interface AppointmentSlotForStudent extends AppointmentSlot {
+  myBooking?: AppointmentBooking | null;
+  availableCount: number;
+}
+
+export const APPOINTMENT_STATUS_LABELS: Record<AppointmentStatus, string> = {
+  confirmed: '予約済み',
+  cancelled_by_student: 'キャンセル（学生）',
+  cancelled_by_staff: 'キャンセル（職員）',
+};
