@@ -329,16 +329,33 @@ const TAG_COLORS: Record<string, string> = {
   "業界研究": "bg-rose-50 text-rose-600",
 };
 
+const TAG_GRADIENTS: Record<string, [string, string]> = {
+  "ES対策":     ["#3b82f6", "#06b6d4"],
+  "面接対策":   ["#8b5cf6", "#ec4899"],
+  "自己分析":   ["#f97316", "#eab308"],
+  "OB/OG訪問": ["#14b8a6", "#10b981"],
+  "インターン": ["#22c55e", "#16a34a"],
+  "就活管理":   ["#6366f1", "#8b5cf6"],
+  "AI就活":     ["#00c896", "#0ea5e9"],
+  "筆記試験":   ["#eab308", "#f97316"],
+  "業界研究":   ["#f43f5e", "#e11d48"],
+};
+
+function getThumbnailColors(tags: string[]): [string, string] {
+  for (const tag of tags) {
+    if (TAG_GRADIENTS[tag]) return TAG_GRADIENTS[tag];
+  }
+  return ["#6366f1", "#8b5cf6"];
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPost[] }) {
   const [scrollY, setScrollY] = useState(0);
-  const [showCTA, setShowCTA] = useState(false);
 
   useEffect(() => {
     const h = () => {
       const sy = window.scrollY;
       setScrollY(sy);
-      setShowCTA(sy > window.innerHeight * 0.85);
     };
     window.addEventListener("scroll", h, { passive: true });
     return () => window.removeEventListener("scroll", h);
@@ -773,19 +790,33 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
             </div>
           </Reveal>
           <div className="space-y-3">
-            {recentPosts.map((post, i) => (
+            {recentPosts.map((post, i) => {
+              const [c1, c2] = getThumbnailColors(post.tags);
+              return (
               <Reveal key={post.id} delay={i * 80}>
                 <Link
                   href={`/blog/${post.slug}`}
                   className="block bg-white rounded-2xl border border-gray-100 overflow-hidden active:scale-[0.99] transition-transform"
                 >
-                  <div className="w-full aspect-[1200/630] overflow-hidden bg-[#0D0B21]">
-                    <img
-                      src={`/blog/${post.slug}/opengraph-image`}
-                      alt={post.title}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
+                  <div
+                    className="relative w-full overflow-hidden"
+                    style={{ aspectRatio: "1200/630", background: `linear-gradient(135deg, ${c1} 0%, ${c2} 100%)` }}
+                  >
+                    <div style={{ position: "absolute", top: "-30%", right: "-10%", width: "55%", paddingBottom: "55%", borderRadius: "50%", background: "rgba(255,255,255,0.10)" }} />
+                    <div style={{ position: "absolute", bottom: "-25%", left: "-8%", width: "42%", paddingBottom: "42%", borderRadius: "50%", background: "rgba(255,255,255,0.07)" }} />
+                    <div className="absolute top-3 left-3">
+                      <span className="text-[10px] font-bold text-white/90 bg-white/20 px-2 py-0.5 rounded-full backdrop-blur-sm">
+                        {post.tags[0] ?? "就活"}
+                      </span>
+                    </div>
+                    <div className="absolute inset-0 flex items-center px-4 pt-7 pb-8">
+                      <p className="text-white font-bold text-xs leading-snug line-clamp-3 drop-shadow-sm">{post.title}</p>
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 flex items-center gap-1.5 px-4 py-2 border-t border-white/20">
+                      <img src="/icon-new.svg" alt="" className="w-3 h-3 brightness-0 invert opacity-80" />
+                      <span className="text-[9px] text-white/80 font-semibold">Careo</span>
+                      <span className="text-[9px] text-white/50 ml-auto">{post.reading_time_min}分で読める</span>
+                    </div>
                   </div>
                   <div className="p-4">
                     <div className="flex items-center gap-1.5 mb-2">
@@ -803,7 +834,8 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
                   </div>
                 </Link>
               </Reveal>
-            ))}
+              );
+            })}
           </div>
         </section>
       )}
@@ -853,23 +885,6 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
         </div>
         <p className="text-gray-700 text-[10px]">© 2026 Careo. All rights reserved.</p>
       </footer>
-
-      {/* ── Floating CTA (appears after scrolling past hero) ───────────────── */}
-      <div
-        className="fixed bottom-[76px] left-4 right-4 z-40 transition-all duration-300"
-        style={{
-          opacity: showCTA ? 1 : 0,
-          transform: showCTA ? "translateY(0)" : "translateY(12px)",
-          pointerEvents: showCTA ? "auto" : "none",
-        }}
-      >
-        <Link
-          href="/signup"
-          className="flex items-center justify-center gap-2 bg-[#00c896] text-white font-bold py-4 rounded-2xl shadow-2xl shadow-[#00c896]/50 text-sm active:scale-[0.98] transition-transform"
-        >
-          無料で始める →
-        </Link>
-      </div>
 
       {/* LP カレオコーチ チャットボット */}
       <LPChatBot

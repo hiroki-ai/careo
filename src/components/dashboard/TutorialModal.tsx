@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useProfile } from "@/hooks/useProfile";
 
 const COACHES = [
   { id: "kareo", name: "カレオ", tagline: "頼れる先輩×落ち着いたメンター", gradient: "from-teal-400 to-emerald-500", emoji: "🌿" },
@@ -59,6 +60,8 @@ const STEPS: Step[] = [
 export function TutorialModal() {
   const [visible, setVisible] = useState(false);
   const [step, setStep] = useState(0);
+  const [selectedCoachId, setSelectedCoachId] = useState("kareo");
+  const { saveCoachId } = useProfile();
 
   useEffect(() => {
     try {
@@ -69,6 +72,16 @@ export function TutorialModal() {
   const close = () => {
     try { localStorage.setItem("careo_tutorial_shown", "1"); } catch { /* ignore */ }
     setVisible(false);
+  };
+
+  const handleSelectCoach = (id: string) => {
+    setSelectedCoachId(id);
+  };
+
+  const handleFinish = () => {
+    try { localStorage.setItem("careo_coach_id", selectedCoachId); } catch { /* ignore */ }
+    saveCoachId(selectedCoachId);
+    close();
   };
 
   const next = () => {
@@ -147,17 +160,34 @@ export function TutorialModal() {
           {/* ステップ4：コーチ一覧 */}
           {current.type === "coach" && (
             <div className="grid grid-cols-2 gap-2 mb-2">
-              {COACHES.map((coach) => (
-                <div key={coach.id} className="flex items-center gap-2 bg-white border border-gray-100 rounded-xl p-2.5 shadow-sm">
-                  <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${coach.gradient} flex items-center justify-center shrink-0 text-sm`}>
-                    {coach.emoji}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs font-bold text-gray-900 truncate">{coach.name}</p>
-                    <p className="text-[10px] text-gray-400 leading-tight line-clamp-2">{coach.tagline}</p>
-                  </div>
-                </div>
-              ))}
+              {COACHES.map((coach) => {
+                const isSelected = selectedCoachId === coach.id;
+                return (
+                  <button
+                    key={coach.id}
+                    type="button"
+                    onClick={() => handleSelectCoach(coach.id)}
+                    className={`flex items-center gap-2 bg-white rounded-xl p-2.5 shadow-sm text-left transition-all ${
+                      isSelected
+                        ? "border-2 border-[#00c896] ring-1 ring-[#00c896]/20"
+                        : "border border-gray-100 hover:border-[#00c896]/40"
+                    }`}
+                  >
+                    <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${coach.gradient} flex items-center justify-center shrink-0 text-sm`}>
+                      {coach.emoji}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-bold text-gray-900 truncate">{coach.name}</p>
+                      <p className="text-[10px] text-gray-400 leading-tight line-clamp-2">{coach.tagline}</p>
+                    </div>
+                    {isSelected && (
+                      <span className="w-4 h-4 rounded-full bg-[#00c896] flex items-center justify-center shrink-0">
+                        <span className="text-white text-[8px] font-bold">✓</span>
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
@@ -176,9 +206,9 @@ export function TutorialModal() {
             )}
             <div className="flex-1" />
             {isLast ? (
-              <Link href="/chat" onClick={close}>
+              <Link href="/chat" onClick={handleFinish}>
                 <button type="button" className="px-5 py-2.5 bg-gradient-to-r from-[#00c896] to-[#00a87e] text-white text-sm font-bold rounded-xl hover:opacity-90 transition-opacity shadow-sm">
-                  コーチと話す →
+                  このコーチで始める →
                 </button>
               </Link>
             ) : (
