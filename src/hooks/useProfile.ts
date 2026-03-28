@@ -22,6 +22,7 @@ function rowToProfile(row: Record<string, unknown>): UserProfile {
     weaknesses: (row.weaknesses as string) ?? "",
     aiSelfAnalysis: (row.ai_self_analysis as UserProfile["aiSelfAnalysis"]) ?? {},
     careerCenterVisibility: (row.career_center_visibility as CareerCenterVisibility) ?? DEFAULT_CAREER_CENTER_VISIBILITY,
+    coachId: (row.coach_id as string) ?? undefined,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
   };
@@ -120,6 +121,36 @@ export function useProfile() {
     return !!saved;
   }, []);
 
+  // 基本プロフィールのみ部分更新（自己分析フィールドは一切触らない）
+  const patchProfileBasics = useCallback(async (
+    fields: Partial<Pick<UserProfile, "university" | "faculty" | "grade" | "graduationYear" | "targetIndustries" | "targetJobs" | "jobSearchStage">>
+  ): Promise<boolean> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return false;
+    const fieldMap: Record<string, string> = {
+      university: "university",
+      faculty: "faculty",
+      grade: "grade",
+      graduationYear: "graduation_year",
+      targetIndustries: "target_industries",
+      targetJobs: "target_jobs",
+      jobSearchStage: "job_search_stage",
+    };
+    const row: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(fields)) {
+      if (value !== undefined) row[fieldMap[key]] = value;
+    }
+    if (Object.keys(row).length === 0) return false;
+    const { data: saved } = await supabase
+      .from("user_profiles")
+      .update(row)
+      .eq("id", user.id)
+      .select()
+      .single();
+    if (saved) setProfile(rowToProfile(saved as Record<string, unknown>));
+    return !!saved;
+  }, []);
+
   const saveCareerCenterVisibility = useCallback(async (visibility: CareerCenterVisibility): Promise<boolean> => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return false;
@@ -133,5 +164,18 @@ export function useProfile() {
     return !!saved;
   }, []);
 
-  return { profile, loading, saveProfile, patchSelfAnalysis, saveAiSelfAnalysis, saveCareerCenterVisibility, refetch: fetch };
+  const saveCoachId = useCallback(async (coachId: string): Promise<boolean> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return false;
+    const { data: saved } = await supabase
+      .from("user_profiles")
+      .update({ coach_id: coachId })
+      .eq("id", user.id)
+      .select()
+      .single();
+    if (saved) setProfile(rowToProfile(saved as Record<string, unknown>));
+    return !!saved;
+  }, []);
+
+  return { profile, loading, saveProfile, patchSelfAnalysis, patchProfileBasics, saveAiSelfAnalysis, saveCareerCenterVisibility, saveCoachId, refetch: fetch };
 }

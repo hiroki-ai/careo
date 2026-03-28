@@ -53,6 +53,7 @@ const moreItems = [
   { href: "/ob-visits", label: "OB/OG訪問", emoji: "🤝" },
   { href: "/tests", label: "筆記試験", emoji: "📝" },
   { href: "/career", label: "自己分析", emoji: "💡" },
+  { href: "/insights", label: "みんなの就活", emoji: "🌐" },
   { href: "/groups", label: "友達と就活", emoji: "👫" },
   { href: "/import", label: "インポート", emoji: "📥" },
   { href: "/settings", label: "設定", emoji: "⚙️" },

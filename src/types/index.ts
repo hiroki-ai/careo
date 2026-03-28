@@ -204,6 +204,8 @@ export interface UserProfile {
   };
   // キャリアセンターへの公開設定（デフォルト全公開）
   careerCenterVisibility?: CareerCenterVisibility;
+  // コーチ選択（デバイス間同期）
+  coachId?: string;
   createdAt: string;
   updatedAt: string;
 }

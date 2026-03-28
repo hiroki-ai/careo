@@ -42,7 +42,7 @@ export async function middleware(request: NextRequest) {
     }
 
     // 管理者専用ルートのサーバーサイド保護
-    const adminRoutes = ["/admin", "/insights", "/honbu"];
+    const adminRoutes = ["/admin", "/honbu"];
     const isAdminRoute = adminRoutes.some(r => pathname === r || pathname.startsWith(r + "/"));
     if (isAdminRoute) {
       if (!user) {

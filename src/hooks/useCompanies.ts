@@ -10,9 +10,12 @@ export function useCompanies() {
   const supabase = createClient();
 
   const fetch = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setLoading(false); return; }
     const { data } = await supabase
       .from("companies")
       .select("*")
+      .eq("user_id", user.id)
       .order("updated_at", { ascending: false });
     if (data) setCompanies(data as Company[]);
     setLoading(false);

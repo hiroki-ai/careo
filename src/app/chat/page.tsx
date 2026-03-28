@@ -59,10 +59,10 @@ const SUGGESTIONS = [
 ];
 
 export default function ChatPage() {
-  const { profile, saveProfile, patchSelfAnalysis, saveAiSelfAnalysis } = useProfile();
+  const { profile, saveProfile: _saveProfile, patchSelfAnalysis, patchProfileBasics, saveAiSelfAnalysis, saveCoachId } = useProfile();
   const { companies, addCompany, updateCompany } = useCompanies();
   const { esList } = useEs();
-  const { interviews } = useInterviews();
+  const { interviews, addInterview } = useInterviews();
   const { pendingItems, completedItems, addItems } = useActionItems();
   const { visits } = useObVisits();
   const { tests } = useAptitudeTests();
@@ -100,11 +100,17 @@ export default function ChatPage() {
     };
   }, []);
 
-  // localStorageからコーチIDを読み込む
+  // コーチIDを初期化（Supabase優先、フォールバックはlocalStorage）
   useEffect(() => {
-    const saved = localStorage.getItem("careo_coach_id");
-    if (saved) setCoachId(saved);
-  }, []);
+    if (profile?.coachId) {
+      // Supabase値を正とする（デバイス間同期）
+      setCoachId(profile.coachId);
+      localStorage.setItem("careo_coach_id", profile.coachId);
+    } else {
+      const saved = localStorage.getItem("careo_coach_id");
+      if (saved) setCoachId(saved);
+    }
+  }, [profile?.coachId]);
 
   // 保存済み履歴を読み込む（初回のみ）
   useEffect(() => {
@@ -293,11 +299,21 @@ export default function ChatPage() {
       }
 
       // 新規企業の自動追加
-      for (const name of result.newCompanies) {
+      for (const rawName of result.newCompanies) {
+        // AIがJSON文字列を返した場合はパースしてnameフィールドを抽出
+        let name = rawName;
+        if (typeof rawName === "string" && rawName.trim().startsWith("{")) {
+          try {
+            const parsed = JSON.parse(rawName) as { name?: string };
+            if (parsed.name) name = parsed.name;
+            else continue;
+          } catch { continue; }
+        }
+        if (!name || !name.trim()) continue;
         const exists = companies.find(c => c.name === name);
         if (!exists) {
-          await addCompany({ name, status: "WISHLIST", industry: "", notes: "カレオとのチャットから自動追加" });
-          showToast(`「${name}」を企業管理に追加しました`, "success");
+          await addCompany({ name: name.trim(), status: "WISHLIST", industry: "", notes: "カレオとのチャットから自動追加" });
+          showToast(`「${name.trim()}」を企業管理に追加しました`, "success");
         }
       }
 
@@ -309,13 +325,35 @@ export default function ChatPage() {
         }
       }
 
-      // カレンダーイベントを最後のメッセージに付与
+      // カレンダーイベントを最後のメッセージに付与 + 面接/GDはDBに自動保存
       if (result.calendarEvents && result.calendarEvents.length > 0) {
         setLocalMessages((prev) => {
           const last = prev[prev.length - 1];
           if (!last || last.role !== "assistant") return prev;
           return [...prev.slice(0, -1), { ...last, calendarEvents: result.calendarEvents }];
         });
+
+        for (const event of result.calendarEvents) {
+          if (event.type === "interview" && event.companyName && event.date) {
+            const company = companies.find(c => c.name === event.companyName);
+            if (!company) continue;
+            // 同企業・同日の面接が既存にあれば重複追加しない
+            const alreadyExists = interviews.some(
+              i => i.companyId === company.id && i.scheduledAt?.startsWith(event.date)
+            );
+            if (alreadyExists) continue;
+            const round = interviews.filter(i => i.companyId === company.id).length + 1;
+            await addInterview({
+              companyId: company.id,
+              round,
+              scheduledAt: event.date,
+              notes: event.title,
+              result: "PENDING",
+              questions: [],
+            });
+            showToast(`「${event.companyName}」の予定をカレンダーに追加しました`, "success");
+          }
+        }
       }
 
       // 企業ステータスの自動更新
@@ -334,16 +372,15 @@ export default function ChatPage() {
         }
       }
 
-      // プロフィールの自動更新
-      if (result.profileUpdates && Object.keys(result.profileUpdates).length > 0 && profile) {
-        const merged = {
-          ...profile,
-          ...Object.fromEntries(
-            Object.entries(result.profileUpdates).filter(([, v]) => v !== undefined && v !== "")
-          ),
-        };
-        await saveProfile(merged);
-        showToast("プロフィール情報を更新しました", "success");
+      // プロフィールの自動更新（自己分析フィールドは触らない）
+      if (result.profileUpdates && Object.keys(result.profileUpdates).length > 0) {
+        const validUpdates = Object.fromEntries(
+          Object.entries(result.profileUpdates).filter(([, v]) => v !== undefined && v !== "")
+        );
+        if (Object.keys(validUpdates).length > 0) {
+          await patchProfileBasics(validUpdates as Parameters<typeof patchProfileBasics>[0]);
+          showToast("プロフィール情報を更新しました", "success");
+        }
       }
 
       // PDCA更新が必要な場合はlocalStorageのキャッシュを削除して次回再取得を促す
@@ -353,7 +390,7 @@ export default function ChatPage() {
     } catch (err) {
       console.error("[chat-sync]", err);
     }
-  }, [companies, profile, pendingItems, patchSelfAnalysis, addCompany, updateCompany, saveProfile, addItems, showToast]);
+  }, [companies, interviews, profile, pendingItems, patchSelfAnalysis, patchProfileBasics, addCompany, updateCompany, addItems, addInterview, showToast]);
 
   const sendMessage = async (text: string) => {
     if (!text.trim() || isStreaming) return;
@@ -486,6 +523,7 @@ export default function ChatPage() {
   const handleSelectCoach = (id: string) => {
     setCoachId(id);
     localStorage.setItem("careo_coach_id", id);
+    saveCoachId(id); // Supabaseに保存してデバイス間同期
     const coach = getCoachPersonality(id);
     // ウェルカムメッセージのみの場合は差し替え
     setLocalMessages((prev) => {

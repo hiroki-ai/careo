@@ -112,7 +112,8 @@ ${conversationText}
 2. newCompanies: 「気になる」「受けたい」「志望」と発言した企業。登録済みは除外。
 3. actionItems: カレオが「やってみて」と提案した具体的アクション。重複なし、3件以内。
 4. calendarEvents: 具体的日付のあるイベント（3件以内、今日=${new Date().toISOString().slice(0, 10)}）。
-   type: "interview"|"deadline"|"other" / date: YYYY-MM-DD
+   type: "interview"（面接・GD・グループディスカッション・説明会・インターン選考含む）|"deadline"（ES締切など）|"other" / date: YYYY-MM-DD
+   title: イベントの内容を簡潔に（例: "○○社 GD"、"○○社 1次面接"）/ companyName: 企業名
 5. companyStatusUpdates: ユーザーが選考の進捗を報告した場合のみ（例:「A社の面接通過した」「B社に落ちた」「C社から内定もらった」）。
    登録済み企業名のみ対象。newStatus は以下から選ぶ:
    INTERN_APPLYING/INTERN_DOCUMENT/INTERN_INTERVIEW_1/INTERN_INTERVIEW_2/INTERN_FINAL/INTERN/
