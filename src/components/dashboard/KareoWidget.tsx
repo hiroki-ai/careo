@@ -81,6 +81,7 @@ export function KareoWidget() {
 
   const buildContext = () => ({
     profile: profile ? {
+      username: profile.username,
       university: profile.university,
       faculty: profile.faculty,
       grade: profile.grade,

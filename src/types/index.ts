@@ -178,8 +178,16 @@ export const DEFAULT_CAREER_CENTER_VISIBILITY: CareerCenterVisibility = {
   offerStatus: true,
 };
 
+export interface PdcaResult {
+  plan: { weeklyGoal: string; taskCompletion: string };
+  do: { highlights: string[]; totalActivity: string };
+  check: { score: number; goodPoints: string[]; issues: string[]; insight: string };
+  act: { improvements: string[]; nextWeekFocus: string; encouragement: string };
+}
+
 export interface UserProfile {
   id: string;
+  username?: string;
   university: string;
   faculty: string;
   grade: string;
@@ -206,6 +214,10 @@ export interface UserProfile {
   careerCenterVisibility?: CareerCenterVisibility;
   // コーチ選択（デバイス間同期）
   coachId?: string;
+  // デバイス間同期フィールド
+  lastPdca?: PdcaResult | null;
+  lastPdcaAt?: string | null;
+  lastChatAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }

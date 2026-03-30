@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { UserProfile, JobSearchStage, UserPlan, CareerCenterVisibility, DEFAULT_CAREER_CENTER_VISIBILITY } from "@/types";
+import { UserProfile, JobSearchStage, UserPlan, CareerCenterVisibility, DEFAULT_CAREER_CENTER_VISIBILITY, PdcaResult } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 
 function rowToProfile(row: Record<string, unknown>): UserProfile {
   return {
     id: row.id as string,
+    username: (row.username as string) ?? undefined,
     university: (row.university as string) ?? "",
     faculty: (row.faculty as string) ?? "",
     grade: row.grade as string,
@@ -23,6 +24,9 @@ function rowToProfile(row: Record<string, unknown>): UserProfile {
     aiSelfAnalysis: (row.ai_self_analysis as UserProfile["aiSelfAnalysis"]) ?? {},
     careerCenterVisibility: (row.career_center_visibility as CareerCenterVisibility) ?? DEFAULT_CAREER_CENTER_VISIBILITY,
     coachId: (row.coach_id as string) ?? undefined,
+    lastPdca: (row.last_pdca as PdcaResult) ?? null,
+    lastPdcaAt: (row.last_pdca_at as string) ?? null,
+    lastChatAt: (row.last_chat_at as string) ?? null,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
   };
@@ -38,6 +42,20 @@ export function useProfile() {
     if (!user) { setLoading(false); return; }
     const { data } = await supabase.from("user_profiles").select("*").eq("id", user.id).single();
     setProfile(data ? rowToProfile(data as Record<string, unknown>) : null);
+    // localStorage同期（BottomNav等がlocalStorageを読むため）
+    if (data) {
+      try {
+        if (data.last_chat_at) {
+          localStorage.setItem("careo_last_chat_date", new Date(data.last_chat_at as string).toDateString());
+        }
+        if (data.last_pdca && data.last_pdca_at) {
+          localStorage.setItem("careo_last_pdca", JSON.stringify({
+            data: data.last_pdca,
+            ts: new Date(data.last_pdca_at as string).getTime(),
+          }));
+        }
+      } catch { /* ignore */ }
+    }
     setLoading(false);
   }, []);
 
@@ -177,5 +195,43 @@ export function useProfile() {
     return !!saved;
   }, []);
 
-  return { profile, loading, saveProfile, patchSelfAnalysis, patchProfileBasics, saveAiSelfAnalysis, saveCareerCenterVisibility, saveCoachId, refetch: fetch };
+  const saveLastPdca = useCallback(async (pdca: PdcaResult): Promise<void> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const now = new Date().toISOString();
+    const { data: saved } = await supabase
+      .from("user_profiles")
+      .update({ last_pdca: pdca, last_pdca_at: now })
+      .eq("id", user.id)
+      .select()
+      .single();
+    if (saved) setProfile(rowToProfile(saved as Record<string, unknown>));
+  }, []);
+
+  const saveLastChatAt = useCallback(async (): Promise<void> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const now = new Date().toISOString();
+    await supabase
+      .from("user_profiles")
+      .update({ last_chat_at: now })
+      .eq("id", user.id);
+    // ローカルにも即時反映
+    try { localStorage.setItem("careo_last_chat_date", new Date().toDateString()); } catch { /* ignore */ }
+  }, []);
+
+  const saveUsername = useCallback(async (username: string): Promise<boolean> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return false;
+    const { data: saved } = await supabase
+      .from("user_profiles")
+      .update({ username: username.trim() || null })
+      .eq("id", user.id)
+      .select()
+      .single();
+    if (saved) setProfile(rowToProfile(saved as Record<string, unknown>));
+    return !!saved;
+  }, []);
+
+  return { profile, loading, saveProfile, patchSelfAnalysis, patchProfileBasics, saveAiSelfAnalysis, saveCareerCenterVisibility, saveCoachId, saveUsername, saveLastPdca, saveLastChatAt, refetch: fetch };
 }

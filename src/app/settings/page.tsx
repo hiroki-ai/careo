@@ -11,10 +11,13 @@ import { JOB_SEARCH_STAGE_LABELS, CareerCenterVisibility, DEFAULT_CAREER_CENTER_
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { profile, loading, saveProfile, saveCareerCenterVisibility } = useProfile();
+  const { profile, loading, saveProfile, saveCareerCenterVisibility, saveUsername } = useProfile();
   const { permission, isSubscribed, isSupported, loading: pushLoading, subscribe, unsubscribe } = usePushNotifications();
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
+  const [usernameInput, setUsernameInput] = useState("");
+  const [usernameSaving, setUsernameSaving] = useState(false);
   const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
   const [deleteInput, setDeleteInput] = useState("");
   const [deleting, setDeleting] = useState(false);
@@ -49,6 +52,53 @@ export default function SettingsPage() {
         <h1 className="text-2xl font-bold text-gray-900">設定</h1>
         <p className="text-sm text-gray-500 mt-1">プロフィールとアカウントを管理</p>
       </div>
+
+      {/* ユーザー名 */}
+      <section className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="font-semibold text-gray-900">ユーザー名</h2>
+            <p className="text-xs text-gray-400 mt-0.5">カレオコーチがこの名前で呼びかけます</p>
+          </div>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => {
+              setUsernameInput(profile?.username ?? "");
+              setIsEditingUsername(!isEditingUsername);
+            }}
+          >
+            {isEditingUsername ? "キャンセル" : "編集"}
+          </Button>
+        </div>
+        {!isEditingUsername && (
+          <p className="text-sm text-gray-800">{profile?.username || <span className="text-gray-400">未設定</span>}</p>
+        )}
+        {isEditingUsername && (
+          <div className="flex gap-2 items-center">
+            <input
+              type="text"
+              value={usernameInput}
+              onChange={e => setUsernameInput(e.target.value)}
+              placeholder="例: たろう"
+              maxLength={20}
+              className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896]"
+            />
+            <Button
+              size="sm"
+              disabled={usernameSaving}
+              onClick={async () => {
+                setUsernameSaving(true);
+                await saveUsername(usernameInput);
+                setUsernameSaving(false);
+                setIsEditingUsername(false);
+              }}
+            >
+              {usernameSaving ? "保存中..." : "保存"}
+            </Button>
+          </div>
+        )}
+      </section>
 
       {/* プロフィール */}
       <section className="bg-white rounded-xl border border-gray-100 p-6 mb-6">

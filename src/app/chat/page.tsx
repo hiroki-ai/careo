@@ -59,7 +59,7 @@ const SUGGESTIONS = [
 ];
 
 export default function ChatPage() {
-  const { profile, saveProfile: _saveProfile, patchSelfAnalysis, patchProfileBasics, saveAiSelfAnalysis, saveCoachId } = useProfile();
+  const { profile, saveProfile: _saveProfile, patchSelfAnalysis, patchProfileBasics, saveAiSelfAnalysis, saveCoachId, saveLastChatAt } = useProfile();
   const { companies, addCompany, updateCompany } = useCompanies();
   const { esList } = useEs();
   const { interviews, addInterview } = useInterviews();
@@ -187,16 +187,20 @@ export default function ChatPage() {
     recognition.start();
   }, [isRecording, showToast]);
 
-  // 直近のPDCA結果をlocalStorageから読む
+  // 直近のPDCA結果を取得（Supabase優先、フォールバックはlocalStorage）
   const getLastPdca = () => {
+    if (profile?.lastPdca) return profile.lastPdca;
     try {
       const raw = localStorage.getItem("careo_last_pdca");
-      return raw ? JSON.parse(raw) : null;
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return parsed?.data ?? (parsed?.check ? parsed : null);
     } catch { return null; }
   };
 
   const buildContext = () => ({
     profile: profile ? {
+      username: profile.username,
       university: profile.university,
       faculty: profile.faculty,
       grade: profile.grade,
@@ -400,8 +404,8 @@ export default function ChatPage() {
     const userMsg: LocalMessage = { role: "user", content: text };
     setLocalMessages((prev) => [...prev, userMsg]);
     await saveMessage("user", text);
-    // 今日チャットしたことを記録（バッジ消去）
-    try { localStorage.setItem("careo_last_chat_date", new Date().toDateString()); } catch { /* ignore */ }
+    // 今日チャットしたことを記録（バッジ消去）— Supabase + localStorage両方更新
+    saveLastChatAt(); // デバイス間同期（内部でlocalStorageも更新）
     thinkingMessageRef.current = getRandomThinkingMessage(getCoachPersonality(coachId));
     setLocalMessages((prev) => [...prev, { role: "assistant", content: "", streaming: true }]);
 

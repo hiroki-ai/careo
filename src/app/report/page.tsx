@@ -12,16 +12,10 @@ import { useActionItems } from "@/hooks/useActionItems";
 import { inferActionLink } from "@/hooks/useActionItems";
 import { useToast } from "@/components/ui/Toast";
 import { InsightsWidget } from "@/components/dashboard/InsightsWidget";
+import { PdcaResult } from "@/types";
 
 const PDCA_CACHE_KEY = "careo_last_pdca";
 const PDCA_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24時間
-
-interface PdcaResult {
-  plan: { weeklyGoal: string; taskCompletion: string };
-  do: { highlights: string[]; totalActivity: string };
-  check: { score: number; goodPoints: string[]; issues: string[]; insight: string };
-  act: { improvements: string[]; nextWeekFocus: string; encouragement: string };
-}
 
 async function fetchAI<T>(url: string, body: unknown): Promise<T | null> {
   const res = await fetch(url, {
@@ -60,7 +54,7 @@ function ScoreRing({ score }: { score: number }) {
 }
 
 export default function ReportPage() {
-  const { profile, loading: profileLoading } = useProfile();
+  const { profile, loading: profileLoading, saveLastPdca } = useProfile();
   const { companies, loading: companiesLoading } = useCompanies();
   const { esList, loading: esLoading } = useEs();
   const { interviews, loading: interviewsLoading } = useInterviews();
@@ -74,26 +68,29 @@ export default function ReportPage() {
   const [pdcaError, setPdcaError] = useState(false);
   const hasAutoRun = useRef(false);
 
-  // localStorageからキャッシュを読み込む（TTLチェック付き）
+  // 1. localStorageから即時表示（初回レンダリング高速化）
   useEffect(() => {
     try {
       const raw = localStorage.getItem(PDCA_CACHE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        // 新形式: { data, ts } または旧形式: PdcaResult直接
-        if (parsed.data && parsed.ts) {
-          if (Date.now() - parsed.ts < PDCA_CACHE_TTL_MS) {
-            setPdca(parsed.data);
-          } else {
-            localStorage.removeItem(PDCA_CACHE_KEY); // 期限切れ
-          }
-        } else if (parsed.check) {
-          // 旧形式はそのまま表示（次回保存時に新形式に移行）
-          setPdca(parsed);
-        }
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (parsed.data && parsed.ts) {
+        if (Date.now() - parsed.ts < PDCA_CACHE_TTL_MS) setPdca(parsed.data);
+        else localStorage.removeItem(PDCA_CACHE_KEY);
+      } else if (parsed.check) {
+        setPdca(parsed); // 旧形式
       }
     } catch { /* ignore */ }
   }, []);
+
+  // 2. Supabaseのキャッシュが最新なら上書き（デバイス間同期）
+  useEffect(() => {
+    if (!profile?.lastPdca || !profile.lastPdcaAt) return;
+    const age = Date.now() - new Date(profile.lastPdcaAt).getTime();
+    if (age < PDCA_CACHE_TTL_MS) {
+      setPdca(profile.lastPdca);
+    }
+  }, [profile?.lastPdca, profile?.lastPdcaAt]);
 
   const runPdca = async () => {
     setPdcaLoading(true);
@@ -116,6 +113,7 @@ export default function ReportPage() {
       } else if (result?.check) {
         setPdca(result);
         try { localStorage.setItem(PDCA_CACHE_KEY, JSON.stringify({ data: result, ts: Date.now() })); } catch { /* ignore */ }
+        saveLastPdca(result); // Supabaseに保存してデバイス間同期
       } else {
         setPdcaError(true);
       }

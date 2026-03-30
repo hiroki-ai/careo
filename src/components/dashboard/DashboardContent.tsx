@@ -17,28 +17,36 @@ import { InsightsWidget } from "@/components/dashboard/InsightsWidget";
 import { PostOfferWidget } from "@/components/dashboard/PostOfferWidget";
 import { createClient } from "@/lib/supabase/client";
 import { daysUntil } from "@/lib/utils";
-import { COMPANY_STATUS_ORDER, JOB_SEARCH_STAGE_LABELS } from "@/types";
+import { COMPANY_STATUS_ORDER, JOB_SEARCH_STAGE_LABELS, UserProfile } from "@/types";
 import { useCoach } from "@/hooks/useCoach";
 import { TutorialModal } from "@/components/dashboard/TutorialModal";
 
 // 毎日のコーチCTA（チャット未実施の日は強調表示）
-function DailyCoachBanner({ profile }: { profile: { careerAxis?: string; gakuchika?: string } | null }) {
+function DailyCoachBanner({ profile }: { profile: UserProfile | null }) {
   const [chatted, setChatted] = useState(true); // サーバーSSRで不一致しないようデフォルトtrue
   const [pdcaIssue, setPdcaIssue] = useState<string | null>(null);
   const { coachName } = useCoach();
 
   useEffect(() => {
-    try {
-      const last = localStorage.getItem("careo_last_chat_date");
-      setChatted(last === new Date().toDateString());
-      const raw = localStorage.getItem("careo_last_pdca");
-      if (raw) {
-        const pdca = JSON.parse(raw);
-        const issue = pdca?.check?.issues?.[0] ?? pdca?.act?.nextWeekFocus ?? null;
-        setPdcaIssue(issue);
-      }
-    } catch { /* ignore */ }
-  }, []);
+    // Supabaseデータ優先、フォールバックはlocalStorage
+    const lastChatDate = profile?.lastChatAt
+      ? new Date(profile.lastChatAt).toDateString()
+      : (() => { try { return localStorage.getItem("careo_last_chat_date") ?? ""; } catch { return ""; } })();
+    setChatted(lastChatDate === new Date().toDateString());
+
+    const pdca = profile?.lastPdca ?? (() => {
+      try {
+        const raw = localStorage.getItem("careo_last_pdca");
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        return parsed?.data ?? (parsed?.check ? parsed : null);
+      } catch { return null; }
+    })();
+    if (pdca) {
+      const issue = pdca?.check?.issues?.[0] ?? pdca?.act?.nextWeekFocus ?? null;
+      setPdcaIssue(issue);
+    }
+  }, [profile?.lastChatAt, profile?.lastPdca]);
 
   const topic = pdcaIssue
     ? `「${pdcaIssue}」について一緒に考えよう`

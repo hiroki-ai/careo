@@ -92,6 +92,7 @@ export async function POST(req: NextRequest) {
       coachId?: string;
       context?: {
         profile?: {
+          username?: string;
           university?: string;
           faculty?: string;
           grade?: string;
@@ -261,8 +262,10 @@ export async function POST(req: NextRequest) {
     // 未入力情報のリスト（自然な会話で引き出すためのヒント）
     const allMissing = [...missingProfile, ...missingAnalysis];
 
+    const username = context?.profile?.username;
     const coach = getCoachPersonality(coachId);
     const systemPrompt = `あなたはユーザーの就活データを全て把握している専属AIコーチです。ユーザーが質問するとき、以下に示す過去のデータを積極的に参照し、「あなたの場合は〜」という形で個人化した回答を行ってください。
+${username ? `\nユーザーのニックネームは「${username}」です。会話の中で自然にこの名前を使って呼びかけてください。` : ""}
 
 ${coach.characterPrompt}
 
