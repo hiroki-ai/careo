@@ -69,6 +69,21 @@ const serviceProfiles = [
     careoUse: "OfferBoxで届いたオファー企業をCareoに登録し、選考の進捗・面接ログを記録する",
   },
   {
+    name: "ABABA（アババ）",
+    tag: "お祈り→スカウト転換",
+    url: "https://ababa.jp/",
+    color: "from-purple-500/10 to-purple-400/5",
+    border: "border-purple-200",
+    strengths: [
+      "不採用通知（お祈りメール）をスキャンして評価に変換",
+      "お祈りから別企業のスカウトが届く逆転発想のサービス",
+      "SPIスコアも評価対象なので筆記試験の頑張りが活きる",
+      "学生は完全無料",
+    ],
+    limitation: "あくまで「落とされた選考のデータ」が資産になるサービス。積極的な求人検索・選考管理機能はない。",
+    careoUse: "ABABAで届いたスカウト企業をCareoに登録し、その後の選考進捗・面接ログを一元管理する",
+  },
+  {
     name: "Notion / スプレッドシート",
     tag: "汎用管理ツール（自作）",
     url: "https://notion.so/",
@@ -90,57 +105,57 @@ const comparisonRows = [
   {
     label: "求人情報・エントリー",
     note: "企業を探す機能",
-    careo: false, base: false, smart: false, riku: true, offer: true, notion: false,
+    careo: false, base: false, smart: false, riku: true, offer: true, notion: false, ababa: false,
   },
   {
     label: "スカウト・オファー受信",
     note: "企業から連絡が来る",
-    careo: false, base: true, smart: false, riku: "△", offer: true, notion: false,
+    careo: false, base: true, smart: false, riku: "△", offer: true, notion: false, ababa: true,
   },
   {
     label: "ES生成AI",
     note: "AIがESを書いてくれる",
-    careo: false, base: true, smart: true, riku: false, offer: false, notion: "△有料",
+    careo: false, base: true, smart: true, riku: false, offer: false, notion: "△有料", ababa: false,
   },
   {
     label: "選考進捗の一元管理",
     note: "複数社をまとめて管理",
-    careo: true, base: false, smart: false, riku: false, offer: false, notion: "△手動",
+    careo: true, base: false, smart: false, riku: false, offer: false, notion: "△手動", ababa: false,
   },
   {
     label: "ES・面接・OB訪問・筆記の記録",
     note: "活動ログを保存",
-    careo: true, base: false, smart: false, riku: false, offer: false, notion: "△手動",
+    careo: true, base: false, smart: false, riku: false, offer: false, notion: "△手動", ababa: false,
   },
   {
     label: "週次PDCAをAIが自動分析",
     note: "AIが全体を振り返る",
-    careo: true, base: false, smart: false, riku: false, offer: false, notion: false,
+    careo: true, base: false, smart: false, riku: false, offer: false, notion: false, ababa: false,
   },
   {
     label: "ES提出前AIチェック",
     note: "自己分析との整合性確認",
-    careo: true, base: false, smart: false, riku: false, offer: false, notion: false,
+    careo: true, base: false, smart: false, riku: false, offer: false, notion: false, ababa: false,
   },
   {
     label: "データ横断の気づき通知",
     note: "OB訪問・面接・ESを繋ぐ",
-    careo: true, base: false, smart: false, riku: false, offer: false, notion: false,
+    careo: true, base: false, smart: false, riku: false, offer: false, notion: false, ababa: false,
   },
   {
     label: "全データを把握したAIコーチ",
     note: "選考全体を知るAIに相談",
-    careo: true, base: "△", smart: false, riku: false, offer: false, notion: false,
+    careo: true, base: "△", smart: false, riku: false, offer: false, notion: false, ababa: false,
   },
   {
     label: "学生は完全無料",
     note: "",
-    careo: true, base: true, smart: "△制限あり", riku: true, offer: true, notion: true,
+    careo: true, base: true, smart: "△制限あり", riku: true, offer: true, notion: true, ababa: true,
   },
   {
     label: "広告・スカウト電話なし",
     note: "",
-    careo: true, base: false, smart: true, riku: false, offer: false, notion: true,
+    careo: true, base: false, smart: true, riku: false, offer: false, notion: true, ababa: "△スカウトあり",
   },
 ];
 
@@ -200,6 +215,10 @@ const faqs = [
   {
     q: "リクナビ・マイナビと何が違いますか？",
     a: "リクナビ・マイナビは企業を探してエントリーするためのプラットフォームです。Careoはエントリーした後の選考管理・AIコーチングに特化しています。リクナビ・マイナビで応募した企業をCareoに登録して管理するのがおすすめの使い方です。",
+  },
+  {
+    q: "ABABAと併用できますか？",
+    a: "はい、ABABAは「お祈りメール（不採用通知）を別企業のスカウトに変換する」というユニークなサービスです。ABABAで届いたスカウト企業をCareoに登録して選考進捗・面接ログを管理することで、両方の強みを活かせます。就活後半にお祈りが増えてきたタイミングでABABAを活用し、Careoで一元管理するのがおすすめです。",
   },
   {
     q: "OfferBoxとの違いは？",
@@ -369,10 +388,10 @@ export default function ComparePage() {
             「何に使うか」で選んでください。
           </p>
           <div className="overflow-x-auto -mx-2 rounded-2xl border border-gray-200 shadow-sm">
-            <table className="w-full text-sm min-w-[680px]">
+            <table className="w-full text-sm min-w-[780px]">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/80">
-                  <th scope="col" className="text-left py-4 px-5 text-gray-400 font-medium w-[30%]">機能</th>
+                  <th scope="col" className="text-left py-4 px-5 text-gray-400 font-medium w-[28%]">機能</th>
                   <th className="py-4 px-3 text-center">
                     <span className="bg-[#00c896] text-white text-xs font-bold px-3 py-1.5 rounded-lg">Careo</span>
                   </th>
@@ -380,6 +399,7 @@ export default function ComparePage() {
                   <th className="py-4 px-3 text-center text-gray-400 font-medium text-xs">SmartES<br /><span className="text-[10px] text-gray-300">ES生成</span></th>
                   <th className="py-4 px-3 text-center text-gray-400 font-medium text-xs">リクナビ<br /><span className="text-[10px] text-gray-300">マイナビ</span></th>
                   <th className="py-4 px-3 text-center text-gray-400 font-medium text-xs">OfferBox<br /><span className="text-[10px] text-gray-300">オファー型</span></th>
+                  <th className="py-4 px-3 text-center text-gray-400 font-medium text-xs">ABABA<br /><span className="text-[10px] text-gray-300">お祈り転換</span></th>
                   <th className="py-4 px-3 text-center text-gray-400 font-medium text-xs">Notion<br /><span className="text-[10px] text-gray-300">スプレッド</span></th>
                 </tr>
               </thead>
@@ -395,6 +415,7 @@ export default function ComparePage() {
                     <td className="py-3.5 px-3 text-center">{cell(row.smart)}</td>
                     <td className="py-3.5 px-3 text-center">{cell(row.riku)}</td>
                     <td className="py-3.5 px-3 text-center">{cell(row.offer)}</td>
+                    <td className="py-3.5 px-3 text-center">{cell(row.ababa)}</td>
                     <td className="py-3.5 px-3 text-center">{cell(row.notion)}</td>
                   </tr>
                 ))}
@@ -467,6 +488,14 @@ export default function ComparePage() {
               </div>
             </div>
 
+            {/* ABABA */}
+            <div className="absolute left-[22%] top-[45%] -translate-x-1/2 -translate-y-1/2">
+              <div className="bg-purple-50 border border-purple-200 rounded-xl px-3 py-2 text-center shadow-sm">
+                <p className="text-[10px] font-bold text-purple-700">ABABA</p>
+                <p className="text-[9px] text-purple-400">お祈り転換</p>
+              </div>
+            </div>
+
             {/* BaseMe */}
             <div className="absolute left-[26%] top-[22%] -translate-x-1/2 -translate-y-1/2">
               <div className="bg-blue-50 border border-blue-200 rounded-xl px-3 py-2 text-center shadow-sm">
@@ -503,6 +532,7 @@ export default function ComparePage() {
               { name: "リクナビ / マイナビ", role: "求人・エントリー", cls: "bg-red-50 text-red-600 border-red-200" },
               { name: "OfferBox", role: "スカウト型採用", cls: "bg-green-50 text-green-700 border-green-200" },
               { name: "BaseMe", role: "スカウト×AI", cls: "bg-blue-50 text-blue-700 border-blue-200" },
+              { name: "ABABA", role: "お祈り→スカウト転換", cls: "bg-purple-50 text-purple-700 border-purple-200" },
               { name: "SmartES", role: "ES生成AI", cls: "bg-orange-50 text-orange-700 border-orange-200" },
               { name: "Notion / SS", role: "汎用管理", cls: "bg-gray-100 text-gray-600 border-gray-300" },
               { name: "Careo", role: "管理×AIコーチング", cls: "bg-[#00c896] text-white border-transparent" },
@@ -534,7 +564,7 @@ export default function ComparePage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 items-center mb-6">
               {[
                 { label: "企業探し", tools: "リクナビ\nマイナビ", icon: "🔍" },
-                { label: "スカウト受信", tools: "BaseMe\nOfferBox", icon: "📩" },
+                { label: "スカウト受信", tools: "BaseMe\nOfferBox\nABABA", icon: "📩" },
                 { label: "ES生成", tools: "SmartES\nBaseMe AI", icon: "✍️" },
                 { label: "自己分析", tools: "AnalyzeU+\nMATCH plus", icon: "💡" },
               ].map((item) => (

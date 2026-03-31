@@ -9,7 +9,7 @@ import { LPChatBot } from "@/components/landing/LPChatBot";
 // ─── Constants ───────────────────────────────────────────────────────────────
 const DEFAULT_BADGE = "あなたの就活を丸ごと知るAIコーチ「カレオ」";
 const DEFAULT_HERO_SUBTEXT =
-  "企業・ES・面接・OB訪問・筆記試験をすべて一か所に。\nあなたのデータを全て把握したAIコーチ「カレオ」が、点と点を繋ぎ、ChatGPTにはできない個人化アドバイスを届ける。";
+  "企業・ES・面接・OB訪問・筆記試験をすべて一か所に。\nあなたの全就活データを把握したAIコーチ「カレオ」が、「A社のESとB社の面接で矛盾あり」など、ChatGPTにはできない個人化の気づきを自動通知する。";
 const DEFAULT_AFTER_ITEMS = [
   "企業・ES・面接・OB訪問・筆記試験がすべて一か所。全体像が常に見える",
   "締切3日前に自動通知。見落としゼロ",
@@ -650,12 +650,12 @@ export function LandingPage({ recentPosts = [] }: { recentPosts?: RecentPost[] }
                 </Link>
               </div>
 
-              <div className="flex items-center gap-2 text-xs text-gray-400">
-                <span>📵</span>
-                <span>広告メール・スカウト電話なし</span>
-                <span className="mx-2">·</span>
-                <span>💳</span>
-                <span>クレカ不要・完全無料</span>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-400">
+                <span className="flex items-center gap-1"><span>📵</span><span>広告・スカウト電話なし</span></span>
+                <span className="hidden sm:block">·</span>
+                <span className="flex items-center gap-1"><span>💳</span><span>クレカ不要・完全無料</span></span>
+                <span className="hidden sm:block">·</span>
+                <span className="flex items-center gap-1"><span>🔒</span><span>データは暗号化保存・第三者販売なし</span></span>
               </div>
             </div>
 
@@ -727,6 +727,19 @@ export function LandingPage({ recentPosts = [] }: { recentPosts?: RecentPost[] }
                     </li>
                   ))}
                 </ul>
+              </div>
+            </div>
+            {/* 具体的な通知例 */}
+            <div className="bg-[#0D0B21]/4 border border-[#00c896]/15 rounded-xl p-4 mb-5">
+              <p className="text-xs font-bold text-[#00a87e] mb-2.5">💡 こんな気づきを、カレオが自動通知します</p>
+              <div className="space-y-2">
+                {[
+                  "「A社のESで書いた強みと、B社の面接で詰められたポイントが一致しています。次の面接前に確認しましょう」",
+                  "「OB訪問で聞いた情報を、C社のES志望動機に活かせるポイントがあります」",
+                  "「今週はES締切が3件集中しています。優先順位を整理しましょう」",
+                ].map((t, i) => (
+                  <p key={i} className="text-xs text-gray-600 leading-relaxed border-l-2 border-[#00c896]/30 pl-3 italic">{t}</p>
+                ))}
               </div>
             </div>
             <p className="text-center text-xs text-gray-500 leading-relaxed">
@@ -1265,6 +1278,19 @@ export function LandingPage({ recentPosts = [] }: { recentPosts?: RecentPost[] }
             </Link>
           </div>
           <p className="text-center text-xs text-gray-400 mt-4">📵 広告メール・スカウト電話は一切ありません</p>
+
+          {/* なぜ無料？ */}
+          <div className="mt-5 bg-white border border-gray-200 rounded-2xl p-5">
+            <p className="text-xs font-bold text-gray-700 mb-2">💡 なぜ無料なのか</p>
+            <p className="text-xs text-gray-500 leading-relaxed">
+              Careoは<strong className="text-gray-700">学生向け機能を今後も無料で提供し続けること</strong>を基本方針としています。
+              将来的には、大学のキャリアセンター向けに就活支援ダッシュボード（B2Bサービス）を展開し、そこからの収益でサービスを維持する予定です。
+              <span className="text-[#00a87e] font-semibold">学生のデータが第三者企業に販売されることはありません。</span>
+            </p>
+            <Link href="/privacy" className="text-xs text-[#00a87e] font-semibold hover:underline mt-2 inline-block">
+              プライバシーポリシーを確認する →
+            </Link>
+          </div>
         </div>
       </section>
 
