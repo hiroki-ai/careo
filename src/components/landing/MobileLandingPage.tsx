@@ -415,7 +415,7 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
 
         <p className="text-gray-400 text-sm leading-relaxed mb-8">
           企業・ES・面接・OB訪問・筆記試験をすべて一か所に。<br />
-          あなたのデータを全て把握したAIコーチ「カレオ」が、点と点を繋ぎ、ChatGPTにはできない個人化アドバイスを届ける。
+          あなたの全就活データを把握したAIコーチ「カレオ」が、「A社のESとB社の面接で矛盾あり」など、ChatGPTにはできない個人化の気づきを自動通知する。
         </p>
 
         <Link
@@ -424,10 +424,12 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
         >
           無料で始める →
         </Link>
-        <div className="flex items-center gap-3 text-[11px] text-gray-600 mb-16">
-          <span>📵 広告メール・スカウト電話なし</span>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-gray-600 mb-16">
+          <span>📵 広告・スカウト電話なし</span>
           <span>·</span>
           <span>💳 クレカ不要</span>
+          <span>·</span>
+          <span>🔒 データは暗号化保存・第三者販売なし</span>
         </div>
 
         {/* Phone mockup */}
@@ -516,6 +518,19 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
                     </li>
                   ))}
                 </ul>
+              </div>
+            </div>
+            {/* 具体的な通知例 */}
+            <div className="bg-[#0D0B21]/4 border border-[#00c896]/15 rounded-xl p-4 mt-3">
+              <p className="text-xs font-bold text-[#00a87e] mb-2">💡 こんな気づきをカレオが自動通知</p>
+              <div className="space-y-1.5">
+                {[
+                  "「A社のESとB社の面接で矛盾を発見しました」",
+                  "「OB訪問の情報をC社のESに活かせます」",
+                  "「今週ES締切が3件集中しています」",
+                ].map((t, i) => (
+                  <p key={i} className="text-[11px] text-gray-600 leading-relaxed border-l-2 border-[#00c896]/30 pl-2.5 italic">{t}</p>
+                ))}
               </div>
             </div>
           </div>
@@ -730,6 +745,18 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
               className="inline-flex items-center justify-center gap-2 bg-[#00c896] text-white font-bold px-6 py-3.5 rounded-xl shadow-lg shadow-[#00c896]/25 active:scale-95 transition-transform text-sm w-full"
             >
               今すぐ無料で始める →
+            </Link>
+          </div>
+
+          {/* なぜ無料？ */}
+          <div className="mt-4 bg-white border border-gray-200 rounded-2xl p-4">
+            <p className="text-xs font-bold text-gray-700 mb-1.5">💡 なぜ無料なのか</p>
+            <p className="text-xs text-gray-500 leading-relaxed">
+              学生向け機能は今後も無料を基本方針とします。将来的に大学キャリアセンター向けのB2Bサービスで収益化予定。
+              <span className="text-[#00a87e] font-semibold">学生のデータが第三者に販売されることはありません。</span>
+            </p>
+            <Link href="/privacy" className="text-xs text-[#00a87e] font-semibold mt-1.5 inline-block">
+              プライバシーポリシー →
             </Link>
           </div>
         </Reveal>
