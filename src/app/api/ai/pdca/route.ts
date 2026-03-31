@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     const failedInterviews = interviews.filter((i: { result: string }) => i.result === "FAIL").length;
     const now = new Date();
     const gradYear = profile?.graduationYear ?? 2028;
-    const monthsLeft = (gradYear - now.getFullYear()) * 12 + (3 - now.getMonth());
+    const monthsLeft = (gradYear - now.getFullYear()) * 12 + (3 - (now.getMonth() + 1));
 
     const lines = [
       `[ユーザー] ${profile ? `${profile.university || ""}${profile.faculty ? " " + profile.faculty : ""} ${profile.grade || ""} ${gradYear}年卒 / 志望:${profile.targetIndustries?.join("・") || "未設定"}` : "未設定"}`,

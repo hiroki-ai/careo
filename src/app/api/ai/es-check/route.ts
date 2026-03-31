@@ -45,9 +45,10 @@ export async function POST(req: NextRequest) {
 1. 自己分析との一貫性 - 就活の軸・強み・ガクチカと回答内容が一致しているか
 2. 具体性 - エピソード・数値・役割が具体的に書かれているか
 3. 文字数バランス - 指定文字数に対して適切な量か（過少・過多）
-4. AIっぽい文体 - "〜においては""〜であることから""しっかりと" など検出
+4. AIっぽい文体 - "〜においては""〜であることから""しっかりと""貢献したい""活かしたい" など検出
 5. 他社ESとの差別化 - 過去ESと同じ内容をコピペしていないか
 6. 企業への志望動機の個別化 - ${companyName}固有の理由が書かれているか
+7. 個性・熱意 - テンプレ的でなく本人の言葉・体験に根ざしているか。読んで熱意が伝わるか
 
 スコア基準:
 - 90+: 提出OK
@@ -88,7 +89,7 @@ ${previousEsAnswers.slice(0, 3).map((a, i) => `過去ES${i + 1}: ${a.substring(0
 
     const response = await anthropic.messages.create({
       model: "claude-haiku-4-5-20251001",
-      max_tokens: 600,
+      max_tokens: 1000,
       system: systemPrompt,
       messages: [{ role: "user", content: userMessage }],
     });
