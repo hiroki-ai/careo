@@ -77,7 +77,12 @@ export default function TestsPage() {
           <h1 className="text-2xl font-bold text-gray-900">筆記試験管理</h1>
           <p className="text-sm text-gray-500 mt-1">{tests.length}件の記録</p>
         </div>
-        <Button onClick={() => setIsOpen(true)}>+ 追加</Button>
+        <div className="flex gap-2">
+          <a href="/tests/practice">
+            <Button variant="secondary">📝 SPI練習</Button>
+          </a>
+          <Button onClick={() => setIsOpen(true)}>+ 追加</Button>
+        </div>
       </div>
 
       {/* 種別サマリー */}

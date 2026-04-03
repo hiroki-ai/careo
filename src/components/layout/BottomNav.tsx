@@ -51,6 +51,7 @@ const moreItems = [
   { href: "/es", label: "ES管理", emoji: "📄" },
   { href: "/interviews", label: "面接ログ", emoji: "👥" },
   { href: "/ob-visits", label: "OB/OG訪問", emoji: "🤝" },
+  { href: "/mentors", label: "先輩に相談", emoji: "👨‍🎓" },
   { href: "/tests", label: "筆記試験", emoji: "📝" },
   { href: "/career", label: "自己分析", emoji: "💡" },
   { href: "/insights", label: "みんなの就活", emoji: "🌐" },

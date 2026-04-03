@@ -13,6 +13,7 @@ import { Modal } from "@/components/ui/Modal";
 import { formatDate } from "@/lib/utils";
 import { QAPair } from "@/types";
 import type { EsCheckResult } from "@/app/api/ai/es-check/route";
+import type { EsProofreadResult } from "@/app/api/ai/es-proofread/route";
 
 function EsQuestionCard({
   qa,
@@ -138,6 +139,74 @@ function EsCheckModal({
   );
 }
 
+// AI添削パネル
+function ProofreadPanel({
+  result,
+  onApply,
+}: {
+  result: EsProofreadResult;
+  onApply: (index: number, improved: string) => void;
+}) {
+  const [applied, setApplied] = useState<Record<number, boolean>>({});
+
+  return (
+    <div className="mt-6 bg-indigo-50 border border-indigo-200 rounded-xl p-5">
+      <div className="flex items-center gap-2 mb-1">
+        <span className="text-indigo-600 font-bold text-base">✏️</span>
+        <h3 className="font-semibold text-indigo-900 text-sm">AI添削結果</h3>
+      </div>
+      <p className="text-xs text-indigo-700 mb-4">{result.overallComment}</p>
+
+      <div className="space-y-5">
+        {result.answers.map((a) => (
+          <div key={a.questionIndex} className="bg-white rounded-xl border border-indigo-100 p-4">
+            <p className="text-xs font-semibold text-gray-500 mb-2">設問 {a.questionIndex + 1}: {a.question}</p>
+
+            {/* 改善ポイント */}
+            {a.points.length > 0 && (
+              <div className="mb-3 flex flex-wrap gap-1.5">
+                {a.points.map((pt, i) => (
+                  <span key={i} className="text-[11px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">{pt}</span>
+                ))}
+              </div>
+            )}
+
+            {/* 添削前後 */}
+            <div className="grid md:grid-cols-2 gap-3 mb-3">
+              <div>
+                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">添削前</p>
+                <p className="text-xs text-gray-500 whitespace-pre-wrap bg-gray-50 rounded-lg p-3 leading-relaxed">{a.original}</p>
+              </div>
+              <div>
+                <p className="text-[10px] font-bold text-indigo-500 uppercase mb-1">添削後</p>
+                <p className="text-xs text-gray-800 whitespace-pre-wrap bg-indigo-50 rounded-lg p-3 leading-relaxed border border-indigo-100">{a.improved}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-gray-400 italic">{a.feedback}</p>
+              {applied[a.questionIndex] ? (
+                <span className="text-xs text-emerald-600 font-medium">✓ 反映済み</span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onApply(a.questionIndex, a.improved);
+                    setApplied((prev) => ({ ...prev, [a.questionIndex]: true }));
+                  }}
+                  className="text-xs font-medium bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors"
+                >
+                  この添削を反映する
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function EsDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
@@ -151,6 +220,8 @@ export default function EsDetailPage({ params }: { params: Promise<{ id: string 
   const [checkLoading, setCheckLoading] = useState(false);
   const [reviewRequesting, setReviewRequesting] = useState(false);
   const [reviewSent, setReviewSent] = useState(false);
+  const [proofreadResult, setProofreadResult] = useState<EsProofreadResult | null>(null);
+  const [proofreadLoading, setProofreadLoading] = useState(false);
 
   const es = esList.find((e) => e.id === id);
   const company = es ? companies.find((c) => c.id === es.companyId) : null;
@@ -225,6 +296,35 @@ export default function EsDetailPage({ params }: { params: Promise<{ id: string 
     }
   };
 
+  const handleProofread = async () => {
+    setProofreadLoading(true);
+    setProofreadResult(null);
+    try {
+      const res = await fetch("/api/ai/es-proofread", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          questions: es.questions.map((q) => ({ question: q.question, answer: q.answer })),
+          companyName: company?.name ?? "不明",
+          industry: company?.industry,
+        }),
+      });
+      const data = await res.json() as EsProofreadResult;
+      setProofreadResult(data);
+    } catch {
+      // silent
+    } finally {
+      setProofreadLoading(false);
+    }
+  };
+
+  const handleApplyProofread = (questionIndex: number, improved: string) => {
+    const updated = es.questions.map((q, i) =>
+      i === questionIndex ? { ...q, answer: improved } : q
+    );
+    updateEs(id, { ...es, questions: updated });
+  };
+
   return (
     <div className="p-4 md:p-8 max-w-3xl">
       <Link href="/es" className="text-sm text-gray-400 hover:text-gray-600 mb-3 inline-block">← ES一覧</Link>
@@ -256,6 +356,14 @@ export default function EsDetailPage({ params }: { params: Promise<{ id: string 
               📋 提出前チェック
             </Button>
           )}
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={handleProofread}
+            disabled={proofreadLoading}
+          >
+            {proofreadLoading ? "添削中..." : "✏️ AI添削"}
+          </Button>
           {reviewSent ? (
             <span className="text-xs text-emerald-600 font-medium self-center">✓ 添削依頼済み</span>
           ) : (
@@ -283,6 +391,21 @@ export default function EsDetailPage({ params }: { params: Promise<{ id: string 
           />
         ))}
       </div>
+
+      {/* AI添削パネル */}
+      {proofreadLoading && (
+        <div className="mt-6 bg-indigo-50 border border-indigo-200 rounded-xl p-6 text-center">
+          <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm text-indigo-700">AIがESを添削中...</p>
+          <p className="text-xs text-indigo-500 mt-1">表現の改善・具体化・自然な文体に修正します</p>
+        </div>
+      )}
+      {proofreadResult && !proofreadLoading && (
+        <ProofreadPanel
+          result={proofreadResult}
+          onApply={handleApplyProofread}
+        />
+      )}
 
       <Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} title="ESを編集" size="lg">
         <EsForm

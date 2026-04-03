@@ -109,6 +109,20 @@ export default function CareerPage() {
         <p className="text-sm text-gray-500 mt-1">就活の軸・ガクチカ・自己PRを整理してESや面接のAI支援に活かします</p>
       </div>
 
+      {/* 深掘りモードへのリンク */}
+      <div className="mb-4 bg-[#00c896]/5 border border-[#00c896]/20 rounded-xl p-4 flex items-center justify-between">
+        <div>
+          <p className="text-sm font-semibold text-gray-800 mb-0.5">質問形式で深掘りしたい人はこちら</p>
+          <p className="text-xs text-gray-500">12問の質問に答えて、自己分析の土台を一緒に作ります</p>
+        </div>
+        <a
+          href="/career/deepen"
+          className="shrink-0 ml-3 px-4 py-2 rounded-xl text-sm font-semibold bg-[#00c896] text-white hover:bg-[#00b586] transition-colors"
+        >
+          深掘りを始める →
+        </a>
+      </div>
+
       {/* 自己分析外部ツール案内 */}
       <div className="mb-6 bg-amber-50 border border-amber-100 rounded-xl p-4">
         <p className="text-sm font-semibold text-amber-900 mb-1">💡 自己分析をもっと深めるには</p>
