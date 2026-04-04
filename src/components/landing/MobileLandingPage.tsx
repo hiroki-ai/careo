@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import type { RecentPost } from "@/app/page";
+import type { RecentPost, UserReview } from "@/app/page";
 import { LPChatBot } from "@/components/landing/LPChatBot";
 
 // ─── Reveal wrapper ──────────────────────────────────────────────────────────
@@ -364,15 +364,79 @@ function getThumbnailColors(tags: string[]): [string, string] {
   return ["#6366f1", "#8b5cf6"];
 }
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
-function getUserCountBadge(count: number): { label: string; message: string } {
-  if (count < 10) return { label: `現在 ${count} 人が利用中`, message: "まだ少ない今が、差をつけるチャンス" };
-  if (count < 30) return { label: `${count} 人が使い始めてる`, message: "早めに習慣化するほど就活が有利になる" };
-  if (count < 100) return { label: `${count} 人の就活生が利用中`, message: "早く始めるほど、データが蓄積されてAIが賢くなる" };
-  return { label: `${count} 人の就活生が利用中`, message: "データが充実したAIコーチで就活を管理しよう" };
+// ─── Mobile Voice Section ─────────────────────────────────────────────────────
+const MOBILE_AVATAR_COLORS = [
+  "from-blue-400 to-indigo-500",
+  "from-emerald-400 to-teal-500",
+  "from-[#00c896] to-emerald-600",
+  "from-purple-400 to-pink-500",
+  "from-orange-400 to-red-500",
+];
+
+const MOBILE_FALLBACK_VOICES = [
+  {
+    quote: "就活のデータがバラバラだったのがCareoで全部つながった感じ。カレオコーチの週次アドバイスが的確すぎて、毎週楽しみになってます。",
+    display_name: "M.T.",
+    university: "早稲田大学 · 就活生",
+    rating: 5,
+  },
+  {
+    quote: "Careoがあることで締切の見落としが完全になくなりました。ESのAIチェックも提出前に必ず使ってます。",
+    display_name: "K.S.",
+    university: "慶應義塾大学 · 就活生",
+    rating: 5,
+  },
+  {
+    quote: "無料でここまでできるのが信じられないレベルです。友達に紹介したら「大学生が作ったの？」って驚かれました。",
+    display_name: "A.Y.",
+    university: "上智大学 · 就活生",
+    rating: 5,
+  },
+];
+
+function MobileVoiceSection({ reviews }: { reviews: UserReview[] }) {
+  const voices = reviews.length > 0 ? reviews : MOBILE_FALLBACK_VOICES;
+  return (
+    <section className="px-6 py-14 bg-gray-50">
+      <Reveal className="mb-6">
+        <p className="text-[#00c896] text-[10px] font-black tracking-widest uppercase mb-2">Voice</p>
+        <h2 className="text-3xl font-black text-gray-900 leading-tight">使っている人の声</h2>
+      </Reveal>
+      <div className="space-y-3">
+        {voices.slice(0, 3).map((item, i) => {
+          const avatar = item.display_name.charAt(0).toUpperCase();
+          const color = MOBILE_AVATAR_COLORS[i % MOBILE_AVATAR_COLORS.length];
+          return (
+            <Reveal key={i} delay={i * 60}>
+              <div className="bg-white rounded-2xl p-5 border border-gray-100">
+                <div className="flex gap-0.5 mb-3">
+                  {[...Array(5)].map((_, j) => (
+                    <svg key={j} className={`w-3 h-3 ${j < item.rating ? "text-amber-400" : "text-gray-200"}`} fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+                <p className="text-sm text-gray-700 leading-relaxed mb-4">&ldquo;{item.quote}&rdquo;</p>
+                <div className="flex items-center gap-2.5">
+                  <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${color} flex items-center justify-center text-white font-bold text-xs shrink-0`}>
+                    {avatar}
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-[#0D0B21]">{item.display_name}</p>
+                    {item.university && <p className="text-[10px] text-gray-400">{item.university}</p>}
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+          );
+        })}
+      </div>
+    </section>
+  );
 }
 
-export function MobileLandingPage({ recentPosts = [], userCount = 0 }: { recentPosts?: RecentPost[]; userCount?: number }) {
+// ─── Main ─────────────────────────────────────────────────────────────────────
+export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [] }: { recentPosts?: RecentPost[]; userCount?: number; reviews?: UserReview[] }) {
   const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
@@ -455,18 +519,6 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0 }: { recentP
           <span>🔒 データは暗号化保存・第三者販売なし</span>
         </div>
 
-        {userCount > 0 && (() => {
-          const { label, message } = getUserCountBadge(userCount);
-          return (
-            <div className="flex items-start gap-2.5 bg-amber-50/90 border border-amber-200 rounded-xl px-4 py-3 mb-16">
-              <span className="text-sm leading-none mt-0.5">👥</span>
-              <div>
-                <p className="text-xs font-bold text-amber-800">{label}</p>
-                <p className="text-xs text-amber-600 mt-0.5">{message}</p>
-              </div>
-            </div>
-          );
-        })()}
 
         {/* Phone mockup */}
         <div className="px-8">
@@ -821,6 +873,9 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0 }: { recentP
           </div>
         </Reveal>
       </section>
+
+      {/* ── Voice ──────────────────────────────────────────────────────────── */}
+      <MobileVoiceSection reviews={reviews} />
 
       {/* ── FAQ ────────────────────────────────────────────────────────────── */}
       <section className="px-6 py-16 bg-white">

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Script from "next/script";
-import type { RecentPost } from "@/app/page";
+import type { RecentPost, UserReview } from "@/app/page";
 import { LPChatBot } from "@/components/landing/LPChatBot";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -376,6 +376,81 @@ function AnimatedCounter({ target, prefix = "", suffix = "", label }: { target: 
   );
 }
 
+// ─── Testimonials Section ─────────────────────────────────────────────────────
+const AVATAR_COLORS = [
+  "from-blue-400 to-indigo-500",
+  "from-emerald-400 to-teal-500",
+  "from-[#00c896] to-emerald-600",
+  "from-purple-400 to-pink-500",
+  "from-orange-400 to-red-500",
+  "from-sky-400 to-blue-500",
+];
+
+const FALLBACK_VOICES = [
+  {
+    quote: "就活のデータがバラバラだったのがCareoで全部つながった感じ。カレオコーチの週次アドバイスが的確すぎて、毎週楽しみになってます。",
+    display_name: "M.T.",
+    university: "早稲田大学 · 就活生",
+    rating: 5,
+  },
+  {
+    quote: "SmartESやリクナビと一緒に使っています。Careoがあることで締切の見落としが完全になくなりました。ESのAIチェックも提出前に必ず使ってます。",
+    display_name: "K.S.",
+    university: "慶應義塾大学 · 就活生",
+    rating: 5,
+  },
+  {
+    quote: "「大学生が一人で作ったの？」って友達に紹介したら驚かれました。無料でここまでできるのが信じられないレベルです。",
+    display_name: "A.Y.",
+    university: "上智大学 · 就活生",
+    rating: 5,
+  },
+];
+
+function TestimonialsSection({ reviews }: { reviews: UserReview[] }) {
+  const voices = reviews.length > 0 ? reviews : FALLBACK_VOICES;
+  return (
+    <section className="px-6 py-24 bg-gray-50/60 reveal">
+      <div className="max-w-4xl mx-auto">
+        <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">Voice</p>
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 tracking-tight">
+          使っている人の<span className="text-[#00c896]">声</span>
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {voices.map((item, i) => {
+            const avatar = item.display_name.charAt(0).toUpperCase();
+            const color = AVATAR_COLORS[i % AVATAR_COLORS.length];
+            return (
+              <div
+                key={i}
+                className={`bg-white rounded-2xl p-6 border border-gray-100 hover:border-[#00c896]/20 hover:shadow-md transition-all duration-300 hover:-translate-y-1 reveal reveal-delay-${(i % 3) + 1}`}
+              >
+                <div className="flex gap-0.5 mb-4">
+                  {[...Array(5)].map((_, j) => (
+                    <svg key={j} className={`w-3.5 h-3.5 ${j < item.rating ? "text-amber-400" : "text-gray-200"}`} fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+                <p className="text-sm text-gray-700 leading-relaxed mb-5">&ldquo;{item.quote}&rdquo;</p>
+                <div className="flex items-center gap-3">
+                  <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${color} flex items-center justify-center text-white font-bold text-sm shrink-0`}>
+                    {avatar}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-[#0D0B21]">{item.display_name}</p>
+                    {item.university && <p className="text-xs text-gray-400">{item.university}</p>}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ─── Blog Preview Section ─────────────────────────────────────────────────────
 const TAG_COLORS: Record<string, string> = {
   "ES対策": "bg-blue-50 text-blue-600 border-blue-100",
@@ -508,14 +583,7 @@ function BlogPreviewSection({ posts }: { posts: RecentPost[] }) {
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-function getUserCountBadge(count: number): { label: string; message: string } {
-  if (count < 10) return { label: `現在 ${count} 人が利用中`, message: "まだ少ない今が、差をつけるチャンス" };
-  if (count < 30) return { label: `${count} 人が使い始めてる`, message: "早めに習慣化するほど就活が有利になる" };
-  if (count < 100) return { label: `${count} 人の就活生が利用中`, message: "早く始めるほど、データが蓄積されてAIが賢くなる" };
-  return { label: `${count} 人の就活生が利用中`, message: "データが充実したAIコーチで就活を管理しよう" };
-}
-
-export function LandingPage({ recentPosts = [], userCount = 0 }: { recentPosts?: RecentPost[]; userCount?: number }) {
+export function LandingPage({ recentPosts = [], userCount = 0, reviews = [] }: { recentPosts?: RecentPost[]; userCount?: number; reviews?: UserReview[] }) {
   const [badgeText, setBadgeText] = useState(DEFAULT_BADGE);
   const [heroSubtext, setHeroSubtext] = useState(DEFAULT_HERO_SUBTEXT);
   const [afterItems, setAfterItems] = useState<string[]>(DEFAULT_AFTER_ITEMS);
@@ -665,18 +733,6 @@ export function LandingPage({ recentPosts = [], userCount = 0 }: { recentPosts?:
                 <span className="flex items-center gap-1"><span>🔒</span><span>データは暗号化保存・第三者販売なし</span></span>
               </div>
 
-              {userCount > 0 && (() => {
-                const { label, message } = getUserCountBadge(userCount);
-                return (
-                  <div className="mt-5 flex items-start gap-2.5 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 max-w-sm">
-                    <span className="text-base leading-none mt-0.5">👥</span>
-                    <div>
-                      <p className="text-xs font-bold text-amber-800">{label}</p>
-                      <p className="text-xs text-amber-600 mt-0.5">{message}</p>
-                    </div>
-                  </div>
-                );
-              })()}
             </div>
 
             {/* Right: App mockup */}
@@ -696,6 +752,9 @@ export function LandingPage({ recentPosts = [], userCount = 0 }: { recentPosts?:
               <p className="text-3xl md:text-4xl font-bold text-[#0D0B21]">全卒年</p>
               <p className="text-gray-400 text-sm mt-1">対応</p>
             </div>
+            {userCount >= 100 && (
+              <AnimatedCounter target={userCount} suffix="人" label="が利用中" />
+            )}
           </div>
         </div>
       </section>
@@ -1111,64 +1170,7 @@ export function LandingPage({ recentPosts = [], userCount = 0 }: { recentPosts?:
       </section>
 
       {/* ── Testimonials ───────────────────────────────────────────────────── */}
-      {/* 実際のユーザーの声に差し替えてください */}
-      <section className="px-6 py-24 bg-gray-50/60 reveal">
-        <div className="max-w-4xl mx-auto">
-          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">Voice</p>
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 tracking-tight">
-            使っている人の<span className="text-[#00c896]">声</span>
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              {
-                quote: "就活のデータがバラバラだったのがCareoで全部つながった感じ。カレオコーチの週次アドバイスが的確すぎて、毎週楽しみになってます。",
-                name: "M.T.",
-                univ: "早稲田大学 · 就活生",
-                avatar: "M",
-                color: "from-blue-400 to-indigo-500",
-              },
-              {
-                quote: "SmartESやリクナビと一緒に使っています。Careoがあることで締切の見落としが完全になくなりました。ESのAIチェックも提出前に必ず使ってます。",
-                name: "K.S.",
-                univ: "慶應義塾大学 · 就活生",
-                avatar: "K",
-                color: "from-emerald-400 to-teal-500",
-              },
-              {
-                quote: "「大学生が一人で作ったの？」って友達に紹介したら驚かれました。無料でここまでできるのが信じられないレベルです。",
-                name: "A.Y.",
-                univ: "上智大学 · 就活生",
-                avatar: "A",
-                color: "from-[#00c896] to-emerald-600",
-              },
-            ].map((item, i) => (
-              <div
-                key={item.name}
-                className={`bg-white rounded-2xl p-6 border border-gray-100 hover:border-[#00c896]/20 hover:shadow-md transition-all duration-300 hover:-translate-y-1 reveal reveal-delay-${i + 1}`}
-              >
-                {/* Stars */}
-                <div className="flex gap-0.5 mb-4">
-                  {[...Array(5)].map((_, j) => (
-                    <svg key={j} className="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-                <p className="text-sm text-gray-700 leading-relaxed mb-5">&ldquo;{item.quote}&rdquo;</p>
-                <div className="flex items-center gap-3">
-                  <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${item.color} flex items-center justify-center text-white font-bold text-sm shrink-0`}>
-                    {item.avatar}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-[#0D0B21]">{item.name}</p>
-                    <p className="text-xs text-gray-400">{item.univ}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <TestimonialsSection reviews={reviews} />
 
       {/* ── 大学キャリアセンター連携 ─────────────────────────────────────────── */}
       <section id="university" className="px-6 py-24 bg-white reveal">

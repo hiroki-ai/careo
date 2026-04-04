@@ -16,6 +16,14 @@ export type RecentPost = {
   published_at: string;
 };
 
+export type UserReview = {
+  id: string;
+  quote: string;
+  display_name: string;
+  university: string | null;
+  rating: number;
+};
+
 async function getUserCount(): Promise<number> {
   try {
     const supabase = createSupabaseClient(
@@ -28,6 +36,24 @@ async function getUserCount(): Promise<number> {
     return count ?? 0;
   } catch {
     return 0;
+  }
+}
+
+async function getApprovedReviews(): Promise<UserReview[]> {
+  try {
+    const supabase = createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+    const { data } = await supabase
+      .from("user_reviews")
+      .select("id, quote, display_name, university, rating")
+      .eq("is_approved", true)
+      .order("created_at", { ascending: false })
+      .limit(9);
+    return data ?? [];
+  } catch {
+    return [];
   }
 }
 
@@ -56,15 +82,16 @@ export default async function RootPage() {
     return <DashboardContent />;
   }
 
-  const [headersList, recentPosts, userCount] = await Promise.all([
+  const [headersList, recentPosts, userCount, reviews] = await Promise.all([
     headers(),
     getRecentPosts(),
     getUserCount(),
+    getApprovedReviews(),
   ]);
   const ua = headersList.get("user-agent") ?? "";
   const isMobile = /iPhone|Android|Mobile/i.test(ua);
 
   return isMobile
-    ? <MobileLandingPage recentPosts={recentPosts} userCount={userCount} />
-    : <LandingPage recentPosts={recentPosts} userCount={userCount} />;
+    ? <MobileLandingPage recentPosts={recentPosts} userCount={userCount} reviews={reviews} />
+    : <LandingPage recentPosts={recentPosts} userCount={userCount} reviews={reviews} />;
 }

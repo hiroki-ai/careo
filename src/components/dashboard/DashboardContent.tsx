@@ -21,6 +21,7 @@ import { daysUntil } from "@/lib/utils";
 import { COMPANY_STATUS_ORDER, JOB_SEARCH_STAGE_LABELS, UserProfile } from "@/types";
 import { useCoach } from "@/hooks/useCoach";
 import { TutorialModal } from "@/components/dashboard/TutorialModal";
+import { ReviewPromptModal } from "@/components/dashboard/ReviewPromptModal";
 
 function getGreeting(): string {
   const h = new Date().getHours();
@@ -264,6 +265,7 @@ export function DashboardContent() {
   return (
     <div className="bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
       <TutorialModal />
+      <ReviewPromptModal />
 
       {/* ========== モバイルレイアウト ========== */}
       <div className="md:hidden p-4 pb-6">
