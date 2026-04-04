@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useCompanies } from "@/hooks/useCompanies";
 import { useEs } from "@/hooks/useEs";
 import { useInterviews } from "@/hooks/useInterviews";
+import { useEvents } from "@/hooks/useEvents";
 import { useProfile } from "@/hooks/useProfile";
 import { useActionItems } from "@/hooks/useActionItems";
 import { useChat } from "@/hooks/useChat";
@@ -96,10 +97,20 @@ const priorityBadgeVariants: Record<string, "danger" | "warning" | "default"> = 
   high: "danger", medium: "warning", low: "default",
 };
 
+const EVENT_TYPE_BADGE: Record<string, string> = {
+  ES: "bg-[#00c896]/10 text-[#00a87e]",
+  面接: "bg-purple-100 text-purple-700",
+  説明会: "bg-orange-100 text-orange-700",
+  インターン: "bg-green-100 text-green-700",
+  セミナー: "bg-indigo-100 text-indigo-700",
+  その他: "bg-gray-100 text-gray-600",
+};
+
 export function DashboardContent() {
   const { companies } = useCompanies();
   const { esList } = useEs();
   const { interviews } = useInterviews();
+  const { events } = useEvents();
   const { profile } = useProfile();
   const { pendingItems, completedItems, loading: itemsLoading, replaceItems, toggleItem } = useActionItems();
   const { recentUserMessages } = useChat();
@@ -114,7 +125,7 @@ export function DashboardContent() {
     return acc;
   }, {} as Record<string, number>);
 
-  // 締切・面接イベント
+  // 締切・面接・説明会・インターンイベント
   const calendarEvents = [
     ...esList
       .filter((e) => e.deadline && e.status === "DRAFT")
@@ -133,6 +144,15 @@ export function DashboardContent() {
         type: "面接" as const,
         title: `${companies.find(c => c.id === i.companyId)?.name ?? ""} ${i.round}次面接`,
         link: `/interviews/${i.id}`,
+      })),
+    ...events
+      .filter((e) => e.status === "upcoming")
+      .map((e) => ({
+        id: e.id,
+        date: e.scheduledAt,
+        type: e.eventType,
+        title: `${e.companyName} ${e.eventType}`,
+        link: `/events`,
       })),
   ];
 
@@ -360,7 +380,7 @@ export function DashboardContent() {
               {upcomingDeadlines.map((d) => (
                 <Link key={`${d.type}-${d.id}`} href={d.link} className="shrink-0">
                   <div className={`flex items-center gap-2 bg-white rounded-xl border px-3.5 py-3 ${d.days <= 3 ? "border-red-200 bg-red-50/30" : "border-gray-100"}`}>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${d.type === "ES" ? "bg-[#00c896]/10 text-[#00a87e]" : "bg-purple-100 text-purple-700"}`}>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${EVENT_TYPE_BADGE[d.type] ?? "bg-gray-100 text-gray-600"}`}>
                       {d.type}
                     </span>
                     <p className="text-xs font-medium text-gray-900 max-w-[110px] truncate">{d.title}</p>
@@ -426,7 +446,7 @@ export function DashboardContent() {
               {upcomingDeadlines.map((d) => (
                 <Link key={`${d.type}-${d.id}`} href={d.link} className="shrink-0">
                   <div className={`flex items-center gap-2 bg-white rounded-xl border px-3 py-2.5 ${d.days <= 3 ? "border-red-200 bg-red-50/30" : "border-gray-100"}`}>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${d.type === "ES" ? "bg-[#00c896]/10 text-[#00a87e]" : "bg-purple-100 text-purple-700"}`}>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${EVENT_TYPE_BADGE[d.type] ?? "bg-gray-100 text-gray-600"}`}>
                       {d.type}
                     </span>
                     <p className="text-xs font-medium text-gray-900 max-w-[110px] truncate">{d.title}</p>
@@ -537,7 +557,7 @@ export function DashboardContent() {
                     <Link key={`${d.type}-${d.id}`} href={d.link}>
                       <div className={`flex items-center justify-between bg-white rounded-xl border p-2.5 hover:bg-gray-50 transition-colors ${d.days <= 3 ? "border-red-200" : "border-gray-100"}`}>
                         <div className="flex items-center gap-2 min-w-0">
-                          <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0 ${d.type === "ES" ? "bg-[#00c896]/10 text-[#00a87e]" : "bg-purple-100 text-purple-700"}`}>
+                          <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0 ${EVENT_TYPE_BADGE[d.type] ?? "bg-gray-100 text-gray-600"}`}>
                             {d.type}
                           </span>
                           <p className="text-xs font-medium text-gray-900 truncate">{d.title}</p>

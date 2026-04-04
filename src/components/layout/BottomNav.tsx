@@ -48,10 +48,11 @@ const moreItems = [
   { href: "/companies", label: "企業管理", emoji: "🏢" },
   { href: "/report", label: "PDCA", emoji: "📊" },
   { href: "/calendar", label: "カレンダー", emoji: "📅" },
+  { href: "/events", label: "説明会・インターン", emoji: "🎯" },
   { href: "/es", label: "ES管理", emoji: "📄" },
   { href: "/interviews", label: "面接ログ", emoji: "👥" },
   { href: "/ob-visits", label: "OB/OG訪問", emoji: "🤝" },
-  { href: "/mentors", label: "先輩に相談", emoji: "👨‍🎓" },
+  { href: "/mentors", label: "先輩に相談", emoji: "👨‍🎓", comingSoon: true },
   { href: "/tests", label: "筆記試験", emoji: "📝" },
   { href: "/career", label: "自己分析", emoji: "💡" },
   { href: "/insights", label: "みんなの就活", emoji: "🌐" },
@@ -118,7 +119,7 @@ export function BottomNav() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex flex-col items-center justify-center gap-1.5 py-3 rounded-2xl text-center transition-colors ${
+                    className={`relative flex flex-col items-center justify-center gap-1.5 py-3 rounded-2xl text-center transition-colors ${
                       isActive
                         ? "bg-[#00c896]/10 text-[#00a87e]"
                         : "bg-gray-50 text-gray-600 active:bg-gray-100"
@@ -126,6 +127,9 @@ export function BottomNav() {
                   >
                     <span className="text-xl">{item.emoji}</span>
                     <span className="text-[10px] font-medium leading-tight">{item.label}</span>
+                    {"comingSoon" in item && item.comingSoon && (
+                      <span className="absolute top-1.5 right-1.5 text-[8px] font-bold bg-amber-100 text-amber-600 px-1 py-0.5 rounded-full leading-none">近日</span>
+                    )}
                   </Link>
                 );
               })}

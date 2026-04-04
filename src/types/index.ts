@@ -517,3 +517,39 @@ export const APPOINTMENT_STATUS_LABELS: Record<AppointmentStatus, string> = {
   cancelled_by_student: 'キャンセル（学生）',
   cancelled_by_staff: 'キャンセル（職員）',
 };
+
+// ── 説明会・インターン日程 ──────────────────────────────────────────────────
+
+export type CompanyEventType = "説明会" | "インターン" | "セミナー" | "その他";
+export type CompanyEventStatus = "upcoming" | "done" | "skipped";
+
+export interface CompanyEvent {
+  id: string;
+  companyId?: string | null;
+  companyName: string;
+  eventType: CompanyEventType;
+  scheduledAt: string;  // ISO datetime
+  endDate?: string | null;
+  location?: string | null;
+  url?: string | null;
+  notes?: string | null;
+  status: CompanyEventStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const COMPANY_EVENT_TYPE_LABELS: Record<CompanyEventType, string> = {
+  説明会: "説明会",
+  インターン: "インターン",
+  セミナー: "セミナー",
+  その他: "その他",
+};
+
+export const COMPANY_EVENT_TYPE_COLORS: Record<CompanyEventType, string> = {
+  説明会: "bg-orange-100 text-orange-700",
+  インターン: "bg-green-100 text-green-700",
+  セミナー: "bg-indigo-100 text-indigo-700",
+  その他: "bg-gray-100 text-gray-600",
+};
+
+export const COMPANY_EVENT_TYPES: CompanyEventType[] = ["説明会", "インターン", "セミナー", "その他"];

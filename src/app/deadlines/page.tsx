@@ -4,25 +4,37 @@ import Link from "next/link";
 import { useEs } from "@/hooks/useEs";
 import { useInterviews } from "@/hooks/useInterviews";
 import { useCompanies } from "@/hooks/useCompanies";
+import { useEvents } from "@/hooks/useEvents";
 import { Badge } from "@/components/ui/Badge";
 import { formatDate, formatDateTime, daysUntil } from "@/lib/utils";
+import { COMPANY_EVENT_TYPE_COLORS } from "@/types";
 
 interface DeadlineItem {
   id: string;
-  type: "ES" | "面接";
+  type: string;
   title: string;
   companyName: string;
-  companyId: string;
+  companyId?: string;
   date: string;
   link: string;
   isPast: boolean;
   days: number;
 }
 
+const TYPE_BADGE: Record<string, string> = {
+  ES: "bg-blue-100 text-blue-700",
+  面接: "bg-purple-100 text-purple-700",
+  説明会: "bg-orange-100 text-orange-700",
+  インターン: "bg-green-100 text-green-700",
+  セミナー: "bg-indigo-100 text-indigo-700",
+  その他: "bg-gray-100 text-gray-600",
+};
+
 export default function DeadlinesPage() {
   const { esList } = useEs();
   const { interviews } = useInterviews();
   const { companies } = useCompanies();
+  const { events } = useEvents();
 
   const getCompanyName = (companyId: string) =>
     companies.find((c) => c.id === companyId)?.name ?? "不明な企業";
@@ -34,7 +46,7 @@ export default function DeadlinesPage() {
         const days = daysUntil(e.deadline!);
         return {
           id: e.id,
-          type: "ES" as const,
+          type: "ES",
           title: e.title,
           companyName: getCompanyName(e.companyId),
           companyId: e.companyId,
@@ -50,7 +62,7 @@ export default function DeadlinesPage() {
         const days = daysUntil(i.scheduledAt);
         return {
           id: i.id,
-          type: "面接" as const,
+          type: "面接",
           title: `${i.round}次面接`,
           companyName: getCompanyName(i.companyId),
           companyId: i.companyId,
@@ -60,10 +72,26 @@ export default function DeadlinesPage() {
           days,
         };
       }),
+    ...events
+      .filter((e) => e.status === "upcoming")
+      .map((e) => {
+        const days = daysUntil(e.scheduledAt);
+        return {
+          id: e.id,
+          type: e.eventType,
+          title: e.eventType,
+          companyName: e.companyName,
+          companyId: e.companyId ?? undefined,
+          date: e.scheduledAt,
+          link: `/events`,
+          isPast: days < 0,
+          days,
+        };
+      }),
   ].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   const upcoming = items.filter((i) => !i.isPast);
-  const past = items.filter((i) => i.isPast);
+  const past = items.filter((i) => i.isPast && (i.type === "ES" || i.type === "面接"));
 
   const getDaysBadge = (days: number) => {
     if (days === 0) return <Badge variant="danger">今日</Badge>;
@@ -76,12 +104,12 @@ export default function DeadlinesPage() {
   return (
     <div className="p-4 md:p-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">締切一覧</h1>
-        <p className="text-sm text-gray-500 mt-1">未提出のES締切・予定面接を表示</p>
+        <h1 className="text-2xl font-bold text-gray-900">スケジュール</h1>
+        <p className="text-sm text-gray-500 mt-1">ES締切・面接・説明会・インターン</p>
       </div>
 
       {upcoming.length === 0 && past.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">直近の締切・面接はありません</div>
+        <div className="text-center py-16 text-gray-400">直近の締切・予定はありません</div>
       ) : (
         <>
           {upcoming.length > 0 && (
@@ -94,16 +122,20 @@ export default function DeadlinesPage() {
                       <div className="flex items-center justify-between">
                         <div>
                           <div className="flex items-center gap-2 mb-1">
-                            <span className={`text-xs font-medium px-2 py-0.5 rounded ${item.type === "ES" ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700"}`}>
+                            <span className={`text-xs font-medium px-2 py-0.5 rounded ${TYPE_BADGE[item.type] ?? "bg-gray-100 text-gray-600"}`}>
                               {item.type}
                             </span>
-                            <Link href={`/companies/${item.companyId}`} onClick={(e) => e.stopPropagation()} className="text-xs text-gray-400 hover:underline">
-                              {item.companyName}
-                            </Link>
+                            {item.companyId ? (
+                              <Link href={`/companies/${item.companyId}`} onClick={(e) => e.stopPropagation()} className="text-xs text-gray-400 hover:underline">
+                                {item.companyName}
+                              </Link>
+                            ) : (
+                              <span className="text-xs text-gray-400">{item.companyName}</span>
+                            )}
                           </div>
                           <p className="font-semibold text-gray-900">{item.title}</p>
                           <p className="text-sm text-gray-500 mt-0.5">
-                            {item.type === "面接" ? formatDateTime(item.date) : formatDate(item.date)}
+                            {formatDateTime(item.date)}
                           </p>
                         </div>
                         {getDaysBadge(item.days)}
@@ -125,7 +157,7 @@ export default function DeadlinesPage() {
                       <div className="flex items-center justify-between">
                         <div>
                           <div className="flex items-center gap-2 mb-1">
-                            <span className={`text-xs font-medium px-2 py-0.5 rounded ${item.type === "ES" ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700"}`}>
+                            <span className={`text-xs font-medium px-2 py-0.5 rounded ${TYPE_BADGE[item.type] ?? "bg-gray-100 text-gray-600"}`}>
                               {item.type}
                             </span>
                             <span className="text-xs text-gray-400">{item.companyName}</span>
