@@ -168,6 +168,10 @@
   background-size: 28px 28px;
 }
 
+/* スクロールバー非表示 */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
 /* QuickAddModal 保存ボタンエリア（safe-area対応） */
 .quick-add-save-area {
   padding-bottom: max(env(safe-area-inset-bottom), 16px);

@@ -21,6 +21,13 @@ import { COMPANY_STATUS_ORDER, JOB_SEARCH_STAGE_LABELS, UserProfile } from "@/ty
 import { useCoach } from "@/hooks/useCoach";
 import { TutorialModal } from "@/components/dashboard/TutorialModal";
 
+function getGreeting(): string {
+  const h = new Date().getHours();
+  if (h >= 5 && h < 12) return "おはようございます";
+  if (h >= 12 && h < 18) return "こんにちは";
+  return "お疲れ様です";
+}
+
 // 毎日のコーチCTA（チャット未実施の日は強調表示）
 function DailyCoachBanner({ profile }: { profile: UserProfile | null }) {
   const [chatted, setChatted] = useState(true); // サーバーSSRで不一致しないようデフォルトtrue
@@ -226,105 +233,69 @@ export function DashboardContent() {
 
   const hasItems = pendingItems.length > 0 || completedItems.length > 0;
 
-  return (
-    <div className="p-3 md:p-5 bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
-      <TutorialModal />
-      {/* ページヘッダー */}
-      <div className="flex items-center justify-between mb-2 md:mb-3">
-        <div>
-          <h1 className="text-lg md:text-2xl font-bold text-gray-900">ダッシュボード</h1>
-          {profile && (
-            <p className="hidden md:block text-xs text-gray-500 mt-0.5">
-              {profile.university ? `${profile.university} · ` : ""}{profile.grade} ／ {JOB_SEARCH_STAGE_LABELS[profile.jobSearchStage]}
-            </p>
-          )}
-        </div>
-        <div className="flex gap-2">
-          <Link href="/settings">
-            <Button variant="secondary" size="sm">設定</Button>
-          </Link>
-          <Button variant="ghost" size="sm" onClick={handleLogout} className="hidden md:inline-flex">ログアウト</Button>
-        </div>
-      </div>
+  // ステータスチップのデータ（モバイル・PC共通）
+  const statusItems = [
+    { label: "選考中", icon: "🏃", count: companies.filter(c => !["OFFERED","REJECTED","WISHLIST"].includes(c.status)).length, gradient: "from-teal-500 to-emerald-500", bg: "bg-gradient-to-br from-teal-50/60 to-emerald-50/40", border: "border-teal-100", link: "/companies" },
+    { label: "内定", icon: "🎉", count: statusCounts["OFFERED"] ?? 0, gradient: "from-emerald-500 to-green-500", bg: "bg-gradient-to-br from-emerald-50 to-green-50", border: "border-emerald-100", link: "/companies" },
+    { label: "ES提出待ち", icon: "✍️", count: esList.filter(e => e.status === "DRAFT").length, gradient: "from-amber-500 to-orange-500", bg: "bg-gradient-to-br from-amber-50 to-orange-50", border: "border-amber-100", link: "/es" },
+    { label: "気になる", icon: "🔖", count: statusCounts["WISHLIST"] ?? 0, gradient: "from-gray-400 to-slate-500", bg: "bg-gradient-to-br from-gray-50 to-slate-50", border: "border-gray-200", link: "/companies" },
+  ];
 
-      {/* ステータスサマリー — モバイルは2×2グリッド */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
-        {[
-          { label: "選考中", icon: "🏃", count: companies.filter(c => !["OFFERED","REJECTED","WISHLIST"].includes(c.status)).length, gradient: "from-teal-500 to-emerald-500", bg: "bg-gradient-to-br from-teal-50/60 to-emerald-50/40", border: "border-teal-100", link: "/companies" },
-          { label: "内定", icon: "🎉", count: statusCounts["OFFERED"] ?? 0, gradient: "from-emerald-500 to-green-500", bg: "bg-gradient-to-br from-emerald-50 to-green-50", border: "border-emerald-100", link: "/companies" },
-          { label: "ES提出待ち", icon: "✍️", count: esList.filter(e => e.status === "DRAFT").length, gradient: "from-amber-500 to-orange-500", bg: "bg-gradient-to-br from-amber-50 to-orange-50", border: "border-amber-100", link: "/es" },
-          { label: "気になる", icon: "🔖", count: statusCounts["WISHLIST"] ?? 0, gradient: "from-gray-400 to-slate-500", bg: "bg-gradient-to-br from-gray-50 to-slate-50", border: "border-gray-200", link: "/companies" },
-        ].map((item) => (
-          <Link key={item.label} href={item.link}>
-            <div className={`${item.bg} border ${item.border} rounded-2xl p-3.5 md:p-3 shadow-sm active:scale-[0.97] transition-transform`}>
-              <div className="flex items-center justify-between mb-1.5">
-                <p className="text-xs font-medium text-gray-500">{item.label}</p>
-                <span className="text-base">{item.icon}</span>
-              </div>
-              <p className={`text-3xl md:text-2xl font-bold bg-gradient-to-r ${item.gradient} bg-clip-text text-transparent leading-none`}>{item.count}</p>
-              <p className="text-[10px] text-gray-400 mt-1">社 / 件</p>
+  return (
+    <div className="bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
+      <TutorialModal />
+
+      {/* ========== モバイルレイアウト ========== */}
+      <div className="md:hidden p-4 pb-6">
+
+        {/* グリーティングヘッダー */}
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <p className="text-xs text-gray-400 mb-0.5">{getGreeting()}</p>
+            <h1 className="text-xl font-bold text-gray-900">
+              {profile?.username ? `${profile.username}さんの就活` : "今日の就活"}
+            </h1>
+          </div>
+          <Link href="/settings">
+            <div className="w-9 h-9 bg-white border border-gray-100 rounded-full flex items-center justify-center shadow-sm active:bg-gray-50 transition-colors">
+              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
             </div>
           </Link>
-        ))}
-      </div>
-
-      {/* 今日のカレオコーチ CTA */}
-      <DailyCoachBanner profile={profile} />
-
-      {/* モバイル：直近の締切を最上部に表示 */}
-      {upcomingDeadlines.length > 0 && (
-        <div className="mb-3 md:hidden">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="font-semibold text-gray-900 text-sm">📅 直近の締切</h2>
-            <Link href="/deadlines" className="text-xs text-[#00c896] hover:underline">すべて →</Link>
-          </div>
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-            {upcomingDeadlines.map((d) => (
-              <Link key={`${d.type}-${d.id}`} href={d.link} className="shrink-0">
-                <div className={`flex items-center gap-2 bg-white rounded-xl border px-3 py-2.5 ${d.days <= 3 ? "border-red-200 bg-red-50/30" : "border-gray-100"}`}>
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${d.type === "ES" ? "bg-[#00c896]/10 text-[#00a87e]" : "bg-purple-100 text-purple-700"}`}>
-                    {d.type}
-                  </span>
-                  <p className="text-xs font-medium text-gray-900 max-w-[110px] truncate">{d.title}</p>
-                  <span className={`text-xs font-bold shrink-0 ${d.days === 0 ? "text-red-600" : d.days <= 3 ? "text-orange-500" : "text-gray-400"}`}>
-                    {d.days === 0 ? "今日！" : `${d.days}日`}
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
         </div>
-      )}
 
-      {/* メインコンテンツ */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4">
-
-        {/* Left / モバイルは上: Next Action */}
-        <div className="md:col-span-7">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="font-semibold text-gray-900 text-base flex items-center gap-1.5">🎯 <span>Next Action</span></h2>
-            <Button variant="ghost" size="sm" onClick={() => fetchAiAdvice()} disabled={aiLoading}>
-              {aiLoading ? "分析中..." : "再分析"}
-            </Button>
+        {/* 今週やること（Next Action）— 最重要・最上部 */}
+        <div className="mb-5">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-bold text-gray-900 text-base flex items-center gap-1.5">
+              🎯 今週やること
+            </h2>
+            <button
+              type="button"
+              onClick={() => fetchAiAdvice()}
+              disabled={aiLoading}
+              className="text-xs text-gray-400 disabled:opacity-40 active:text-gray-600 transition-colors"
+            >
+              {aiLoading ? "分析中..." : "↻ 更新"}
+            </button>
           </div>
-          {aiSummary && (
-            <p className="text-xs text-gray-400 mb-1.5 px-1 hidden md:block">{aiSummary}</p>
-          )}
 
           {(aiLoading || itemsLoading) && (
-            <div className="space-y-1.5">
+            <div className="space-y-2.5">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-11 bg-gray-100 rounded-xl animate-pulse" />
+                <div key={i} className="h-16 bg-gray-100 rounded-2xl animate-pulse" />
               ))}
             </div>
           )}
 
           {!aiLoading && !itemsLoading && hasItems && (
-            <div className="space-y-1.5">
+            <div className="space-y-2.5">
               {pendingItems.map((item) => (
                 <div
                   key={item.id}
-                  className={`flex items-start gap-3 border-l-4 rounded-r-xl p-3 ${priorityColors[item.priority]}`}
+                  className={`flex items-start gap-3 border-l-4 rounded-r-2xl p-3.5 ${priorityColors[item.priority]}`}
                 >
                   <input
                     type="checkbox"
@@ -334,94 +305,266 @@ export function DashboardContent() {
                     className="mt-0.5 w-5 h-5 rounded border-gray-400 accent-[#00c896] cursor-pointer shrink-0"
                   />
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                    <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
                       <Badge variant={priorityBadgeVariants[item.priority]}>
                         {priorityLabels[item.priority]}
                       </Badge>
                       <p className="text-sm font-semibold text-gray-900 leading-tight">{item.action}</p>
                     </div>
-                    <p className="text-xs text-gray-500">{item.reason}</p>
+                    <p className="text-xs text-gray-500 leading-relaxed">{item.reason}</p>
                   </div>
                   {item.link && (
                     item.link.external
-                      ? <a href={item.link.href} target="_blank" rel="noopener noreferrer" className="shrink-0 ml-1 text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2 py-1 rounded-lg transition-colors whitespace-nowrap">{item.link.label}</a>
-                      : <Link href={item.link.href} className="shrink-0 ml-1 text-[10px] font-bold text-[#00a87e] bg-[#00c896]/10 hover:bg-[#00c896]/20 border border-[#00c896]/30 px-2 py-1 rounded-lg transition-colors whitespace-nowrap">{item.link.label}</Link>
+                      ? <a href={item.link.href} target="_blank" rel="noopener noreferrer" className="shrink-0 text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-200 px-2 py-1 rounded-lg whitespace-nowrap">{item.link.label}</a>
+                      : <Link href={item.link.href} className="shrink-0 text-[10px] font-bold text-[#00a87e] bg-[#00c896]/10 border border-[#00c896]/30 px-2 py-1 rounded-lg whitespace-nowrap">{item.link.label}</Link>
                   )}
                 </div>
               ))}
-              {completedItems.length > 0 && (
-                <div className="mt-1 hidden md:block">
-                  <p className="text-[10px] text-gray-400 mb-1 px-1">完了済み</p>
-                  {completedItems.map((item) => (
-                    <label
-                      key={item.id}
-                      className="flex items-center gap-2.5 border-l-4 border-l-gray-200 bg-gray-50 rounded-r-xl p-2 mb-1 cursor-pointer opacity-60"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={true}
-                        onChange={() => toggleItem(item.id, false)}
-                        className="w-4 h-4 rounded border-gray-400 accent-[#00c896] cursor-pointer shrink-0"
-                      />
-                      <p className="text-xs text-gray-500 line-through">{item.action}</p>
-                    </label>
-                  ))}
-                </div>
-              )}
             </div>
           )}
 
           {!aiLoading && !itemsLoading && !hasItems && (
-            <div className="text-center py-4 text-gray-400">
-              <p className="text-xs mb-2">プロフィールを設定するとAIがアドバイスします</p>
+            <div className="text-center py-8 bg-white rounded-2xl border border-dashed border-gray-200">
+              <p className="text-xs text-gray-400 mb-3">プロフィールを設定するとAIがアドバイスします</p>
               <Button size="sm" onClick={() => fetchAiAdvice([])}>AIアドバイスを取得</Button>
             </div>
           )}
         </div>
 
-        {/* Right / モバイルは下: 直近の締切 + 気づき (PC のみ締切表示) */}
-        <div className="md:col-span-5 space-y-3 md:space-y-4">
-          {/* 直近の締切 — PCのみ */}
-          <div className="hidden md:block">
-            <div className="flex items-center justify-between mb-1.5">
+        {/* コーチCTA */}
+        <DailyCoachBanner profile={profile} />
+
+        {/* ステータスチップ — 横スクロール */}
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide mb-5 -mx-4 px-4">
+          {statusItems.map((item) => (
+            <Link key={item.label} href={item.link} className="shrink-0">
+              <div className="flex items-center gap-2 bg-white border border-gray-100 rounded-2xl px-4 py-2.5 shadow-sm active:bg-gray-50 transition-colors">
+                <span className="text-lg">{item.icon}</span>
+                <div>
+                  <p className="text-xl font-bold text-gray-900 leading-none">{item.count}</p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">{item.label}</p>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* 直近の締切 */}
+        {upcomingDeadlines.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-2.5">
               <h2 className="font-semibold text-gray-900 text-sm">📅 直近の締切</h2>
-              <Link href="/calendar" className="text-[10px] text-[#00c896] hover:underline">カレンダー →</Link>
+              <Link href="/deadlines" className="text-xs text-[#00c896]">すべて →</Link>
             </div>
-            {upcomingDeadlines.length > 0 ? (
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-4 px-4">
+              {upcomingDeadlines.map((d) => (
+                <Link key={`${d.type}-${d.id}`} href={d.link} className="shrink-0">
+                  <div className={`flex items-center gap-2 bg-white rounded-xl border px-3.5 py-3 ${d.days <= 3 ? "border-red-200 bg-red-50/30" : "border-gray-100"}`}>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${d.type === "ES" ? "bg-[#00c896]/10 text-[#00a87e]" : "bg-purple-100 text-purple-700"}`}>
+                      {d.type}
+                    </span>
+                    <p className="text-xs font-medium text-gray-900 max-w-[110px] truncate">{d.title}</p>
+                    <span className={`text-xs font-bold shrink-0 ${d.days === 0 ? "text-red-600" : d.days <= 3 ? "text-orange-500" : "text-gray-400"}`}>
+                      {d.days === 0 ? "今日！" : `${d.days}日`}
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ========== PCレイアウト（変更なし） ========== */}
+      <div className="hidden md:block p-5">
+
+        {/* PCヘッダー */}
+        <div className="flex items-center justify-between mb-2 md:mb-3">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">ダッシュボード</h1>
+            {profile && (
+              <p className="text-xs text-gray-500 mt-0.5">
+                {profile.university ? `${profile.university} · ` : ""}{profile.grade} ／ {JOB_SEARCH_STAGE_LABELS[profile.jobSearchStage]}
+              </p>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <Link href="/settings">
+              <Button variant="secondary" size="sm">設定</Button>
+            </Link>
+            <Button variant="ghost" size="sm" onClick={handleLogout}>ログアウト</Button>
+          </div>
+        </div>
+
+        {/* PCステータスグリッド */}
+        <div className="grid grid-cols-4 gap-2 mb-3">
+          {statusItems.map((item) => (
+            <Link key={item.label} href={item.link}>
+              <div className={`${item.bg} border ${item.border} rounded-2xl p-3 shadow-sm active:scale-[0.97] transition-transform`}>
+                <div className="flex items-center justify-between mb-1.5">
+                  <p className="text-xs font-medium text-gray-500">{item.label}</p>
+                  <span className="text-base">{item.icon}</span>
+                </div>
+                <p className={`text-2xl font-bold bg-gradient-to-r ${item.gradient} bg-clip-text text-transparent leading-none`}>{item.count}</p>
+                <p className="text-[10px] text-gray-400 mt-1">社 / 件</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* PCコーチCTA */}
+        <DailyCoachBanner profile={profile} />
+
+        {/* PC 直近の締切（モバイルは上で表示済み） */}
+        {upcomingDeadlines.length > 0 && (
+          <div className="mb-3">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="font-semibold text-gray-900 text-sm">📅 直近の締切</h2>
+              <Link href="/deadlines" className="text-xs text-[#00c896] hover:underline">すべて →</Link>
+            </div>
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {upcomingDeadlines.map((d) => (
+                <Link key={`${d.type}-${d.id}`} href={d.link} className="shrink-0">
+                  <div className={`flex items-center gap-2 bg-white rounded-xl border px-3 py-2.5 ${d.days <= 3 ? "border-red-200 bg-red-50/30" : "border-gray-100"}`}>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${d.type === "ES" ? "bg-[#00c896]/10 text-[#00a87e]" : "bg-purple-100 text-purple-700"}`}>
+                      {d.type}
+                    </span>
+                    <p className="text-xs font-medium text-gray-900 max-w-[110px] truncate">{d.title}</p>
+                    <span className={`text-xs font-bold shrink-0 ${d.days === 0 ? "text-red-600" : d.days <= 3 ? "text-orange-500" : "text-gray-400"}`}>
+                      {d.days === 0 ? "今日！" : `${d.days}日`}
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* PC 12カラムグリッド */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4">
+
+          {/* Left: Next Action */}
+          <div className="md:col-span-7">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="font-semibold text-gray-900 text-base flex items-center gap-1.5">🎯 <span>Next Action</span></h2>
+              <Button variant="ghost" size="sm" onClick={() => fetchAiAdvice()} disabled={aiLoading}>
+                {aiLoading ? "分析中..." : "再分析"}
+              </Button>
+            </div>
+            {aiSummary && (
+              <p className="text-xs text-gray-400 mb-1.5 px-1">{aiSummary}</p>
+            )}
+
+            {(aiLoading || itemsLoading) && (
               <div className="space-y-1.5">
-                {upcomingDeadlines.map((d) => (
-                  <Link key={`${d.type}-${d.id}`} href={d.link}>
-                    <div className={`flex items-center justify-between bg-white rounded-xl border p-2.5 hover:bg-gray-50 transition-colors ${d.days <= 3 ? "border-red-200" : "border-gray-100"}`}>
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0 ${d.type === "ES" ? "bg-[#00c896]/10 text-[#00a87e]" : "bg-purple-100 text-purple-700"}`}>
-                          {d.type}
-                        </span>
-                        <p className="text-xs font-medium text-gray-900 truncate">{d.title}</p>
-                      </div>
-                      <span className={`text-[10px] font-bold shrink-0 ml-2 ${d.days === 0 ? "text-red-600" : d.days <= 3 ? "text-orange-500" : "text-gray-400"}`}>
-                        {d.days === 0 ? "今日！" : `あと${d.days}日`}
-                      </span>
-                    </div>
-                  </Link>
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="h-11 bg-gray-100 rounded-xl animate-pulse" />
                 ))}
               </div>
-            ) : (
-              <div className="bg-white border border-gray-100 rounded-xl p-2.5 text-center">
-                <p className="text-xs text-gray-400">直近7日に締切はありません</p>
+            )}
+
+            {!aiLoading && !itemsLoading && hasItems && (
+              <div className="space-y-1.5">
+                {pendingItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className={`flex items-start gap-3 border-l-4 rounded-r-xl p-3 ${priorityColors[item.priority]}`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={false}
+                      title={`完了: ${item.action}`}
+                      onChange={() => handleToggle(item.id, true)}
+                      className="mt-0.5 w-5 h-5 rounded border-gray-400 accent-[#00c896] cursor-pointer shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                        <Badge variant={priorityBadgeVariants[item.priority]}>
+                          {priorityLabels[item.priority]}
+                        </Badge>
+                        <p className="text-sm font-semibold text-gray-900 leading-tight">{item.action}</p>
+                      </div>
+                      <p className="text-xs text-gray-500">{item.reason}</p>
+                    </div>
+                    {item.link && (
+                      item.link.external
+                        ? <a href={item.link.href} target="_blank" rel="noopener noreferrer" className="shrink-0 ml-1 text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2 py-1 rounded-lg transition-colors whitespace-nowrap">{item.link.label}</a>
+                        : <Link href={item.link.href} className="shrink-0 ml-1 text-[10px] font-bold text-[#00a87e] bg-[#00c896]/10 hover:bg-[#00c896]/20 border border-[#00c896]/30 px-2 py-1 rounded-lg transition-colors whitespace-nowrap">{item.link.label}</Link>
+                    )}
+                  </div>
+                ))}
+                {completedItems.length > 0 && (
+                  <div className="mt-1">
+                    <p className="text-[10px] text-gray-400 mb-1 px-1">完了済み</p>
+                    {completedItems.map((item) => (
+                      <label
+                        key={item.id}
+                        className="flex items-center gap-2.5 border-l-4 border-l-gray-200 bg-gray-50 rounded-r-xl p-2 mb-1 cursor-pointer opacity-60"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={true}
+                          onChange={() => toggleItem(item.id, false)}
+                          className="w-4 h-4 rounded border-gray-400 accent-[#00c896] cursor-pointer shrink-0"
+                        />
+                        <p className="text-xs text-gray-500 line-through">{item.action}</p>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {!aiLoading && !itemsLoading && !hasItems && (
+              <div className="text-center py-4 text-gray-400">
+                <p className="text-xs mb-2">プロフィールを設定するとAIがアドバイスします</p>
+                <Button size="sm" onClick={() => fetchAiAdvice([])}>AIアドバイスを取得</Button>
               </div>
             )}
           </div>
 
-          {/* カレオからの気づき — PCのみ */}
-          <div className="hidden md:block">
+          {/* Right: 気づき */}
+          <div className="md:col-span-5 space-y-3 md:space-y-4">
+            {/* 直近の締切 — PCのみ（サイドカラム） */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <h2 className="font-semibold text-gray-900 text-sm">📅 締切詳細</h2>
+                <Link href="/calendar" className="text-[10px] text-[#00c896] hover:underline">カレンダー →</Link>
+              </div>
+              {upcomingDeadlines.length > 0 ? (
+                <div className="space-y-1.5">
+                  {upcomingDeadlines.map((d) => (
+                    <Link key={`${d.type}-${d.id}`} href={d.link}>
+                      <div className={`flex items-center justify-between bg-white rounded-xl border p-2.5 hover:bg-gray-50 transition-colors ${d.days <= 3 ? "border-red-200" : "border-gray-100"}`}>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0 ${d.type === "ES" ? "bg-[#00c896]/10 text-[#00a87e]" : "bg-purple-100 text-purple-700"}`}>
+                            {d.type}
+                          </span>
+                          <p className="text-xs font-medium text-gray-900 truncate">{d.title}</p>
+                        </div>
+                        <span className={`text-[10px] font-bold shrink-0 ml-2 ${d.days === 0 ? "text-red-600" : d.days <= 3 ? "text-orange-500" : "text-gray-400"}`}>
+                          {d.days === 0 ? "今日！" : `あと${d.days}日`}
+                        </span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-white border border-gray-100 rounded-xl p-2.5 text-center">
+                  <p className="text-xs text-gray-400">直近7日に締切はありません</p>
+                </div>
+              )}
+            </div>
+
+            {/* カレオからの気づき */}
             <InsightsWidget />
           </div>
         </div>
       </div>
 
-      {/* 内定後コンテンツ */}
+      {/* 内定後コンテンツ（モバイル・PC共通） */}
       {companies.filter(c => c.status === "OFFERED").length > 0 && (
-        <div className="mt-3 md:mt-4">
+        <div className="mt-3 px-4 md:px-5 pb-4">
           <PostOfferWidget offeredCompanies={companies.filter(c => c.status === "OFFERED")} />
         </div>
       )}
