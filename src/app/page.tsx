@@ -16,6 +16,21 @@ export type RecentPost = {
   published_at: string;
 };
 
+async function getUserCount(): Promise<number> {
+  try {
+    const supabase = createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+    const { count } = await supabase
+      .from("user_profiles")
+      .select("*", { count: "exact", head: true });
+    return count ?? 0;
+  } catch {
+    return 0;
+  }
+}
+
 async function getRecentPosts(): Promise<RecentPost[]> {
   try {
     const supabase = createSupabaseClient(
@@ -41,14 +56,15 @@ export default async function RootPage() {
     return <DashboardContent />;
   }
 
-  const [headersList, recentPosts] = await Promise.all([
+  const [headersList, recentPosts, userCount] = await Promise.all([
     headers(),
     getRecentPosts(),
+    getUserCount(),
   ]);
   const ua = headersList.get("user-agent") ?? "";
   const isMobile = /iPhone|Android|Mobile/i.test(ua);
 
   return isMobile
-    ? <MobileLandingPage recentPosts={recentPosts} />
-    : <LandingPage recentPosts={recentPosts} />;
+    ? <MobileLandingPage recentPosts={recentPosts} userCount={userCount} />
+    : <LandingPage recentPosts={recentPosts} userCount={userCount} />;
 }
