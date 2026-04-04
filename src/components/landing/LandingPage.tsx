@@ -856,9 +856,9 @@ export function LandingPage({ recentPosts = [], userCount = 0 }: { recentPosts?:
                 tag: "インサイト通知",
               },
               {
-                icon: "📋",
-                title: "ES提出前AIチェック",
-                desc: "自己分析との整合性・AIっぽい文体・過去ESとの重複・企業固有の志望理由を提出前に一括確認",
+                icon: "✍️",
+                title: "ES管理・AI添削・チェック",
+                desc: "8業界テンプレで作成 → AI添削で人間らしい文章に → 提出前に自己分析との整合性・文体・重複を一括チェック。3ステップ完結。",
                 tag: "AI機能",
               },
               {
@@ -886,6 +886,18 @@ export function LandingPage({ recentPosts = [], userCount = 0 }: { recentPosts?:
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[
+              {
+                icon: "💡",
+                title: "自己分析 深掘り12問",
+                desc: "「10年後のなりたい姿」「しんどかった瞬間」など12問の深掘り質問＋過去就活生の回答例で、軸・ガクチカ・自己PRを迷わず言語化。",
+                tag: "自己分析",
+              },
+              {
+                icon: "📝",
+                title: "SPI練習・スコア記録",
+                desc: "言語・非言語の練習問題をランダム出題。正答率・成績を毎回記録し、苦手分野を把握。試験種別ごとの記録管理も。",
+                tag: "筆記試験対策",
+              },
               {
                 icon: "🎓",
                 title: "キャリアセンターレポート出力",

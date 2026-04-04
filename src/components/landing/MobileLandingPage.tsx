@@ -267,10 +267,24 @@ const features = [
   },
   {
     icon: "✍️",
-    title: "ES AIチェック",
-    desc: "提出前に自己分析との整合性を一括確認。",
+    title: "ES管理・AI添削",
+    desc: "8業界テンプレで作成→AI添削→提出前チェックまで一気通貫。",
     grad: "from-purple-500/20 to-pink-400/10",
     border: "border-purple-100",
+  },
+  {
+    icon: "💡",
+    title: "自己分析 深掘り",
+    desc: "12問の深掘り質問＋過去就活生の回答例で、軸を言語化。",
+    grad: "from-orange-400/20 to-amber-300/10",
+    border: "border-orange-100",
+  },
+  {
+    icon: "📝",
+    title: "SPI練習問題",
+    desc: "言語・非言語の練習問題でスコアを記録。苦手分野を把握。",
+    grad: "from-yellow-400/20 to-lime-300/10",
+    border: "border-yellow-100",
   },
   {
     icon: "📊",
@@ -285,7 +299,9 @@ const comparisonRows = [
   { label: "締切自動通知", notion: "❌", careo: "✅" },
   { label: "AIコーチング", notion: "❌", careo: "✅" },
   { label: "選考進捗管理", notion: "△ 手動", careo: "✅" },
-  { label: "ES AIチェック", notion: "❌", careo: "✅" },
+  { label: "ES AI添削・チェック", notion: "❌", careo: "✅" },
+  { label: "自己分析 深掘り12問", notion: "❌", careo: "✅" },
+  { label: "SPI練習・スコア記録", notion: "❌", careo: "✅" },
   { label: "自由なメモ・資料", notion: "✅", careo: "△" },
   { label: "完全無料", notion: "△ 制限あり", careo: "✅" },
 ];
@@ -349,7 +365,14 @@ function getThumbnailColors(tags: string[]): [string, string] {
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
-export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPost[] }) {
+function getUserCountBadge(count: number): { label: string; message: string } {
+  if (count < 10) return { label: `現在 ${count} 人が利用中`, message: "まだ少ない今が、差をつけるチャンス" };
+  if (count < 30) return { label: `${count} 人が使い始めてる`, message: "早めに習慣化するほど就活が有利になる" };
+  if (count < 100) return { label: `${count} 人の就活生が利用中`, message: "早く始めるほど、データが蓄積されてAIが賢くなる" };
+  return { label: `${count} 人の就活生が利用中`, message: "データが充実したAIコーチで就活を管理しよう" };
+}
+
+export function MobileLandingPage({ recentPosts = [], userCount = 0 }: { recentPosts?: RecentPost[]; userCount?: number }) {
   const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
@@ -424,13 +447,26 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
         >
           無料で始める →
         </Link>
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-gray-600 mb-16">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-gray-600 mb-5">
           <span>📵 広告・スカウト電話なし</span>
           <span>·</span>
           <span>💳 クレカ不要</span>
           <span>·</span>
           <span>🔒 データは暗号化保存・第三者販売なし</span>
         </div>
+
+        {userCount > 0 && (() => {
+          const { label, message } = getUserCountBadge(userCount);
+          return (
+            <div className="flex items-start gap-2.5 bg-amber-50/90 border border-amber-200 rounded-xl px-4 py-3 mb-16">
+              <span className="text-sm leading-none mt-0.5">👥</span>
+              <div>
+                <p className="text-xs font-bold text-amber-800">{label}</p>
+                <p className="text-xs text-amber-600 mt-0.5">{message}</p>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Phone mockup */}
         <div className="px-8">
@@ -892,6 +928,49 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
         </div>
       </section>
 
+      {/* ── SNS フォローセクション ───────────────────────────────────────────── */}
+      <section className="px-5 py-14 bg-[#0a0820]">
+        <p className="text-center text-xs font-bold text-gray-600 uppercase tracking-widest mb-1">Follow & Read</p>
+        <h2 className="text-center text-lg font-black text-white mb-6">就活リアルを発信中</h2>
+        <div className="flex flex-col gap-4">
+
+          {/* X カード */}
+          <a
+            href="https://x.com/hiroki_careo"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-2xl p-4 active:scale-[.98] transition-transform"
+          >
+            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-content-center flex-shrink-0 flex items-center justify-center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="black"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.91-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-white font-bold text-sm">@hiroki_careo</div>
+              <div className="text-gray-400 text-xs mt-0.5">就活ノウハウ・体験談を毎日投稿</div>
+            </div>
+            <span className="text-[#1d9bf0] text-xs font-bold flex-shrink-0">フォロー →</span>
+          </a>
+
+          {/* Note カード */}
+          <a
+            href="https://note.com/hiroki_careo"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-2xl p-4 active:scale-[.98] transition-transform"
+          >
+            <div className="w-10 h-10 bg-[#41c9b0] rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M20.24 0H3.76A3.76 3.76 0 0 0 0 3.76v16.48A3.76 3.76 0 0 0 3.76 24h16.48A3.76 3.76 0 0 0 24 20.24V3.76A3.76 3.76 0 0 0 20.24 0zM8.95 17.3H6.67V6.7h2.28zm7.08 0h-2.07l-3.36-6.86V17.3H8.32V6.7h2.28l3.16 6.44V6.7h2.27z"/></svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-white font-bold text-sm">hiroki_careo</div>
+              <div className="text-gray-400 text-xs mt-0.5">就活ノウハウ記事を週3本更新</div>
+            </div>
+            <span className="text-[#41c9b0] text-xs font-bold flex-shrink-0">読む →</span>
+          </a>
+
+        </div>
+      </section>
+
       {/* ── Footer ─────────────────────────────────────────────────────────── */}
       <footer className="px-6 py-8 bg-[#080618] border-t border-white/5">
         <div className="flex items-center gap-2 mb-4">
@@ -899,6 +978,14 @@ export function MobileLandingPage({ recentPosts = [] }: { recentPosts?: RecentPo
           <span className="font-bold text-sm text-gray-500">Careo</span>
         </div>
         <div className="flex flex-wrap gap-x-5 gap-y-2 mb-5">
+          <a href="https://x.com/hiroki_careo" target="_blank" rel="noopener noreferrer" className="text-gray-600 text-xs hover:text-gray-300 transition-colors flex items-center gap-1">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.91-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            X
+          </a>
+          <a href="https://note.com/hiroki_careo" target="_blank" rel="noopener noreferrer" className="text-gray-600 text-xs hover:text-gray-300 transition-colors flex items-center gap-1">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M20.24 0H3.76A3.76 3.76 0 0 0 0 3.76v16.48A3.76 3.76 0 0 0 3.76 24h16.48A3.76 3.76 0 0 0 24 20.24V3.76A3.76 3.76 0 0 0 20.24 0zM8.95 17.3H6.67V6.7h2.28zm7.08 0h-2.07l-3.36-6.86V17.3H8.32V6.7h2.28l3.16 6.44V6.7h2.27z"/></svg>
+            Note
+          </a>
           {[
             { label: "利用規約", href: "/terms" },
             { label: "プライバシーポリシー", href: "/privacy" },
