@@ -282,7 +282,7 @@ export function DashboardContent() {
       <ReviewPromptModal />
 
       {/* ========== モバイルレイアウト ========== */}
-      <div className="md:hidden px-4 pt-5 pb-28">
+      <div className="md:hidden px-4 pt-5 pb-32">
 
         {/* グリーティングヘッダー */}
         <div className="flex items-center justify-between mb-6">
