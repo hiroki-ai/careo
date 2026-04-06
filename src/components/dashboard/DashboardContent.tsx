@@ -69,15 +69,19 @@ function DailyCoachBanner({ profile }: { profile: UserProfile | null }) {
 
   return (
     <Link href="/chat">
-      <div className="mb-4 bg-gradient-to-r from-[#00c896] to-[#00a87e] rounded-xl px-4 py-3 flex items-center gap-3 hover:opacity-95 transition-opacity cursor-pointer shadow-sm">
-        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
-          <span className="text-white font-bold text-sm">K</span>
+      <div className="mb-5 bg-gradient-to-br from-[#00c896] via-[#00b488] to-[#00a87e] rounded-3xl px-4 py-4 flex items-center gap-3 active:opacity-90 transition-opacity cursor-pointer coach-banner-shadow">
+        <div className="w-11 h-11 bg-white/25 rounded-2xl flex items-center justify-center shrink-0 backdrop-blur-sm">
+          <span className="text-white font-black text-base leading-none">{coachName[0]}</span>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-white font-semibold text-sm">今日の{coachName}コーチ</p>
-          <p className="text-white/75 text-xs truncate">{topic}</p>
+          <p className="text-white/80 text-[11px] font-semibold tracking-wide mb-0.5">今日の{coachName}コーチ</p>
+          <p className="text-white font-bold text-sm truncate">{topic}</p>
         </div>
-        <span className="text-white text-lg shrink-0">→</span>
+        <div className="shrink-0 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
       </div>
     </Link>
   );
@@ -89,9 +93,19 @@ interface NextActionResult {
 }
 
 const priorityColors = {
-  high: "border-l-red-500 bg-red-50",
-  medium: "border-l-yellow-500 bg-yellow-50",
-  low: "border-l-blue-500 bg-blue-50",
+  high: "bg-red-50",
+  medium: "bg-amber-50",
+  low: "bg-blue-50/60",
+};
+const priorityAccent = {
+  high: "bg-red-500",
+  medium: "bg-amber-400",
+  low: "bg-blue-400",
+};
+const priorityPill = {
+  high: "bg-red-100 text-red-600",
+  medium: "bg-amber-100 text-amber-600",
+  low: "bg-blue-100 text-blue-500",
 };
 const priorityLabels = { high: "緊急", medium: "推奨", low: "情報" };
 const priorityBadgeVariants: Record<string, "danger" | "warning" | "default"> = {
@@ -268,127 +282,134 @@ export function DashboardContent() {
       <ReviewPromptModal />
 
       {/* ========== モバイルレイアウト ========== */}
-      <div className="md:hidden p-4 pb-6">
+      <div className="md:hidden px-4 pt-5 pb-28">
 
         {/* グリーティングヘッダー */}
-        <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <p className="text-xs text-gray-400 mb-0.5">{getGreeting()}</p>
-            <h1 className="text-xl font-bold text-gray-900">
-              {profile?.username ? `${profile.username}さんの就活` : "今日の就活"}
+            <p className="text-xs text-gray-400 font-medium mb-1">{getGreeting()}</p>
+            <h1 className="text-[22px] font-black text-gray-900 tracking-tight leading-tight">
+              {profile?.username ? `${profile.username}の就活` : "今日の就活"}
             </h1>
           </div>
           <Link href="/settings">
-            <div className="w-9 h-9 bg-white border border-gray-100 rounded-full flex items-center justify-center shadow-sm active:bg-gray-50 transition-colors">
-              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center shadow-sm active:scale-95 transition-transform border border-gray-100/80">
+              <svg className="w-4.5 h-4.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
           </Link>
         </div>
 
-        {/* 今週やること（Next Action）— 最重要・最上部 */}
-        <div className="mb-5">
+        {/* ステータスチップ — 横スクロール */}
+        <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-hide mb-6 -mx-4 px-4">
+          {statusItems.map((item) => (
+            <Link key={item.label} href={item.link} className="shrink-0">
+              <div className={`${item.bg} border ${item.border} rounded-2xl px-4 py-3 min-w-[88px] active:scale-95 transition-transform`}>
+                <p className={`text-2xl font-black bg-gradient-to-br ${item.gradient} bg-clip-text text-transparent leading-none`}>
+                  {item.count}
+                </p>
+                <p className="text-[11px] text-gray-500 font-semibold mt-1">{item.label}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* コーチCTA */}
+        <DailyCoachBanner profile={profile} />
+
+        {/* 今週やること（Next Action）— 最重要 */}
+        <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-bold text-gray-900 text-base flex items-center gap-1.5">
-              🎯 今週やること
-            </h2>
+            <div className="flex items-center gap-2">
+              <span className="w-1 h-5 bg-gradient-to-b from-[#00c896] to-[#00a87e] rounded-full" />
+              <h2 className="text-[15px] font-bold text-gray-900">今週やること</h2>
+            </div>
             <button
               type="button"
               onClick={() => fetchAiAdvice()}
               disabled={aiLoading}
-              className="text-xs text-gray-400 disabled:opacity-40 active:text-gray-600 transition-colors"
+              className="text-xs text-gray-400 disabled:opacity-40 active:text-gray-600 transition-colors font-medium"
             >
-              {aiLoading ? "分析中..." : "↻ 更新"}
+              {aiLoading ? "分析中..." : "更新"}
             </button>
           </div>
 
           {(aiLoading || itemsLoading) && (
-            <div className="space-y-2.5">
+            <div className="space-y-2">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-16 bg-gray-100 rounded-2xl animate-pulse" />
+                <div key={i} className="h-[68px] bg-gray-100/80 rounded-2xl animate-pulse" />
               ))}
             </div>
           )}
 
           {!aiLoading && !itemsLoading && hasItems && (
-            <div className="space-y-2.5">
+            <div className="space-y-2">
               {pendingItems.map((item) => (
                 <div
                   key={item.id}
-                  className={`flex items-start gap-3 border-l-4 rounded-r-2xl p-3.5 ${priorityColors[item.priority]}`}
+                  className={`relative flex items-start gap-3 rounded-2xl p-4 ${priorityColors[item.priority]}`}
                 >
+                  {/* 上端カラーライン */}
+                  <div className={`absolute top-0 left-4 right-4 h-[2px] rounded-full ${priorityAccent[item.priority]}`} />
                   <input
                     type="checkbox"
                     checked={false}
                     title={`完了: ${item.action}`}
                     onChange={() => handleToggle(item.id, true)}
-                    className="mt-0.5 w-5 h-5 rounded border-gray-400 accent-[#00c896] cursor-pointer shrink-0"
+                    className="mt-0.5 w-5 h-5 rounded-md border-gray-300 accent-[#00c896] cursor-pointer shrink-0"
                   />
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
-                      <Badge variant={priorityBadgeVariants[item.priority]}>
-                        {priorityLabels[item.priority]}
-                      </Badge>
-                      <p className="text-sm font-semibold text-gray-900 leading-tight">{item.action}</p>
-                    </div>
+                    <p className="text-sm font-bold text-gray-900 leading-tight mb-0.5">{item.action}</p>
                     <p className="text-xs text-gray-500 leading-relaxed">{item.reason}</p>
                   </div>
-                  {item.link && (
-                    item.link.external
-                      ? <a href={item.link.href} target="_blank" rel="noopener noreferrer" className="shrink-0 text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-200 px-2 py-1 rounded-lg whitespace-nowrap">{item.link.label}</a>
-                      : <Link href={item.link.href} className="shrink-0 text-[10px] font-bold text-[#00a87e] bg-[#00c896]/10 border border-[#00c896]/30 px-2 py-1 rounded-lg whitespace-nowrap">{item.link.label}</Link>
-                  )}
+                  <div className="flex flex-col items-end gap-1.5 shrink-0">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${priorityPill[item.priority]}`}>
+                      {priorityLabels[item.priority]}
+                    </span>
+                    {item.link && (
+                      item.link.external
+                        ? <a href={item.link.href} target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-blue-500 whitespace-nowrap">{item.link.label} →</a>
+                        : <Link href={item.link.href} className="text-[10px] font-bold text-[#00a87e] whitespace-nowrap">{item.link.label} →</Link>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
           )}
 
           {!aiLoading && !itemsLoading && !hasItems && (
-            <div className="text-center py-8 bg-white rounded-2xl border border-dashed border-gray-200">
-              <p className="text-xs text-gray-400 mb-3">プロフィールを設定するとAIがアドバイスします</p>
+            <div className="text-center py-10 rounded-3xl bg-gray-50">
+              <p className="text-xs text-gray-400 mb-3 font-medium">プロフィールを設定するとAIがアドバイスします</p>
               <Button size="sm" onClick={() => fetchAiAdvice([])}>AIアドバイスを取得</Button>
             </div>
           )}
         </div>
 
-        {/* コーチCTA */}
-        <DailyCoachBanner profile={profile} />
-
-        {/* ステータスチップ — 横スクロール */}
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide mb-5 -mx-4 px-4">
-          {statusItems.map((item) => (
-            <Link key={item.label} href={item.link} className="shrink-0">
-              <div className="flex items-center gap-2 bg-white border border-gray-100 rounded-2xl px-4 py-2.5 shadow-sm active:bg-gray-50 transition-colors">
-                <span className="text-lg">{item.icon}</span>
-                <div>
-                  <p className="text-xl font-bold text-gray-900 leading-none">{item.count}</p>
-                  <p className="text-[10px] text-gray-400 mt-0.5">{item.label}</p>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-
         {/* 直近の締切 */}
         {upcomingDeadlines.length > 0 && (
           <div>
-            <div className="flex items-center justify-between mb-2.5">
-              <h2 className="font-semibold text-gray-900 text-sm">📅 直近の締切</h2>
-              <Link href="/deadlines" className="text-xs text-[#00c896]">すべて →</Link>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="w-1 h-5 bg-gradient-to-b from-orange-400 to-red-400 rounded-full" />
+                <h2 className="text-[15px] font-bold text-gray-900">直近の締切</h2>
+              </div>
+              <Link href="/deadlines" className="text-xs font-semibold text-[#00c896]">すべて</Link>
             </div>
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-4 px-4">
+            <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-hide -mx-4 px-4">
               {upcomingDeadlines.map((d) => (
                 <Link key={`${d.type}-${d.id}`} href={d.link} className="shrink-0">
-                  <div className={`flex items-center gap-2 bg-white rounded-xl border px-3.5 py-3 ${d.days <= 3 ? "border-red-200 bg-red-50/30" : "border-gray-100"}`}>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${EVENT_TYPE_BADGE[d.type] ?? "bg-gray-100 text-gray-600"}`}>
-                      {d.type}
-                    </span>
-                    <p className="text-xs font-medium text-gray-900 max-w-[110px] truncate">{d.title}</p>
-                    <span className={`text-xs font-bold shrink-0 ${d.days === 0 ? "text-red-600" : d.days <= 3 ? "text-orange-500" : "text-gray-400"}`}>
-                      {d.days === 0 ? "今日！" : `${d.days}日`}
-                    </span>
+                  <div className={`flex flex-col gap-1.5 rounded-2xl px-3.5 py-3 min-w-[140px] active:scale-95 transition-transform ${d.days <= 3 ? "bg-red-50" : "bg-white shadow-sm border border-gray-100/80"}`}>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${EVENT_TYPE_BADGE[d.type] ?? "bg-gray-100 text-gray-600"}`}>
+                        {d.type}
+                      </span>
+                      <span className={`text-[11px] font-black ${d.days === 0 ? "text-red-600" : d.days <= 3 ? "text-orange-500" : "text-gray-400"}`}>
+                        {d.days === 0 ? "今日" : `${d.days}日`}
+                      </span>
+                    </div>
+                    <p className="text-xs font-semibold text-gray-900 leading-snug line-clamp-2">{d.title}</p>
                   </div>
                 </Link>
               ))}

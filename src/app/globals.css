@@ -168,6 +168,16 @@
   background-size: 28px 28px;
 }
 
+/* BottomNav FAB グロー */
+.fab-shadow {
+  box-shadow: 0 8px 24px rgba(0,200,150,0.45), 0 2px 8px rgba(0,200,150,0.25);
+}
+
+/* コーチバナー シャドウ */
+.coach-banner-shadow {
+  box-shadow: 0 8px 24px rgba(0,200,150,0.28), 0 2px 8px rgba(0,200,150,0.15);
+}
+
 /* スクロールバー非表示 */
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
