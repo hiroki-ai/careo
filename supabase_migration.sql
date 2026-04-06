@@ -152,3 +152,35 @@ CREATE TABLE IF NOT EXISTS team_reports (
 ALTER TABLE team_reports DISABLE ROW LEVEL SECURITY;
 CREATE INDEX IF NOT EXISTS team_reports_member_id_idx ON team_reports(member_id);
 CREATE INDEX IF NOT EXISTS team_reports_created_at_idx ON team_reports(created_at DESC);
+
+-- 2026-04-06: ブログ週次スケジュール管理テーブル
+-- ロードマップサイトから1週間分のブログテーマを管理するために使用
+-- status: 'planned' = 予定、'published' = 投稿済み、'skipped' = スキップ
+CREATE TABLE IF NOT EXISTS blog_schedule (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  scheduled_date date NOT NULL UNIQUE,
+  theme text NOT NULL,
+  keyword text,
+  hint text,
+  status text NOT NULL DEFAULT 'planned',
+  published_slug text,
+  created_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE blog_schedule ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "anyone can read blog_schedule"
+  ON blog_schedule FOR SELECT USING (true);
+
+-- X（Twitter）投稿ログ（サービスロールのみアクセス）
+CREATE TABLE IF NOT EXISTS x_posts (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tweet_id text NOT NULL UNIQUE,
+  text text NOT NULL,
+  pillar text NOT NULL,          -- info / empathy / question / careo / trend
+  url text NOT NULL,
+  posted_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE x_posts ENABLE ROW LEVEL SECURITY;
+-- アクセスはサービスロールのみ（RLSポリシーなし = 全員拒否）

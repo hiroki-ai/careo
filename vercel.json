@@ -5,6 +5,18 @@
       "schedule": "0 23 * * *"
     },
     {
+      "path": "/api/cron/x-post",
+      "schedule": "0 23 * * *"
+    },
+    {
+      "path": "/api/cron/x-post",
+      "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/x-post",
+      "schedule": "0 12 * * *"
+    },
+    {
       "path": "/api/cron/blog-pdca",
       "schedule": "0 23 * * 0"
     },
