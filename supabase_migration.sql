@@ -171,16 +171,3 @@ ALTER TABLE blog_schedule ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "anyone can read blog_schedule"
   ON blog_schedule FOR SELECT USING (true);
-
--- X（Twitter）投稿ログ（サービスロールのみアクセス）
-CREATE TABLE IF NOT EXISTS x_posts (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tweet_id text NOT NULL UNIQUE,
-  text text NOT NULL,
-  pillar text NOT NULL,          -- info / empathy / question / careo / trend
-  url text NOT NULL,
-  posted_at timestamptz DEFAULT now()
-);
-
-ALTER TABLE x_posts ENABLE ROW LEVEL SECURITY;
--- アクセスはサービスロールのみ（RLSポリシーなし = 全員拒否）
