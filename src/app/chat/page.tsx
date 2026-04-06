@@ -101,8 +101,10 @@ export default function ChatPage() {
   const [isRecording, setIsRecording] = useState(false);
   const [coachId, setCoachId] = useState<string>(DEFAULT_COACH_ID);
   const [showCoachSelector, setShowCoachSelector] = useState(false);
+  const [fileAttachment, setFileAttachment] = useState<{ name: string; type: string; data: string } | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
 
@@ -420,14 +422,45 @@ export default function ChatPage() {
     }
   }, [companies, interviews, profile, pendingItems, patchSelfAnalysis, patchProfileBasics, addCompany, updateCompany, addItems, addInterview, showToast]);
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!fileInputRef.current) return;
+    fileInputRef.current.value = "";
+    if (!file) return;
+    const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+    if (file.size > MAX_SIZE) {
+      showToast("ファイルサイズは5MB以下にしてください", "warning");
+      return;
+    }
+    const allowed = ["image/jpeg", "image/png", "image/gif", "image/webp", "application/pdf", "text/plain", "text/markdown", "text/csv"];
+    if (!allowed.includes(file.type)) {
+      showToast("画像・PDF・テキストファイルのみ対応しています", "warning");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      const base64 = dataUrl.split(",")[1];
+      setFileAttachment({ name: file.name, type: file.type, data: base64 });
+    };
+    reader.readAsDataURL(file);
+  };
+
   const sendMessage = async (text: string) => {
-    if (!text.trim() || isStreaming) return;
+    const hasFile = !!fileAttachment;
+    if (!text.trim() && !hasFile) return;
+    if (isStreaming) return;
+    const attachedFile = fileAttachment;
     setInput("");
+    setFileAttachment(null);
     setIsStreaming(true);
 
-    const userMsg: LocalMessage = { role: "user", content: text, createdAt: new Date().toISOString() };
+    const displayContent = attachedFile
+      ? (text.trim() ? `📎 ${attachedFile.name}\n${text}` : `📎 ${attachedFile.name}`)
+      : text;
+    const userMsg: LocalMessage = { role: "user", content: displayContent, createdAt: new Date().toISOString() };
     setLocalMessages((prev) => [...prev, userMsg]);
-    await saveMessage("user", text);
+    await saveMessage("user", displayContent);
     // 今日チャットしたことを記録（バッジ消去）— Supabase + localStorage両方更新
     saveLastChatAt(); // デバイス間同期（内部でlocalStorageも更新）
     thinkingMessageRef.current = getRandomThinkingMessage(getCoachPersonality(coachId));
@@ -444,7 +477,7 @@ export default function ChatPage() {
       const res = await fetch("/api/ai/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: historyForApi, context: buildContext(), coachId }),
+        body: JSON.stringify({ messages: historyForApi, context: buildContext(), coachId, file: attachedFile }),
       });
 
       // レート制限 or コンテンツモデレーション
@@ -865,6 +898,32 @@ export default function ChatPage() {
             ))}
           </div>
         )}
+        <input
+          ref={fileInputRef}
+          type="file"
+          aria-label="ファイルを添付"
+          className="hidden"
+          accept="image/jpeg,image/png,image/gif,image/webp,application/pdf,text/plain,text/markdown,text/csv"
+          onChange={handleFileSelect}
+        />
+        {fileAttachment && (
+          <div className="mx-3 mb-1 flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-xl px-3 py-2">
+            <svg className="w-4 h-4 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+            </svg>
+            <span className="text-xs text-blue-700 font-medium truncate flex-1">{fileAttachment.name}</span>
+            <button
+              type="button"
+              onClick={() => setFileAttachment(null)}
+              className="text-blue-400 hover:text-blue-600 shrink-0"
+              aria-label="添付を削除"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        )}
         <div className="px-4 py-3 flex items-end gap-2 bg-gray-50 mx-3 mb-3 rounded-2xl border border-gray-200 focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-200 transition-all">
           {/* クイック返信トグル */}
           <button
@@ -877,6 +936,18 @@ export default function ChatPage() {
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </button>
+          {/* ファイル添付ボタン */}
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            title="ファイルを添付（画像・PDF・テキスト）"
+            className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mb-0.5 transition-colors text-gray-400 hover:text-purple-500 hover:bg-purple-50"
+            disabled={isStreaming}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
             </svg>
           </button>
           {/* 音声入力ボタン */}
@@ -907,7 +978,7 @@ export default function ChatPage() {
             type="button"
             title="送信"
             onClick={() => sendMessage(input)}
-            disabled={!input.trim() || isStreaming || historyLoading}
+            disabled={(!input.trim() && !fileAttachment) || isStreaming || historyLoading}
             className="w-8 h-8 bg-blue-600 text-white rounded-xl flex items-center justify-center shrink-0 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
