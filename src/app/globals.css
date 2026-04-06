@@ -178,6 +178,11 @@
   box-shadow: 0 8px 24px rgba(0,200,150,0.28), 0 2px 8px rgba(0,200,150,0.15);
 }
 
+/* サイドバー グラデーション背景 */
+.sidebar-bg {
+  background: linear-gradient(180deg, #0e0b26 0%, #14103A 40%, #120e32 100%);
+}
+
 /* スクロールバー非表示 */
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

@@ -12,7 +12,6 @@ import { useActionItems } from "@/hooks/useActionItems";
 import { useChat } from "@/hooks/useChat";
 import { useToast } from "@/components/ui/Toast";
 import { useDeadlineNotifications } from "@/hooks/useDeadlineNotifications";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { InsightsWidget } from "@/components/dashboard/InsightsWidget";
 import { PostOfferWidget } from "@/components/dashboard/PostOfferWidget";
@@ -108,9 +107,6 @@ const priorityPill = {
   low: "bg-blue-100 text-blue-500",
 };
 const priorityLabels = { high: "緊急", medium: "推奨", low: "情報" };
-const priorityBadgeVariants: Record<string, "danger" | "warning" | "default"> = {
-  high: "danger", medium: "warning", low: "default",
-};
 
 const EVENT_TYPE_BADGE: Record<string, string> = {
   ES: "bg-[#00c896]/10 text-[#00a87e]",
@@ -418,38 +414,46 @@ export function DashboardContent() {
         )}
       </div>
 
-      {/* ========== PCレイアウト（変更なし） ========== */}
-      <div className="hidden md:block p-5">
+      {/* ========== PCレイアウト ========== */}
+      <div className="hidden md:block px-6 pt-6 pb-8">
 
         {/* PCヘッダー */}
-        <div className="flex items-center justify-between mb-2 md:mb-3">
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">ダッシュボード</h1>
+            <p className="text-xs text-gray-400 font-medium mb-1">{getGreeting()}</p>
+            <h1 className="text-[26px] font-black text-gray-900 tracking-tight leading-tight">
+              {profile?.username ? `${profile.username}の就活` : "ダッシュボード"}
+            </h1>
             {profile && (
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="text-xs text-gray-400 mt-1 font-medium">
                 {profile.university ? `${profile.university} · ` : ""}{profile.grade} ／ {JOB_SEARCH_STAGE_LABELS[profile.jobSearchStage]}
               </p>
             )}
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             <Link href="/settings">
-              <Button variant="secondary" size="sm">設定</Button>
+              <button type="button" className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm font-medium transition-colors">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                設定
+              </button>
             </Link>
-            <Button variant="ghost" size="sm" onClick={handleLogout}>ログアウト</Button>
+            <button type="button" onClick={handleLogout} className="px-3.5 py-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 text-sm font-medium transition-colors">
+              ログアウト
+            </button>
           </div>
         </div>
 
         {/* PCステータスグリッド */}
-        <div className="grid grid-cols-4 gap-2 mb-3">
+        <div className="grid grid-cols-4 gap-3 mb-5">
           {statusItems.map((item) => (
             <Link key={item.label} href={item.link}>
-              <div className={`${item.bg} border ${item.border} rounded-2xl p-3 shadow-sm active:scale-[0.97] transition-transform`}>
-                <div className="flex items-center justify-between mb-1.5">
-                  <p className="text-xs font-medium text-gray-500">{item.label}</p>
-                  <span className="text-base">{item.icon}</span>
-                </div>
-                <p className={`text-2xl font-bold bg-gradient-to-r ${item.gradient} bg-clip-text text-transparent leading-none`}>{item.count}</p>
-                <p className="text-[10px] text-gray-400 mt-1">社 / 件</p>
+              <div className={`${item.bg} border ${item.border} rounded-2xl p-4 hover:scale-[1.02] transition-transform cursor-pointer`}>
+                <p className="text-xs font-semibold text-gray-500 mb-2">{item.label}</p>
+                <p className={`text-3xl font-black bg-gradient-to-br ${item.gradient} bg-clip-text text-transparent leading-none`}>{item.count}</p>
+                <p className="text-[10px] text-gray-400 mt-1.5 font-medium">社 / 件</p>
               </div>
             </Link>
           ))}
@@ -458,97 +462,81 @@ export function DashboardContent() {
         {/* PCコーチCTA */}
         <DailyCoachBanner profile={profile} />
 
-        {/* PC 直近の締切（モバイルは上で表示済み） */}
-        {upcomingDeadlines.length > 0 && (
-          <div className="mb-3">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="font-semibold text-gray-900 text-sm">📅 直近の締切</h2>
-              <Link href="/deadlines" className="text-xs text-[#00c896] hover:underline">すべて →</Link>
-            </div>
-            <div className="flex gap-2 overflow-x-auto pb-1">
-              {upcomingDeadlines.map((d) => (
-                <Link key={`${d.type}-${d.id}`} href={d.link} className="shrink-0">
-                  <div className={`flex items-center gap-2 bg-white rounded-xl border px-3 py-2.5 ${d.days <= 3 ? "border-red-200 bg-red-50/30" : "border-gray-100"}`}>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${EVENT_TYPE_BADGE[d.type] ?? "bg-gray-100 text-gray-600"}`}>
-                      {d.type}
-                    </span>
-                    <p className="text-xs font-medium text-gray-900 max-w-[110px] truncate">{d.title}</p>
-                    <span className={`text-xs font-bold shrink-0 ${d.days === 0 ? "text-red-600" : d.days <= 3 ? "text-orange-500" : "text-gray-400"}`}>
-                      {d.days === 0 ? "今日！" : `${d.days}日`}
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* PC 12カラムグリッド */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4">
+        <div className="grid grid-cols-12 gap-5">
 
           {/* Left: Next Action */}
-          <div className="md:col-span-7">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="font-semibold text-gray-900 text-base flex items-center gap-1.5">🎯 <span>Next Action</span></h2>
-              <Button variant="ghost" size="sm" onClick={() => fetchAiAdvice()} disabled={aiLoading}>
+          <div className="col-span-7">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="w-1 h-5 bg-gradient-to-b from-[#00c896] to-[#00a87e] rounded-full" />
+                <h2 className="text-[15px] font-bold text-gray-900">今週やること</h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => fetchAiAdvice()}
+                disabled={aiLoading}
+                className="text-xs text-gray-400 hover:text-gray-600 disabled:opacity-40 transition-colors font-medium"
+              >
                 {aiLoading ? "分析中..." : "再分析"}
-              </Button>
+              </button>
             </div>
             {aiSummary && (
-              <p className="text-xs text-gray-400 mb-1.5 px-1">{aiSummary}</p>
+              <p className="text-xs text-gray-400 mb-2 px-0.5">{aiSummary}</p>
             )}
 
             {(aiLoading || itemsLoading) && (
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 {[...Array(3)].map((_, i) => (
-                  <div key={i} className="h-11 bg-gray-100 rounded-xl animate-pulse" />
+                  <div key={i} className="h-[60px] bg-gray-100/80 rounded-2xl animate-pulse" />
                 ))}
               </div>
             )}
 
             {!aiLoading && !itemsLoading && hasItems && (
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 {pendingItems.map((item) => (
                   <div
                     key={item.id}
-                    className={`flex items-start gap-3 border-l-4 rounded-r-xl p-3 ${priorityColors[item.priority]}`}
+                    className={`relative flex items-start gap-3 rounded-2xl p-3.5 ${priorityColors[item.priority]}`}
                   >
+                    <div className={`absolute top-0 left-4 right-4 h-[2px] rounded-full ${priorityAccent[item.priority]}`} />
                     <input
                       type="checkbox"
                       checked={false}
                       title={`完了: ${item.action}`}
                       onChange={() => handleToggle(item.id, true)}
-                      className="mt-0.5 w-5 h-5 rounded border-gray-400 accent-[#00c896] cursor-pointer shrink-0"
+                      className="mt-0.5 w-4 h-4 rounded-md border-gray-300 accent-[#00c896] cursor-pointer shrink-0"
                     />
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 mb-1 flex-wrap">
-                        <Badge variant={priorityBadgeVariants[item.priority]}>
-                          {priorityLabels[item.priority]}
-                        </Badge>
-                        <p className="text-sm font-semibold text-gray-900 leading-tight">{item.action}</p>
-                      </div>
+                      <p className="text-sm font-bold text-gray-900 leading-tight mb-0.5">{item.action}</p>
                       <p className="text-xs text-gray-500">{item.reason}</p>
                     </div>
-                    {item.link && (
-                      item.link.external
-                        ? <a href={item.link.href} target="_blank" rel="noopener noreferrer" className="shrink-0 ml-1 text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2 py-1 rounded-lg transition-colors whitespace-nowrap">{item.link.label}</a>
-                        : <Link href={item.link.href} className="shrink-0 ml-1 text-[10px] font-bold text-[#00a87e] bg-[#00c896]/10 hover:bg-[#00c896]/20 border border-[#00c896]/30 px-2 py-1 rounded-lg transition-colors whitespace-nowrap">{item.link.label}</Link>
-                    )}
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${priorityPill[item.priority]}`}>
+                        {priorityLabels[item.priority]}
+                      </span>
+                      {item.link && (
+                        item.link.external
+                          ? <a href={item.link.href} target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-blue-500 hover:underline whitespace-nowrap">{item.link.label} →</a>
+                          : <Link href={item.link.href} className="text-[10px] font-bold text-[#00a87e] hover:underline whitespace-nowrap">{item.link.label} →</Link>
+                      )}
+                    </div>
                   </div>
                 ))}
                 {completedItems.length > 0 && (
-                  <div className="mt-1">
-                    <p className="text-[10px] text-gray-400 mb-1 px-1">完了済み</p>
+                  <div className="mt-2">
+                    <p className="text-[10px] text-gray-400 mb-1.5 font-semibold uppercase tracking-wide">完了済み</p>
                     {completedItems.map((item) => (
                       <label
                         key={item.id}
-                        className="flex items-center gap-2.5 border-l-4 border-l-gray-200 bg-gray-50 rounded-r-xl p-2 mb-1 cursor-pointer opacity-60"
+                        className="flex items-center gap-2.5 bg-gray-50 rounded-xl px-3.5 py-2.5 mb-1.5 cursor-pointer opacity-55 hover:opacity-70 transition-opacity"
                       >
                         <input
                           type="checkbox"
                           checked={true}
                           onChange={() => toggleItem(item.id, false)}
-                          className="w-4 h-4 rounded border-gray-400 accent-[#00c896] cursor-pointer shrink-0"
+                          className="w-4 h-4 rounded-md accent-[#00c896] cursor-pointer shrink-0"
                         />
                         <p className="text-xs text-gray-500 line-through">{item.action}</p>
                       </label>
@@ -559,42 +547,45 @@ export function DashboardContent() {
             )}
 
             {!aiLoading && !itemsLoading && !hasItems && (
-              <div className="text-center py-4 text-gray-400">
-                <p className="text-xs mb-2">プロフィールを設定するとAIがアドバイスします</p>
+              <div className="text-center py-10 rounded-3xl bg-gray-50">
+                <p className="text-xs text-gray-400 mb-3 font-medium">プロフィールを設定するとAIがアドバイスします</p>
                 <Button size="sm" onClick={() => fetchAiAdvice([])}>AIアドバイスを取得</Button>
               </div>
             )}
           </div>
 
-          {/* Right: 気づき */}
-          <div className="md:col-span-5 space-y-3 md:space-y-4">
-            {/* 直近の締切 — PCのみ（サイドカラム） */}
+          {/* Right: 締切＋気づき */}
+          <div className="col-span-5 space-y-4">
+            {/* 締切詳細 */}
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <h2 className="font-semibold text-gray-900 text-sm">📅 締切詳細</h2>
-                <Link href="/calendar" className="text-[10px] text-[#00c896] hover:underline">カレンダー →</Link>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="w-1 h-5 bg-gradient-to-b from-orange-400 to-red-400 rounded-full" />
+                  <h2 className="text-[15px] font-bold text-gray-900">締切</h2>
+                </div>
+                <Link href="/calendar" className="text-xs font-semibold text-[#00c896] hover:opacity-70 transition-opacity">カレンダー</Link>
               </div>
               {upcomingDeadlines.length > 0 ? (
                 <div className="space-y-1.5">
                   {upcomingDeadlines.map((d) => (
                     <Link key={`${d.type}-${d.id}`} href={d.link}>
-                      <div className={`flex items-center justify-between bg-white rounded-xl border p-2.5 hover:bg-gray-50 transition-colors ${d.days <= 3 ? "border-red-200" : "border-gray-100"}`}>
+                      <div className={`flex items-center justify-between rounded-2xl px-3.5 py-2.5 hover:scale-[1.01] transition-transform ${d.days <= 3 ? "bg-red-50" : "bg-gray-50 hover:bg-gray-100"}`}>
                         <div className="flex items-center gap-2 min-w-0">
-                          <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0 ${EVENT_TYPE_BADGE[d.type] ?? "bg-gray-100 text-gray-600"}`}>
+                          <span className={`text-[9px] font-black px-2 py-0.5 rounded-full shrink-0 ${EVENT_TYPE_BADGE[d.type] ?? "bg-gray-100 text-gray-600"}`}>
                             {d.type}
                           </span>
-                          <p className="text-xs font-medium text-gray-900 truncate">{d.title}</p>
+                          <p className="text-xs font-semibold text-gray-900 truncate">{d.title}</p>
                         </div>
-                        <span className={`text-[10px] font-bold shrink-0 ml-2 ${d.days === 0 ? "text-red-600" : d.days <= 3 ? "text-orange-500" : "text-gray-400"}`}>
-                          {d.days === 0 ? "今日！" : `あと${d.days}日`}
+                        <span className={`text-[11px] font-black shrink-0 ml-2 ${d.days === 0 ? "text-red-600" : d.days <= 3 ? "text-orange-500" : "text-gray-400"}`}>
+                          {d.days === 0 ? "今日" : `${d.days}日`}
                         </span>
                       </div>
                     </Link>
                   ))}
                 </div>
               ) : (
-                <div className="bg-white border border-gray-100 rounded-xl p-2.5 text-center">
-                  <p className="text-xs text-gray-400">直近7日に締切はありません</p>
+                <div className="bg-gray-50 rounded-2xl p-4 text-center">
+                  <p className="text-xs text-gray-400 font-medium">直近7日に締切はありません</p>
                 </div>
               )}
             </div>
