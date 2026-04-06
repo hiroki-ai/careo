@@ -29,7 +29,31 @@ interface LocalMessage {
   selfAnalysisSuggestions?: SelfAnalysisSuggestion[];
   savedFields?: string[]; // 保存済みフィールドを追跡
   calendarEvents?: CalendarEvent[];
+  createdAt?: string;
 }
+
+const isSameDay = (a: Date, b: Date) =>
+  a.getFullYear() === b.getFullYear() &&
+  a.getMonth() === b.getMonth() &&
+  a.getDate() === b.getDate();
+
+const getDateLabel = (dateStr?: string): string => {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  if (isSameDay(date, today)) return "今日";
+  if (isSameDay(date, yesterday)) return "昨日";
+  return `${date.getMonth() + 1}月${date.getDate()}日`;
+};
+
+const formatTime = (dateStr?: string): string => {
+  if (!dateStr) return "";
+  return new Date(dateStr).toLocaleTimeString("ja-JP", {
+    hour: "2-digit", minute: "2-digit", hour12: false,
+  });
+};
 
 const CoachAvatar = ({ coachId, size = 8 }: { coachId: string; size?: number }) => {
   const coach = getCoachPersonality(coachId);
@@ -116,7 +140,7 @@ export default function ChatPage() {
   useEffect(() => {
     if (!historyLoading && !initialized) {
       if (savedMessages.length > 0) {
-        setLocalMessages(savedMessages.map((m) => ({ role: m.role, content: m.content })));
+        setLocalMessages(savedMessages.map((m) => ({ role: m.role, content: m.content, createdAt: m.createdAt })));
       } else {
         // 新規チャット：PDCAがあればカレオ用のウェルカムメッセージを使用
         const pdca = getLastPdca();
@@ -401,7 +425,7 @@ export default function ChatPage() {
     setInput("");
     setIsStreaming(true);
 
-    const userMsg: LocalMessage = { role: "user", content: text };
+    const userMsg: LocalMessage = { role: "user", content: text, createdAt: new Date().toISOString() };
     setLocalMessages((prev) => [...prev, userMsg]);
     await saveMessage("user", text);
     // 今日チャットしたことを記録（バッジ消去）— Supabase + localStorage両方更新
@@ -463,6 +487,7 @@ export default function ChatPage() {
             content: display,
             suggestedCompanies: suggested.length ? suggested : undefined,
             selfAnalysisSuggestions: selfSuggestions.length ? selfSuggestions : undefined,
+            createdAt: new Date().toISOString(),
           },
         ];
         setLocalMessages(finalMessages);
@@ -608,147 +633,209 @@ export default function ChatPage() {
       </div>
 
       {/* メッセージエリア */}
-      <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 space-y-4 bg-gray-50">
+      <div className="flex-1 overflow-y-auto bg-white">
         {historyLoading ? (
-          <div className="flex justify-center py-8">
-            <div className="text-xs text-gray-400">履歴を読み込み中...</div>
+          <div className="flex justify-center py-12">
+            <div className="flex flex-col items-center gap-2">
+              <div className="flex gap-1">
+                <span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce [animation-delay:0ms]" />
+                <span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce [animation-delay:150ms]" />
+                <span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce [animation-delay:300ms]" />
+              </div>
+              <div className="text-xs text-gray-400">履歴を読み込み中...</div>
+            </div>
           </div>
         ) : (
-          <>
-            {localMessages.map((msg, i) => (
-              <div key={i}>
-                <div className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
-                  {msg.role === "assistant" && <CoachAvatar coachId={coachId} />}
-                  {msg.role === "user" && (
-                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center shrink-0">
-                      <span className="text-gray-600 text-sm">👤</span>
+          <div className="px-4 md:px-5 pt-4 pb-2 space-y-0.5">
+            {localMessages.map((msg, i) => {
+              const prevMsg = localMessages[i - 1];
+              const nextMsg = localMessages[i + 1];
+              const isFirstInGroup = !prevMsg || prevMsg.role !== msg.role || prevMsg.streaming;
+              const isLastInGroup = !nextMsg || nextMsg.role !== msg.role;
+              // 日付セパレーター表示判定
+              const showDateSep = !!msg.createdAt && (
+                !prevMsg?.createdAt ||
+                !isSameDay(new Date(msg.createdAt), new Date(prevMsg.createdAt))
+              );
+              const dateSepLabel = showDateSep ? getDateLabel(msg.createdAt) : null;
+              // バブルの角丸調整（グループ内は角を変える）
+              const userBubble = isFirstInGroup
+                ? "rounded-2xl rounded-tr-md"
+                : isLastInGroup
+                  ? "rounded-2xl rounded-tr-md"
+                  : "rounded-xl";
+              const aiBubble = isFirstInGroup
+                ? "rounded-2xl rounded-tl-md"
+                : isLastInGroup
+                  ? "rounded-2xl rounded-tl-md"
+                  : "rounded-xl";
+
+              return (
+                <div key={i}>
+                  {/* 日付セパレーター */}
+                  {dateSepLabel && (
+                    <div className="flex items-center justify-center py-4">
+                      <span className="text-[11px] text-gray-400 bg-gray-100 px-3 py-1 rounded-full font-medium">
+                        {dateSepLabel}
+                      </span>
                     </div>
                   )}
-                  <div className="flex flex-col gap-1 max-w-[75%]">
-                    <div
-                      className={`rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap shadow-sm ${
-                        msg.role === "user"
-                          ? "bg-blue-600 text-white rounded-tr-sm"
-                          : "bg-white text-gray-800 rounded-tl-sm border border-gray-100"
-                      }`}
-                    >
-                      {msg.content}
-                      {msg.streaming && msg.content === "" && (
-                        <span className="inline-flex items-center gap-1.5 text-gray-400 text-xs italic">
-                          {thinkingMessageRef.current}
-                          <span className="inline-flex gap-0.5">
-                            <span className="w-1 h-1 bg-gray-300 rounded-full animate-bounce [animation-delay:0ms]" />
-                            <span className="w-1 h-1 bg-gray-300 rounded-full animate-bounce [animation-delay:150ms]" />
-                            <span className="w-1 h-1 bg-gray-300 rounded-full animate-bounce [animation-delay:300ms]" />
+
+                  {/* メッセージ行 */}
+                  <div className={`flex items-end gap-2 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"} ${isLastInGroup ? "mb-3" : "mb-0.5"}`}>
+                    {/* アバター：AIのグループ先頭のみ表示、それ以外はスペーサー */}
+                    {msg.role === "assistant" ? (
+                      isFirstInGroup ? (
+                        <div className="shrink-0 self-end mb-0.5">
+                          <CoachAvatar coachId={coachId} size={7} />
+                        </div>
+                      ) : (
+                        <div className="w-7 shrink-0" />
+                      )
+                    ) : null}
+
+                    <div className={`flex flex-col max-w-[78%] ${msg.role === "user" ? "items-end" : "items-start"}`}>
+                      <div
+                        className={`px-4 py-2.5 text-[14px] leading-relaxed whitespace-pre-wrap ${
+                          msg.role === "user"
+                            ? `bg-[#2563EB] text-white ${userBubble} shadow-sm`
+                            : `bg-gray-100 text-gray-800 ${aiBubble}`
+                        }`}
+                      >
+                        {msg.content}
+                        {msg.streaming && msg.content === "" && (
+                          <span className="inline-flex items-center gap-1.5 text-gray-500 text-xs">
+                            {thinkingMessageRef.current}
+                            <span className="inline-flex gap-0.5 ml-1">
+                              <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:0ms]" />
+                              <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:150ms]" />
+                              <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:300ms]" />
+                            </span>
                           </span>
-                        </span>
+                        )}
+                      </div>
+
+                      {/* タイムスタンプ + 音声ボタン：グループ最後のみ */}
+                      {isLastInGroup && (
+                        <div className={`flex items-center gap-1.5 mt-1 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
+                          {msg.createdAt && (
+                            <span className="text-[10px] text-gray-400">
+                              {formatTime(msg.createdAt)}
+                            </span>
+                          )}
+                          {msg.role === "assistant" && !msg.streaming && msg.content && (
+                            <button
+                              type="button"
+                              onClick={() => speak(msg.content)}
+                              className="text-gray-300 hover:text-blue-400 transition-colors"
+                              title="読み上げる"
+                            >
+                              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+                              </svg>
+                            </button>
+                          )}
+                        </div>
                       )}
                     </div>
-                    {/* カレオメッセージの音声再生ボタン */}
-                    {msg.role === "assistant" && !msg.streaming && msg.content && (
-                      <button
-                        onClick={() => speak(msg.content)}
-                        className="self-start ml-1 text-gray-300 hover:text-blue-400 transition-colors"
-                        title="読み上げる"
-                      >
-                        <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
-                        </svg>
-                      </button>
-                    )}
                   </div>
-                </div>
-                {/* 自己分析保存ボタン */}
-                {msg.selfAnalysisSuggestions && msg.selfAnalysisSuggestions.length > 0 && (
-                  <div className="ml-11 mt-2 space-y-2">
-                    {msg.selfAnalysisSuggestions.map((s) => {
-                      const saved = msg.savedFields?.includes(s.field);
-                      return (
-                        <div key={s.field} className={`rounded-xl border p-3 ${saved ? "bg-green-50 border-green-200" : "bg-blue-50 border-blue-200"}`}>
-                          <div className="flex items-center justify-between gap-2 mb-1.5">
-                            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${saved ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700"}`}>
-                              📝 {SELF_ANALYSIS_LABELS[s.field]}
-                            </span>
-                            <button
-                              onClick={() => handleSaveSelfAnalysis(i, s)}
-                              disabled={saved}
-                              className={`text-xs font-medium px-3 py-1 rounded-lg transition-colors shrink-0 ${
-                                saved
-                                  ? "bg-green-200 text-green-700 cursor-default"
-                                  : "bg-blue-600 text-white hover:bg-blue-700"
-                              }`}
+
+                  {/* アクションカード類（アバタースペーサー分インデント） */}
+                  {/* 自己分析保存ボタン */}
+                  {msg.selfAnalysisSuggestions && msg.selfAnalysisSuggestions.length > 0 && (
+                    <div className="ml-9 mt-2 mb-3 space-y-2">
+                      {msg.selfAnalysisSuggestions.map((s) => {
+                        const saved = msg.savedFields?.includes(s.field);
+                        return (
+                          <div key={s.field} className={`rounded-2xl border p-3.5 ${saved ? "bg-green-50 border-green-200" : "bg-blue-50 border-blue-200"}`}>
+                            <div className="flex items-center justify-between gap-2 mb-2">
+                              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${saved ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700"}`}>
+                                📝 {SELF_ANALYSIS_LABELS[s.field]}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleSaveSelfAnalysis(i, s)}
+                                disabled={saved}
+                                className={`text-xs font-medium px-3 py-1.5 rounded-xl transition-colors shrink-0 ${
+                                  saved
+                                    ? "bg-green-200 text-green-700 cursor-default"
+                                    : "bg-blue-600 text-white active:scale-95"
+                                }`}
+                              >
+                                {saved ? "✓ 保存済み" : "自己分析に保存"}
+                              </button>
+                            </div>
+                            <p className="text-xs text-gray-700 line-clamp-3 leading-relaxed">{s.content}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* 企業追加候補ボタン */}
+                  {msg.suggestedCompanies && msg.suggestedCompanies.length > 0 && (
+                    <div className="ml-9 mt-2 mb-3 flex flex-wrap gap-2">
+                      {msg.suggestedCompanies.map((name) => (
+                        <button
+                          type="button"
+                          key={name}
+                          onClick={() => handleAddCompany(name)}
+                          className="text-xs bg-indigo-50 active:bg-indigo-100 border border-indigo-200 text-indigo-700 rounded-full px-3 py-1.5 transition-colors flex items-center gap-1.5 font-medium"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                          </svg>
+                          {name}を企業管理に追加
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* カレンダーイベントカード */}
+                  {msg.calendarEvents && msg.calendarEvents.length > 0 && (
+                    <div className="ml-9 mt-2 mb-3 space-y-2">
+                      {msg.calendarEvents.map((event, j) => {
+                        const eventDateLabel = (() => {
+                          try {
+                            const d = new Date(event.date);
+                            return `${d.getMonth() + 1}/${d.getDate()}（${["日","月","火","水","木","金","土"][d.getDay()]}）`;
+                          } catch { return event.date; }
+                        })();
+                        const href = event.type === "interview" ? "/interviews" : event.type === "deadline" ? "/es" : "/deadlines";
+                        const linkLabel = event.type === "interview" ? "面接ログに追加" : event.type === "deadline" ? "ES締切に設定" : "カレンダーで確認";
+                        return (
+                          <div key={j} className="rounded-2xl border border-orange-200 bg-orange-50 p-3.5 flex items-center justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="text-xs font-semibold text-orange-800">📅 {event.title}</p>
+                              <p className="text-[11px] text-orange-600 mt-0.5">
+                                {event.companyName ? `${event.companyName} · ` : ""}{eventDateLabel}
+                              </p>
+                            </div>
+                            <a
+                              href={href}
+                              className="shrink-0 text-xs bg-orange-500 active:bg-orange-600 text-white font-medium px-3 py-1.5 rounded-xl transition-colors"
                             >
-                              {saved ? "✓ 保存済み" : "自己分析に保存"}
-                            </button>
+                              {linkLabel}
+                            </a>
                           </div>
-                          <p className="text-xs text-gray-700 line-clamp-3">{s.content}</p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {/* 企業追加候補ボタン */}
-                {msg.suggestedCompanies && msg.suggestedCompanies.length > 0 && (
-                  <div className="ml-11 mt-2 flex flex-wrap gap-2">
-                    {msg.suggestedCompanies.map((name) => (
-                      <button
-                        key={name}
-                        onClick={() => handleAddCompany(name)}
-                        className="text-xs bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 rounded-full px-3 py-1.5 transition-colors flex items-center gap-1.5 font-medium"
-                      >
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                        {name}を企業管理に追加
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {/* カレンダーイベントカード */}
-                {msg.calendarEvents && msg.calendarEvents.length > 0 && (
-                  <div className="ml-11 mt-2 space-y-2">
-                    {msg.calendarEvents.map((event, j) => {
-                      const dateLabel = (() => {
-                        try {
-                          const d = new Date(event.date);
-                          return `${d.getMonth() + 1}/${d.getDate()}（${["日","月","火","水","木","金","土"][d.getDay()]}）`;
-                        } catch { return event.date; }
-                      })();
-                      const href = event.type === "interview" ? "/interviews" : event.type === "deadline" ? "/es" : "/deadlines";
-                      const linkLabel = event.type === "interview" ? "面接ログに追加" : event.type === "deadline" ? "ES締切に設定" : "カレンダーで確認";
-                      return (
-                        <div key={j} className="rounded-xl border border-orange-200 bg-orange-50 p-3 flex items-center justify-between gap-3">
-                          <div className="min-w-0">
-                            <p className="text-xs font-semibold text-orange-800">📅 {event.title}</p>
-                            <p className="text-[11px] text-orange-600 mt-0.5">
-                              {event.companyName ? `${event.companyName} · ` : ""}{dateLabel}
-                            </p>
-                          </div>
-                          <a
-                            href={href}
-                            className="shrink-0 text-xs bg-orange-500 hover:bg-orange-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors"
-                          >
-                            {linkLabel}
-                          </a>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            ))}
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
 
             {showSuggestions && (
-              <div className="ml-11">
+              <div className="ml-9 mt-1 mb-2">
                 <p className="text-xs text-gray-400 mb-2">こんなことを聞いてみよう</p>
                 <div className="flex flex-wrap gap-2">
                   {SUGGESTIONS.map((s) => (
                     <button
+                      type="button"
                       key={s}
                       onClick={() => sendMessage(s)}
-                      className="text-xs bg-white border border-gray-200 rounded-full px-3 py-1.5 text-gray-600 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-colors"
+                      className="text-xs bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 text-gray-600 active:bg-blue-50 active:border-blue-300 active:text-blue-700 transition-colors"
                     >
                       {s}
                     </button>
@@ -756,7 +843,7 @@ export default function ChatPage() {
                 </div>
               </div>
             )}
-          </>
+          </div>
         )}
         <div ref={bottomRef} />
       </div>
@@ -794,6 +881,7 @@ export default function ChatPage() {
           </button>
           {/* 音声入力ボタン */}
           <button
+            type="button"
             onClick={toggleRecording}
             title={isRecording ? "録音を停止" : "音声で入力"}
             className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mb-0.5 transition-colors ${
@@ -812,8 +900,7 @@ export default function ChatPage() {
             onKeyDown={handleKeyDown}
             placeholder={isRecording ? "音声を認識中..." : "メッセージを入力... (Shift+Enterで改行)"}
             rows={1}
-            className="flex-1 bg-transparent text-sm resize-none outline-none text-gray-800 placeholder-gray-400 max-h-32"
-            style={{ minHeight: "24px" }}
+            className="flex-1 bg-transparent text-sm resize-none outline-none text-gray-800 placeholder-gray-400 max-h-32 min-h-6"
             disabled={isStreaming || historyLoading}
           />
           <button
