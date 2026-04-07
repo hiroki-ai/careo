@@ -50,9 +50,24 @@ function LoginForm() {
 
   return (
     <div className={`min-h-screen flex items-center justify-center p-4 ${isStaffLogin ? "bg-[#0d1b2a]" : "bg-[#0a1628]"}`}>
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm">
+      <div className="w-full max-w-sm">
+        {/* カレオ welcome (student login only) */}
+        {!isStaffLogin && (
+          <div className="flex flex-col items-center mb-5">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/kareo.png" alt="カレオ" className="w-24 h-auto animate-float drop-shadow-xl" />
+            <div className="bg-white rounded-2xl rounded-tl-none px-5 py-3 shadow-lg max-w-xs relative -mt-1">
+              <div className="absolute -top-3 left-0 w-4 h-4 bg-white rotate-[-35deg] rounded-tl-sm" />
+              <p className="text-sm font-semibold text-[#0D0B21] leading-relaxed">
+                おかえり！<span className="text-[#00a87e]">就活の続き、一緒にやろう。</span>
+              </p>
+            </div>
+          </div>
+        )}
+        <div className="bg-white rounded-2xl shadow-xl p-8">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/icon-new.svg" alt="Careo" className="w-8 h-8 rounded-xl" />
             <h1 className="text-2xl font-bold text-[#0a1628]">Careo</h1>
           </div>
@@ -105,6 +120,7 @@ function LoginForm() {
         <div className="flex justify-center gap-4 mt-6 pt-4 border-t border-gray-100">
           <Link href="/terms" target="_blank" className="text-xs text-gray-400 hover:text-gray-600">利用規約</Link>
           <Link href="/privacy" target="_blank" className="text-xs text-gray-400 hover:text-gray-600">プライバシーポリシー</Link>
+        </div>
         </div>
       </div>
     </div>

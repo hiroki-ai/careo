@@ -246,62 +246,81 @@ export default function CareerCenterLandingPage() {
       </header>
 
       {/* ── Hero ───────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden pt-24 pb-20 md:pt-36 md:pb-32">
-        {/* 背景 */}
+      <section className="relative overflow-hidden pt-24 pb-20 md:pt-32 md:pb-28">
         <div className="absolute inset-0 lp-dot-grid opacity-60" />
         <div className="lp-hero-glow absolute inset-0 pointer-events-none" />
         <div className="lp-hero-blob-1 absolute w-[600px] h-[500px] -top-32 -left-40 animate-blob animate-float-slow pointer-events-none" />
         <div className="lp-hero-blob-2 absolute w-[500px] h-[400px] -bottom-20 -right-32 animate-blob delay-1000 animate-float pointer-events-none" />
 
-        <div className="relative max-w-5xl mx-auto px-6 text-center">
-          {/* バッジ */}
-          <div className="inline-flex items-center gap-2 bg-[#00c896]/8 border border-[#00c896]/20 text-[#00a87e] text-xs font-bold px-4 py-2 rounded-full mb-8 animate-fade-in">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00c896] animate-pulse" />
-            大学キャリアセンター担当者の方へ
-          </div>
+        <div className="relative max-w-6xl mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
-          {/* メインコピー */}
-          <h1 className="text-4xl md:text-6xl font-bold text-[#0D0B21] tracking-tight leading-tight mb-6 animate-fade-up">
-            学生の就活を、<br className="hidden md:block" />
-            <span className="lp-gradient-text-hero bg-clip-text text-transparent">
-              データで支援できる時代へ。
-            </span>
-          </h1>
-
-          <p className="text-gray-500 text-base md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-up delay-200">
-            Careoは学生が自主的に使う就活管理アプリです。<br className="hidden md:block" />
-            大学と連携することで、面談の質が上がり、孤立した学生に届き、<br className="hidden md:block" />
-            支援の成果が可視化されます。<span className="font-semibold text-[#0D0B21]">相談予約もCareoで完結</span>。まずは<span className="font-semibold text-[#0D0B21]">無料ヒアリング</span>からお気軽にご相談ください。
-          </p>
-
-          {/* CTAボタン */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-up delay-300">
-            <a
-              href="#contact"
-              className="lp-btn-hero text-white font-bold px-8 py-4 rounded-2xl text-base transition-all hover:scale-105 hover:-translate-y-0.5 w-full sm:w-auto"
-            >
-              提携を検討する（ヒアリング無料）→
-            </a>
-            <a
-              href="#features"
-              className="text-gray-600 font-medium px-6 py-4 rounded-2xl border border-gray-200 hover:border-[#00c896]/40 hover:text-[#00a87e] transition-all text-base w-full sm:w-auto text-center"
-            >
-              機能を見る
-            </a>
-          </div>
-
-          {/* 実績バッジ */}
-          <div className="mt-12 flex flex-wrap items-center justify-center gap-6 animate-fade-in delay-500">
-            {[
-              { value: "無料", label: "初回ヒアリング" },
-              { value: "完全", label: "プライバシー優先設計" },
-              { value: "即日", label: "導入開始可能" },
-            ].map(({ value, label }) => (
-              <div key={label} className="flex flex-col items-center">
-                <span className="text-2xl font-bold text-[#00c896]">{value}</span>
-                <span className="text-xs text-gray-400 mt-0.5">{label}</span>
+            {/* Left: テキスト */}
+            <div className="animate-fade-up">
+              <div className="inline-flex items-center gap-2 bg-[#00c896]/8 border border-[#00c896]/20 text-[#00a87e] text-xs font-bold px-4 py-2 rounded-full mb-8">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#00c896] animate-pulse" />
+                大学キャリアセンター担当者の方へ
               </div>
-            ))}
+
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#0D0B21] tracking-tight leading-[1.15] mb-6">
+                学生の就活が、<br />
+                <span className="lp-gradient-text-hero bg-clip-text text-transparent">
+                  全部見える。
+                </span>
+              </h1>
+
+              <p className="text-gray-500 text-base md:text-lg mb-10 leading-relaxed max-w-xl">
+                CareoのAIコーチ「カレオ」が学生の就活を丸ごと把握。
+                大学と連携することで、<span className="font-semibold text-[#0D0B21]">面談の質が上がり</span>、孤立した学生に届き、支援の成果が可視化されます。
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 mb-12">
+                <a
+                  href="#contact"
+                  className="lp-btn-hero text-white font-bold px-8 py-4 rounded-2xl text-base transition-all hover:scale-105 hover:-translate-y-0.5 text-center"
+                >
+                  提携を検討する（ヒアリング無料）→
+                </a>
+                <a
+                  href="#features"
+                  className="text-gray-600 font-medium px-6 py-4 rounded-2xl border border-gray-200 hover:border-[#00c896]/40 hover:text-[#00a87e] transition-all text-base text-center"
+                >
+                  機能を見る
+                </a>
+              </div>
+
+              <div className="flex flex-wrap gap-8">
+                {[
+                  { value: "無料", label: "初回ヒアリング" },
+                  { value: "完全", label: "プライバシー優先設計" },
+                  { value: "即日", label: "導入開始可能" },
+                ].map(({ value, label }) => (
+                  <div key={label} className="flex flex-col">
+                    <span className="text-2xl font-bold text-[#00c896]">{value}</span>
+                    <span className="text-xs text-gray-400 mt-0.5">{label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right: カレオ */}
+            <div className="relative hidden lg:flex flex-col items-center justify-center">
+              <div className="absolute w-72 h-72 rounded-full bg-[#00c896]/10 blur-3xl" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/kareo.png"
+                alt="カレオ"
+                className="relative w-72 xl:w-80 h-auto drop-shadow-2xl animate-float"
+              />
+              <div className="relative -mt-4 bg-white border border-[#00c896]/25 rounded-2xl rounded-tl-none px-5 py-3 shadow-lg max-w-xs">
+                <p className="text-sm font-semibold text-[#0D0B21] leading-relaxed">
+                  学生の就活データ、<br />
+                  <span className="text-[#00a87e]">全部キャリアセンターに届けるよ！</span>
+                </p>
+                <div className="absolute -top-3 left-0 w-4 h-4 bg-white border-l border-t border-[#00c896]/25 rotate-[-35deg] rounded-tl-sm" />
+              </div>
+            </div>
+
           </div>
         </div>
       </section>

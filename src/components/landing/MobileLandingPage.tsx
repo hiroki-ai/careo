@@ -517,6 +517,12 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
         </div>
 
 
+        {/* カレオ mascot */}
+        <div className="flex justify-center mb-4">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/kareo.png" alt="カレオ" className="w-40 h-auto animate-float drop-shadow-xl" />
+        </div>
+
         {/* Phone mockup */}
         <div className="px-8">
           <PhoneMockup />
