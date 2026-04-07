@@ -310,7 +310,7 @@ export default function CareerCenterLandingPage() {
               <img
                 src="/kareo.png"
                 alt="カレオ"
-                className="relative w-72 xl:w-80 h-auto drop-shadow-2xl animate-float"
+                className="relative w-96 xl:w-[440px] h-auto drop-shadow-2xl animate-float"
               />
               <div className="relative -mt-4 bg-white border border-[#00c896]/25 rounded-2xl rounded-tl-none px-5 py-3 shadow-lg max-w-xs">
                 <p className="text-sm font-semibold text-[#0D0B21] leading-relaxed">
