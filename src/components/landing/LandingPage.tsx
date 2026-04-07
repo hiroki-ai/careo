@@ -745,7 +745,7 @@ export function LandingPage({ recentPosts = [], userCount = 0, reviews = [] }: {
               <img
                 src="/kareo.png"
                 alt="カレオ"
-                className="relative w-80 xl:w-[400px] h-auto drop-shadow-2xl"
+                className="relative w-[420px] xl:w-[500px] h-auto drop-shadow-2xl"
               />
               {/* Speech bubble */}
               <div className="relative -mt-4 bg-white border border-[#00c896]/25 rounded-2xl rounded-tl-none px-5 py-3 shadow-lg max-w-xs">
