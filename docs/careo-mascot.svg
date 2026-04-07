@@ -1,0 +1,58 @@
+<svg width="240" height="280" viewBox="0 0 240 280" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Shadow -->
+  <ellipse cx="120" cy="272" rx="56" ry="8" fill="rgba(0,0,0,0.08)"/>
+
+  <!-- Body -->
+  <ellipse cx="120" cy="192" rx="66" ry="76" fill="#1e293b"/>
+
+  <!-- White belly -->
+  <ellipse cx="120" cy="200" rx="40" ry="58" fill="#f8fafc"/>
+
+  <!-- Left wing -->
+  <ellipse cx="57" cy="190" rx="19" ry="58" fill="#1e293b" transform="rotate(-10, 57, 190)"/>
+  <!-- Right wing -->
+  <ellipse cx="183" cy="190" rx="19" ry="58" fill="#1e293b" transform="rotate(10, 183, 190)"/>
+
+  <!-- Left foot -->
+  <ellipse cx="100" cy="263" rx="22" ry="8" fill="#f59e0b" transform="rotate(-18, 100, 263)"/>
+  <!-- Right foot -->
+  <ellipse cx="140" cy="263" rx="22" ry="8" fill="#f59e0b" transform="rotate(18, 140, 263)"/>
+
+  <!-- Head -->
+  <circle cx="120" cy="94" r="56" fill="#1e293b"/>
+
+  <!-- White face patch -->
+  <ellipse cx="120" cy="100" rx="36" ry="34" fill="#f8fafc"/>
+
+  <!-- Left eye white -->
+  <circle cx="106" cy="86" r="11" fill="#f8fafc"/>
+  <!-- Right eye white -->
+  <circle cx="134" cy="86" r="11" fill="#f8fafc"/>
+
+  <!-- Left pupil -->
+  <circle cx="108" cy="86" r="6.5" fill="#1e293b"/>
+  <!-- Right pupil -->
+  <circle cx="136" cy="86" r="6.5" fill="#1e293b"/>
+
+  <!-- Left eye shine -->
+  <circle cx="111" cy="83" r="2.5" fill="white"/>
+  <!-- Right eye shine -->
+  <circle cx="139" cy="83" r="2.5" fill="white"/>
+
+  <!-- Beak -->
+  <path d="M111,104 Q120,112 129,104 Q120,98 111,104Z" fill="#f59e0b"/>
+
+  <!-- Tie knot -->
+  <path d="M115,135 L120,128 L125,135 L120,134Z" fill="#00a87e"/>
+  <!-- Tie body -->
+  <path d="M116,135 L124,135 L122,168 L120,172 L118,168Z" fill="#00c896"/>
+  <!-- Tie highlight -->
+  <path d="M119,137 L121,137 L120.5,155 L119.5,155Z" fill="rgba(255,255,255,0.25)"/>
+
+  <!-- Cheek blush left -->
+  <ellipse cx="93" cy="103" rx="10" ry="7" fill="rgba(255,150,150,0.18)"/>
+  <!-- Cheek blush right -->
+  <ellipse cx="147" cy="103" rx="10" ry="7" fill="rgba(255,150,150,0.18)"/>
+
+</svg>

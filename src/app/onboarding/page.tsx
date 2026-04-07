@@ -57,9 +57,9 @@ export default function OnboardingPage() {
         {step === 1 && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
             <div className="text-center mb-8">
-              <h1 className="text-2xl font-bold text-[#00c896]">Careo</h1>
-              <p className="text-gray-900 font-semibold mt-3">あなたのことを教えてください</p>
-              <p className="text-sm text-gray-400 mt-1">AIがあなたに合ったアドバイスをします</p>
+              <img src="/careo-mascot.svg" alt="カレオ" className="w-24 h-auto mx-auto mb-3" />
+              <p className="text-gray-900 font-semibold">あなたのことを教えてください</p>
+              <p className="text-sm text-gray-400 mt-1">カレオがあなたに合ったアドバイスをします</p>
             </div>
             <ProfileForm onSubmit={handleProfileSave} submitLabel="次へ →" showSelfAnalysis />
           </div>
@@ -69,8 +69,11 @@ export default function OnboardingPage() {
         {step === 2 && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
             <div className="text-center mb-8">
-              <div className="w-12 h-12 bg-[#00c896]/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                <span className="text-2xl">📥</span>
+              <div className="flex items-end justify-center gap-3 mb-3">
+                <img src="/careo-mascot.svg" alt="カレオ" className="w-20 h-auto" />
+                <div className="bg-[#00c896]/10 border border-[#00c896]/20 rounded-2xl rounded-bl-none px-3 py-2 mb-4 text-left">
+                  <p className="text-xs text-[#00a87e] font-semibold">データ、取り込もう！</p>
+                </div>
               </div>
               <p className="text-gray-900 font-semibold">今まで管理していたデータを取り込もう</p>
               <p className="text-sm text-gray-400 mt-1">NotionやスプレッドシートのデータをそのままCareoに移行できます</p>
@@ -120,9 +123,7 @@ export default function OnboardingPage() {
         {/* Step 3: 完了・ウェルカム */}
         {step === 3 && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
-            <div className="w-16 h-16 bg-[#00c896]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">🎉</span>
-            </div>
+            <img src="/careo-mascot.svg" alt="カレオ" className="w-28 h-auto mx-auto mb-2" />
             <h2 className="text-xl font-bold text-gray-900 mb-2">準備完了！</h2>
 
             {/* AIウェルカムメッセージ */}
