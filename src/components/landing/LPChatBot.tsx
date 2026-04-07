@@ -127,7 +127,7 @@ export function LPChatBot({
           <div className="flex items-center gap-2.5 px-4 py-3 border-b border-gray-100"
             style={{ background: "linear-gradient(135deg, #00c896 0%, #00a87e 100%)" }}>
             <div className="w-8 h-8 rounded-full overflow-hidden shrink-0">
-              <img src="/kareo-coach-avatar.svg" alt="カレオコーチ" className="w-full h-full object-cover" />
+              <img src="/kareo.png" alt="カレオコーチ" className="w-full h-full object-cover" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-white font-bold text-sm leading-none">カレオコーチ</p>
@@ -151,7 +151,7 @@ export function LPChatBot({
               <div key={i} className={`flex gap-2 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                 {m.role === "assistant" && (
                   <div className="w-6 h-6 rounded-full shrink-0 overflow-hidden mt-0.5">
-                    <img src="/kareo-coach-avatar.svg" alt="カレオコーチ" className="w-full h-full object-cover" />
+                    <img src="/kareo.png" alt="カレオコーチ" className="w-full h-full object-cover" />
                   </div>
                 )}
                 <div
@@ -237,7 +237,7 @@ export function LPChatBot({
             <path d="M4 4l12 12M16 4L4 16" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
           </svg>
         ) : (
-          <img src="/kareo-coach-avatar.svg" alt="カレオコーチ" className="w-10 h-10 object-cover rounded-full" />
+          <img src="/kareo.png" alt="カレオコーチ" className="w-10 h-10 object-cover rounded-full" />
         )}
 
         {/* 未読バッジ（初回表示） */}

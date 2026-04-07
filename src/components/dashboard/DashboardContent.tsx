@@ -69,8 +69,8 @@ function DailyCoachBanner({ profile }: { profile: UserProfile | null }) {
   return (
     <Link href="/chat">
       <div className="mb-5 bg-gradient-to-br from-[#00c896] via-[#00b488] to-[#00a87e] rounded-3xl px-4 py-4 flex items-center gap-3 active:opacity-90 transition-opacity cursor-pointer coach-banner-shadow">
-        <div className="w-11 h-11 bg-white/25 rounded-2xl flex items-center justify-center shrink-0 backdrop-blur-sm">
-          <span className="text-white font-black text-base leading-none">{coachName[0]}</span>
+        <div className="w-14 h-14 shrink-0">
+          <img src="/kareo.png" alt="カレオ" className="w-full h-full object-contain" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-white/80 text-[11px] font-semibold tracking-wide mb-0.5">今日の{coachName}コーチ</p>

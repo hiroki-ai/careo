@@ -52,7 +52,11 @@ export default function EsPage() {
       </div>
 
       {sorted.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">ESが登録されていません</div>
+        <div className="text-center py-12">
+          <img src="/kareo.png" alt="カレオ" className="w-28 h-auto mx-auto mb-4 opacity-80" />
+          <p className="text-gray-400 font-medium">ESがまだ登録されていません</p>
+          <p className="text-sm text-gray-300 mt-1">企業ページからESを追加してみよう！</p>
+        </div>
       ) : (
         <div className="space-y-3">
           {sorted.map((es) => {

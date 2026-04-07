@@ -32,7 +32,11 @@ export default function InterviewsPage() {
       </div>
 
       {sorted.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">面接が登録されていません</div>
+        <div className="text-center py-12">
+          <img src="/kareo.png" alt="カレオ" className="w-28 h-auto mx-auto mb-4 opacity-80" />
+          <p className="text-gray-400 font-medium">面接がまだ登録されていません</p>
+          <p className="text-sm text-gray-300 mt-1">企業ページから面接を追加してみよう！</p>
+        </div>
       ) : (
         <div className="space-y-3">
           {sorted.map((interview) => (
