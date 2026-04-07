@@ -12,40 +12,15 @@ import { useToast } from "@/components/ui/Toast";
 import { parseCompanySuggestions } from "@/lib/chatUtils";
 import { useCoach } from "@/hooks/useCoach";
 
-// カレオのキャラクターSVG
 export function KareoCharacter({ size = 56 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="kareoHead" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#6366F1" />
-          <stop offset="1" stopColor="#4338CA" />
-        </linearGradient>
-      </defs>
-      {/* アンテナ */}
-      <line x1="32" y1="6" x2="32" y2="13" stroke="#818CF8" strokeWidth="2.5" strokeLinecap="round"/>
-      <circle cx="32" cy="4" r="3" fill="#A5B4FC" />
-      {/* 頭 */}
-      <rect x="6" y="12" width="52" height="46" rx="16" fill="url(#kareoHead)" />
-      {/* 耳（左） */}
-      <rect x="2" y="24" width="6" height="12" rx="3" fill="#4338CA" />
-      {/* 耳（右） */}
-      <rect x="56" y="24" width="6" height="12" rx="3" fill="#4338CA" />
-      {/* 目（白目） */}
-      <circle cx="23" cy="32" r="7" fill="white" />
-      <circle cx="41" cy="32" r="7" fill="white" />
-      {/* 目（瞳） */}
-      <circle cx="24" cy="33" r="4" fill="#1E1B4B" />
-      <circle cx="42" cy="33" r="4" fill="#1E1B4B" />
-      {/* 目のハイライト */}
-      <circle cx="26" cy="31" r="1.5" fill="white" />
-      <circle cx="44" cy="31" r="1.5" fill="white" />
-      {/* 頬 */}
-      <circle cx="14" cy="40" r="5" fill="#C7D2FE" opacity="0.45" />
-      <circle cx="50" cy="40" r="5" fill="#C7D2FE" opacity="0.45" />
-      {/* 口 */}
-      <path d="M24 44 Q32 51 40 44" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
-    </svg>
+    <img
+      src="/kareo.png"
+      alt="カレオ"
+      width={size}
+      height={size}
+      style={{ objectFit: "contain" }}
+    />
   );
 }
 
