@@ -190,7 +190,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
   };
 
   return (
-    <div className="p-4 md:p-8 max-w-4xl">
+    <div className="p-4 md:p-8">
       {/* ヘッダー */}
       <div className="mb-6">
         <Link href="/companies" className="text-sm text-gray-400 hover:text-gray-600 mb-3 inline-block">

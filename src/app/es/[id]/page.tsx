@@ -326,7 +326,7 @@ export default function EsDetailPage({ params }: { params: Promise<{ id: string 
   };
 
   return (
-    <div className="p-4 md:p-8 max-w-3xl">
+    <div className="p-4 md:p-8">
       <Link href="/es" className="text-sm text-gray-400 hover:text-gray-600 mb-3 inline-block">← ES一覧</Link>
 
       <div className="flex items-start justify-between mb-6">

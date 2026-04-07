@@ -363,7 +363,7 @@ export default function ReportPage() {
   const badges = computeBadges({ companies, esList, interviews, visits, tests, pdca });
 
   return (
-    <div className="p-4 md:p-8 max-w-3xl">
+    <div className="p-4 md:p-8">
 
       {/* ① 今日のひとこと */}
       {!companiesLoading && !interviewsLoading && (

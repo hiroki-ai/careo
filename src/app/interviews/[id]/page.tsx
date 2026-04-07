@@ -85,7 +85,7 @@ export default function InterviewDetailPage({ params }: { params: Promise<{ id: 
   }
 
   return (
-    <div className="p-4 md:p-8 max-w-3xl">
+    <div className="p-4 md:p-8">
       <Link href="/interviews" className="text-sm text-gray-400 hover:text-gray-600 mb-3 inline-block">← 面接一覧</Link>
 
       <div className="flex items-start justify-between mb-6">
