@@ -262,14 +262,14 @@ export default function CareerCenterLandingPage() {
                 大学キャリアセンター担当者の方へ
               </div>
 
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#0D0B21] tracking-tight leading-[1.15] mb-6">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-[#0D0B21] tracking-tight leading-[1.15] mb-6">
                 学生の就活が、<br />
                 <span className="lp-gradient-text-hero bg-clip-text text-transparent">
                   全部見える。
                 </span>
               </h1>
 
-              <p className="text-gray-500 text-base md:text-lg mb-10 leading-relaxed max-w-xl">
+              <p className="text-gray-500 text-lg md:text-xl mb-10 leading-relaxed max-w-xl">
                 CareoのAIコーチ「カレオ」が学生の就活を丸ごと把握。
                 大学と連携することで、<span className="font-semibold text-[#0D0B21]">面談の質が上がり</span>、孤立した学生に届き、支援の成果が可視化されます。
               </p>
@@ -310,7 +310,7 @@ export default function CareerCenterLandingPage() {
               <img
                 src="/kareo.png"
                 alt="カレオ"
-                className="relative w-96 xl:w-[440px] h-auto drop-shadow-2xl animate-float"
+                className="relative w-[460px] xl:w-[560px] h-auto drop-shadow-2xl animate-float"
               />
               <div className="relative -mt-4 bg-white border border-[#00c896]/25 rounded-2xl rounded-tl-none px-5 py-3 shadow-lg max-w-xs">
                 <p className="text-sm font-semibold text-[#0D0B21] leading-relaxed">
