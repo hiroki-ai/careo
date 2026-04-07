@@ -495,12 +495,11 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
         {/* headline */}
         <h1 className="font-black text-white leading-[1.1] tracking-tight mb-5" style={{ fontSize: "clamp(2.5rem,11vw,3.5rem)" }}>
           就活、<br />
-          <span className="text-[#00c896]">楽しんでる？</span>
+          <span className="text-[#00c896]">全部知ってる。</span>
         </h1>
 
         <p className="text-gray-400 text-sm leading-relaxed mb-8">
-          記録するだけで就活が整理される。バッジが貯まる。AIが毎日ひとこと届ける。<br />
-          就活を「こなす作業」から「積み上がる体験」に変えるアプリ。
+          ES・面接・OB訪問・筆記試験——あなたの就活データを全部把握したAIが、本当に必要なアドバイスだけを届ける。
         </p>
 
         <Link

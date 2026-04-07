@@ -9,7 +9,7 @@ import { LPChatBot } from "@/components/landing/LPChatBot";
 // ─── Constants ───────────────────────────────────────────────────────────────
 const DEFAULT_BADGE = "あなたの就活を丸ごと知るAIコーチ「カレオ」";
 const DEFAULT_HERO_SUBTEXT =
-  "記録するだけで整理され、バッジが貯まり、AIが毎日ひとこと届ける。\n就活を「こなす作業」から「積み上がる体験」に変えるアプリ。";
+  "ES・面接・OB訪問・筆記試験——あなたの就活データを全部把握したAIが、\n本当に必要なアドバイスだけを届ける。ChatGPTにはできないことを、カレオはやる。";
 const DEFAULT_AFTER_ITEMS = [
   "企業・ES・面接・説明会・インターン・OB訪問・筆記試験がすべて一か所。全体像が常に見える",
   "説明会・インターン・ES締切を一元管理。3日前に自動通知で見落としゼロ",
@@ -699,10 +699,10 @@ export function LandingPage({ recentPosts = [], userCount = 0, reviews = [] }: {
               </div>
 
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] mb-6 tracking-tight">
-                就活を、<br />
+                就活、<br />
                 <span className="relative inline-block">
                   <span className="bg-clip-text text-transparent lp-gradient-text-hero">
-                    楽しもう。
+                    全部知ってる。
                   </span>
                 </span>
               </h1>
