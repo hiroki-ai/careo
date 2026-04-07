@@ -273,7 +273,7 @@ export default function ComparePage() {
         <div className="max-w-5xl mx-auto px-6 py-3 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icon-new.svg" alt="Careo" className="w-7 h-7" />
+            <img src="/icon-192.png" alt="Careo" className="w-7 h-7" />
             <span className="font-bold text-[#0D0B21] text-lg">Careo</span>
           </Link>
           <div className="flex items-center gap-3">
@@ -789,7 +789,7 @@ export default function ComparePage() {
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icon-new.svg" alt="Careo" className="w-6 h-6" />
+            <img src="/icon-192.png" alt="Careo" className="w-6 h-6" />
             <span className="text-white font-bold">Careo</span>
           </Link>
           <div className="flex items-center gap-6 text-gray-500 text-xs">

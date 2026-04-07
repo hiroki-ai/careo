@@ -7,7 +7,7 @@ export default function PrivacyPage() {
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
         <div className="flex items-center gap-2 mb-8">
-          <img src="/icon-new.svg" alt="Careo" className="w-7 h-7 rounded-xl" />
+          <img src="/icon-192.png" alt="Careo" className="w-7 h-7 rounded-xl" />
           <span className="font-bold text-lg text-[#0D0B21]">Careo</span>
         </div>
 

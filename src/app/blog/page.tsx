@@ -118,7 +118,7 @@ export default async function BlogPage() {
         <header className="border-b border-gray-200 bg-white/80 backdrop-blur-md sticky top-0 z-50">
           <div className="max-w-5xl mx-auto px-5 h-14 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
-              <img src="/icon-new.svg" alt="Careo" className="w-6 h-6" />
+              <img src="/icon-192.png" alt="Careo" className="w-6 h-6" />
               <span className="font-bold text-[#0D0B21] text-sm">Careo</span>
               <span className="text-gray-300 text-sm">/</span>
               <span className="text-gray-500 text-sm">ブログ</span>
@@ -207,7 +207,7 @@ export default async function BlogPage() {
                     </div>
                     {/* フッター */}
                     <div className="absolute bottom-0 left-0 right-0 flex items-center gap-1.5 px-4 md:px-6 py-2.5 border-t border-white/20">
-                      <img src="/icon-new.svg" alt="" className="w-4 h-4 brightness-0 invert opacity-80" />
+                      <img src="/icon-192.png" alt="" className="w-4 h-4 brightness-0 invert opacity-80" />
                       <span className="text-[10px] text-white/80 font-semibold">Careo</span>
                       <span className="text-[10px] text-white/50 ml-auto">{post.reading_time_min}分で読める</span>
                     </div>

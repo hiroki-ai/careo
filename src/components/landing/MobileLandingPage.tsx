@@ -462,7 +462,7 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
       >
         <div className="flex items-center justify-between px-5 py-4">
           <div className="flex items-center gap-2">
-            <img src="/icon-new.svg" alt="Careo" className="w-7 h-7 rounded-xl" />
+            <img src="/icon-192.png" alt="Careo" className="w-7 h-7 rounded-xl" />
             <span
               className="font-bold text-base tracking-tight transition-colors duration-300"
               style={{ color: scrollY > 50 ? "#0D0B21" : "#ffffff" }}
@@ -499,7 +499,7 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
             <span className="text-[#00c896]">全部知ってる。</span>
           </h1>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/kareo.png" alt="カレオ" className="w-32 h-auto animate-float drop-shadow-xl shrink-0" />
+          <img src="/kareo.png" alt="カレオ" className="w-44 h-auto animate-float drop-shadow-xl shrink-0" />
         </div>
 
         <p className="text-gray-400 text-sm leading-relaxed mb-8">
@@ -988,7 +988,7 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
                       <p className="text-white font-bold text-xs leading-snug line-clamp-3 drop-shadow-sm">{post.title}</p>
                     </div>
                     <div className="absolute bottom-0 left-0 right-0 flex items-center gap-1.5 px-4 py-2 border-t border-white/20">
-                      <img src="/icon-new.svg" alt="" className="w-3 h-3 brightness-0 invert opacity-80" />
+                      <img src="/icon-192.png" alt="" className="w-3 h-3 brightness-0 invert opacity-80" />
                       <span className="text-[9px] text-white/80 font-semibold">Careo</span>
                       <span className="text-[9px] text-white/50 ml-auto">{post.reading_time_min}分で読める</span>
                     </div>
@@ -1086,7 +1086,7 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
       {/* ── Footer ─────────────────────────────────────────────────────────── */}
       <footer className="px-6 py-8 bg-[#080618] border-t border-white/5">
         <div className="flex items-center gap-2 mb-4">
-          <img src="/icon-new.svg" alt="Careo" className="w-6 h-6 rounded-lg opacity-60" />
+          <img src="/icon-192.png" alt="Careo" className="w-6 h-6 rounded-lg opacity-60" />
           <span className="font-bold text-sm text-gray-500">Careo</span>
         </div>
         <div className="flex flex-wrap gap-x-5 gap-y-2 mb-5">

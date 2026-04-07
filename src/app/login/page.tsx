@@ -68,7 +68,7 @@ function LoginForm() {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icon-new.svg" alt="Careo" className="w-8 h-8 rounded-xl" />
+            <img src="/icon-192.png" alt="Careo" className="w-8 h-8 rounded-xl" />
             <h1 className="text-2xl font-bold text-[#0a1628]">Careo</h1>
           </div>
           {isStaffLogin ? (

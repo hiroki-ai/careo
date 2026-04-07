@@ -85,7 +85,7 @@ export default function SignupPage() {
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="flex items-center justify-center gap-2 mb-6">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icon-new.svg" alt="Careo" className="w-7 h-7 rounded-xl" />
+            <img src="/icon-192.png" alt="Careo" className="w-7 h-7 rounded-xl" />
             <h1 className="text-xl font-bold text-[#0a1628]">Careo — 無料で始める</h1>
           </div>
           <form onSubmit={handleSignup} className="space-y-4">

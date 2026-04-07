@@ -116,7 +116,7 @@ export default async function BlogPostPage({ params }: Props) {
       "@type": "Organization",
       name: "Careo",
       url: "https://careoai.jp",
-      logo: { "@type": "ImageObject", url: "https://careoai.jp/icon-new.svg" },
+      logo: { "@type": "ImageObject", url: "https://careoai.jp/icon-192.png" },
     },
     keywords: post.tags.join(", "),
     timeRequired: `PT${post.reading_time_min}M`,
@@ -134,7 +134,7 @@ export default async function BlogPostPage({ params }: Props) {
         <header className="border-b border-gray-200 bg-white/80 backdrop-blur-md sticky top-0 z-50">
           <div className="max-w-4xl mx-auto px-4 md:px-8 h-14 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
-              <img src="/icon-new.svg" alt="Careo" className="w-6 h-6" />
+              <img src="/icon-192.png" alt="Careo" className="w-6 h-6" />
               <span className="font-bold text-[#0D0B21] text-sm">Careo</span>
             </Link>
             <Link
@@ -179,7 +179,7 @@ export default async function BlogPostPage({ params }: Props) {
           {/* メタ情報 */}
           <div className="flex flex-wrap items-center gap-3 md:gap-5 text-xs text-gray-400 mb-6 md:mb-10 pb-5 md:pb-7 border-b border-gray-200">
             <div className="flex items-center gap-1.5">
-              <img src="/icon-new.svg" alt="" className="w-4 h-4" />
+              <img src="/icon-192.png" alt="" className="w-4 h-4" />
               <span className="font-semibold text-gray-600">Careo編集部</span>
             </div>
             <span>{formatDate(post.published_at)}</span>

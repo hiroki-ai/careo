@@ -254,7 +254,7 @@ export function Sidebar() {
           <>
             <div className="flex items-center gap-2.5 flex-1 min-w-0">
               <div className="w-8 h-8 rounded-xl overflow-hidden shrink-0 ring-1 ring-white/10">
-                <img src="/icon-new.svg" alt="Careo" className="w-full h-full" />
+                <img src="/icon-192.png" alt="Careo" className="w-full h-full" />
               </div>
               <div>
                 <span className="text-white font-black text-[17px] tracking-tight leading-none">Careo</span>
@@ -279,7 +279,7 @@ export function Sidebar() {
             className="w-8 h-8 rounded-xl overflow-hidden ring-1 ring-white/10 hover:ring-white/30 transition-all"
             title="展開"
           >
-            <img src="/icon-new.svg" alt="Careo" className="w-full h-full" />
+            <img src="/icon-192.png" alt="Careo" className="w-full h-full" />
           </button>
         )}
       </div>

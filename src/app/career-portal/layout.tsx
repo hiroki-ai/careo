@@ -125,7 +125,7 @@ export default function CareerPortalLayout({ children }: { children: React.React
         {/* ロゴ */}
         <div className="px-4 pt-5 pb-4 border-b border-white/10">
           <div className="flex items-center gap-2 mb-0.5">
-            <img src="/icon-new.svg" alt="Careo" className="w-7 h-7 rounded-lg shrink-0" />
+            <img src="/icon-192.png" alt="Careo" className="w-7 h-7 rounded-lg shrink-0" />
             <span className="font-bold text-lg tracking-wide">Careo</span>
           </div>
           <p className="text-blue-200/50 text-[10px] tracking-widest uppercase pl-9">Career Center</p>

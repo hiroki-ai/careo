@@ -26,7 +26,7 @@ const jsonLd = {
       "@type": "Organization",
       "name": "Careo",
       "url": "https://careoai.jp",
-      "logo": { "@type": "ImageObject", "url": "https://careoai.jp/icon-new.svg" },
+      "logo": { "@type": "ImageObject", "url": "https://careoai.jp/icon-192.png" },
     },
     {
       "@type": "WebSite",
@@ -271,7 +271,7 @@ function AppMockup() {
           <div className="flex items-center justify-between mb-3">
             <p className="text-xs font-bold text-gray-900">ダッシュボード</p>
             <div className="flex items-center gap-1.5">
-              <img src="/icon-new.svg" alt="" className="w-4 h-4 rounded" />
+              <img src="/icon-192.png" alt="" className="w-4 h-4 rounded" />
               <span className="text-[9px] font-bold text-[#0D0B21]">Careo</span>
             </div>
           </div>
@@ -637,7 +637,7 @@ export function LandingPage({ recentPosts = [], userCount = 0, reviews = [] }: {
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "lp-header-scrolled" : ""}`}>
         <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2.5">
-            <img src="/icon-new.svg" alt="Careo" className="w-8 h-8 rounded-xl" />
+            <img src="/icon-192.png" alt="Careo" className="w-8 h-8 rounded-xl" />
             <span className="font-bold text-lg tracking-tight text-[#0D0B21]">Careo</span>
           </div>
           <nav className="hidden md:flex items-center gap-6">
@@ -1766,7 +1766,7 @@ export function LandingPage({ recentPosts = [], userCount = 0, reviews = [] }: {
       <footer className="px-6 py-8 border-t border-gray-100">
         <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <img src="/icon-new.svg" alt="Careo" className="w-6 h-6 rounded-lg" />
+            <img src="/icon-192.png" alt="Careo" className="w-6 h-6 rounded-lg" />
             <span className="font-bold text-sm text-[#0D0B21]">Careo</span>
             <span className="text-gray-300 text-xs ml-2">© 2026 — 就活管理AIアプリ</span>
           </div>

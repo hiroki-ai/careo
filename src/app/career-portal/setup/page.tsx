@@ -125,7 +125,7 @@ export default function CareerPortalSetupPage() {
     <div className="min-h-screen bg-[#0d1b2a] flex flex-col items-center justify-center p-4">
       {/* ロゴ */}
       <div className="flex items-center gap-2 mb-8">
-        <img src="/icon-new.svg" alt="Careo" className="w-8 h-8 rounded-xl" />
+        <img src="/icon-192.png" alt="Careo" className="w-8 h-8 rounded-xl" />
         <span className="text-white font-bold text-xl tracking-wide">Careo</span>
         <span className="text-blue-300/60 text-xs border-l border-white/20 pl-3 ml-1">
           Career Center Portal

@@ -210,7 +210,7 @@ export default function CareerCenterLandingPage() {
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icon-new.svg" alt="Careo" className="w-7 h-7" />
+            <img src="/icon-192.png" alt="Careo" className="w-7 h-7" />
             <span className="font-bold text-[#0D0B21] text-lg tracking-tight">Careo</span>
             <span className="hidden sm:inline text-xs text-gray-400 font-medium ml-1 border-l border-gray-200 pl-2">
               for キャリアセンター
@@ -1169,7 +1169,7 @@ export default function CareerCenterLandingPage() {
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-400">
           <div className="flex items-center gap-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icon-new.svg" alt="Careo" className="w-5 h-5 opacity-60" />
+            <img src="/icon-192.png" alt="Careo" className="w-5 h-5 opacity-60" />
             <span>Careo — AI就活コーチアプリ</span>
           </div>
           <div className="flex items-center gap-5">
