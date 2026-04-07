@@ -492,11 +492,15 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
           <span className="text-[#00c896] text-xs font-semibold tracking-wide">あなたの就活を丸ごと知るAIコーチ「カレオ」</span>
         </div>
 
-        {/* headline */}
-        <h1 className="font-black text-white leading-[1.1] tracking-tight mb-5" style={{ fontSize: "clamp(2.5rem,11vw,3.5rem)" }}>
-          就活、<br />
-          <span className="text-[#00c896]">全部知ってる。</span>
-        </h1>
+        {/* headline + カレオ side by side */}
+        <div className="flex items-end justify-between gap-4 mb-5">
+          <h1 className="font-black text-white leading-[1.1] tracking-tight" style={{ fontSize: "clamp(2.5rem,11vw,3.5rem)" }}>
+            就活、<br />
+            <span className="text-[#00c896]">全部知ってる。</span>
+          </h1>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/kareo.png" alt="カレオ" className="w-32 h-auto animate-float drop-shadow-xl shrink-0" />
+        </div>
 
         <p className="text-gray-400 text-sm leading-relaxed mb-8">
           ES・面接・OB訪問・筆記試験——あなたの就活データを全部把握したAIが、本当に必要なアドバイスだけを届ける。
@@ -514,13 +518,6 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
           <span>💳 クレカ不要</span>
           <span>·</span>
           <span>🔒 データは暗号化保存・第三者販売なし</span>
-        </div>
-
-
-        {/* カレオ mascot */}
-        <div className="flex justify-center mb-4">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/kareo.png" alt="カレオ" className="w-40 h-auto animate-float drop-shadow-xl" />
         </div>
 
         {/* Phone mockup */}
