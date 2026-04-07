@@ -9,7 +9,7 @@ import { LPChatBot } from "@/components/landing/LPChatBot";
 // ─── Constants ───────────────────────────────────────────────────────────────
 const DEFAULT_BADGE = "あなたの就活を丸ごと知るAIコーチ「カレオ」";
 const DEFAULT_HERO_SUBTEXT =
-  "企業・ES・面接・OB訪問・筆記試験をすべて一か所に。\nあなたの全就活データを把握したAIコーチ「カレオ」が、「A社のESとB社の面接で矛盾あり」など、ChatGPTにはできない個人化の気づきを自動通知する。";
+  "記録するだけで整理され、バッジが貯まり、AIが毎日ひとこと届ける。\n就活を「こなす作業」から「積み上がる体験」に変えるアプリ。";
 const DEFAULT_AFTER_ITEMS = [
   "企業・ES・面接・説明会・インターン・OB訪問・筆記試験がすべて一か所。全体像が常に見える",
   "説明会・インターン・ES締切を一元管理。3日前に自動通知で見落としゼロ",
@@ -696,10 +696,10 @@ export function LandingPage({ recentPosts = [], userCount = 0, reviews = [] }: {
               </div>
 
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] mb-6 tracking-tight">
-                迷わず動ける、<br />
+                就活を、<br />
                 <span className="relative inline-block">
                   <span className="bg-clip-text text-transparent lp-gradient-text-hero">
-                    就活へ。
+                    楽しもう。
                   </span>
                 </span>
               </h1>
@@ -1165,6 +1165,74 @@ export function LandingPage({ recentPosts = [], userCount = 0, reviews = [] }: {
                 <p className="text-[11px] text-[#00c896] font-medium border-t border-gray-100 pt-2">{cat.tip}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 楽しくなる新機能 ─────────────────────────────────────────────────── */}
+      <section className="px-6 py-24 bg-[#0D0B21] reveal">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">Fun &amp; Engaging</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 tracking-tight text-white">
+            記録するのが、<span className="text-[#00c896]">楽しくなる</span>。
+          </h2>
+          <p className="text-gray-400 text-base text-center mb-12 max-w-xl mx-auto">
+            情報を入力するのが楽しく、簡単で、見やすい。<br />
+            データが貯まるほど、AIの精度が上がる好循環。
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              {
+                emoji: "🎉",
+                title: "内定でコンフェッティ",
+                desc: "内定・インターン合格を記録すると画面いっぱいにお祝い演出。一人でも「やった！」を一緒に喜べる。",
+                color: "border-amber-500/20 bg-amber-500/5",
+              },
+              {
+                emoji: "😊",
+                title: "感情タグ記録",
+                desc: "面接後に「😊楽しかった」「🔥手応えあり」をワンタップ。感情の傾向がAIの週次分析に活用される。",
+                color: "border-purple-500/20 bg-purple-500/5",
+              },
+              {
+                emoji: "🏅",
+                title: "マイルストーンバッジ",
+                desc: "「初ES提出」「初面接通過」「10社登録」など、12種類の達成バッジで就活の進捗を可視化。",
+                color: "border-[#00c896]/20 bg-[#00c896]/5",
+              },
+              {
+                emoji: "🗺️",
+                title: "就活ジャーニーマップ",
+                desc: "WISHLIST→応募→面接→内定まで、自分の就活の旅路がグラフで一目でわかる。「ここまで来た」が実感できる。",
+                color: "border-blue-500/20 bg-blue-500/5",
+              },
+              {
+                emoji: "🏃",
+                title: "週次コーチセッション",
+                desc: "毎週AIが先週を振り返り、今週のフォーカスとアクション3つを提案。感情タグデータも分析に活用。",
+                color: "border-indigo-500/20 bg-indigo-500/5",
+              },
+              {
+                emoji: "💬",
+                title: "今日のひとこと",
+                desc: "あなたの就活状況を把握したAIが、毎日パーソナライズされた一言を届ける。開くのが楽しみになる。",
+                color: "border-pink-500/20 bg-pink-500/5",
+              },
+            ].map((item) => (
+              <div key={item.title} className={`border ${item.color} rounded-2xl p-5 hover:scale-[1.02] transition-transform duration-200`}>
+                <span className="text-3xl mb-3 block">{item.emoji}</span>
+                <p className="font-bold text-white text-sm mb-2">{item.title}</p>
+                <p className="text-gray-400 text-xs leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-10">
+            <Link
+              href="/signup"
+              className="inline-flex items-center gap-2 bg-[#00c896] hover:bg-[#00b586] text-white font-bold px-8 py-4 rounded-2xl text-base transition-colors"
+            >
+              無料で始める → <span className="text-sm font-normal opacity-80">5分でセットアップ</span>
+            </Link>
           </div>
         </div>
       </section>

@@ -6,6 +6,7 @@ import { useCompanies } from "@/hooks/useCompanies";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { formatDateTime } from "@/lib/utils";
+import { INTERVIEW_MOOD_LABELS } from "@/types";
 
 export default function InterviewsPage() {
   const { interviews } = useInterviews();
@@ -46,14 +47,21 @@ export default function InterviewsPage() {
                       <p className="text-xs text-gray-400 mt-1">面接官: {interview.interviewers}</p>
                     )}
                   </div>
-                  <Badge
-                    variant={
-                      interview.result === "PASS" ? "success" :
-                      interview.result === "FAIL" ? "danger" : "default"
-                    }
-                  >
-                    {interview.result === "PASS" ? "通過" : interview.result === "FAIL" ? "不通過" : "結果待ち"}
-                  </Badge>
+                  <div className="flex items-center gap-1.5">
+                    {interview.mood && (
+                      <span className="text-lg" title={INTERVIEW_MOOD_LABELS[interview.mood].label}>
+                        {INTERVIEW_MOOD_LABELS[interview.mood].emoji}
+                      </span>
+                    )}
+                    <Badge
+                      variant={
+                        interview.result === "PASS" ? "success" :
+                        interview.result === "FAIL" ? "danger" : "default"
+                      }
+                    >
+                      {interview.result === "PASS" ? "通過" : interview.result === "FAIL" ? "不通過" : "結果待ち"}
+                    </Badge>
+                  </div>
                 </div>
                 {interview.notes && (
                   <p className="text-sm text-gray-600 mt-3 line-clamp-2">{interview.notes}</p>

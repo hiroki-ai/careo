@@ -153,6 +153,10 @@ ALTER TABLE team_reports DISABLE ROW LEVEL SECURITY;
 CREATE INDEX IF NOT EXISTS team_reports_member_id_idx ON team_reports(member_id);
 CREATE INDEX IF NOT EXISTS team_reports_created_at_idx ON team_reports(created_at DESC);
 
+-- 2026-04-07: interviews テーブルに mood カラムを追加（感情タグ機能）
+-- good=😊楽しかった / nervous=😤緊張した / hot=🔥手応えあり / tired=😴疲れた / neutral=😶普通
+ALTER TABLE interviews ADD COLUMN IF NOT EXISTS mood TEXT DEFAULT NULL;
+
 -- 2026-04-06: ブログ週次スケジュール管理テーブル
 -- ロードマップサイトから1週間分のブログテーマを管理するために使用
 -- status: 'planned' = 予定、'published' = 投稿済み、'skipped' = スキップ

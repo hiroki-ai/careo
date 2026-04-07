@@ -68,9 +68,9 @@ const moreCategories = [
     label: "分析・コミュニティ",
     items: [
       { href: "/report", label: "PDCA", emoji: "📊" },
+      { href: "/weekly-coach", label: "週次コーチ", emoji: "🏃" },
       { href: "/insights", label: "みんなの就活", emoji: "🌐" },
       { href: "/groups", label: "友達と就活", emoji: "👫" },
-      { href: "/mentors", label: "先輩相談", emoji: "👨‍🎓", comingSoon: true },
     ],
   },
   {
@@ -153,7 +153,7 @@ export function BottomNav() {
                           <span className={`text-[10px] font-semibold leading-tight ${isActive ? "text-[#00a87e]" : "text-gray-500"}`}>
                             {item.label}
                           </span>
-                          {"comingSoon" in item && item.comingSoon && (
+                          {(item as { comingSoon?: boolean }).comingSoon && (
                             <span className="absolute top-1.5 right-1.5 text-[7px] font-black bg-gradient-to-r from-amber-400 to-orange-400 text-white px-1 py-0.5 rounded-full leading-none">
                               近日
                             </span>

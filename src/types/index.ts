@@ -18,6 +18,16 @@ export type EsStatus = "DRAFT" | "SUBMITTED";
 
 export type InterviewResult = "PASS" | "FAIL" | "PENDING";
 
+export type InterviewMood = "good" | "nervous" | "hot" | "tired" | "neutral";
+
+export const INTERVIEW_MOOD_LABELS: Record<InterviewMood, { emoji: string; label: string }> = {
+  good:    { emoji: "😊", label: "楽しかった" },
+  nervous: { emoji: "😤", label: "緊張した" },
+  hot:     { emoji: "🔥", label: "手応えあり" },
+  tired:   { emoji: "😴", label: "疲れた" },
+  neutral: { emoji: "😶", label: "普通" },
+};
+
 export interface QAPair {
   id: string;
   question: string;
@@ -72,6 +82,7 @@ export interface Interview {
   questions: QAPair[];
   notes?: string;
   result: InterviewResult;
+  mood?: InterviewMood;
   createdAt: string;
   updatedAt: string;
 }

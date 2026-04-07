@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { formatDateTime } from "@/lib/utils";
+import { INTERVIEW_MOOD_LABELS, InterviewMood } from "@/types";
 
 interface QuestionFeedback {
   question: string;
@@ -31,7 +32,7 @@ interface AIFeedback {
 export default function InterviewDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
-  const { interviews, updateInterview, deleteInterview } = useInterviews();
+  const { interviews, updateInterview, updateMood, deleteInterview } = useInterviews();
   const { companies } = useCompanies();
   const { profile } = useProfile();
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -99,7 +100,7 @@ export default function InterviewDetailPage({ params }: { params: Promise<{ id: 
           {interview.interviewers && (
             <p className="text-sm text-gray-500 mt-1">面接官: {interview.interviewers}</p>
           )}
-          <div className="mt-2">
+          <div className="mt-2 flex items-center gap-2 flex-wrap">
             <Badge
               variant={
                 interview.result === "PASS" ? "success" :
@@ -108,6 +109,20 @@ export default function InterviewDetailPage({ params }: { params: Promise<{ id: 
             >
               {interview.result === "PASS" ? "通過" : interview.result === "FAIL" ? "不通過" : "結果待ち"}
             </Badge>
+            {/* 感情タグ */}
+            <div className="flex gap-1">
+              {(Object.entries(INTERVIEW_MOOD_LABELS) as [InterviewMood, { emoji: string; label: string }][]).map(([key, { emoji, label }]) => (
+                <button
+                  key={key}
+                  type="button"
+                  title={label}
+                  onClick={() => void updateMood(interview.id, interview.mood === key ? null : key)}
+                  className={`text-lg px-1.5 py-0.5 rounded-lg transition-all ${interview.mood === key ? "bg-[#00c896]/20 ring-2 ring-[#00c896]" : "opacity-40 hover:opacity-80"}`}
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
         <div className="flex gap-2 flex-wrap justify-end">

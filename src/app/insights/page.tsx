@@ -253,6 +253,89 @@ export default function InsightsPage() {
         ) : null}
       </section>
 
+      {/* ベンチマーク比較バー */}
+      {activeInsights && !activeLoading && (
+        <section className="mb-8">
+          <h2 className="font-semibold text-gray-800 mb-3 text-sm uppercase tracking-wide">あなた vs 同期比較</h2>
+          <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm space-y-4">
+            {[
+              {
+                label: "登録企業数",
+                my: myCompaniesCount,
+                avg: Math.round(activeInsights.avg_companies_per_user),
+                unit: "社",
+                color: "bg-blue-500",
+              },
+              {
+                label: "面接回数",
+                my: myInterviewCount,
+                avg: Math.round(Number(activeInsights.avg_interviews_before_offer)),
+                unit: "回",
+                color: "bg-purple-500",
+              },
+              {
+                label: "ES提出数",
+                my: myEsCount,
+                avg: Math.round(activeInsights.avg_companies_per_user * 0.6),
+                unit: "件",
+                color: "bg-indigo-500",
+              },
+            ].map(({ label, my, avg, unit, color }) => {
+              const max = Math.max(my, avg, 1);
+              const myPct = Math.round((my / max) * 100);
+              const avgPct = Math.round((avg / max) * 100);
+              const isAhead = my >= avg;
+              return (
+                <div key={label}>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className="text-xs font-medium text-gray-600">{label}</span>
+                    <span className={`text-xs font-bold ${isAhead ? "text-green-600" : "text-orange-500"}`}>
+                      {isAhead ? `平均+${my - avg}${unit}` : `平均-${avg - my}${unit}`}
+                    </span>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-gray-400 w-12 shrink-0">あなた</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-2.5">
+                        <div className={`${color} h-2.5 rounded-full transition-all`} style={{ width: `${myPct}%` }} />
+                      </div>
+                      <span className="text-xs font-bold text-gray-700 w-10 text-right shrink-0">{my}{unit}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-gray-400 w-12 shrink-0">平均{!activeIsReal ? "※" : ""}</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-2.5">
+                        <div className="bg-gray-300 h-2.5 rounded-full transition-all" style={{ width: `${avgPct}%` }} />
+                      </div>
+                      <span className="text-xs font-bold text-gray-400 w-10 text-right shrink-0">{avg}{unit}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+            {/* モチベーションメッセージ */}
+            {(() => {
+              const aheadCount = [
+                myCompaniesCount >= Math.round(activeInsights.avg_companies_per_user),
+                myInterviewCount >= Math.round(Number(activeInsights.avg_interviews_before_offer)),
+                myEsCount >= Math.round(activeInsights.avg_companies_per_user * 0.6),
+              ].filter(Boolean).length;
+              const msg = aheadCount === 3
+                ? "🎉 全項目で平均以上！絶好調です"
+                : aheadCount >= 2
+                ? "📈 平均以上の項目が多い。このペースを維持しよう"
+                : aheadCount === 1
+                ? "💪 まだ差がある。焦らず着実に積み上げていこう"
+                : "🌱 これからが本番。一歩ずつ行動しよう！";
+              return (
+                <div className="bg-[#00c896]/5 border border-[#00c896]/20 rounded-xl px-4 py-2.5 mt-2">
+                  <p className="text-sm font-semibold text-[#00a87e]">{msg}</p>
+                </div>
+              );
+            })()}
+          </div>
+        </section>
+      )}
+
       {/* あなたの詳細データ */}
       <section>
         <h2 className="font-semibold text-gray-800 mb-3 text-sm uppercase tracking-wide">あなたの就活データ</h2>

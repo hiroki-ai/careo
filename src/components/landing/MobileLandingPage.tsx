@@ -495,14 +495,12 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
         {/* headline */}
         <h1 className="font-black text-white leading-[1.1] tracking-tight mb-5" style={{ fontSize: "clamp(2.5rem,11vw,3.5rem)" }}>
           就活、<br />
-          ひとりで<br />
-          <span className="text-[#00c896]">抱えすぎて</span><br />
-          ない？
+          <span className="text-[#00c896]">楽しんでる？</span>
         </h1>
 
         <p className="text-gray-400 text-sm leading-relaxed mb-8">
-          企業・ES・面接・OB訪問・筆記試験をすべて一か所に。<br />
-          あなたの全就活データを把握したAIコーチ「カレオ」が、「A社のESとB社の面接で矛盾あり」など、ChatGPTにはできない個人化の気づきを自動通知する。
+          記録するだけで就活が整理される。バッジが貯まる。AIが毎日ひとこと届ける。<br />
+          就活を「こなす作業」から「積み上がる体験」に変えるアプリ。
         </p>
 
         <Link
@@ -723,6 +721,63 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
                 <span className="text-2xl mb-3 block">{f.icon}</span>
                 <p className="font-black text-gray-900 text-sm mb-1.5 leading-snug">{f.title}</p>
                 <p className="text-xs text-gray-500 leading-relaxed">{f.desc}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* ── 楽しくなる新機能 ────────────────────────────────────────────────── */}
+      <section className="px-6 py-16 bg-[#0D0B21] overflow-hidden">
+        <Reveal className="mb-8">
+          <p className="text-[#00c896] text-[10px] font-black tracking-widest uppercase mb-2">Fun & Engaging</p>
+          <h2 className="text-3xl font-black text-white leading-tight">
+            就活が、<br /><span className="text-[#00c896]">楽しくなる</span>仕掛け
+          </h2>
+          <p className="text-gray-400 text-sm mt-3 leading-relaxed">
+            記録するのが楽しくなると、データが貯まる。<br />データが貯まると、AIの精度が上がる。
+          </p>
+        </Reveal>
+        <div className="space-y-3">
+          {[
+            {
+              emoji: "🏆",
+              title: "内定でコンフェッティ演出",
+              desc: "内定・インターン合格のステータスを記録するとお祝い演出。小さな達成を一緒に喜ぶ。",
+              color: "from-amber-500/20 to-yellow-400/10 border-amber-500/20",
+            },
+            {
+              emoji: "😊",
+              title: "感情タグで面接を記録",
+              desc: "面接後に「😊楽しかった」「🔥手応えあり」をワンタップ。感情パターンがAI分析に活かされる。",
+              color: "from-purple-500/20 to-pink-400/10 border-purple-500/20",
+            },
+            {
+              emoji: "🏅",
+              title: "マイルストーンバッジ",
+              desc: "「初ES提出」「初面接通過」「10社登録」など、就活の節目を達成バッジで可視化。",
+              color: "from-[#00c896]/20 to-emerald-400/10 border-[#00c896]/20",
+            },
+            {
+              emoji: "🗺️",
+              title: "就活ジャーニーマップ",
+              desc: "WISHLIST→応募→面接→内定まで、自分の就活の旅路がグラフで一目でわかる。",
+              color: "from-blue-500/20 to-cyan-400/10 border-blue-500/20",
+            },
+            {
+              emoji: "🏃",
+              title: "週次コーチセッション",
+              desc: "毎週AIが先週を振り返り、今週のフォーカスとアクションを3つ提案。感情データも分析に活用。",
+              color: "from-indigo-500/20 to-violet-400/10 border-indigo-500/20",
+            },
+          ].map((item, i) => (
+            <Reveal key={item.title} delay={i * 60}>
+              <div className={`bg-gradient-to-br ${item.color} border rounded-2xl p-4 flex gap-3`}>
+                <span className="text-3xl shrink-0">{item.emoji}</span>
+                <div>
+                  <p className="font-black text-white text-sm mb-1">{item.title}</p>
+                  <p className="text-gray-400 text-xs leading-relaxed">{item.desc}</p>
+                </div>
               </div>
             </Reveal>
           ))}

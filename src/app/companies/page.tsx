@@ -222,9 +222,19 @@ export default function CompaniesPage() {
     localStorage.removeItem(SUGGEST_CACHE_KEY);
   }, [addCompany]);
 
+  // 内定・インターン合格時にconfetti演出
+  const fireConfetti = useCallback(async () => {
+    const confetti = (await import("canvas-confetti")).default;
+    confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 }, colors: ["#00c896", "#00b586", "#fff", "#fbbf24"] });
+    setTimeout(() => confetti({ particleCount: 60, spread: 100, origin: { y: 0.7 }, colors: ["#00c896", "#a78bfa", "#fb7185"] }), 300);
+  }, []);
+
   // 不採用になった瞬間に自動で提案を開く
   const handleStatusChange = useCallback((id: string, status: CompanyStatus) => {
     updateStatus(id, status);
+    if (status === "OFFERED" || status === "INTERN") {
+      void fireConfetti();
+    }
     if (status === "REJECTED") {
       setSuggestOpen(true);
       // キャッシュがあれば即表示、なければ自動フetch

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Interview } from "@/types";
+import { Interview, InterviewMood } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 
 function rowToInterview(row: Record<string, unknown>, questions: Record<string, unknown>[] = []): Interview {
@@ -13,6 +13,7 @@ function rowToInterview(row: Record<string, unknown>, questions: Record<string, 
     interviewers: row.interviewers as string | undefined,
     notes: row.notes as string | undefined,
     result: row.result as Interview["result"],
+    mood: row.mood as InterviewMood | undefined,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
     questions: questions.map((q) => ({
@@ -45,7 +46,7 @@ export function useInterviews() {
     const { data: { user } } = await supabase.auth.getUser();
     const { data: row } = await supabase
       .from("interviews")
-      .insert({ company_id: data.companyId, round: data.round, scheduled_at: data.scheduledAt, interviewers: data.interviewers || null, notes: data.notes || null, result: data.result, user_id: user!.id })
+      .insert({ company_id: data.companyId, round: data.round, scheduled_at: data.scheduledAt, interviewers: data.interviewers || null, notes: data.notes || null, result: data.result, mood: data.mood || null, user_id: user!.id })
       .select()
       .single();
     if (!row) throw new Error("Failed to create interview");
@@ -68,6 +69,7 @@ export function useInterviews() {
       interviewers: data.interviewers || null,
       notes: data.notes || null,
       result: data.result,
+      mood: data.mood ?? null,
     }).eq("id", id);
 
     if (data.questions) {
@@ -86,8 +88,13 @@ export function useInterviews() {
     setInterviews((prev) => prev.filter((i) => i.id !== id));
   }, []);
 
+  const updateMood = useCallback(async (id: string, mood: InterviewMood | null) => {
+    await supabase.from("interviews").update({ mood }).eq("id", id);
+    setInterviews((prev) => prev.map((i) => i.id === id ? { ...i, mood: mood ?? undefined } : i));
+  }, [supabase]);
+
   const getInterviewById = useCallback((id: string) => interviews.find((i) => i.id === id), [interviews]);
   const getInterviewsByCompany = useCallback((companyId: string) => interviews.filter((i) => i.companyId === companyId).sort((a, b) => a.round - b.round), [interviews]);
 
-  return { interviews, loading, addInterview, updateInterview, deleteInterview, getInterviewById, getInterviewsByCompany };
+  return { interviews, loading, addInterview, updateInterview, updateMood, deleteInterview, getInterviewById, getInterviewsByCompany };
 }
