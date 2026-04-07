@@ -691,7 +691,7 @@ export function LandingPage({ recentPosts = [], userCount = 0, reviews = [] }: {
             {/* Left: Text */}
             <div>
               <div className="flex items-center gap-3 mb-8">
-                <img src="/careo-mascot.svg" alt="カレオ" className="w-10 h-auto flex-shrink-0" />
+                <img src="/kareo.png" alt="カレオ" className="w-10 h-auto flex-shrink-0" />
                 <div className="inline-flex items-center gap-2 border border-[#00c896]/30 bg-[#00c896]/6 text-[#00a87e] text-xs font-semibold px-4 py-2 rounded-full">
                   <span className="w-1.5 h-1.5 bg-[#00c896] rounded-full animate-pulse" />
                   {badgeText}
@@ -743,7 +743,7 @@ export function LandingPage({ recentPosts = [], userCount = 0, reviews = [] }: {
               {/* Glow behind mascot */}
               <div className="absolute w-80 h-80 rounded-full bg-[#00c896]/12 blur-3xl" />
               <img
-                src="/careo-mascot.svg"
+                src="/kareo.png"
                 alt="カレオ"
                 className="relative w-72 xl:w-80 h-auto drop-shadow-2xl"
               />
