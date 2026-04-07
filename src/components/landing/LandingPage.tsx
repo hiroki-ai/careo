@@ -738,9 +738,23 @@ export function LandingPage({ recentPosts = [], userCount = 0, reviews = [] }: {
 
             </div>
 
-            {/* Right: App mockup */}
-            <div className="relative hidden md:block px-8 lg:px-4">
-              <AppMockup />
+            {/* Right: カレオ mascot hero */}
+            <div className="relative hidden md:flex flex-col items-center justify-center px-4">
+              {/* Glow behind mascot */}
+              <div className="absolute w-80 h-80 rounded-full bg-[#00c896]/12 blur-3xl" />
+              <img
+                src="/careo-mascot.svg"
+                alt="カレオ"
+                className="relative w-72 xl:w-80 h-auto drop-shadow-2xl"
+              />
+              {/* Speech bubble */}
+              <div className="relative -mt-4 bg-white border border-[#00c896]/25 rounded-2xl rounded-tl-none px-5 py-3 shadow-lg max-w-xs">
+                <p className="text-sm font-semibold text-[#0D0B21] leading-relaxed">
+                  就活データを全部知ってるから、<br />
+                  <span className="text-[#00a87e]">本当に必要なアドバイス</span>ができるよ！
+                </p>
+                <div className="absolute -top-3 left-0 w-4 h-4 bg-white border-l border-t border-[#00c896]/25 rotate-[-35deg] rounded-tl-sm" />
+              </div>
             </div>
           </div>
 

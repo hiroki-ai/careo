@@ -57,9 +57,12 @@ export default function OnboardingPage() {
         {step === 1 && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
             <div className="text-center mb-8">
-              <img src="/careo-mascot.svg" alt="カレオ" className="w-24 h-auto mx-auto mb-3" />
+              <img src="/careo-mascot.svg" alt="カレオ" className="w-36 h-auto mx-auto mb-1" />
+              <div className="inline-block bg-[#00c896]/8 border border-[#00c896]/20 rounded-2xl px-4 py-2 mb-4">
+                <p className="text-sm font-semibold text-[#00a87e]">はじめまして！カレオです 🎉</p>
+              </div>
               <p className="text-gray-900 font-semibold">あなたのことを教えてください</p>
-              <p className="text-sm text-gray-400 mt-1">カレオがあなたに合ったアドバイスをします</p>
+              <p className="text-sm text-gray-400 mt-1">就活データを全部知ったうえで、本当に役立つアドバイスをします</p>
             </div>
             <ProfileForm onSubmit={handleProfileSave} submitLabel="次へ →" showSelfAnalysis />
           </div>
@@ -70,9 +73,9 @@ export default function OnboardingPage() {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
             <div className="text-center mb-8">
               <div className="flex items-end justify-center gap-3 mb-3">
-                <img src="/careo-mascot.svg" alt="カレオ" className="w-20 h-auto" />
-                <div className="bg-[#00c896]/10 border border-[#00c896]/20 rounded-2xl rounded-bl-none px-3 py-2 mb-4 text-left">
-                  <p className="text-xs text-[#00a87e] font-semibold">データ、取り込もう！</p>
+                <img src="/careo-mascot.svg" alt="カレオ" className="w-28 h-auto flex-shrink-0" />
+                <div className="bg-[#00c896]/10 border border-[#00c896]/20 rounded-2xl rounded-bl-none px-4 py-3 mb-6 text-left">
+                  <p className="text-sm text-[#00a87e] font-semibold leading-relaxed">今まで使ってたデータ、<br />そのまま持ってきて！</p>
                 </div>
               </div>
               <p className="text-gray-900 font-semibold">今まで管理していたデータを取り込もう</p>
@@ -123,8 +126,12 @@ export default function OnboardingPage() {
         {/* Step 3: 完了・ウェルカム */}
         {step === 3 && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
-            <img src="/careo-mascot.svg" alt="カレオ" className="w-28 h-auto mx-auto mb-2" />
-            <h2 className="text-xl font-bold text-gray-900 mb-2">準備完了！</h2>
+            <div className="relative inline-block mb-2">
+              <img src="/careo-mascot.svg" alt="カレオ" className="w-40 h-auto mx-auto" />
+              <div className="absolute -top-2 -right-2 w-8 h-8 bg-[#00c896] rounded-full flex items-center justify-center text-white text-lg shadow-lg">🎉</div>
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-1">準備完了！</h2>
+            <p className="text-sm text-[#00a87e] font-medium mb-4">一緒に内定、取りに行こう！</p>
 
             {/* AIウェルカムメッセージ */}
             <div className="bg-gray-50 rounded-xl p-4 my-6 text-left">
