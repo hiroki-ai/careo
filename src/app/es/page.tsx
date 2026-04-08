@@ -2,16 +2,21 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEs } from "@/hooks/useEs";
 import { useCompanies } from "@/hooks/useCompanies";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { formatDate, daysUntil } from "@/lib/utils";
+import { ES } from "@/types";
 
 export default function EsPage() {
-  const { esList } = useEs();
+  const router = useRouter();
+  const { esList, updateEs } = useEs();
   const { companies } = useCompanies();
   const [filter, setFilter] = useState<"ALL" | "DRAFT" | "SUBMITTED">("ALL");
+  const [editingDeadlineId, setEditingDeadlineId] = useState<string | null>(null);
+  const [savingId, setSavingId] = useState<string | null>(null);
 
   const getCompanyName = (companyId: string) =>
     companies.find((c) => c.id === companyId)?.name ?? "不明な企業";
@@ -23,6 +28,14 @@ export default function EsPage() {
     if (!b.deadline) return -1;
     return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
   });
+
+  const handleDeadlineChange = async (es: ES, value: string) => {
+    setSavingId(es.id);
+    const deadline = value ? new Date(value).toISOString() : undefined;
+    await updateEs(es.id, { companyId: es.companyId, title: es.title, status: es.status, deadline });
+    setSavingId(null);
+    setEditingDeadlineId(null);
+  };
 
   return (
     <div className="p-4 md:p-8">
@@ -39,6 +52,7 @@ export default function EsPage() {
       <div className="flex gap-2 mb-6">
         {(["ALL", "DRAFT", "SUBMITTED"] as const).map((f) => (
           <button
+            type="button"
             key={f}
             onClick={() => setFilter(f)}
             className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors cursor-pointer ${
@@ -53,6 +67,7 @@ export default function EsPage() {
 
       {sorted.length === 0 ? (
         <div className="text-center py-12">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/kareo.png" alt="カレオ" className="w-28 h-auto mx-auto mb-4 opacity-80" />
           <p className="text-gray-400 font-medium">ESがまだ登録されていません</p>
           <p className="text-sm text-gray-300 mt-1">企業ページからESを追加してみよう！</p>
@@ -62,30 +77,94 @@ export default function EsPage() {
           {sorted.map((es) => {
             const days = es.deadline ? daysUntil(es.deadline) : null;
             const isUrgent = days !== null && days <= 3 && es.status === "DRAFT";
+            const isEditing = editingDeadlineId === es.id;
+            const isSaving = savingId === es.id;
+
             return (
-              <Link key={es.id} href={`/es/${es.id}`}>
-                <div className={`bg-white rounded-xl border p-5 hover:shadow-md transition-shadow cursor-pointer ${isUrgent ? "border-red-200" : "border-gray-100"}`}>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="text-xs text-gray-400 mb-1">{getCompanyName(es.companyId)}</p>
-                      <h3 className="font-semibold text-gray-900">{es.title}</h3>
-                      <p className="text-sm text-gray-500 mt-1">{es.questions.length}問</p>
-                    </div>
-                    <div className="flex flex-col items-end gap-2">
-                      <Badge variant={es.status === "SUBMITTED" ? "success" : "warning"}>
-                        {es.status === "SUBMITTED" ? "提出済み" : "下書き"}
-                      </Badge>
-                      {es.deadline && (
-                        <span className={`text-xs ${isUrgent ? "text-red-600 font-semibold" : "text-gray-400"}`}>
-                          締切: {formatDate(es.deadline)}
-                          {days !== null && days >= 0 && ` (あと${days}日)`}
-                          {days !== null && days < 0 && " (期限切れ)"}
-                        </span>
+              <div
+                key={es.id}
+                className={`bg-white rounded-xl border ${isUrgent ? "border-red-200" : "border-gray-100"}`}
+              >
+                {/* メイン情報（タップで詳細へ） */}
+                <div
+                  className="flex items-start justify-between p-5 cursor-pointer hover:bg-gray-50 rounded-t-xl transition-colors"
+                  onClick={() => router.push(`/es/${es.id}`)}
+                >
+                  <div>
+                    <p className="text-xs text-gray-400 mb-1">{getCompanyName(es.companyId)}</p>
+                    <h3 className="font-semibold text-gray-900">{es.title}</h3>
+                    <p className="text-sm text-gray-500 mt-1">{es.questions.length}問</p>
+                  </div>
+                  <Badge variant={es.status === "SUBMITTED" ? "success" : "warning"}>
+                    {es.status === "SUBMITTED" ? "提出済み" : "下書き"}
+                  </Badge>
+                </div>
+
+                {/* 締切エリア（独立した入力エリア） */}
+                <div className="border-t border-gray-100 px-4 py-3">
+                  {isEditing ? (
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs text-gray-500 font-medium">📅 締切日時</span>
+                      <input
+                        type="datetime-local"
+                        aria-label="締切日時"
+                        autoFocus
+                        defaultValue={es.deadline ? es.deadline.slice(0, 16) : ""}
+                        disabled={isSaving}
+                        onChange={(e) => {
+                          if (e.target.value) handleDeadlineChange(es, e.target.value);
+                        }}
+                        onBlur={(e) => {
+                          if (!isSaving) {
+                            if (e.target.value) {
+                              handleDeadlineChange(es, e.target.value);
+                            } else {
+                              setEditingDeadlineId(null);
+                            }
+                          }
+                        }}
+                        className="flex-1 min-w-0 text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      />
+                      {isSaving ? (
+                        <span className="text-xs text-gray-400">保存中...</span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setEditingDeadlineId(null)}
+                          className="text-xs text-gray-400 hover:text-gray-600 px-2 py-1"
+                        >
+                          キャンセル
+                        </button>
                       )}
                     </div>
-                  </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setEditingDeadlineId(es.id)}
+                      className={`w-full text-left flex items-center justify-between gap-2 rounded-lg px-3 py-2.5 transition-colors active:scale-[0.98] ${
+                        es.deadline
+                          ? isUrgent
+                            ? "text-red-600 font-semibold bg-red-50 hover:bg-red-100"
+                            : "text-gray-600 bg-gray-50 hover:bg-gray-100"
+                          : "text-blue-500 bg-blue-50 hover:bg-blue-100 border border-dashed border-blue-200"
+                      }`}
+                    >
+                      <span className="text-sm">
+                        {es.deadline ? (
+                          <>
+                            📅 締切: {formatDate(es.deadline)}
+                            {days !== null && days >= 0 && <span className="ml-1.5 font-medium">あと{days}日</span>}
+                            {days !== null && days < 0 && <span className="ml-1.5">期限切れ</span>}
+                          </>
+                        ) : (
+                          <>📅 締切日を設定する</>
+                        )}
+                      </span>
+                      <span className="text-xs opacity-40 shrink-0">{es.deadline ? "変更" : "＋"}</span>
+                    </button>
+                  )}
                 </div>
-              </Link>
+              </div>
             );
           })}
         </div>

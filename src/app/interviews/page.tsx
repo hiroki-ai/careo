@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useInterviews } from "@/hooks/useInterviews";
 import { useCompanies } from "@/hooks/useCompanies";
@@ -7,10 +9,14 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { formatDateTime } from "@/lib/utils";
 import { INTERVIEW_MOOD_LABELS } from "@/types";
+import { Interview } from "@/types";
 
 export default function InterviewsPage() {
-  const { interviews } = useInterviews();
+  const router = useRouter();
+  const { interviews, updateInterview } = useInterviews();
   const { companies } = useCompanies();
+  const [editingScheduleId, setEditingScheduleId] = useState<string | null>(null);
+  const [savingId, setSavingId] = useState<string | null>(null);
 
   const getCompanyName = (companyId: string) =>
     companies.find((c) => c.id === companyId)?.name ?? "不明な企業";
@@ -18,6 +24,22 @@ export default function InterviewsPage() {
   const sorted = [...interviews].sort(
     (a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime()
   );
+
+  const handleScheduleChange = async (interview: Interview, value: string) => {
+    if (!value) return;
+    setSavingId(interview.id);
+    await updateInterview(interview.id, {
+      companyId: interview.companyId,
+      round: interview.round,
+      scheduledAt: new Date(value).toISOString(),
+      result: interview.result,
+      interviewers: interview.interviewers,
+      notes: interview.notes,
+      mood: interview.mood,
+    });
+    setSavingId(null);
+    setEditingScheduleId(null);
+  };
 
   return (
     <div className="p-4 md:p-8">
@@ -33,25 +55,39 @@ export default function InterviewsPage() {
 
       {sorted.length === 0 ? (
         <div className="text-center py-12">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/kareo.png" alt="カレオ" className="w-28 h-auto mx-auto mb-4 opacity-80" />
           <p className="text-gray-400 font-medium">面接がまだ登録されていません</p>
           <p className="text-sm text-gray-300 mt-1">企業ページから面接を追加してみよう！</p>
         </div>
       ) : (
         <div className="space-y-3">
-          {sorted.map((interview) => (
-            <Link key={interview.id} href={`/interviews/${interview.id}`}>
-              <div className="bg-white rounded-xl border border-gray-100 p-5 hover:shadow-md transition-shadow cursor-pointer">
-                <div className="flex items-start justify-between">
+          {sorted.map((interview) => {
+            const isEditing = editingScheduleId === interview.id;
+            const isSaving = savingId === interview.id;
+            const isPast = new Date(interview.scheduledAt) < new Date();
+
+            return (
+              <div
+                key={interview.id}
+                className="bg-white rounded-xl border border-gray-100"
+              >
+                {/* メイン情報（タップで詳細へ） */}
+                <div
+                  className="flex items-start justify-between p-5 cursor-pointer hover:bg-gray-50 rounded-t-xl transition-colors"
+                  onClick={() => router.push(`/interviews/${interview.id}`)}
+                >
                   <div>
                     <p className="text-xs text-gray-400 mb-1">{getCompanyName(interview.companyId)}</p>
                     <h3 className="font-semibold text-gray-900">{interview.round}次面接</h3>
-                    <p className="text-sm text-gray-500 mt-1">{formatDateTime(interview.scheduledAt)}</p>
                     {interview.interviewers && (
                       <p className="text-xs text-gray-400 mt-1">面接官: {interview.interviewers}</p>
                     )}
+                    {interview.notes && (
+                      <p className="text-sm text-gray-600 mt-2 line-clamp-2">{interview.notes}</p>
+                    )}
                   </div>
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 shrink-0">
                     {interview.mood && (
                       <span className="text-lg" title={INTERVIEW_MOOD_LABELS[interview.mood].label}>
                         {INTERVIEW_MOOD_LABELS[interview.mood].emoji}
@@ -67,12 +103,69 @@ export default function InterviewsPage() {
                     </Badge>
                   </div>
                 </div>
-                {interview.notes && (
-                  <p className="text-sm text-gray-600 mt-3 line-clamp-2">{interview.notes}</p>
-                )}
+
+                {/* 日程エリア（独立した入力エリア） */}
+                <div className="border-t border-gray-100 px-4 py-3">
+                  {isEditing ? (
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs text-gray-500 font-medium">🗓 日時</span>
+                      <input
+                        type="datetime-local"
+                        aria-label="面接日時"
+                        autoFocus
+                        defaultValue={interview.scheduledAt.slice(0, 16)}
+                        disabled={isSaving}
+                        onChange={(e) => {
+                          if (e.target.value) handleScheduleChange(interview, e.target.value);
+                        }}
+                        onBlur={(e) => {
+                          if (!isSaving) {
+                            if (e.target.value) {
+                              handleScheduleChange(interview, e.target.value);
+                            } else {
+                              setEditingScheduleId(null);
+                            }
+                          }
+                        }}
+                        className="flex-1 min-w-0 text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      />
+                      {isSaving ? (
+                        <span className="text-xs text-gray-400">保存中...</span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setEditingScheduleId(null)}
+                          className="text-xs text-gray-400 hover:text-gray-600 px-2 py-1"
+                        >
+                          キャンセル
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setEditingScheduleId(interview.id)}
+                      className={`w-full text-left flex items-center justify-between gap-2 rounded-lg px-3 py-2.5 transition-colors active:scale-[0.98] ${
+                        isPast && interview.result === "PENDING"
+                          ? "text-amber-600 bg-amber-50 hover:bg-amber-100"
+                          : "text-gray-600 bg-gray-50 hover:bg-gray-100"
+                      }`}
+                    >
+                      <span className="text-sm">
+                        🗓 {formatDateTime(interview.scheduledAt)}
+                        {!isPast && (
+                          <span className="ml-2 text-xs text-blue-500 font-medium">
+                            あと{Math.ceil((new Date(interview.scheduledAt).getTime() - Date.now()) / 86400000)}日
+                          </span>
+                        )}
+                      </span>
+                      <span className="text-xs opacity-40 shrink-0">変更</span>
+                    </button>
+                  )}
+                </div>
               </div>
-            </Link>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
