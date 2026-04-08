@@ -516,12 +516,21 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
         >
           無料で始める →
         </Link>
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-gray-600 mb-5">
-          <span>📵 広告・スカウト電話なし</span>
-          <span>·</span>
-          <span>💳 クレカ不要</span>
-          <span>·</span>
-          <span>🔒 データは暗号化保存・第三者販売なし</span>
+        {/* 約束バナー */}
+        <div className="border border-white/10 bg-white/5 rounded-2xl px-4 py-3 mb-5">
+          <p className="text-[#00c896] text-[10px] font-bold tracking-widest uppercase mb-2">Careoからの約束</p>
+          <div className="flex gap-3">
+            {[
+              { icon: "📵", text: "スカウト・営業電話なし" },
+              { icon: "📧", text: "広告メールなし" },
+              { icon: "🔒", text: "データ販売なし" },
+            ].map(({ icon, text }) => (
+              <div key={text} className="flex-1 flex flex-col items-center gap-1 bg-white/5 rounded-xl py-2 px-1">
+                <span className="text-lg">{icon}</span>
+                <span className="text-white text-[9px] font-semibold text-center leading-tight">{text}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Phone mockup */}

@@ -776,6 +776,38 @@ export function LandingPage({ recentPosts = [], userCount = 0, reviews = [] }: {
         </div>
       </section>
 
+      {/* ── 約束バナー（スカウト・営業電話ゼロ） ───────────────────────────── */}
+      <section className="px-6 py-10 bg-[#0D0B21]">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 rounded-2xl border border-white/8 bg-white/4 px-8 py-6">
+            <div className="flex-1 text-center md:text-left">
+              <p className="text-[#00c896] text-xs font-bold tracking-widest uppercase mb-2">Careoからの約束</p>
+              <h2 className="text-xl md:text-2xl font-bold text-white leading-snug">
+                スカウトメールも、営業電話も、<br className="hidden md:block" />
+                <span className="text-[#00c896]">一切ありません。</span>
+              </h2>
+              <p className="text-gray-400 text-sm mt-2 leading-relaxed">
+                Careoに登録した情報が企業や第三者に渡ることはありません。<br className="hidden md:block" />
+                就活データは、あなたとAIコーチだけのものです。
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 shrink-0">
+              {[
+                { icon: "📵", label: "スカウト・営業電話", sub: "登録後も一切なし" },
+                { icon: "📧", label: "広告・迷惑メール", sub: "送りません" },
+                { icon: "🔒", label: "データの第三者販売", sub: "絶対にしません" },
+              ].map(({ icon, label, sub }) => (
+                <div key={label} className="flex flex-col items-center bg-white/6 rounded-xl px-4 py-3 min-w-[110px]">
+                  <span className="text-2xl mb-1">{icon}</span>
+                  <span className="text-white text-xs font-bold text-center leading-tight">{label}</span>
+                  <span className="text-red-400 text-[10px] font-semibold mt-0.5 line-through opacity-70">{sub}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── ChatGPT差別化セクション ─────────────────────────────────────────── */}
       <section className="px-6 py-16 bg-white reveal">
         <div className="max-w-3xl mx-auto">
