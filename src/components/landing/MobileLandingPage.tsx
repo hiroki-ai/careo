@@ -494,9 +494,9 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
 
         {/* headline + カレオ */}
         <div className="relative mb-5 pr-44">
-          <h1 className="font-black text-white leading-[1.1] tracking-tight" style={{ fontSize: "clamp(2.5rem,11vw,3.5rem)" }}>
+          <h1 className="font-black text-white leading-[1.1] tracking-tight" style={{ fontSize: "clamp(2.2rem,9vw,3rem)" }}>
             就活、<br />
-            <span className="text-[#00c896]">全部知ってる。</span>
+            <span className="text-[#00c896]">全部<br />知ってる。</span>
           </h1>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
