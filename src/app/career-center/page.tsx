@@ -55,7 +55,7 @@ export default function CareerCenterPage() {
   }
 
   return (
-    <div className="p-4 md:p-8 max-w-3xl">
+    <div className="p-4 md:p-8">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">キャリアセンター</h1>
         <p className="text-sm text-gray-400 mt-0.5">メッセージ確認・就活レポートの印刷・提出</p>

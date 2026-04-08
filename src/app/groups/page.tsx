@@ -176,7 +176,7 @@ export default function GroupsPage() {
   };
 
   return (
-    <div className="p-4 md:p-8 max-w-2xl">
+    <div className="p-4 md:p-8">
       <div className="mb-6">
         <Link href="/" className="text-sm text-gray-400 hover:text-gray-600 mb-3 inline-block">← ダッシュボード</Link>
         <h1 className="text-2xl font-bold text-gray-900">友達と一緒に就活</h1>

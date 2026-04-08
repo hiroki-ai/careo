@@ -492,18 +492,17 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
           <span className="text-[#00c896] text-xs font-semibold tracking-wide">あなたの就活を丸ごと知るAIコーチ「カレオ」</span>
         </div>
 
-        {/* headline */}
-        <div className="relative mb-5 pr-36">
+        {/* headline + カレオ */}
+        <div className="relative mb-5 pr-44">
           <h1 className="font-black text-white leading-[1.1] tracking-tight" style={{ fontSize: "clamp(2.5rem,11vw,3.5rem)" }}>
             就活、<br />
             <span className="text-[#00c896]">全部知ってる。</span>
           </h1>
-          {/* カレオ — absolute right of headline block */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/kareo.png"
             alt="カレオ"
-            className="absolute -right-4 -top-4 w-40 h-auto animate-float drop-shadow-xl"
+            className="absolute -right-4 bottom-0 w-48 h-auto animate-float drop-shadow-xl"
           />
         </div>
 
