@@ -48,8 +48,9 @@ function InterviewRecordingPage() {
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Web Speech API
+  // Transcription
   const [isTranscribing, setIsTranscribing] = useState(false);
+  const [transcribeMethod, setTranscribeMethod] = useState<"gemini" | "browser">("gemini");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
 
@@ -177,6 +178,37 @@ function InterviewRecordingPage() {
   const stopSpeechRecognition = () => {
     recognitionRef.current?.stop();
     setIsTranscribing(false);
+  };
+
+  // ── Gemini AI Transcription ──
+  const transcribeWithGemini = async (audioSource: File | Blob) => {
+    setIsTranscribing(true);
+    setError(null);
+    try {
+      const formData = new FormData();
+      if (audioSource instanceof File) {
+        formData.append("audio", audioSource);
+      } else {
+        formData.append("audio", audioSource, "recording.webm");
+      }
+
+      const res = await fetch("/api/ai/transcribe", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "文字起こしに失敗しました");
+      }
+
+      const data = await res.json();
+      setTranscript(data.transcript);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "文字起こしに失敗しました");
+    } finally {
+      setIsTranscribing(false);
+    }
   };
 
   // ── AI Feedback ──
@@ -338,23 +370,57 @@ function InterviewRecordingPage() {
             </div>
           )}
 
-          <div className="bg-blue-50 rounded-xl p-4">
-            <p className="text-sm text-blue-700 font-medium mb-1">音声のテキスト化</p>
-            <p className="text-xs text-blue-600 mb-3">
-              音声ファイルの内容を下のテキストエリアに貼り付けるか、「リアルタイム文字起こし」ボタンで
-              ブラウザの音声認識を使って文字起こしできます。
-            </p>
-            <button
-              onClick={isTranscribing ? stopSpeechRecognition : startSpeechRecognition}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                isTranscribing
-                  ? "bg-red-500 text-white"
-                  : "bg-blue-500 text-white hover:bg-blue-600"
-              }`}
-            >
-              {isTranscribing ? "文字起こし停止" : "リアルタイム文字起こし開始"}
-            </button>
-          </div>
+          {/* Gemini AI Transcription */}
+          {audioFile && (
+            <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-4 border border-emerald-100">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-lg">✨</span>
+                <p className="text-sm text-emerald-800 font-semibold">Gemini AIで自動文字起こし</p>
+                <span className="text-[9px] font-bold bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">推奨</span>
+              </div>
+              <p className="text-xs text-emerald-700 mb-3">
+                音声ファイルをGemini AIが解析し、面接官・候補者を自動で区別して文字起こしします。
+              </p>
+              <button
+                onClick={() => transcribeWithGemini(audioFile)}
+                disabled={isTranscribing}
+                className="px-5 py-2.5 bg-emerald-600 text-white rounded-lg text-sm font-semibold hover:bg-emerald-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {isTranscribing ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    AIが文字起こし中...
+                  </>
+                ) : (
+                  "AIで文字起こし開始"
+                )}
+              </button>
+            </div>
+          )}
+
+          <details className="group">
+            <summary className="text-xs text-gray-400 cursor-pointer hover:text-gray-600 transition-colors">
+              ブラウザの音声認識を使う（精度低め）
+            </summary>
+            <div className="bg-blue-50 rounded-xl p-4 mt-2">
+              <p className="text-xs text-blue-600 mb-3">
+                ブラウザ内蔵の音声認識で文字起こしします。精度はGemini AIより劣ります。
+              </p>
+              <button
+                onClick={isTranscribing ? stopSpeechRecognition : startSpeechRecognition}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  isTranscribing
+                    ? "bg-red-500 text-white"
+                    : "bg-blue-500 text-white hover:bg-blue-600"
+                }`}
+              >
+                {isTranscribing ? "文字起こし停止" : "ブラウザ文字起こし開始"}
+              </button>
+            </div>
+          </details>
         </div>
       )}
 
@@ -404,22 +470,59 @@ function InterviewRecordingPage() {
             )}
           </div>
 
-          <div className="bg-blue-50 rounded-xl p-4">
-            <p className="text-sm text-blue-700 font-medium mb-1">文字起こし</p>
-            <p className="text-xs text-blue-600 mb-3">
-              録音した内容をテキストエリアに入力するか、リアルタイム文字起こしを使ってください。
-            </p>
-            <button
-              onClick={isTranscribing ? stopSpeechRecognition : startSpeechRecognition}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                isTranscribing
-                  ? "bg-red-500 text-white"
-                  : "bg-blue-500 text-white hover:bg-blue-600"
-              }`}
-            >
-              {isTranscribing ? "文字起こし停止" : "リアルタイム文字起こし開始"}
-            </button>
-          </div>
+          {/* Gemini AI Transcription for recorded audio */}
+          {recordedBlob && !isRecording && (
+            <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-4 border border-emerald-100">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-lg">✨</span>
+                <p className="text-sm text-emerald-800 font-semibold">Gemini AIで自動文字起こし</p>
+                <span className="text-[9px] font-bold bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">推奨</span>
+              </div>
+              <p className="text-xs text-emerald-700 mb-3">
+                録音した音声をGemini AIが解析し、面接官・候補者を自動で区別して文字起こしします。
+              </p>
+              <button
+                type="button"
+                onClick={() => transcribeWithGemini(recordedBlob)}
+                disabled={isTranscribing}
+                className="px-5 py-2.5 bg-emerald-600 text-white rounded-lg text-sm font-semibold hover:bg-emerald-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {isTranscribing ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    AIが文字起こし中...
+                  </>
+                ) : (
+                  "AIで文字起こし開始"
+                )}
+              </button>
+            </div>
+          )}
+
+          <details className="group">
+            <summary className="text-xs text-gray-400 cursor-pointer hover:text-gray-600 transition-colors">
+              ブラウザの音声認識を使う（精度低め）
+            </summary>
+            <div className="bg-blue-50 rounded-xl p-4 mt-2">
+              <p className="text-xs text-blue-600 mb-3">
+                ブラウザ内蔵の音声認識で文字起こしします。
+              </p>
+              <button
+                type="button"
+                onClick={isTranscribing ? stopSpeechRecognition : startSpeechRecognition}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  isTranscribing
+                    ? "bg-red-500 text-white"
+                    : "bg-blue-500 text-white hover:bg-blue-600"
+                }`}
+              >
+                {isTranscribing ? "文字起こし停止" : "ブラウザ文字起こし開始"}
+              </button>
+            </div>
+          </details>
         </div>
       )}
 
