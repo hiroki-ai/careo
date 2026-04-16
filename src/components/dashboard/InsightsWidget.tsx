@@ -19,7 +19,7 @@ const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6時間キャッシュ
 const VALID_INSIGHT_LINKS = new Set([
   "/", "/chat", "/companies", "/es", "/interviews",
   "/ob-visits", "/tests", "/career", "/deadlines",
-  "/groups", "/report", "/settings",
+  "/report", "/settings",
 ]);
 
 const typeConfig: Record<InsightItem["type"], { bg: string; border: string; iconBg: string; icon: string }> = {

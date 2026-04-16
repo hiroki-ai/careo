@@ -146,7 +146,6 @@ export default function CompaniesPage() {
   const { companies, addCompany, deleteCompany, updateStatus, updateCompany } = useCompanies();
   const { profile } = useProfile();
   const { showToast } = useToast();
-  const hasIntern = companies.some(c => c.status === "INTERN" || c.status === "INTERN_APPLYING");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<CompanyStatus | "ALL">("ALL");
@@ -608,23 +607,6 @@ export default function CompaniesPage() {
               </div>
             </Link>
           ))}
-        </div>
-      )}
-
-      {/* インターン中の場合：服装バナー */}
-      {hasIntern && (
-        <div className="mt-6 flex items-center justify-between gap-3 bg-teal-50 border border-teal-200 rounded-xl px-4 py-3">
-          <p className="text-sm text-teal-800">👔 インターン中の服装に</p>
-          <a
-            href="https://px.a8.net/svt/ejp?a8mat=4AZIOB+402X6A+537A+5YJRM"
-            rel="nofollow noopener noreferrer"
-            target="_blank"
-            className="shrink-0 text-xs font-bold text-teal-700 border border-teal-300 hover:bg-teal-100 px-3 py-1.5 rounded-lg transition-colors"
-          >
-            ORIHICA →
-          </a>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img width={1} height={1} src="https://www12.a8.net/0.gif?a8mat=4AZIOB+402X6A+537A+5YJRM" alt="" style={{ display: "none" }} />
         </div>
       )}
 

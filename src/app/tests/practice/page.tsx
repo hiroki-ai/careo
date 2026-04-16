@@ -352,28 +352,6 @@ export default function SpiPracticePage() {
         </div>
       )}
 
-      {/* 参考書リンク */}
-      <div className="mt-6 border-t border-gray-100 pt-5">
-        <p className="text-xs text-gray-400 font-medium mb-3">📚 SPI対策本を探す（Amazon）</p>
-        <div className="flex flex-wrap gap-2">
-          {[
-            { label: "SPI3完全問題集", url: "https://www.amazon.co.jp/s?k=SPI3+完全問題集&tag=careo-22" },
-            { label: "テストセンター対策", url: "https://www.amazon.co.jp/s?k=テストセンター+対策+問題集&tag=careo-22" },
-            { label: "言語問題集", url: "https://www.amazon.co.jp/s?k=SPI+言語+問題集&tag=careo-22" },
-            { label: "非言語問題集", url: "https://www.amazon.co.jp/s?k=SPI+非言語+問題集&tag=careo-22" },
-          ].map(({ label, url }) => (
-            <a
-              key={label}
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-800 border border-gray-200 hover:border-gray-400 px-3 py-1.5 rounded-full transition-colors"
-            >
-              {label} →
-            </a>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }

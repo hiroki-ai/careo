@@ -1012,12 +1012,6 @@ export function LandingPage({ recentPosts = [], userCount = 0, reviews = [] }: {
                 desc: "就活の全データを1枚のPDFにまとめ、大学のキャリアセンターに持参できる。大学側との連携をCareoが架け橋に。",
                 tag: "大学連携",
               },
-              {
-                icon: "👥",
-                title: "友達と就活グループ",
-                desc: "就活仲間とグループを作り、お互いの進捗（応募数・面接数・PDCAスコア）を匿名で共有。ライバルと刺激し合える。",
-                tag: "コミュニティ",
-              },
             ].map((item, i) => (
               <div
                 key={item.title}
@@ -1414,7 +1408,6 @@ export function LandingPage({ recentPosts = [], userCount = 0, reviews = [] }: {
                 "点と点を繋ぐ気づき通知",
                 "進捗ベンチマーク",
                 "キャリアセンターレポート出力",
-                "友達と就活グループ",
               ].map(f => (
                 <div key={f} className="flex items-center gap-2 text-sm text-[#0D0B21]">
                   <span className="text-[#00c896] font-bold shrink-0">✓</span>{f}

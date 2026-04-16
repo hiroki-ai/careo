@@ -70,7 +70,6 @@ const moreCategories = [
       { href: "/report", label: "PDCA", emoji: "📊" },
       { href: "/weekly-coach", label: "週次コーチ", emoji: "🏃" },
       { href: "/insights", label: "みんなの就活", emoji: "🌐" },
-      { href: "/groups", label: "友達と就活", emoji: "👫" },
     ],
   },
   {

@@ -43,13 +43,6 @@ export function inferActionLink(action: string): ActionLink | undefined {
     return { href: "https://www.linkedin.com/", label: "LinkedIn →", external: true };
   if (/Gmail|就活用メール|就活メール/i.test(a))
     return { href: "https://mail.google.com/mail/u/0/#create", label: "Gmail →", external: true };
-  if (/SPI|適性検査.*対策|筆記.*対策|対策.*SPI/.test(a))
-    return { href: "https://www.amazon.co.jp/s?k=SPI+就活+問題集&tag=careo-22", label: "Amazon →", external: true };
-  if (/スーツ|ビジネスカジュアル|服装|ジャケット/i.test(a))
-    return { href: "https://px.a8.net/svt/ejp?a8mat=4AZIOB+402X6A+537A+5YJRM", label: "ORIHICA →", external: true };
-  if (/証明写真/i.test(a))
-    return { href: "https://www.kitamura.co.jp/", label: "キタムラ →", external: true };
-
   // ── CareoのAI機能で対応できるアクション ──
   if (/ES|エントリーシート|提出/.test(a))
     return { href: "/es", label: "やる →", external: false };

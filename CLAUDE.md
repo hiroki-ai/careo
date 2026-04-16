@@ -139,19 +139,6 @@ getShukatsuContext(graduationYear, now) → ShukatsuContext
 | `/offers` | 内定比較（内定時にBuy Me a Coffeeバナーを表示） |
 | `/onboarding` | 新規登録後の初期設定（3ステップ） |
 
-### アフィリエイト設置箇所
-
-| ページ | 内容 |
-|-------|------|
-| `/es` | カメラのキタムラ（証明写真） |
-| `/ob-visits` | ORIHICA（ビジネスカジュアル）+ Amazon就活本 |
-| `/tests` | Amazon SPI・筆記対策本 |
-| `/offers` | Buy Me a Coffee（内定お祝い） |
-| `/companies` | ORIHICA（インターン中ステータス時のみ表示） |
-
-Amazonアソシエイト ID: `careo-22`
-A8.net メディアID: `a26031890624`
-
 ### X（Twitter）自動投稿システム
 
 ```

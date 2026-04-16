@@ -189,21 +189,6 @@ export default function EsPage() {
         </div>
       </div>
 
-      {/* 証明写真アフィリエイト */}
-      <div className="mt-8 border-t border-gray-100 pt-6">
-        <p className="text-xs text-gray-400 font-medium mb-2">📸 ES提出前の準備</p>
-        <a
-          href="https://px.a8.net/svt/ejp?a8mat=4AZIOB+3YW1YQ+2O9U+HVFKY"
-          rel="nofollow noopener noreferrer"
-          target="_blank"
-          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-200 hover:border-gray-400 px-4 py-2 rounded-full transition-colors"
-        >
-          カメラのキタムラで証明写真を撮る →
-        </a>
-        {/* A8.net トラッキングピクセル */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img width={1} height={1} src="https://www13.a8.net/0.gif?a8mat=4AZIOB+3YW1YQ+2O9U+HVFKY" alt="" style={{ display: "none" }} />
-      </div>
     </div>
   );
 }

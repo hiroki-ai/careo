@@ -85,7 +85,7 @@ JSON形式で返答: { "insights": [...] }
 各insightは: type, priority, title(15字以内), body(60字以内), link(オプション、下記の有効パスのみ), emoji
 
 有効なlinkパス（これ以外は使わないこと）:
-/, /chat, /companies, /es, /interviews, /ob-visits, /tests, /career, /deadlines, /groups, /report, /settings
+/, /chat, /companies, /es, /interviews, /ob-visits, /tests, /career, /deadlines, /report, /settings
 
 ${shukatsuCtx.phase}フェーズ（${shukatsuCtx.currentAdvice}）`;
 

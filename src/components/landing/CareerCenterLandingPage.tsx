@@ -7,6 +7,14 @@ import { LPChatBot } from "@/components/landing/LPChatBot";
 // ─── FAQ データ ──────────────────────────────────────────────────────────────
 const faqItems = [
   {
+    q: "個人開発のサービスは、長期的に続きますか？",
+    a: "開発者自身が上智大学の現役学生で、Careoのユーザーでもあります。サービスが止まれば自分の就活も困る——当事者だからこそ、止める理由がありません。データはクラウドインフラ（Supabase）で管理しており、開発者個人の端末に依存しない設計です。ご連絡・ご相談はメールにて48時間以内を目安に返信します。また、サービスの成長に合わせた法人化も視野に入れています。",
+  },
+  {
+    q: "現在、別の就活支援サービスと実証実験中ですが、並行して使えますか？",
+    a: "はい、問題ありません。Careoは既存の就職支援システムや実証実験中のサービスを「置き換える」ものではなく、「学生の自主的な就活データ」という新しいレイヤーを追加するだけです。担当者の方への追加作業は初期設定のみ。実証実験の邪魔をしません。並行して活用いただくことで、比較・補完的なデータが得られます。",
+  },
+  {
     q: "導入費用はかかりますか？",
     a: "大学・キャリアセンター向けには利用料が発生します。料金は大学の規模・利用形態・連携機能の範囲に応じてご相談ください。初回ヒアリングは無料です。なお、学生側の利用は引き続き完全無料です。",
   },
@@ -60,13 +68,19 @@ const painPoints = [
   },
 ];
 
-// ─── Features データ ──────────────────────────────────────────────────────────
+// ─── Features データ（絞り込み版）────────────────────────────────────────────
 const features = [
   {
     icon: "📱",
     title: "学生の就活ダッシュボード共有",
     desc: "学生が同意した情報（応募企業数・選考フェーズ・ES提出状況など）をリアルタイムで確認。面談前に全体像を把握できます。",
     tag: "リアルタイム",
+  },
+  {
+    icon: "🚨",
+    title: "孤立学生への自動アラート",
+    desc: "30日以上ログインなし・応募ゼロ・連続お祈りなど、支援が必要な学生を自動検知してアラート通知。来談しない学生をデータで発見します。",
+    tag: "プロアクティブ支援",
   },
   {
     icon: "🤖",
@@ -81,52 +95,16 @@ const features = [
     tag: "プロアクティブ支援",
   },
   {
-    icon: "📝",
-    title: "ES添削をAIと分担",
-    desc: "学生がキャリセン添削を依頼すると、まずAIが整合性・具体性・文体を自動チェック。スコアと改善提案を付けてから担当者に届けます。担当者は質の高い添削に集中できます。",
-    tag: "業務効率化",
-  },
-  {
-    icon: "🚨",
-    title: "孤立学生への自動アラート",
-    desc: "30日以上ログインなし・応募ゼロ・連続お祈りなど、支援が必要な学生を自動検知してアラート通知。困っている学生ほど相談に来ない問題を、データで解決します。",
-    tag: "プロアクティブ支援",
-  },
-  {
-    icon: "📈",
-    title: "大学全体の就活状況を集計",
-    desc: "全体の応募社数・選考通過率・内定獲得状況を集計データで把握。学部別の内定率・卒業年度別の分布・志望業界ランキングまで多角的に分析できます。",
-    tag: "データ分析",
-  },
-  {
     icon: "📊",
     title: "月次支援効果レポート",
     desc: "「面談あり学生の内定率 vs なし学生」を自動集計。面談の効果を数字で証明し、予算交渉・活動報告に活用できます。月次レポートはPDFで出力可能です。",
     tag: "成果可視化",
   },
   {
-    icon: "🎓",
-    title: "説明会・ガイダンスの効果測定",
-    desc: "開催したイベントへの参加者を登録するだけ。参加前後30日の就活活動量を自動比較し、どのイベントが学生の行動変容に繋がったかをデータで確認できます。",
-    tag: "効果測定",
-  },
-  {
-    icon: "🎯",
-    title: "大学独自のお知らせ配信",
-    desc: "「説明会スケジュール」「OB/OG訪問受付開始」——大学からのお知らせをCareo経由で就活中の学生にリーチ。開封率が高い、使用中のツール内での配信が可能です。",
-    tag: "情報配信",
-  },
-  {
     icon: "📅",
     title: "相談予約システム",
     desc: "学生がCareoアプリから相談枠を予約・キャンセルできます。職員は空き枠を設定・管理でき、予約リマインダーを自動送信。来談率の向上と予約管理の効率化を同時に実現します。",
-    tag: "新機能",
-  },
-  {
-    icon: "🤝",
-    title: "貴大学に合わせた導入サポート",
-    desc: "初回ヒアリングで課題・規模・既存システムを確認し、最適な連携プランをご提案します。料金は大学の規模・利用範囲に応じてご相談ください。",
-    tag: "オーダーメイド",
+    tag: "業務効率化",
   },
 ];
 
@@ -257,9 +235,14 @@ export default function CareerCenterLandingPage() {
 
             {/* Left: テキスト */}
             <div className="animate-fade-up">
-              <div className="inline-flex items-center gap-2 bg-[#00c896]/8 border border-[#00c896]/20 text-[#00a87e] text-xs font-bold px-4 py-2 rounded-full mb-8">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#00c896] animate-pulse" />
-                大学キャリアセンター担当者の方へ
+              <div className="flex flex-wrap gap-2 mb-8">
+                <div className="inline-flex items-center gap-2 bg-[#00c896]/8 border border-[#00c896]/20 text-[#00a87e] text-xs font-bold px-4 py-2 rounded-full">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#00c896] animate-pulse" />
+                  大学キャリアセンター担当者の方へ
+                </div>
+                <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-600 text-xs font-bold px-4 py-2 rounded-full">
+                  🤝 既存システム・実証実験と並行OK
+                </div>
               </div>
 
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-[#0D0B21] tracking-tight leading-[1.15] mb-6">
@@ -292,7 +275,7 @@ export default function CareerCenterLandingPage() {
               <div className="flex flex-wrap gap-8">
                 {[
                   { value: "無料", label: "初回ヒアリング" },
-                  { value: "完全", label: "プライバシー優先設計" },
+                  { value: "48h", label: "メール返信目安" },
                   { value: "即日", label: "導入開始可能" },
                 ].map(({ value, label }) => (
                   <div key={label} className="flex flex-col">
@@ -328,7 +311,6 @@ export default function CareerCenterLandingPage() {
       {/* ── Pain Points ────────────────────────────────────────────────────── */}
       <section className="bg-[#0D0B21] py-24 px-6 relative overflow-hidden">
         <div className="lp-dark-grid absolute inset-0 opacity-40" />
-        {/* ambient glow */}
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#00c896]/5 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-blue-500/3 rounded-full blur-3xl pointer-events-none" />
 
@@ -359,7 +341,6 @@ export default function CareerCenterLandingPage() {
             ))}
           </div>
 
-          {/* Bridge */}
           <div className="mt-14 text-center reveal">
             <p className="text-gray-300 text-lg font-medium">
               これらは全て、<span className="text-[#00c896] font-bold">Careoとの提携</span>で解決できます。
@@ -410,7 +391,6 @@ export default function CareerCenterLandingPage() {
                 key={item.problem}
                 className={`flex flex-col ${item.align === "right" ? "md:flex-row-reverse" : "md:flex-row"} gap-8 items-center reveal`}
               >
-                {/* テキスト側 */}
                 <div className="flex-1">
                   <span className="inline-block text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full mb-3">
                     課題: {item.problem}
@@ -420,7 +400,6 @@ export default function CareerCenterLandingPage() {
                   </h3>
                   <p className="text-gray-600 text-sm leading-relaxed">{item.detail}</p>
                 </div>
-                {/* アイコン側 */}
                 <div className="flex-shrink-0 w-full md:w-64 h-48 bg-gradient-to-br from-[#00c896]/5 to-[#059669]/8 rounded-2xl border border-[#00c896]/15 flex items-center justify-center text-6xl">
                   {item.icon}
                 </div>
@@ -430,105 +409,128 @@ export default function CareerCenterLandingPage() {
         </div>
       </section>
 
-      {/* ── Handshake / Market Proof ───────────────────────────────────────── */}
-      <section className="bg-[#0D0B21] py-24 px-6 relative overflow-hidden">
-        <div className="lp-dark-grid absolute inset-0 opacity-30" />
-        <div className="absolute top-1/3 left-0 w-[500px] h-[400px] bg-[#00c896]/4 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-blue-500/3 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative max-w-5xl mx-auto">
-          <div className="text-center mb-16 reveal">
-            <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3">Market Proof</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight mb-4">
-              このモデルは、<span className="lp-gradient-text-dark bg-clip-text text-transparent">すでにアメリカで証明されている</span>
+      {/* ── 2つの懸念に、正面から答えます ──────────────────────────────────── */}
+      <section className="py-24 px-6 bg-white">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-14 reveal">
+            <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3">Straight Answers</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#0D0B21] tracking-tight mb-4">
+              「導入しにくい」と感じる<br className="hidden md:block" />
+              <span className="text-[#00c896]">2つの理由に、正面から答えます</span>
             </h2>
-            <p className="text-gray-400 text-sm max-w-2xl mx-auto leading-relaxed">
-              Careoが目指すビジネスモデルの先駆者が、アメリカにいます。その名は<span className="text-white font-semibold">Handshake</span>。
+            <p className="text-gray-500 text-sm max-w-2xl mx-auto leading-relaxed">
+              よくいただく懸念を回避するのではなく、根拠とともにお答えします。
             </p>
           </div>
 
-          {/* Handshake実績カード */}
-          <div className="lp-story-card rounded-2xl p-8 md:p-10 mb-10 reveal">
-            <div className="flex flex-col md:flex-row gap-8 items-start">
-              <div className="flex-1">
-                <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-xs text-gray-300 font-medium mb-5">
-                  🇺🇸 アメリカ・就活プラットフォーム
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* 懸念① 個人開発 */}
+            <div className="border border-gray-200 rounded-2xl p-8 reveal reveal-delay-1">
+              <div className="flex items-start gap-4 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-xl shrink-0">
+                  ⚠️
                 </div>
-                <div className="flex items-center gap-3 mb-3">
-                  <h3 className="text-2xl font-bold text-white">Handshake</h3>
-                  <a
-                    href="https://joinhandshake.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-[#00c896] transition-colors border border-white/10 hover:border-[#00c896]/30 px-2.5 py-1 rounded-full"
-                  >
-                    公式サイト
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                  </a>
+                <div>
+                  <p className="text-xs font-bold text-amber-600 mb-1">よくある懸念 ①</p>
+                  <h3 className="font-bold text-[#0D0B21] text-base leading-snug">
+                    「個人開発だから、<br />長期的に続くか不安」
+                  </h3>
                 </div>
-                <p className="text-gray-300 text-sm leading-relaxed mb-6">
-                  2014年創業。「大学キャリアセンターと学生と企業をつなぐ」プラットフォームとして急成長。
-                  学生は無料、大学・企業が課金するビジネスモデルで、全米トップ大学の90%以上が導入。
-                  2022年には評価額<span className="text-[#00c896] font-bold">約3,500億円（$3.5B）</span>のユニコーン企業となりました。
-                </p>
-                <div className="grid grid-cols-3 gap-4">
-                  {[
-                    { value: "1,400+", label: "導入大学数" },
-                    { value: "1,400万+", label: "登録学生数" },
-                    { value: "$3.5B", label: "企業評価額" },
-                  ].map(({ value, label }) => (
-                    <div key={label} className="text-center bg-white/5 rounded-xl p-3">
-                      <p className="text-xl font-bold text-[#00c896]">{value}</p>
-                      <p className="text-xs text-gray-400 mt-1">{label}</p>
+              </div>
+
+              <div className="space-y-4">
+                {[
+                  {
+                    icon: "🎓",
+                    title: "開発者自身がユーザー",
+                    desc: "Careoは上智大学の現役学生が自分の就活のために作ったツールです。サービスが止まれば自分も困る——当事者だからこそ、止める理由がありません。",
+                  },
+                  {
+                    icon: "☁️",
+                    title: "データはクラウドインフラで管理",
+                    desc: "学生データは業務グレードのクラウドインフラ（Supabase）に保管。開発者個人の端末には依存しない設計です。",
+                  },
+                  {
+                    icon: "📩",
+                    title: "48時間以内にメール返信",
+                    desc: "ご連絡・ご相談はメールにて48時間以内を目安に返信します。導入後も継続的なサポートを提供します。",
+                  },
+                  {
+                    icon: "🏢",
+                    title: "法人化も視野に",
+                    desc: "サービスの成長に合わせた法人化を検討しています。大学との継続的な関係を担保できる体制を整えていきます。",
+                  },
+                ].map((item) => (
+                  <div key={item.title} className="flex items-start gap-3">
+                    <span className="text-lg shrink-0 mt-0.5">{item.icon}</span>
+                    <div>
+                      <p className="text-sm font-semibold text-[#0D0B21] mb-0.5">{item.title}</p>
+                      <p className="text-xs text-gray-500 leading-relaxed">{item.desc}</p>
                     </div>
-                  ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 懸念② 他社実証実験中 */}
+            <div className="border border-gray-200 rounded-2xl p-8 reveal reveal-delay-2">
+              <div className="flex items-start gap-4 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-xl shrink-0">
+                  🔄
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-blue-600 mb-1">よくある懸念 ②</p>
+                  <h3 className="font-bold text-[#0D0B21] text-base leading-snug">
+                    「今、別のサービスと<br />実証実験中で余裕がない」
+                  </h3>
                 </div>
               </div>
 
-              {/* 矢印＋Careo */}
-              <div className="hidden md:flex flex-col items-center justify-center gap-3 pt-8">
-                <div className="text-3xl text-[#00c896] animate-float">→</div>
-              </div>
-
-              <div className="flex-1 lp-pricing-card rounded-xl p-6">
-                <div className="inline-flex items-center gap-2 bg-[#00c896]/10 border border-[#00c896]/20 px-3 py-1.5 rounded-full text-xs text-[#00c896] font-bold mb-5">
-                  🇯🇵 日本版 × AI特化
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-3">Careo</h3>
-                <p className="text-gray-300 text-sm leading-relaxed mb-5">
-                  Handshakeと同じ「学生無料・大学課金」モデルを、<span className="text-white font-semibold">日本の就活文化に最適化</span>した形で展開。
-                  さらにAIコーチング・ES分析・PDCA自動化という独自機能で、
-                  単なるプラットフォームを超えた<span className="text-[#00c896] font-bold">「就活OS」</span>を目指しています。
-                </p>
-                <ul className="space-y-2">
-                  {[
-                    "日本独自のES・OB訪問・筆記試験に対応",
-                    "AIが学生の就活全体をコーチング",
-                    "大学キャリアセンターとのデータ連携",
-                  ].map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-sm text-gray-300">
-                      <span className="text-[#00c896] mt-0.5 flex-shrink-0">✓</span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+              <div className="space-y-4">
+                {[
+                  {
+                    icon: "🤝",
+                    title: "置き換えではなく、補完",
+                    desc: "Careoは既存の就職支援システムや実証実験中のサービスと競合しません。「学生の自主的な就活データ」という新しいレイヤーを追加するだけです。",
+                  },
+                  {
+                    icon: "⚡",
+                    title: "担当者の追加作業は初期設定のみ",
+                    desc: "提携後は学生が自分でCareoを使い始め、データが自動連携されます。実証実験の運用を邪魔しません。",
+                  },
+                  {
+                    icon: "📊",
+                    title: "比較データとして活用できる",
+                    desc: "並行して使うことで、既存の実証実験との比較データが得られます。支援効果の根拠として活用できます。",
+                  },
+                  {
+                    icon: "🕐",
+                    title: "実証実験後の選択肢としても",
+                    desc: "今すぐでなくても構いません。実証実験が終わった段階で改めてご検討いただくことも歓迎です。",
+                  },
+                ].map((item) => (
+                  <div key={item.title} className="flex items-start gap-3">
+                    <span className="text-lg shrink-0 mt-0.5">{item.icon}</span>
+                    <div>
+                      <p className="text-sm font-semibold text-[#0D0B21] mb-0.5">{item.title}</p>
+                      <p className="text-xs text-gray-500 leading-relaxed">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
 
-          {/* メッセージ */}
-          <div className="text-center reveal">
-            <p className="text-gray-300 text-base md:text-lg leading-relaxed">
-              Handshakeが証明した通り、<span className="text-white font-bold">大学キャリアセンターが就活エコシステムの中心</span>になれる時代が来ています。<br className="hidden md:block" />
-              日本でそれを実現するのが、Careoです。
+          <div className="mt-8 bg-[#00c896]/5 border border-[#00c896]/20 rounded-2xl px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-4 reveal">
+            <p className="text-sm text-gray-600 leading-relaxed">
+              <span className="font-semibold text-[#0D0B21]">まずはヒアリングで、懸念を一つずつ確認しましょう。</span><br />
+              30分のオンラインMTGで、貴大学の状況に合わせてお答えします。
             </p>
             <a
               href="#contact"
-              className="inline-flex items-center gap-2 mt-8 lp-btn-primary text-white font-bold px-8 py-3.5 rounded-xl transition-all hover:scale-105"
+              className="shrink-0 lp-btn-primary text-white font-bold px-6 py-3 rounded-xl transition-all hover:scale-105 text-sm"
             >
-              貴大学でも、この革命を →
+              無料ヒアリングを申し込む →
             </a>
           </div>
         </div>
@@ -545,87 +547,19 @@ export default function CareerCenterLandingPage() {
             <p className="text-gray-500 text-sm max-w-2xl mx-auto leading-relaxed">
               「今あるツールで十分では？」——この疑問に正面から答えます。
             </p>
-          </div>
 
-          {/* ポジショニングマップ */}
-          <div className="mb-16 reveal">
-            <h3 className="text-base font-bold text-gray-400 uppercase tracking-widest text-center mb-8">就活支援ツールのポジショニングマップ</h3>
-
-            <div className="relative mx-auto max-w-[560px] h-[400px]">
-              {/* 外枠 */}
-              <div className="absolute inset-0 rounded-3xl border border-gray-200 overflow-hidden bg-white shadow-sm">
-                <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
-                  <div className="bg-gray-50/60" />
-                  <div className="bg-[#00c896]/5" />
-                  <div className="bg-gray-50/80" />
-                  <div className="bg-gray-50/60" />
-                </div>
-                <div className="absolute top-1/2 left-0 right-0 h-px bg-gray-200" />
-                <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gray-200" />
-              </div>
-
-              {/* 軸ラベル */}
-              <div className="absolute top-2 w-full flex justify-center">
-                <span className="text-[11px] font-bold text-[#00c896] bg-white/90 px-2 py-0.5 rounded-full border border-[#00c896]/20">情報可視性 高 ↑</span>
-              </div>
-              <div className="absolute bottom-2 w-full flex justify-center">
-                <span className="text-[11px] text-gray-400 bg-white/90 px-2 py-0.5 rounded-full">情報可視性 低</span>
-              </div>
-              <div className="absolute left-2 top-0 bottom-0 flex items-center justify-center">
-                <span className="text-[10px] text-gray-400 select-none -rotate-90 whitespace-nowrap">← 義務的（強制利用）</span>
-              </div>
-              <div className="absolute right-2 top-0 bottom-0 flex items-center justify-center">
-                <span className="text-[10px] font-bold text-gray-600 select-none [writing-mode:vertical-rl]">自主利用 →</span>
-              </div>
-
-              {/* ゾーンラベル */}
-              <div className="absolute top-7 right-7 text-[9px] text-[#00c896]/50 font-bold select-none">Careoゾーン（空白地帯）</div>
-
-              {/* 従来の就職支援システム */}
-              <div className="absolute left-[18%] top-[28%] -translate-x-1/2 -translate-y-1/2">
-                <div className="bg-gray-100 border border-gray-300 rounded-xl px-3 py-2 text-center shadow-sm whitespace-nowrap">
-                  <p className="text-[10px] font-bold text-gray-600">従来の就職支援システム</p>
-                </div>
-              </div>
-
-              {/* Google Forms / アンケート */}
-              <div className="absolute left-[24%] top-[68%] -translate-x-1/2 -translate-y-1/2">
-                <div className="bg-gray-100 border border-gray-300 rounded-xl px-3 py-2 text-center shadow-sm whitespace-nowrap">
-                  <p className="text-[10px] font-bold text-gray-500">アンケート / Forms</p>
-                </div>
-              </div>
-
-              {/* LINE / メール */}
-              <div className="absolute left-[38%] top-[74%] -translate-x-1/2 -translate-y-1/2">
-                <div className="bg-yellow-50 border border-yellow-200 rounded-xl px-3 py-2 text-center shadow-sm">
-                  <p className="text-[10px] font-bold text-yellow-700">LINE / メール</p>
-                </div>
-              </div>
-
-              {/* リクナビ / マイナビ */}
-              <div className="absolute left-[75%] top-[78%] -translate-x-1/2 -translate-y-1/2">
-                <div className="bg-red-50 border border-red-200 rounded-xl px-3 py-2 text-center shadow-sm whitespace-nowrap">
-                  <p className="text-[10px] font-bold text-red-600">リクナビ / マイナビ</p>
-                </div>
-              </div>
-
-              {/* Careo（強調） */}
-              <div className="absolute left-[80%] top-[18%] -translate-x-1/2 -translate-y-1/2">
-                <div className="bg-[#00c896] rounded-xl px-3.5 py-2.5 text-center shadow-lg shadow-[#00c896]/40 ring-2 ring-[#00c896]/30">
-                  <p className="text-[11px] font-bold text-white">✦ Careo</p>
-                  <p className="text-[9px] text-white/80">自主利用×高可視性</p>
-                </div>
-              </div>
+            {/* 補完バナー */}
+            <div className="mt-8 inline-flex items-center gap-3 bg-[#00c896]/10 border border-[#00c896]/30 rounded-2xl px-6 py-4">
+              <span className="text-2xl">🤝</span>
+              <p className="text-sm font-bold text-[#00c896] text-left leading-relaxed">
+                Careoは既存の就活支援システムを<span className="underline decoration-[#00c896]/50">置き換えません</span>。<br />
+                <span className="font-normal text-gray-600">現在ご利用中のシステム・実証実験と並行して活用できます。</span>
+              </p>
             </div>
-
-            <p className="text-center text-xs text-gray-400 mt-4">
-              ※ ポジションはCareoの主観的評価に基づくイメージです。
-            </p>
           </div>
 
           {/* 比較テーブル */}
           <div className="reveal">
-            <h3 className="text-base font-bold text-gray-400 uppercase tracking-widest text-center mb-8">各ツールとの比較</h3>
             <div className="overflow-x-auto -mx-2 rounded-2xl border border-gray-200 shadow-sm bg-white">
               <table className="w-full text-xs min-w-[620px]">
                 <thead>
@@ -710,137 +644,6 @@ export default function CareerCenterLandingPage() {
         </div>
       </section>
 
-      {/* ── 立ち位置と発展戦略 ─────────────────────────────────────────────── */}
-      <section className="py-24 px-6 bg-white">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16 reveal">
-            <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3">Strategy</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-[#0D0B21] tracking-tight mb-4">
-              Careoはどこを目指すのか
-            </h2>
-            <p className="text-gray-500 text-sm max-w-2xl mx-auto leading-relaxed">
-              学生のツールとして始まり、大学キャリアセンターのインフラへ。<br className="hidden md:block" />
-              段階的に価値を積み上げる、Careoの発展戦略です。
-            </p>
-          </div>
-
-          {/* 3層エコシステム図 */}
-          <div className="mb-16 reveal">
-            <h3 className="text-base font-bold text-gray-400 uppercase tracking-widest text-center mb-8">就活エコシステムにおける立ち位置</h3>
-            <div className="space-y-2 max-w-2xl mx-auto">
-              {/* Layer 1: 学生 */}
-              <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5">
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="bg-blue-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">LAYER 1</span>
-                  <h4 className="font-bold text-blue-800 text-sm">学生</h4>
-                </div>
-                <p className="text-sm text-blue-700 mb-3">自主的にCareoを使って就活を管理。AIコーチング・ES管理・選考PDCA。</p>
-                <div className="flex gap-1.5 flex-wrap">
-                  {["ES管理", "面接ログ", "OB/OG訪問", "PDCA分析", "AIコーチ「カレオ」"].map(tag => (
-                    <span key={tag} className="bg-white text-blue-600 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-blue-200">{tag}</span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex justify-center py-1">
-                <span className="text-[#00c896] text-xs font-semibold">↕ 学生が同意した情報をリアルタイムで連携</span>
-              </div>
-
-              {/* Layer 2: Careo */}
-              <div className="bg-gradient-to-r from-[#00c896]/10 to-[#059669]/8 border border-[#00c896]/30 rounded-2xl p-5">
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="bg-[#00c896] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">LAYER 2</span>
-                  <h4 className="font-bold text-[#0D0B21] text-sm">Careo（データハブ＋AIエンジン）</h4>
-                </div>
-                <p className="text-sm text-gray-600 mb-3">学生データを集約・AIで分析し、学生とキャリアセンターの両方に価値を提供。</p>
-                <div className="flex gap-1.5 flex-wrap">
-                  {["AIインサイト生成", "週次PDCA自動化", "プライバシー管理", "データ集計", "キャリアセンターレポート"].map(tag => (
-                    <span key={tag} className="bg-white text-[#00a87e] text-[10px] font-semibold px-2 py-0.5 rounded-full border border-[#00c896]/30">{tag}</span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex justify-center py-1">
-                <span className="text-[#00c896] text-xs font-semibold">↓ ダッシュボードで可視化・支援強化</span>
-              </div>
-
-              {/* Layer 3: キャリアセンター */}
-              <div className="bg-purple-50 border border-purple-200 rounded-2xl p-5">
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="bg-purple-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">LAYER 3</span>
-                  <h4 className="font-bold text-purple-800 text-sm">キャリアセンター（提携大学）</h4>
-                </div>
-                <p className="text-sm text-purple-700 mb-3">学生の就活状況をリアルタイムで把握。面談の質向上・孤立学生へのリーチ・支援効果の可視化。</p>
-                <div className="flex gap-1.5 flex-wrap">
-                  {["ダッシュボード閲覧", "個別メッセージ送信", "集計レポート", "AI面談準備サポート"].map(tag => (
-                    <span key={tag} className="bg-white text-purple-600 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-purple-200">{tag}</span>
-                  ))}
-                </div>
-              </div>
-            </div>
-            <p className="text-center text-xs text-gray-400 mt-5">
-              既存の就職支援システムの置き換えではなく、「学生の実態データ」という新しいレイヤーを追加します。
-            </p>
-          </div>
-
-          {/* 発展ロードマップ */}
-          <div className="reveal">
-            <h3 className="text-base font-bold text-gray-400 uppercase tracking-widest text-center mb-8">Careoの発展ロードマップ</h3>
-            <div className="grid md:grid-cols-3 gap-5">
-              {[
-                {
-                  phase: "Phase 1",
-                  title: "学生への普及・信頼構築",
-                  status: "現在進行中",
-                  statusCls: "bg-[#00c896] text-white",
-                  desc: "就活AIアプリとして学生に使われること。AIコーチング・ES管理・PDCA分析を通じて「手放せないツール」になる。",
-                  items: ["AIコーチ「カレオ」", "週次PDCA分析", "ES管理・AIチェック", "OB/OG訪問・筆記試験管理"],
-                  borderCls: "border-[#00c896]/40",
-                  bgCls: "bg-[#00c896]/5",
-                },
-                {
-                  phase: "Phase 2",
-                  title: "大学連携 × SaaS提供",
-                  status: "提携募集中",
-                  statusCls: "bg-blue-500 text-white",
-                  desc: "普及した学生データをキャリアセンターへ橋渡し。月額SaaSとして提供し、相談予約システム・ダッシュボード・AI分析インサイトを一体で導入できます（詳細はヒアリングにて）。",
-                  items: ["キャリアセンターダッシュボード", "相談予約システム", "学生への個別メッセージ", "大学全体の集計分析", "面談前AIインサイト"],
-                  borderCls: "border-blue-200",
-                  bgCls: "bg-blue-50/50",
-                },
-                {
-                  phase: "Phase 3",
-                  title: "企業マッチング × 採用インフラ化",
-                  status: "将来ビジョン",
-                  statusCls: "bg-purple-500 text-white",
-                  desc: "学生・大学・企業の3者をつなぐ就活データプラットフォームへ。就活過程データを活用した高精度マッチングで、日本の採用インフラを変える。",
-                  items: ["企業との採用データ連携", "就活過程データを使った高精度マッチング", "複数大学間の比較分析", "就活トレンド・予測レポート"],
-                  borderCls: "border-purple-200",
-                  bgCls: "bg-purple-50/50",
-                },
-              ].map((phase, i) => (
-                <div key={phase.phase} className={`border ${phase.borderCls} ${phase.bgCls} rounded-2xl p-6 reveal reveal-delay-${i + 1}`}>
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-xs font-bold text-gray-400">{phase.phase}</span>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${phase.statusCls}`}>{phase.status}</span>
-                  </div>
-                  <h4 className="font-bold text-[#0D0B21] text-base mb-3 leading-snug">{phase.title}</h4>
-                  <p className="text-gray-500 text-xs leading-relaxed mb-4">{phase.desc}</p>
-                  <ul className="space-y-1.5">
-                    {phase.items.map(item => (
-                      <li key={item} className="flex items-start gap-1.5 text-xs text-gray-600">
-                        <span className="text-[#00c896] mt-0.5 shrink-0">✓</span>
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ── 開発者ストーリー ─────────────────────────────────────────────────── */}
       <section className="bg-[#0D0B21] py-24 px-6 relative overflow-hidden">
         <div className="lp-dark-grid absolute inset-0 opacity-30" />
@@ -884,17 +687,34 @@ export default function CareerCenterLandingPage() {
               </p>
             </div>
 
-            <div className="mt-8 pt-7 border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <p className="text-gray-400 text-xs leading-relaxed max-w-lg">
-                開発者自身がユーザーであるため、学生目線の改善が常に行われています。<br />
-                「使ってもらえるツール」にこだわり続けることが、Careoの競争優位です。
-              </p>
-              <a
-                href="#contact"
-                className="shrink-0 inline-flex items-center gap-2 lp-btn-primary text-white font-bold px-6 py-3 rounded-xl transition-all hover:scale-105 text-sm"
-              >
-                提携を検討する →
-              </a>
+            {/* サポート体制 */}
+            <div className="mt-8 pt-7 border-t border-white/10">
+              <p className="text-[#00c896] text-xs font-bold tracking-wider uppercase mb-4">サポート体制</p>
+              <div className="grid sm:grid-cols-3 gap-4 mb-6">
+                {[
+                  { icon: "📩", title: "メール対応", desc: "ご連絡から48時間以内を目安に返信します" },
+                  { icon: "☁️", title: "データ管理", desc: "業務グレードのクラウドインフラで安全に保管" },
+                  { icon: "🔄", title: "継続的な改善", desc: "開発者自身がユーザーのため、改善が止まりません" },
+                ].map((item) => (
+                  <div key={item.title} className="bg-white/5 rounded-xl p-4">
+                    <span className="text-xl">{item.icon}</span>
+                    <p className="text-white text-xs font-bold mt-2 mb-1">{item.title}</p>
+                    <p className="text-gray-400 text-[11px] leading-relaxed">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <p className="text-gray-400 text-xs leading-relaxed max-w-lg">
+                  開発者自身がユーザーであるため、学生目線の改善が常に行われています。<br />
+                  「使ってもらえるツール」にこだわり続けることが、Careoの競争優位です。
+                </p>
+                <a
+                  href="#contact"
+                  className="shrink-0 inline-flex items-center gap-2 lp-btn-primary text-white font-bold px-6 py-3 rounded-xl transition-all hover:scale-105 text-sm"
+                >
+                  提携を検討する →
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -909,7 +729,7 @@ export default function CareerCenterLandingPage() {
               提携で使えるようになる<span className="text-[#00c896]">主要機能</span>
             </h2>
             <p className="text-gray-500 text-sm max-w-xl mx-auto">
-              提携プランに含まれる機能一覧です。詳細はヒアリングにてご説明します。
+              提携プランに含まれる主要機能です。詳細はヒアリングにてご説明します。
             </p>
           </div>
 
@@ -945,7 +765,6 @@ export default function CareerCenterLandingPage() {
           </div>
 
           <div className="relative">
-            {/* 接続ライン（PCのみ） */}
             <div className="hidden md:block absolute top-10 left-[16.67%] right-[16.67%] h-px bg-gradient-to-r from-[#00c896]/30 via-[#00c896]/60 to-[#00c896]/30" />
 
             <div className="grid md:grid-cols-3 gap-8">
@@ -1022,6 +841,103 @@ export default function CareerCenterLandingPage() {
         </div>
       </section>
 
+      {/* ── Handshake / Market Proof ───────────────────────────────────────── */}
+      <section className="py-24 px-6 bg-gray-50/50 relative overflow-hidden">
+        <div className="relative max-w-5xl mx-auto">
+          <div className="text-center mb-16 reveal">
+            <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3">Market Proof</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#0D0B21] tracking-tight mb-4">
+              このモデルは、<span className="text-[#00c896]">すでにアメリカで証明されている</span>
+            </h2>
+            <p className="text-gray-500 text-sm max-w-2xl mx-auto leading-relaxed">
+              Careoが目指すビジネスモデルの先駆者が、アメリカにいます。その名は<span className="font-semibold text-[#0D0B21]">Handshake</span>。
+            </p>
+          </div>
+
+          <div className="bg-white border border-gray-200 rounded-2xl p-8 md:p-10 mb-10 reveal shadow-sm">
+            <div className="flex flex-col md:flex-row gap-8 items-start">
+              <div className="flex-1">
+                <div className="inline-flex items-center gap-2 bg-gray-100 border border-gray-200 px-3 py-1.5 rounded-full text-xs text-gray-600 font-medium mb-5">
+                  🇺🇸 アメリカ・就活プラットフォーム
+                </div>
+                <div className="flex items-center gap-3 mb-3">
+                  <h3 className="text-2xl font-bold text-[#0D0B21]">Handshake</h3>
+                  <a
+                    href="https://joinhandshake.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-[#00c896] transition-colors border border-gray-200 hover:border-[#00c896]/30 px-2.5 py-1 rounded-full"
+                  >
+                    公式サイト
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                </div>
+                <p className="text-gray-600 text-sm leading-relaxed mb-6">
+                  2014年創業。「大学キャリアセンターと学生と企業をつなぐ」プラットフォームとして急成長。
+                  学生は無料、大学・企業が課金するビジネスモデルで、全米トップ大学の90%以上が導入。
+                  2022年には評価額<span className="text-[#00c896] font-bold">約3,500億円（$3.5B）</span>のユニコーン企業となりました。
+                </p>
+                <div className="grid grid-cols-3 gap-4">
+                  {[
+                    { value: "1,400+", label: "導入大学数" },
+                    { value: "1,400万+", label: "登録学生数" },
+                    { value: "$3.5B", label: "企業評価額" },
+                  ].map(({ value, label }) => (
+                    <div key={label} className="text-center bg-gray-50 rounded-xl p-3">
+                      <p className="text-xl font-bold text-[#00c896]">{value}</p>
+                      <p className="text-xs text-gray-400 mt-1">{label}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="hidden md:flex flex-col items-center justify-center gap-3 pt-8">
+                <div className="text-3xl text-[#00c896] animate-float">→</div>
+              </div>
+
+              <div className="flex-1 bg-[#00c896]/5 border border-[#00c896]/20 rounded-xl p-6">
+                <div className="inline-flex items-center gap-2 bg-[#00c896]/10 border border-[#00c896]/20 px-3 py-1.5 rounded-full text-xs text-[#00c896] font-bold mb-5">
+                  🇯🇵 日本版 × AI特化
+                </div>
+                <h3 className="text-2xl font-bold text-[#0D0B21] mb-3">Careo</h3>
+                <p className="text-gray-600 text-sm leading-relaxed mb-5">
+                  Handshakeと同じ「学生無料・大学課金」モデルを、<span className="font-semibold text-[#0D0B21]">日本の就活文化に最適化</span>した形で展開。
+                  さらにAIコーチング・ES分析・PDCA自動化という独自機能で、
+                  単なるプラットフォームを超えた<span className="text-[#00c896] font-bold">「就活OS」</span>を目指しています。
+                </p>
+                <ul className="space-y-2">
+                  {[
+                    "日本独自のES・OB訪問・筆記試験に対応",
+                    "AIが学生の就活全体をコーチング",
+                    "大学キャリアセンターとのデータ連携",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2 text-sm text-gray-600">
+                      <span className="text-[#00c896] mt-0.5 flex-shrink-0">✓</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center reveal">
+            <p className="text-gray-600 text-base md:text-lg leading-relaxed">
+              Handshakeが証明した通り、<span className="font-bold text-[#0D0B21]">大学キャリアセンターが就活エコシステムの中心</span>になれる時代が来ています。<br className="hidden md:block" />
+              日本でそれを実現するのが、Careoです。
+            </p>
+            <a
+              href="#contact"
+              className="inline-flex items-center gap-2 mt-8 lp-btn-primary text-white font-bold px-8 py-3.5 rounded-xl transition-all hover:scale-105"
+            >
+              貴大学でも、この革命を →
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* ── FAQ ────────────────────────────────────────────────────────────── */}
       <section className="py-24 px-6 bg-white">
         <div className="max-w-2xl mx-auto">
@@ -1086,7 +1002,7 @@ export default function CareerCenterLandingPage() {
               <div className="text-5xl mb-4">✅</div>
               <h3 className="text-xl font-bold text-[#0D0B21] mb-2">お問い合わせを受け付けました</h3>
               <p className="text-gray-500 text-sm leading-relaxed">
-                通常2営業日以内にご連絡いたします。<br />
+                48時間以内にご連絡いたします。<br />
                 しばらくお待ちください。
               </p>
             </div>
@@ -1183,12 +1099,12 @@ export default function CareerCenterLandingPage() {
       </footer>
 
       <LPChatBot
-        welcomeMessage={"こんにちは。キャリアセンター担当者の方ですね。\n導入のご相談・費用のこと・学生データの扱いなど、何でもお答えします。"}
+        welcomeMessage={"こんにちは。キャリアセンター担当者の方ですね。\n導入のご相談・他サービスとの併用・費用のことなど、何でもお答えします。"}
         subtitle="キャリアセンター向け相談窓口"
         suggestions={[
+          "今、別のサービスと実証実験中ですが併用できますか？",
+          "個人開発のサービスは長期的に続きますか？",
           "導入費用はどのくらいですか？",
-          "学生のプライバシーは守られますか？",
-          "既存の支援システムと併用できますか？",
           "まず何から始めればいいですか？",
         ]}
       />

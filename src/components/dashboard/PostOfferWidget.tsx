@@ -54,10 +54,9 @@ const POST_OFFER_CONTENT: { intern: OfferContent; main: OfferContent } = {
     items: [
       {
         icon: "📚",
-        title: "入社前に読んでおきたいビジネス書",
-        desc: "Amazonで業界別必読本をチェック",
-        link: "https://www.amazon.co.jp/s?k=%E3%83%93%E3%82%B8%E3%83%8D%E3%82%B9%E6%9C%AC+%E5%85%A5%E7%A4%BE%E5%89%8D&tag=careo-22",
-        external: true,
+        title: "入社前の準備をカレオに相談する",
+        desc: "業界知識・ビジネスマナーなど入社前にやるべきことを整理",
+        link: "/chat",
       },
       {
         icon: "🧑‍💼",

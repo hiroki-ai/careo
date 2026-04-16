@@ -142,30 +142,6 @@ export default function TestsPage() {
         </div>
       )}
 
-      {/* 対策本リンク */}
-      <div className="mt-8 border-t border-gray-100 pt-6">
-        <p className="text-xs text-gray-400 font-medium mb-3">📚 対策本を探す（Amazon）</p>
-        <div className="flex flex-wrap gap-2">
-          {[
-            { label: "SPI3対策", url: "https://www.amazon.co.jp/s?k=SPI3+対策&tag=careo-22" },
-            { label: "玉手箱対策", url: "https://www.amazon.co.jp/s?k=玉手箱+対策&tag=careo-22" },
-            { label: "テストセンター対策", url: "https://www.amazon.co.jp/s?k=テストセンター+SPI+対策&tag=careo-22" },
-            { label: "CAB・GAB対策", url: "https://www.amazon.co.jp/s?k=CAB+GAB+対策&tag=careo-22" },
-            { label: "数的処理・非言語", url: "https://www.amazon.co.jp/s?k=SPI+非言語+対策&tag=careo-22" },
-          ].map(({ label, url }) => (
-            <a
-              key={label}
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-800 border border-gray-200 hover:border-gray-400 px-3 py-1.5 rounded-full transition-colors"
-            >
-              {label} →
-            </a>
-          ))}
-        </div>
-      </div>
-
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="筆記試験を記録">
         <div className="space-y-4">
           <div>

@@ -110,44 +110,6 @@ export default function ObVisitsPage() {
         </div>
       )}
 
-      {/* 関連書籍リンク */}
-      <div className="mt-8 border-t border-gray-100 pt-6">
-        <p className="text-xs text-gray-400 font-medium mb-3">📚 OB/OG訪問・業界研究に役立つ本（Amazon）</p>
-        <div className="flex flex-wrap gap-2">
-          {[
-            { label: "OB訪問・就活準備", url: "https://www.amazon.co.jp/s?k=OB訪問+就活+準備&tag=careo-22" },
-            { label: "業界研究2026", url: "https://www.amazon.co.jp/s?k=業界研究+就活+2026&tag=careo-22" },
-            { label: "自己分析・ES", url: "https://www.amazon.co.jp/s?k=就活+自己分析+ES+書き方&tag=careo-22" },
-            { label: "面接対策", url: "https://www.amazon.co.jp/s?k=就活+面接+対策+2026&tag=careo-22" },
-          ].map(({ label, url }) => (
-            <a
-              key={label}
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-800 border border-gray-200 hover:border-gray-400 px-3 py-1.5 rounded-full transition-colors"
-            >
-              {label} →
-            </a>
-          ))}
-        </div>
-      </div>
-
-      {/* 服装アフィリエイト */}
-      <div className="mt-4">
-        <p className="text-xs text-gray-400 font-medium mb-2">👔 OB訪問の服装</p>
-        <a
-          href="https://px.a8.net/svt/ejp?a8mat=4AZIOB+402X6A+537A+5YJRM"
-          rel="nofollow"
-          target="_blank"
-          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-200 hover:border-gray-400 px-4 py-2 rounded-full transition-colors"
-        >
-          ビジネスカジュアルならORIHICA（オリヒカ） →
-        </a>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img width={1} height={1} src="https://www12.a8.net/0.gif?a8mat=4AZIOB+402X6A+537A+5YJRM" alt="" style={{ display: "none" }} />
-      </div>
-
       {/* 追加モーダル */}
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="OB/OG訪問を記録">
         <div className="space-y-4">
