@@ -13,6 +13,7 @@ type Post = {
   reading_time_min: number;
   published_at: string;
   focus_keyphrase?: string;
+  thumbnail_url?: string | null;
 };
 
 type Props = { params: Promise<{ slug: string }> };
@@ -190,6 +191,18 @@ export default async function BlogPostPage({ params }: Props) {
               {post.reading_time_min}分で読める
             </div>
           </div>
+
+          {/* ─── サムネイル ──────────────────────────── */}
+          {post.thumbnail_url && (
+            <div className="mb-8 md:mb-10 rounded-xl md:rounded-2xl overflow-hidden">
+              <img
+                src={post.thumbnail_url}
+                alt={post.title}
+                className="w-full h-auto"
+                style={{ aspectRatio: "1200/630", objectFit: "cover" }}
+              />
+            </div>
+          )}
 
           {/* ─── 本文 ──────────────────────────────── */}
           <div

@@ -1,0 +1,157 @@
+import { NextRequest, NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/apiAuth";
+import { writeFile, mkdir } from "fs/promises";
+import path from "path";
+
+export const maxDuration = 60;
+
+const EXPRESSIONS = [
+  "default",
+  "thinking",
+  "celebrating",
+  "sad",
+  "encouraging",
+  "loading",
+  "error",
+  "waving",
+] as const;
+
+type Expression = (typeof EXPRESSIONS)[number];
+
+function isValidExpression(s: string): s is Expression {
+  return (EXPRESSIONS as readonly string[]).includes(s);
+}
+
+export async function POST(req: NextRequest) {
+  const auth = await requireAdmin();
+  if (!auth.user) {
+    return auth.errorResponse;
+  }
+
+  const { expression, prompt: customPrompt } = await req.json();
+
+  if (!expression || !isValidExpression(expression)) {
+    return NextResponse.json(
+      { error: `Invalid expression. Must be one of: ${EXPRESSIONS.join(", ")}` },
+      { status: 400 }
+    );
+  }
+
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    return NextResponse.json(
+      { error: "GEMINI_API_KEY is not configured" },
+      { status: 500 }
+    );
+  }
+
+  const expressionPrompts: Record<Expression, string> = {
+    default:
+      "Neutral, friendly smile. Standing straight with flippers at sides.",
+    thinking:
+      "One flipper on chin, looking upward with a curious/pondering expression. A small thought bubble or question mark nearby.",
+    celebrating:
+      "Arms/flippers raised up in celebration! Confetti or sparkles around. Big happy smile with closed eyes.",
+    sad: "Slightly droopy posture, downturned beak, small tear drop. Looking down.",
+    encouraging:
+      "Thumbs up (flipper up) gesture, winking, energetic pose. Maybe a small star or sparkle.",
+    loading:
+      "Running or walking in a hurry, slight motion blur lines. Determined expression.",
+    error:
+      "Surprised/shocked expression, small sweat drop, holding a red X mark or warning sign.",
+    waving:
+      "One flipper raised and waving hello! Cheerful open-mouth smile.",
+  };
+
+  const basePrompt = `Generate a cute kawaii penguin mascot character named "Kareo" for a Japanese job hunting app called "Careo".
+
+Character description:
+- A small, adorable penguin with a round body
+- Dark navy blue body (#0d1b2e to #3b4f6b gradient)
+- White belly
+- Big expressive eyes with sparkle highlights
+- Small yellow/orange beak
+- Wearing a green necktie (emerald green #00c896)
+- Pink/rosy cheeks
+- Simple, clean design suitable for app UI
+- Chibi/kawaii style (big head, small body ratio)
+- White background, no other elements
+- High quality, smooth rendering, studio lighting
+- Character should be centered and full body visible
+- Style: modern Japanese mascot character, similar to LINE stickers
+- PNG format, transparent or white background
+
+Expression/Pose: ${expressionPrompts[expression]}${customPrompt ? `\n\nAdditional instructions: ${customPrompt}` : ""}`;
+
+  try {
+    // Use Gemini REST API directly since the SDK types don't include responseModalities
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: basePrompt }] }],
+          generationConfig: {
+            responseModalities: ["TEXT", "IMAGE"],
+          },
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Gemini API error:", errorText);
+      return NextResponse.json(
+        { error: "Gemini API request failed", detail: errorText },
+        { status: 502 }
+      );
+    }
+
+    const data = await response.json();
+
+    // Extract image from response parts
+    const parts = data.candidates?.[0]?.content?.parts || [];
+    for (const part of parts) {
+      if (part.inlineData?.mimeType?.startsWith("image/")) {
+        const imageData = part.inlineData.data;
+        const buffer = Buffer.from(imageData, "base64");
+
+        // Save to public/kareo/
+        const dir = path.join(process.cwd(), "public", "kareo");
+        await mkdir(dir, { recursive: true });
+        const filename = `kareo-${expression}.png`;
+        await writeFile(path.join(dir, filename), buffer);
+
+        return NextResponse.json({
+          success: true,
+          filename,
+          path: `/kareo/${filename}`,
+          size: buffer.length,
+          // Return base64 for preview in the admin UI
+          preview: `data:${part.inlineData.mimeType};base64,${imageData}`,
+        });
+      }
+    }
+
+    // If no image was found, return the text response for debugging
+    const textParts = parts
+      .filter((p: { text?: string }) => p.text)
+      .map((p: { text: string }) => p.text)
+      .join("\n");
+
+    return NextResponse.json(
+      {
+        error: "No image generated by Gemini",
+        detail: textParts || "Empty response",
+      },
+      { status: 500 }
+    );
+  } catch (err) {
+    console.error("Kareo generation error:", err);
+    return NextResponse.json(
+      { error: "Generation failed", detail: String(err) },
+      { status: 500 }
+    );
+  }
+}

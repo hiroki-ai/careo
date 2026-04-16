@@ -473,7 +473,7 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
           </h1>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/kareo.png"
+            src="/kareo/kareo-default.svg"
             alt="カレオ"
             className="absolute -right-4 bottom-0 w-48 h-auto animate-float drop-shadow-xl"
           />

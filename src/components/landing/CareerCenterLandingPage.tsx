@@ -291,7 +291,7 @@ export default function CareerCenterLandingPage() {
               <div className="absolute w-72 h-72 rounded-full bg-[#00c896]/10 blur-3xl" />
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/kareo.png"
+                src="/kareo/kareo-default.svg"
                 alt="カレオ"
                 className="relative w-[460px] xl:w-[560px] h-auto drop-shadow-2xl animate-float"
               />

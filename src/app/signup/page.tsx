@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
+import { KareoCharacter } from "@/components/kareo/KareoCharacter";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -44,8 +45,9 @@ export default function SignupPage() {
     return (
       <div className="min-h-screen bg-[#0a1628] flex items-center justify-center p-4">
         <div className="w-full max-w-sm text-center">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/kareo.png" alt="カレオ" className="w-28 h-auto mx-auto mb-4 animate-float drop-shadow-xl" />
+          <div className="mx-auto mb-4">
+            <KareoCharacter expression="waving" size={112} />
+          </div>
           <div className="bg-white rounded-3xl rounded-tl-none px-6 py-5 shadow-xl mb-4 text-left relative">
             <div className="absolute -top-3 left-0 w-4 h-4 bg-white rotate-[-35deg] rounded-tl-sm" />
             <p className="font-bold text-gray-900 mb-1">確認メールを送ったよ！📬</p>
@@ -70,8 +72,7 @@ export default function SignupPage() {
 
         {/* カレオ + speech bubble */}
         <div className="flex flex-col items-center mb-6">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/kareo.png" alt="カレオ" className="w-28 h-auto animate-float drop-shadow-xl" />
+          <KareoCharacter expression="waving" size={112} />
           <div className="bg-white rounded-2xl rounded-tl-none px-5 py-3 shadow-lg max-w-xs relative -mt-1">
             <div className="absolute -top-3 left-0 w-4 h-4 bg-white rotate-[-35deg] rounded-tl-sm" />
             <p className="text-sm font-semibold text-[#0D0B21] leading-relaxed">

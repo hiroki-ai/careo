@@ -28,9 +28,25 @@ export default async function Image({ params }: Props) {
   );
   const { data: post } = await supabase
     .from("blog_posts")
-    .select("title, tags")
+    .select("title, tags, thumbnail_url")
     .eq("slug", slug)
     .single();
+
+  // If a Gemini-generated thumbnail exists, fetch and return it directly
+  if (post?.thumbnail_url) {
+    try {
+      const imgRes = await fetch(post.thumbnail_url);
+      if (imgRes.ok) {
+        const buffer = await imgRes.arrayBuffer();
+        const ct = imgRes.headers.get("content-type") || "image/png";
+        return new Response(buffer, {
+          headers: { "Content-Type": ct, "Cache-Control": "public, max-age=86400" },
+        });
+      }
+    } catch {
+      // Fallback to Satori generation below
+    }
+  }
 
   const title = post?.title ?? "就活ブログ | Careo";
   const tag = post?.tags?.[0] ?? "AI就活";

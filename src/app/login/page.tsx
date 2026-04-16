@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
+import { KareoCharacter } from "@/components/kareo/KareoCharacter";
 
 function LoginForm() {
   const router = useRouter();
@@ -54,8 +55,7 @@ function LoginForm() {
         {/* カレオ welcome (student login only) */}
         {!isStaffLogin && (
           <div className="flex flex-col items-center mb-5">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/kareo.png" alt="カレオ" className="w-24 h-auto animate-float drop-shadow-xl" />
+            <KareoCharacter expression="waving" size={96} />
             <div className="bg-white rounded-2xl rounded-tl-none px-5 py-3 shadow-lg max-w-xs relative -mt-1">
               <div className="absolute -top-3 left-0 w-4 h-4 bg-white rotate-[-35deg] rounded-tl-sm" />
               <p className="text-sm font-semibold text-[#0D0B21] leading-relaxed">

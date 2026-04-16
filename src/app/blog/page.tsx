@@ -28,6 +28,7 @@ type Post = {
   tags: string[];
   reading_time_min: number;
   published_at: string;
+  thumbnail_url: string | null;
 };
 
 const TAG_COLORS: Record<string, string> = {
@@ -78,7 +79,7 @@ async function getPosts(): Promise<Post[]> {
   );
   const { data } = await supabase
     .from("blog_posts")
-    .select("id, slug, title, description, tags, reading_time_min, published_at")
+    .select("id, slug, title, description, tags, reading_time_min, published_at, thumbnail_url")
     .order("published_at", { ascending: false })
     .limit(50);
   return data ?? [];
@@ -181,29 +182,42 @@ export default async function BlogPage() {
                   href={`/blog/${post.slug}`}
                   className="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:border-[#00c896]/40 hover:shadow-md transition-all duration-200 flex flex-col"
                 >
-                  {/* CSS生成サムネイル（常に表示可能） */}
+                  {/* サムネイル */}
                   <div
                     className="relative w-full overflow-hidden flex-shrink-0"
                     style={{
                       aspectRatio: "1200/630",
-                      background: `linear-gradient(135deg, ${c1} 0%, ${c2} 100%)`,
+                      background: post.thumbnail_url ? undefined : `linear-gradient(135deg, ${c1} 0%, ${c2} 100%)`,
                     }}
                   >
-                    {/* 右上の装飾円 */}
-                    <div style={{ position: "absolute", top: "-30%", right: "-10%", width: "55%", paddingBottom: "55%", borderRadius: "50%", background: "rgba(255,255,255,0.10)" }} />
-                    {/* 左下の装飾円 */}
-                    <div style={{ position: "absolute", bottom: "-25%", left: "-8%", width: "42%", paddingBottom: "42%", borderRadius: "50%", background: "rgba(255,255,255,0.07)" }} />
+                    {post.thumbnail_url ? (
+                      /* Gemini生成サムネイル */
+                      <img
+                        src={post.thumbnail_url}
+                        alt={post.title}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    ) : (
+                      /* CSSフォールバックサムネイル */
+                      <>
+                        {/* 右上の装飾円 */}
+                        <div style={{ position: "absolute", top: "-30%", right: "-10%", width: "55%", paddingBottom: "55%", borderRadius: "50%", background: "rgba(255,255,255,0.10)" }} />
+                        {/* 左下の装飾円 */}
+                        <div style={{ position: "absolute", bottom: "-25%", left: "-8%", width: "42%", paddingBottom: "42%", borderRadius: "50%", background: "rgba(255,255,255,0.07)" }} />
+                        {/* タイトル */}
+                        <div className="absolute inset-0 flex items-center px-4 md:px-6 pt-8 pb-10">
+                          <p className="text-white font-bold text-sm md:text-base leading-snug line-clamp-3 drop-shadow-sm">
+                            {post.title}
+                          </p>
+                        </div>
+                      </>
+                    )}
                     {/* タグ */}
                     <div className="absolute top-4 left-4 md:top-5 md:left-6">
                       <span className="text-[10px] md:text-xs font-bold text-white/90 bg-white/20 px-2.5 py-1 rounded-full backdrop-blur-sm">
                         {post.tags[0] ?? "就活"}
                       </span>
-                    </div>
-                    {/* タイトル */}
-                    <div className="absolute inset-0 flex items-center px-4 md:px-6 pt-8 pb-10">
-                      <p className="text-white font-bold text-sm md:text-base leading-snug line-clamp-3 drop-shadow-sm">
-                        {post.title}
-                      </p>
                     </div>
                     {/* フッター */}
                     <div className="absolute bottom-0 left-0 right-0 flex items-center gap-1.5 px-4 md:px-6 py-2.5 border-t border-white/20">

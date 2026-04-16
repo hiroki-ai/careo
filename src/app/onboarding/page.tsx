@@ -6,6 +6,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { CsvImportModal } from "@/components/companies/CsvImportModal";
 import { UserProfile } from "@/types";
+import { KareoCharacter } from "@/components/kareo/KareoCharacter";
 
 type Step = 1 | 2 | 3;
 
@@ -57,7 +58,7 @@ export default function OnboardingPage() {
         {step === 1 && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
             <div className="text-center mb-8">
-              <img src="/kareo.png" alt="カレオ" className="w-36 h-auto mx-auto mb-1" />
+              <div className="mx-auto mb-1"><KareoCharacter expression="waving" size={144} /></div>
               <div className="inline-block bg-[#00c896]/8 border border-[#00c896]/20 rounded-2xl px-4 py-2 mb-4">
                 <p className="text-sm font-semibold text-[#00a87e]">はじめまして！カレオです 🎉</p>
               </div>
@@ -73,7 +74,7 @@ export default function OnboardingPage() {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
             <div className="text-center mb-8">
               <div className="flex items-end justify-center gap-3 mb-3">
-                <img src="/kareo.png" alt="カレオ" className="w-28 h-auto flex-shrink-0" />
+                <KareoCharacter expression="encouraging" size={112} animate={false} />
                 <div className="bg-[#00c896]/10 border border-[#00c896]/20 rounded-2xl rounded-bl-none px-4 py-3 mb-6 text-left">
                   <p className="text-sm text-[#00a87e] font-semibold leading-relaxed">今まで使ってたデータ、<br />そのまま持ってきて！</p>
                 </div>
@@ -127,7 +128,7 @@ export default function OnboardingPage() {
         {step === 3 && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
             <div className="relative inline-block mb-2">
-              <img src="/kareo.png" alt="カレオ" className="w-40 h-auto mx-auto" />
+              <KareoCharacter expression="celebrating" size={160} />
               <div className="absolute -top-2 -right-2 w-8 h-8 bg-[#00c896] rounded-full flex items-center justify-center text-white text-lg shadow-lg">🎉</div>
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-1">準備完了！</h2>

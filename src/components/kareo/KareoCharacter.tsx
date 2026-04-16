@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion, type Variants } from "framer-motion";
 import Image from "next/image";
 
@@ -52,7 +53,13 @@ export function KareoCharacter({
   walking = false,
   className,
 }: KareoCharacterProps) {
+  const [useFallback, setUseFallback] = useState(false);
   const variants = walking ? walkingVariants : animate ? floatingVariants : undefined;
+
+  // Try PNG first (AI-generated), fallback to SVG
+  const pngSrc = `/kareo/kareo-${expression}.png`;
+  const svgSrc = `/kareo/kareo-${expression}.svg`;
+  const imageSrc = useFallback ? svgSrc : pngSrc;
 
   return (
     <motion.div
@@ -62,12 +69,16 @@ export function KareoCharacter({
       animate={animate || walking ? "animate" : undefined}
     >
       <Image
-        src={`/kareo/kareo-${expression}.svg`}
+        src={imageSrc}
         alt="カレオ"
         width={size}
         height={Math.round(size * (380 / 320))}
         style={{ objectFit: "contain" }}
         priority={expression === "default"}
+        onError={() => {
+          if (!useFallback) setUseFallback(true);
+        }}
+        unoptimized={!useFallback}
       />
     </motion.div>
   );
