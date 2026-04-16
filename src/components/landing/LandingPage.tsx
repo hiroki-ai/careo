@@ -482,7 +482,9 @@ export function LandingPage({ recentPosts = [], userCount = 0, reviews = [] }: {
         <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2.5">
             <img src="/icon-192.png" alt="Careo" className="w-8 h-8 rounded-xl" />
-            <span className="font-bold text-lg tracking-tight text-[#0D0B21]">Careo</span>
+            <span className="font-black text-xl tracking-tight">
+              <span className="text-[#0D0B21]">Care</span><span className="text-[#00c896]">o</span>
+            </span>
           </div>
           <nav className="hidden md:flex items-center gap-6">
             {[
@@ -595,9 +597,13 @@ export function LandingPage({ recentPosts = [], userCount = 0, reviews = [] }: {
             <div className="relative hidden md:flex flex-col items-center justify-center px-4">
               {/* Glow behind mascot */}
               <div className="absolute w-80 h-80 rounded-full bg-[#00c896]/12 blur-3xl" />
+              {/* 手書き風の名前 */}
+              <p className="relative text-2xl xl:text-3xl text-[#00c896] mb-2 select-none handwriting-animate -rotate-3">
+                カレオくん
+              </p>
               <img
                 src="/kareo/kareo-default.png"
-                alt="カレオ"
+                alt="カレオくん"
                 className="relative w-[460px] xl:w-[560px] h-auto drop-shadow-2xl animate-float"
               />
               {/* Speech bubble */}

@@ -428,10 +428,10 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
           <div className="flex items-center gap-2">
             <img src="/icon-192.png" alt="Careo" className="w-7 h-7 rounded-xl" />
             <span
-              className="font-bold text-base tracking-tight transition-colors duration-300"
+              className="font-black text-base tracking-tight transition-colors duration-300"
               style={{ color: scrollY > 50 ? "#0D0B21" : "#ffffff" }}
             >
-              Careo
+              Care<span className="text-[#00c896]">o</span>
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -471,12 +471,15 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
             就活、<br />
             <span className="text-[#00c896]">全部<br /><span className="whitespace-nowrap">知ってる。</span></span>
           </h1>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/kareo/kareo-default.png"
-            alt="カレオ"
-            className="absolute -right-4 bottom-0 w-48 h-auto animate-float drop-shadow-xl"
-          />
+          <div className="absolute -right-4 bottom-0 flex flex-col items-center">
+            <p className="text-sm text-[#00c896] mb-0.5 select-none handwriting-animate -rotate-3">カレオくん</p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/kareo/kareo-default.png"
+              alt="カレオくん"
+              className="w-48 h-auto animate-float drop-shadow-xl"
+            />
+          </div>
         </div>
 
         <p className="text-gray-400 text-sm leading-relaxed mb-8">

@@ -249,7 +249,7 @@ export function Sidebar() {
                 <img src="/icon-192.png" alt="Careo" className="w-full h-full" />
               </div>
               <div>
-                <span className="text-white font-black text-[17px] tracking-tight leading-none">Careo</span>
+                <span className="font-black text-[17px] tracking-tight leading-none"><span className="text-white">Care</span><span className="text-[#00c896]">o</span></span>
                 <p className="text-white/30 text-[9px] tracking-widest uppercase mt-0.5">AI Career</p>
               </div>
             </div>

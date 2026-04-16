@@ -361,6 +361,31 @@
   word-spacing: 0.1em;
 }
 
+/* Handwriting-style text with writing animation */
+.handwriting-text {
+  font-family: 'Comic Sans MS', 'Chalkboard SE', 'Segoe Script', cursive;
+}
+
+.handwriting-animate {
+  font-family: 'Comic Sans MS', 'Chalkboard SE', 'Segoe Script', cursive;
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid #00c896;
+  animation: handwrite 1.2s steps(5) 0.5s forwards, blink-caret 0.6s step-end 3 forwards;
+  width: 0;
+}
+
+@keyframes handwrite {
+  from { width: 0; }
+  to { width: 5em; }
+}
+
+@keyframes blink-caret {
+  from, to { border-color: transparent; }
+  50% { border-color: #00c896; }
+}
+
 /* Reduce motion (theme toggle) */
 .reduce-motion *, .reduce-motion *::before, .reduce-motion *::after {
   animation-duration: 0.01ms !important;

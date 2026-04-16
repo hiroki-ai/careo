@@ -224,12 +224,14 @@ export function LPChatBot({
       {/* マスコットボタン（左下固定） */}
       <button
         onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-6 left-4 z-50 w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95"
+        className="fixed bottom-6 left-4 z-50 w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 overflow-hidden"
         style={{
           background: open
             ? "linear-gradient(135deg, #00a87e 0%, #008f6a 100%)"
-            : "linear-gradient(135deg, #00c896 0%, #00a87e 100%)",
-          boxShadow: "0 4px 20px rgba(0, 200, 150, 0.4)",
+            : "#0d1b2e",
+          boxShadow: open
+            ? "0 4px 20px rgba(0, 200, 150, 0.4)"
+            : "0 4px 20px rgba(0, 0, 0, 0.3)",
         }}
         aria-label={open ? "チャットを閉じる" : "カレオに質問する"}
       >
@@ -238,7 +240,7 @@ export function LPChatBot({
             <path d="M4 4l12 12M16 4L4 16" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
           </svg>
         ) : (
-          <KareoAvatar size={40} />
+          <KareoAvatar size={44} />
         )}
 
         {/* 未読バッジ（初回表示） */}
