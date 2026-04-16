@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { formatDate, daysUntil } from "@/lib/utils";
 import { ES, EsResult, ES_RESULT_LABELS, EsCommunityInsight } from "@/types";
 import { KareoCharacter } from "@/components/kareo/KareoCharacter";
+import { PageTutorial, PAGE_TUTORIALS } from "@/components/PageTutorial";
 
 export default function EsPage() {
   const router = useRouter();
@@ -66,6 +67,7 @@ export default function EsPage() {
 
   return (
     <div className="p-4 md:p-8">
+      <PageTutorial {...PAGE_TUTORIALS["es"]} pageKey="es" />
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">ES管理</h1>

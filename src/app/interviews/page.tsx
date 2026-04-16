@@ -11,6 +11,7 @@ import { formatDateTime } from "@/lib/utils";
 import { INTERVIEW_MOOD_LABELS } from "@/types";
 import { Interview } from "@/types";
 import { KareoCharacter } from "@/components/kareo/KareoCharacter";
+import { PageTutorial, PAGE_TUTORIALS } from "@/components/PageTutorial";
 
 export default function InterviewsPage() {
   const router = useRouter();
@@ -44,6 +45,7 @@ export default function InterviewsPage() {
 
   return (
     <div className="p-4 md:p-8">
+      <PageTutorial {...PAGE_TUTORIALS["interviews"]} pageKey="interviews" />
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">面接ログ</h1>

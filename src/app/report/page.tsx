@@ -16,6 +16,7 @@ import { InsightsWidget } from "@/components/dashboard/InsightsWidget";
 import { KareoCharacter } from "@/components/kareo/KareoCharacter";
 import { PdcaResult } from "@/types";
 import { daysUntil } from "@/lib/utils";
+import { PageTutorial, PAGE_TUTORIALS } from "@/components/PageTutorial";
 
 const PDCA_CACHE_KEY = "careo_last_pdca";
 const PDCA_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
@@ -383,6 +384,7 @@ export default function ReportPage() {
 
   return (
     <div className="p-4 md:p-8">
+      <PageTutorial {...PAGE_TUTORIALS["report"]} pageKey="report" />
 
       {/* 3日以内の締切アラート */}
       {urgentDeadlines.length > 0 && (

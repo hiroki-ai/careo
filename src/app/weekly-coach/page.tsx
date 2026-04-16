@@ -7,6 +7,7 @@ import { useEs } from "@/hooks/useEs";
 import { useInterviews } from "@/hooks/useInterviews";
 import { useObVisits } from "@/hooks/useObVisits";
 import { useAptitudeTests } from "@/hooks/useAptitudeTests";
+import { PageTutorial, PAGE_TUTORIALS } from "@/components/PageTutorial";
 
 const CACHE_KEY = "careo_weekly_coach";
 const CACHE_TTL = 60 * 60 * 1000; // 1時間
@@ -88,6 +89,7 @@ export default function WeeklyCoachPage() {
 
   return (
     <div className="p-4 md:p-8">
+      <PageTutorial {...PAGE_TUTORIALS["weekly-coach"]} pageKey="weekly-coach" />
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">週次コーチセッション</h1>

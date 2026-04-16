@@ -10,6 +10,7 @@ import { useToast } from "@/components/ui/Toast";
 import { AptitudeTest, APTITUDE_TEST_TYPES } from "@/types";
 import { formatDate } from "@/lib/utils";
 import { KareoCharacter } from "@/components/kareo/KareoCharacter";
+import { PageTutorial, PAGE_TUTORIALS } from "@/components/PageTutorial";
 
 const RESULT_VARIANTS: Record<AptitudeTest["result"], "success" | "danger" | "default"> = {
   PASS: "success", FAIL: "danger", PENDING: "default",
@@ -73,6 +74,7 @@ export default function TestsPage() {
 
   return (
     <div className="p-4 md:p-8">
+      <PageTutorial {...PAGE_TUTORIALS["tests"]} pageKey="tests" />
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">筆記試験管理</h1>

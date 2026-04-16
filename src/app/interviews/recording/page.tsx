@@ -11,6 +11,7 @@ import { useInterviews } from "@/hooks/useInterviews";
 import { useCompanies } from "@/hooks/useCompanies";
 import { Button } from "@/components/ui/Button";
 import { InterviewAIFeedback } from "@/types";
+import { PageTutorial, PAGE_TUTORIALS } from "@/components/PageTutorial";
 
 type TabType = "upload" | "record" | "paste";
 
@@ -280,6 +281,7 @@ function InterviewRecordingPage() {
 
   return (
     <div className="p-4 md:p-8 max-w-4xl mx-auto">
+      <PageTutorial {...PAGE_TUTORIALS["interviews-recording"]} pageKey="interviews-recording" />
       <Link href="/interviews" className="text-sm text-gray-400 hover:text-gray-600 mb-3 inline-block">
         ← 面接一覧
       </Link>

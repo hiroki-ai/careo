@@ -5,6 +5,7 @@ import { useEvents } from "@/hooks/useEvents";
 import { EventForm } from "@/components/events/EventForm";
 import { CompanyEvent, COMPANY_EVENT_TYPE_COLORS } from "@/types";
 import { daysUntil, formatDateTime } from "@/lib/utils";
+import { PageTutorial, PAGE_TUTORIALS } from "@/components/PageTutorial";
 
 function EventCard({ event, onEdit, onDelete }: {
   event: CompanyEvent;
@@ -100,6 +101,7 @@ export default function EventsPage() {
 
   return (
     <div className="p-4 md:p-8">
+      <PageTutorial {...PAGE_TUTORIALS["events"]} pageKey="events" />
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">説明会・インターン</h1>

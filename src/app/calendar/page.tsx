@@ -7,6 +7,7 @@ import { useInterviews } from "@/hooks/useInterviews";
 import { useEvents } from "@/hooks/useEvents";
 import { MiniCalendar, CalendarEvent } from "@/components/dashboard/MiniCalendar";
 import { daysUntil } from "@/lib/utils";
+import { PageTutorial, PAGE_TUTORIALS } from "@/components/PageTutorial";
 
 export default function CalendarPage() {
   const { companies } = useCompanies();
@@ -60,6 +61,7 @@ export default function CalendarPage() {
 
   return (
     <div className="p-4 md:p-8">
+      <PageTutorial {...PAGE_TUTORIALS["calendar"]} pageKey="calendar" />
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">カレンダー</h1>

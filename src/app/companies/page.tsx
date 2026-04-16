@@ -35,6 +35,7 @@ import { useToast } from "@/components/ui/Toast";
 import { Company, CompanyStatus, COMPANY_STATUS_LABELS, COMPANY_STATUS_ORDER } from "@/types";
 import { KareoCharacter } from "@/components/kareo/KareoCharacter";
 import { daysUntil } from "@/lib/utils";
+import { PageTutorial, PAGE_TUTORIALS } from "@/components/PageTutorial";
 
 // モバイル：左スワイプでクイックアクション
 function SwipeableCompanyCard({ company, onDelete, onStatusChange }: {
@@ -479,6 +480,7 @@ export default function CompaniesPage() {
 
   return (
     <div className="p-4 md:p-8">
+      <PageTutorial {...PAGE_TUTORIALS["companies"]} pageKey="companies" />
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">企業管理</h1>

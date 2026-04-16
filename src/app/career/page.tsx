@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { UserProfile } from "@/types";
 import { useToast } from "@/components/ui/Toast";
 import { useCoach } from "@/hooks/useCoach";
+import { PageTutorial, PAGE_TUTORIALS } from "@/components/PageTutorial";
 
 type CareerFields = Pick<UserProfile, "careerAxis" | "gakuchika" | "selfPr" | "strengths" | "weaknesses">;
 
@@ -104,6 +105,7 @@ export default function CareerPage() {
 
   return (
     <div className="p-4 md:p-8">
+      <PageTutorial {...PAGE_TUTORIALS["career"]} pageKey="career" />
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">自己分析</h1>
         <p className="text-sm text-gray-500 mt-1">就活の軸・ガクチカ・自己PRを整理してESや面接のAI支援に活かします</p>

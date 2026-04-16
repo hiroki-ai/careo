@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/Toast";
 import { ObVisit, OB_VISIT_PURPOSE_LABELS, OB_IMPRESSION_LABELS } from "@/types";
 import { formatDate } from "@/lib/utils";
 import { KareoCharacter } from "@/components/kareo/KareoCharacter";
+import { PageTutorial, PAGE_TUTORIALS } from "@/components/PageTutorial";
 
 const IMPRESSION_COLORS: Record<string, string> = {
   positive: "bg-green-100 text-green-700",
@@ -61,6 +62,7 @@ export default function ObVisitsPage() {
 
   return (
     <div className="p-4 md:p-8">
+      <PageTutorial {...PAGE_TUTORIALS["ob-visits"]} pageKey="ob-visits" />
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">OB/OG訪問ログ</h1>

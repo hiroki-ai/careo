@@ -9,6 +9,7 @@ import { LegacyBadge as Badge } from "@/components/ui/StatusBadge";
 import { formatDate, formatDateTime, daysUntil } from "@/lib/utils";
 import { COMPANY_EVENT_TYPE_COLORS } from "@/types";
 import { KareoCharacter } from "@/components/kareo/KareoCharacter";
+import { PageTutorial, PAGE_TUTORIALS } from "@/components/PageTutorial";
 
 interface DeadlineItem {
   id: string;
@@ -121,6 +122,7 @@ export default function DeadlinesPage() {
 
   return (
     <div className="p-4 md:p-8">
+      <PageTutorial {...PAGE_TUTORIALS["deadlines"]} pageKey="deadlines" />
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">スケジュール</h1>
         <p className="text-sm text-gray-500 mt-1">ES締切・面接・説明会・インターン</p>

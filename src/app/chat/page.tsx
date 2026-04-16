@@ -13,6 +13,7 @@ import { useToast } from "@/components/ui/Toast";
 import { parseCompanySuggestions, parseSelfAnalysis, SELF_ANALYSIS_LABELS, SelfAnalysisSuggestion } from "@/lib/chatUtils";
 import { COACH_PERSONALITIES, getCoachPersonality, getRandomThinkingMessage, DEFAULT_COACH_ID } from "@/lib/coachPersonalities";
 import { KareoAvatar } from "@/components/kareo/KareoAvatar";
+import { PageTutorial, PAGE_TUTORIALS } from "@/components/PageTutorial";
 
 interface CalendarEvent {
   type: "interview" | "deadline" | "other";
@@ -609,6 +610,7 @@ export default function ChatPage() {
 
   return (
     <div ref={containerRef} className="flex flex-col overflow-hidden chat-container">
+      <PageTutorial {...PAGE_TUTORIALS["chat"]} pageKey="chat" />
       {/* ヘッダー */}
       <div className="flex items-center gap-3 px-4 md:px-6 py-3 border-b border-gray-100 dark:border-[#2a2d37] bg-white dark:bg-[#0f1117] shrink-0">
         <button

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { createClient } from "@/lib/supabase/client";
 import { JOB_SEARCH_STAGE_LABELS, CareerCenterVisibility, DEFAULT_CAREER_CENTER_VISIBILITY } from "@/types";
 import { useTheme, type ColorMode, type FontStyle } from "@/components/ThemeProvider";
+import { PageTutorial, PAGE_TUTORIALS } from "@/components/PageTutorial";
 
 const colorModeOptions: { value: ColorMode; label: string }[] = [
   { value: "light", label: "ライト" },
@@ -96,6 +97,7 @@ export default function SettingsPage() {
 
   return (
     <div className="p-4 md:p-8">
+      <PageTutorial {...PAGE_TUTORIALS["settings"]} pageKey="settings" />
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">設定</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">プロフィールとアカウントを管理</p>
