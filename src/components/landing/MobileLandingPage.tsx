@@ -472,7 +472,7 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
             <span className="text-[#00c896]">全部<br /><span className="whitespace-nowrap">知ってる。</span></span>
           </h1>
           <div className="absolute -right-4 bottom-0 flex flex-col items-center">
-            <p className="text-sm text-[#00c896] mb-0.5 select-none handwriting-animate -rotate-3">カレオくん</p>
+            <p className="text-2xl text-[#00c896] mb-1 select-none handwriting-animate -rotate-3">カレオくん</p>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/kareo/kareo-default.png"

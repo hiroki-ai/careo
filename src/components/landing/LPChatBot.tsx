@@ -228,10 +228,10 @@ export function LPChatBot({
         style={{
           background: open
             ? "linear-gradient(135deg, #00a87e 0%, #008f6a 100%)"
-            : "#0d1b2e",
+            : "#ffffff",
           boxShadow: open
             ? "0 4px 20px rgba(0, 200, 150, 0.4)"
-            : "0 4px 20px rgba(0, 0, 0, 0.3)",
+            : "0 4px 20px rgba(0, 0, 0, 0.15)",
         }}
         aria-label={open ? "チャットを閉じる" : "カレオに質問する"}
       >

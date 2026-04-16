@@ -598,7 +598,7 @@ export function LandingPage({ recentPosts = [], userCount = 0, reviews = [] }: {
               {/* Glow behind mascot */}
               <div className="absolute w-80 h-80 rounded-full bg-[#00c896]/12 blur-3xl" />
               {/* 手書き風の名前 */}
-              <p className="relative text-2xl xl:text-3xl text-[#00c896] mb-2 select-none handwriting-animate -rotate-3">
+              <p className="relative text-4xl xl:text-5xl text-[#00c896] mb-3 select-none handwriting-animate -rotate-3">
                 カレオくん
               </p>
               <img
