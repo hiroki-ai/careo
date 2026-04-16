@@ -11,8 +11,11 @@ import { useAptitudeTests } from "@/hooks/useAptitudeTests";
 import { useActionItems } from "@/hooks/useActionItems";
 import { inferActionLink } from "@/hooks/useActionItems";
 import { useToast } from "@/components/ui/Toast";
+import { useEvents } from "@/hooks/useEvents";
 import { InsightsWidget } from "@/components/dashboard/InsightsWidget";
+import { KareoCharacter } from "@/components/kareo/KareoCharacter";
 import { PdcaResult } from "@/types";
+import { daysUntil } from "@/lib/utils";
 
 const PDCA_CACHE_KEY = "careo_last_pdca";
 const PDCA_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
@@ -289,6 +292,7 @@ export default function ReportPage() {
   const { visits } = useObVisits();
   const { tests } = useAptitudeTests();
   const { pendingItems, completedItems } = useActionItems();
+  const { events } = useEvents();
   const { showToast } = useToast();
 
   const [pdca, setPdca] = useState<PdcaResult | null>(null);
@@ -362,8 +366,68 @@ export default function ReportPage() {
 
   const badges = computeBadges({ companies, esList, interviews, visits, tests, pdca });
 
+  // 3日以内の締切を集計
+  const urgentDeadlines = [
+    ...esList
+      .filter(e => e.deadline && e.status === "DRAFT")
+      .map(e => ({ title: `${companies.find(c => c.id === e.companyId)?.name ?? ""} ES`, days: daysUntil(e.deadline!), link: `/es/${e.id}` })),
+    ...interviews
+      .filter(i => i.result === "PENDING")
+      .map(i => ({ title: `${companies.find(c => c.id === i.companyId)?.name ?? ""} ${i.round}次面接`, days: daysUntil(i.scheduledAt), link: `/interviews/${i.id}` })),
+    ...events
+      .filter(e => e.status === "upcoming")
+      .map(e => ({ title: `${e.companyName} ${e.eventType}`, days: daysUntil(e.scheduledAt), link: "/events" })),
+  ]
+    .filter(d => d.days >= 0 && d.days <= 3)
+    .sort((a, b) => a.days - b.days);
+
   return (
     <div className="p-4 md:p-8">
+
+      {/* 3日以内の締切アラート */}
+      {urgentDeadlines.length > 0 && (
+        <div className={`rounded-2xl p-4 mb-6 ${
+          urgentDeadlines[0].days === 0 ? "bg-red-50 border border-red-200" :
+          urgentDeadlines[0].days === 1 ? "bg-amber-50 border border-amber-200" :
+          "bg-blue-50 border border-blue-200"
+        }`}>
+          <div className="flex items-start gap-3">
+            <KareoCharacter expression="encouraging" size={48} className="shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className={`text-sm font-bold ${
+                urgentDeadlines[0].days === 0 ? "text-red-700" :
+                urgentDeadlines[0].days === 1 ? "text-amber-700" :
+                "text-blue-700"
+              }`}>
+                {urgentDeadlines[0].days === 0
+                  ? "今日が締切の予定があります！"
+                  : urgentDeadlines[0].days === 1
+                  ? "明日締切の予定があります"
+                  : `${urgentDeadlines.length}件が3日以内に迫っています`}
+              </p>
+              <div className="mt-2 space-y-1">
+                {urgentDeadlines.slice(0, 4).map((d, i) => (
+                  <Link key={i} href={d.link}>
+                    <div className="flex items-center gap-2 text-sm hover:underline">
+                      <span className={`font-bold ${
+                        d.days === 0 ? "text-red-600" : d.days === 1 ? "text-amber-600" : "text-blue-600"
+                      }`}>
+                        {d.days === 0 ? "今日" : d.days === 1 ? "明日" : `${d.days}日後`}
+                      </span>
+                      <span className="text-gray-700">{d.title}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+              {urgentDeadlines.length > 4 && (
+                <Link href="/deadlines" className="text-xs text-gray-500 hover:text-gray-700 mt-1 inline-block">
+                  他{urgentDeadlines.length - 4}件 →
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ① 今日のひとこと */}
       {!companiesLoading && !interviewsLoading && (

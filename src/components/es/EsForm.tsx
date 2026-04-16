@@ -22,6 +22,8 @@ export function EsForm({ companies, initialCompanyId, initialData, onSubmit, onC
     questions: initialData?.questions ?? [{ id: generateId(), question: "", answer: "" }],
     deadline: initialData?.deadline ?? "",
     status: initialData?.status ?? "DRAFT",
+    result: initialData?.result ?? "unknown",
+    isSharedAnonymously: initialData?.isSharedAnonymously ?? false,
   });
 
   const addQuestion = () => {

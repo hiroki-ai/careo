@@ -1,0 +1,48 @@
+<svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bodyG" cx="35%" cy="28%" r="65%">
+      <stop offset="0%" stop-color="#3b4f6b"/>
+      <stop offset="100%" stop-color="#0d1b2e"/>
+    </radialGradient>
+    <radialGradient id="bellyG" cx="50%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#dff5ef"/>
+    </radialGradient>
+    <radialGradient id="eyeG" cx="38%" cy="32%" r="58%">
+      <stop offset="0%" stop-color="#1e3a5f"/>
+      <stop offset="65%" stop-color="#0a1628"/>
+      <stop offset="100%" stop-color="#000"/>
+    </radialGradient>
+    <linearGradient id="beakG" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Head circle -->
+  <circle cx="40" cy="40" r="38" fill="url(#bodyG)"/>
+
+  <!-- White face patch -->
+  <ellipse cx="40" cy="45" rx="26" ry="24" fill="url(#bellyG)"/>
+
+  <!-- Eyes -->
+  <circle cx="32" cy="36" r="9" fill="white"/>
+  <circle cx="48" cy="36" r="9" fill="white"/>
+  <circle cx="33" cy="37" r="5.5" fill="url(#eyeG)"/>
+  <circle cx="49" cy="37" r="5.5" fill="url(#eyeG)"/>
+  <circle cx="33.5" cy="37.5" r="3.2" fill="#020617"/>
+  <circle cx="49.5" cy="37.5" r="3.2" fill="#020617"/>
+  <!-- Sparkles -->
+  <circle cx="36" cy="34" r="2" fill="white"/>
+  <circle cx="52" cy="34" r="2" fill="white"/>
+  <circle cx="31" cy="39" r="1" fill="rgba(255,255,255,0.6)"/>
+  <circle cx="47" cy="39" r="1" fill="rgba(255,255,255,0.6)"/>
+
+  <!-- Beak -->
+  <path d="M34,52 Q40,59 46,52 Q40,48 34,52Z" fill="url(#beakG)"/>
+  <path d="M36,52 Q40,55 44,52" stroke="#b45309" stroke-width="0.6" fill="none"/>
+
+  <!-- Cheeks -->
+  <ellipse cx="22" cy="50" rx="7" ry="5" fill="rgba(255,130,130,0.25)"/>
+  <ellipse cx="58" cy="50" rx="7" ry="5" fill="rgba(255,130,130,0.25)"/>
+</svg>

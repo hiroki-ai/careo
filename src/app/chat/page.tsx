@@ -12,6 +12,7 @@ import { useChat } from "@/hooks/useChat";
 import { useToast } from "@/components/ui/Toast";
 import { parseCompanySuggestions, parseSelfAnalysis, SELF_ANALYSIS_LABELS, SelfAnalysisSuggestion } from "@/lib/chatUtils";
 import { COACH_PERSONALITIES, getCoachPersonality, getRandomThinkingMessage, DEFAULT_COACH_ID } from "@/lib/coachPersonalities";
+import { KareoAvatar } from "@/components/kareo/KareoAvatar";
 
 interface CalendarEvent {
   type: "interview" | "deadline" | "other";
@@ -57,6 +58,10 @@ const formatTime = (dateStr?: string): string => {
 
 const CoachAvatar = ({ coachId, size = 8 }: { coachId: string; size?: number }) => {
   const coach = getCoachPersonality(coachId);
+  const pxSize = size * 4; // Tailwind units to px (w-8 = 32px)
+  if (coachId === "kareo") {
+    return <KareoAvatar size={pxSize} className="shadow-sm" />;
+  }
   const sizeClass = `w-${size} h-${size}`;
   if (coach.avatarSvg) {
     return (
@@ -605,7 +610,7 @@ export default function ChatPage() {
   return (
     <div ref={containerRef} className="flex flex-col overflow-hidden chat-container">
       {/* ヘッダー */}
-      <div className="flex items-center gap-3 px-4 md:px-6 py-3 border-b border-gray-100 bg-white shrink-0">
+      <div className="flex items-center gap-3 px-4 md:px-6 py-3 border-b border-gray-100 dark:border-[#2a2d37] bg-white dark:bg-[#0f1117] shrink-0">
         <button
           type="button"
           onClick={() => setShowCoachSelector(true)}
@@ -666,7 +671,7 @@ export default function ChatPage() {
       </div>
 
       {/* メッセージエリア */}
-      <div className="flex-1 overflow-y-auto bg-white">
+      <div className="flex-1 overflow-y-auto bg-white dark:bg-[#0f1117]">
         {historyLoading ? (
           <div className="flex justify-center py-12">
             <div className="flex flex-col items-center gap-2">
@@ -882,7 +887,7 @@ export default function ChatPage() {
       </div>
 
       {/* 入力エリア */}
-      <div className="bg-white border-t border-gray-100 shrink-0">
+      <div className="bg-white dark:bg-[#0f1117] border-t border-gray-100 dark:border-[#2a2d37] shrink-0">
         {/* クイック返信チップス */}
         {showQuickReplies && !isStreaming && (
           <div className="px-4 pt-2 pb-1 flex gap-2 overflow-x-auto scrollbar-hide">
@@ -924,7 +929,7 @@ export default function ChatPage() {
             </button>
           </div>
         )}
-        <div className="px-4 py-3 flex items-end gap-2 bg-gray-50 mx-3 mb-3 rounded-2xl border border-gray-200 focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-200 transition-all">
+        <div className="px-4 py-3 flex items-end gap-2 bg-gray-50 dark:bg-[#1a1d27] mx-3 mb-3 rounded-2xl border border-gray-200 dark:border-[#2a2d37] focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-200 transition-all">
           {/* クイック返信トグル */}
           <button
             type="button"

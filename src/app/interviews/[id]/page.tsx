@@ -7,7 +7,7 @@ import { useInterviews } from "@/hooks/useInterviews";
 import { useCompanies } from "@/hooks/useCompanies";
 import { useProfile } from "@/hooks/useProfile";
 import { InterviewForm } from "@/components/interviews/InterviewForm";
-import { Badge } from "@/components/ui/Badge";
+import { LegacyBadge as Badge } from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { formatDateTime } from "@/lib/utils";
@@ -142,8 +142,11 @@ export default function InterviewDetailPage({ params }: { params: Promise<{ id: 
               </span>
             ) : "AIフィードバックを生成"}
           </Button>
+          <Link href={`/interviews/recording?interviewId=${id}`}>
+            <Button variant="secondary" size="sm">面接録音AI</Button>
+          </Link>
           <Button variant="secondary" size="sm" onClick={() => setIsEditOpen(true)}>編集</Button>
-          <Button variant="danger" size="sm" onClick={() => setIsDeleteConfirm(true)}>削除</Button>
+          <Button variant="destructive" size="sm" onClick={() => setIsDeleteConfirm(true)}>削除</Button>
         </div>
       </div>
 
@@ -265,7 +268,7 @@ export default function InterviewDetailPage({ params }: { params: Promise<{ id: 
         <p className="text-sm text-gray-600 mb-6">この面接ログを削除しますか？</p>
         <div className="flex justify-end gap-3">
           <Button variant="secondary" onClick={() => setIsDeleteConfirm(false)}>キャンセル</Button>
-          <Button variant="danger" onClick={() => { deleteInterview(id); router.push("/interviews"); }}>削除する</Button>
+          <Button variant="destructive" onClick={() => { deleteInterview(id); router.push("/interviews"); }}>削除する</Button>
         </div>
       </Modal>
     </div>

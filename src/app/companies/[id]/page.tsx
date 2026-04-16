@@ -9,7 +9,7 @@ import { useInterviews } from "@/hooks/useInterviews";
 import { useChat } from "@/hooks/useChat";
 import { useProfile } from "@/hooks/useProfile";
 import { CompanyForm } from "@/components/companies/CompanyForm";
-import { StatusBadge, Badge } from "@/components/ui/Badge";
+import { StatusBadge, LegacyBadge as Badge } from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { COMPANY_STATUS_ORDER, COMPANY_STATUS_LABELS, SelectionSchedule } from "@/types";
@@ -54,11 +54,38 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
   const [researchMemo, setResearchMemo] = useState("");
   const [memoEditing, setMemoEditing] = useState(false);
 
+  // マイページ管理
+  const [mypageOpen, setMypageOpen] = useState(false);
+  const [mypageLoginId, setMypageLoginId] = useState("");
+  const [mypagePassword, setMypagePassword] = useState("");
+  const [mypageNotes, setMypageNotes] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [mypageSaving, setMypageSaving] = useState(false);
+
   const company = companies.find((c) => c.id === id);
   const companyEs = esList.filter((e) => e.companyId === id);
   const companyInterviews = interviews
     .filter((i) => i.companyId === id)
     .sort((a, b) => a.round - b.round);
+
+  // マイページ情報の初期化
+  useEffect(() => {
+    if (!company) return;
+    setMypageLoginId(company.mypage_login_id ?? "");
+    setMypagePassword(company.mypage_password_encrypted ?? "");
+    setMypageNotes(company.mypage_notes ?? "");
+  }, [company?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const saveMypage = async () => {
+    setMypageSaving(true);
+    await updateCompany(id, {
+      mypage_login_id: mypageLoginId || undefined,
+      mypage_password_encrypted: mypagePassword || undefined,
+      mypage_notes: mypageNotes || undefined,
+    });
+    setMypageSaving(false);
+    showToast("マイページ情報を保存しました", "success");
+  };
 
   // ai_researchの初期化（companyが解決したとき）
   const savedResearch = (() => {
@@ -217,9 +244,133 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
           </div>
           <div className="flex gap-2">
             <Button variant="secondary" size="sm" onClick={() => setIsEditOpen(true)}>編集</Button>
-            <Button variant="danger" size="sm" onClick={() => setIsDeleteConfirm(true)}>削除</Button>
+            <Button variant="destructive" size="sm" onClick={() => setIsDeleteConfirm(true)}>削除</Button>
           </div>
         </div>
+      </div>
+
+      {/* マイページ管理 */}
+      <div className="bg-white rounded-xl border border-gray-100 mb-6">
+        <button
+          type="button"
+          onClick={() => setMypageOpen(!mypageOpen)}
+          className="w-full flex items-center justify-between p-5 hover:bg-gray-50 transition-colors rounded-xl"
+        >
+          <div className="flex items-center gap-2">
+            <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+            </svg>
+            <h2 className="font-semibold text-gray-900">マイページ管理</h2>
+            {company.mypage_login_id && (
+              <span className="text-[10px] font-bold bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full">設定済</span>
+            )}
+          </div>
+          <svg className={`w-4 h-4 text-gray-400 transition-transform ${mypageOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        {mypageOpen && (
+          <div className="px-5 pb-5 space-y-4 border-t border-gray-100 pt-4">
+            {/* マイページURL */}
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1">マイページURL</label>
+              <div className="flex gap-2">
+                <input
+                  type="url"
+                  value={company.mypage_url ?? ""}
+                  readOnly
+                  className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-600"
+                  placeholder="企業編集から設定"
+                />
+                {company.mypage_url && (
+                  <a
+                    href={company.mypage_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors shrink-0"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    マイページを開く
+                  </a>
+                )}
+              </div>
+            </div>
+
+            {/* ログインID */}
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1">ログインID</label>
+              <input
+                type="text"
+                value={mypageLoginId}
+                onChange={(e) => setMypageLoginId(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="メールアドレスやID"
+              />
+            </div>
+
+            {/* パスワード */}
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1">パスワード</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={mypagePassword}
+                  onChange={(e) => setMypagePassword(e.target.value)}
+                  className="w-full px-3 py-2 pr-10 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  placeholder="パスワード"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+                  title={showPassword ? "隠す" : "表示"}
+                >
+                  {showPassword ? (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* メモ */}
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1">メモ</label>
+              <textarea
+                value={mypageNotes}
+                onChange={(e) => setMypageNotes(e.target.value)}
+                rows={2}
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="秘密の質問の回答など"
+              />
+            </div>
+
+            {/* 保存ボタン */}
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={saveMypage}
+                disabled={mypageSaving}
+                className="flex items-center gap-1.5 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors"
+              >
+                {mypageSaving ? "保存中..." : "保存する"}
+              </button>
+            </div>
+
+            <p className="text-[10px] text-gray-400">
+              ※ パスワードはブラウザのローカルストレージに保存されます。安全な環境でご利用ください。
+            </p>
+          </div>
+        )}
       </div>
 
       {/* 選考フロー */}
@@ -669,7 +820,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
         </p>
         <div className="flex justify-end gap-3">
           <Button variant="secondary" onClick={() => setIsDeleteConfirm(false)}>キャンセル</Button>
-          <Button variant="danger" onClick={handleDelete}>削除する</Button>
+          <Button variant="destructive" onClick={handleDelete}>削除する</Button>
         </div>
       </Modal>
     </div>

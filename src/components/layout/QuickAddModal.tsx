@@ -87,7 +87,7 @@ export function QuickAddModal({ isOpen, onClose }: Props) {
       } else if (tab === "es") {
         if (!esCo) { showToast("企業を選択してください", "warning"); return; }
         const name = companies.find(c => c.id === esCo)?.name ?? "";
-        await addEs({ companyId: esCo, title: `${name} ES`, deadline: esDeadline || undefined, status: "DRAFT", questions: [] });
+        await addEs({ companyId: esCo, title: `${name} ES`, deadline: esDeadline || undefined, status: "DRAFT", questions: [], result: "unknown", isSharedAnonymously: false });
         showToast("ESを追加しました", "success");
       } else if (tab === "event") {
         const name = evCoName.trim() || (evCo ? companies.find(c => c.id === evCo)?.name ?? "" : "");

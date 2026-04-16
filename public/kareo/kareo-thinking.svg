@@ -1,0 +1,87 @@
+<svg width="320" height="380" viewBox="0 0 320 380" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bodyG" cx="35%" cy="28%" r="65%">
+      <stop offset="0%" stop-color="#3b4f6b"/>
+      <stop offset="100%" stop-color="#0d1b2e"/>
+    </radialGradient>
+    <radialGradient id="bellyG" cx="50%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#dff5ef"/>
+    </radialGradient>
+    <radialGradient id="eyeG" cx="38%" cy="32%" r="58%">
+      <stop offset="0%" stop-color="#1e3a5f"/>
+      <stop offset="65%" stop-color="#0a1628"/>
+      <stop offset="100%" stop-color="#000"/>
+    </radialGradient>
+    <linearGradient id="tieG" x1="0%" y1="0%" x2="40%" y2="100%">
+      <stop offset="0%" stop-color="#00e8b8"/>
+      <stop offset="100%" stop-color="#009e76"/>
+    </linearGradient>
+    <linearGradient id="beakG" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="rgba(0,0,0,0.16)"/>
+    </filter>
+  </defs>
+
+  <ellipse cx="160" cy="374" rx="80" ry="10" fill="rgba(0,0,0,0.10)"/>
+
+  <!-- Body (slight tilt) -->
+  <g transform="rotate(-5,160,258)">
+    <ellipse cx="160" cy="258" rx="90" ry="100" fill="url(#bodyG)" filter="url(#softShadow)"/>
+    <ellipse cx="160" cy="270" rx="57" ry="78" fill="url(#bellyG)"/>
+
+    <!-- Left wing (raised to chin) -->
+    <ellipse cx="84" cy="210" rx="26" ry="62" fill="url(#bodyG)" transform="rotate(25,84,210)"/>
+    <!-- Right wing (down) -->
+    <ellipse cx="246" cy="260" rx="26" ry="72" fill="url(#bodyG)" transform="rotate(15,246,260)"/>
+
+    <!-- Tie -->
+    <path d="M152,187 L160,174 L168,187 L160,185Z" fill="#007f5e"/>
+    <path d="M153,187 L167,187 L163,232 L160,238 L157,232Z" fill="url(#tieG)"/>
+  </g>
+
+  <!-- Feet -->
+  <ellipse cx="130" cy="352" rx="30" ry="11" fill="url(#beakG)" transform="rotate(-22,130,352)"/>
+  <ellipse cx="190" cy="352" rx="30" ry="11" fill="url(#beakG)" transform="rotate(22,190,352)"/>
+
+  <!-- Head (slight tilt) -->
+  <g transform="rotate(-5,160,135)">
+    <circle cx="160" cy="135" r="84" fill="url(#bodyG)" filter="url(#softShadow)"/>
+    <ellipse cx="160" cy="146" rx="56" ry="53" fill="url(#bellyG)"/>
+
+    <!-- Left eye (squinting) -->
+    <circle cx="140" cy="128" r="20" fill="white"/>
+    <circle cx="142" cy="131" r="10" fill="url(#eyeG)"/>
+    <circle cx="143" cy="132" r="6" fill="#020617"/>
+    <circle cx="147" cy="127" r="3.5" fill="white"/>
+    <!-- Squint line over left eye -->
+    <path d="M125,125 Q140,118 155,125" stroke="#0d1b2e" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+    <!-- Right eye (normal, looking up) -->
+    <circle cx="180" cy="128" r="20" fill="white"/>
+    <circle cx="182" cy="125" r="12" fill="url(#eyeG)"/>
+    <circle cx="183" cy="124" r="7" fill="#020617"/>
+    <circle cx="188" cy="120" r="4.2" fill="white"/>
+    <circle cx="179" cy="130" r="2.2" fill="rgba(255,255,255,0.65)"/>
+
+    <!-- Eyelashes -->
+    <path d="M166,112 Q170,105 176,108" stroke="#0d1b2e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M194,115 Q198,108 202,111" stroke="#0d1b2e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+    <!-- Beak (slight pout) -->
+    <path d="M146,160 Q160,170 174,160 Q160,152 146,160Z" fill="url(#beakG)"/>
+    <path d="M152,160 Q160,163 168,160" stroke="#b45309" stroke-width="1.3" fill="none"/>
+
+    <!-- Cheeks -->
+    <ellipse cx="116" cy="156" rx="18" ry="12" fill="rgba(255,130,130,0.22)"/>
+    <ellipse cx="204" cy="156" rx="18" ry="12" fill="rgba(255,130,130,0.22)"/>
+  </g>
+
+  <!-- Thought bubble -->
+  <circle cx="245" cy="80" r="6" fill="rgba(0,0,0,0.08)"/>
+  <circle cx="258" cy="60" r="9" fill="rgba(0,0,0,0.08)"/>
+  <circle cx="275" cy="38" r="14" fill="rgba(0,0,0,0.08)"/>
+</svg>

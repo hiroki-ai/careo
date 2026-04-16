@@ -82,6 +82,16 @@ const navGroups = [
         ),
       },
       {
+        href: "/interviews/recording",
+        label: "面接録音AI",
+        badge: "New",
+        icon: (
+          <svg className="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4M12 15a3 3 0 01-3-3V5a3 3 0 116 0v7a3 3 0 01-3 3z" />
+          </svg>
+        ),
+      },
+      {
         href: "/calendar",
         label: "カレンダー",
         icon: (
@@ -335,6 +345,26 @@ export function Sidebar() {
           </>
         )}
       </nav>
+
+      {/* 検索ショートカット */}
+      {!collapsed && (
+        <div className="mx-2.5 mb-2">
+          <button
+            type="button"
+            onClick={() => {
+              const evt = new KeyboardEvent("keydown", { key: "k", ctrlKey: true });
+              document.dispatchEvent(evt);
+            }}
+            className="flex items-center gap-2 w-full px-3 py-2 rounded-xl bg-white/5 hover:bg-white/8 text-white/30 hover:text-white/50 transition-all text-[12px]"
+          >
+            <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <span className="flex-1 text-left">検索...</span>
+            <kbd className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white/10 text-white/30">Ctrl K</kbd>
+          </button>
+        </div>
+      )}
 
       {/* 区切り線 */}
       <div className="mx-3 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />

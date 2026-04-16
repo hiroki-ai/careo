@@ -1,0 +1,77 @@
+<svg width="320" height="380" viewBox="0 0 320 380" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bodyG" cx="35%" cy="28%" r="65%">
+      <stop offset="0%" stop-color="#3b4f6b"/>
+      <stop offset="100%" stop-color="#0d1b2e"/>
+    </radialGradient>
+    <radialGradient id="bellyG" cx="50%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#dff5ef"/>
+    </radialGradient>
+    <linearGradient id="tieG" x1="0%" y1="0%" x2="40%" y2="100%">
+      <stop offset="0%" stop-color="#00e8b8"/>
+      <stop offset="100%" stop-color="#009e76"/>
+    </linearGradient>
+    <linearGradient id="beakG" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="rgba(0,0,0,0.16)"/>
+    </filter>
+  </defs>
+
+  <ellipse cx="160" cy="374" rx="80" ry="10" fill="rgba(0,0,0,0.10)"/>
+
+  <!-- Body -->
+  <ellipse cx="160" cy="258" rx="90" ry="100" fill="url(#bodyG)" filter="url(#softShadow)"/>
+  <ellipse cx="160" cy="270" rx="57" ry="78" fill="url(#bellyG)"/>
+
+  <!-- Wings (slightly raised in worry) -->
+  <ellipse cx="78" cy="240" rx="26" ry="70" fill="url(#bodyG)" transform="rotate(-20,78,240)"/>
+  <ellipse cx="242" cy="240" rx="26" ry="70" fill="url(#bodyG)" transform="rotate(20,242,240)"/>
+
+  <!-- Feet -->
+  <ellipse cx="130" cy="352" rx="30" ry="11" fill="url(#beakG)" transform="rotate(-22,130,352)"/>
+  <ellipse cx="190" cy="352" rx="30" ry="11" fill="url(#beakG)" transform="rotate(22,190,352)"/>
+
+  <!-- Tie -->
+  <path d="M152,187 L160,174 L168,187 L160,185Z" fill="#007f5e"/>
+  <path d="M153,187 L167,187 L163,232 L160,238 L157,232Z" fill="url(#tieG)"/>
+
+  <!-- Head -->
+  <circle cx="160" cy="135" r="84" fill="url(#bodyG)" filter="url(#softShadow)"/>
+  <ellipse cx="160" cy="146" rx="56" ry="53" fill="url(#bellyG)"/>
+
+  <!-- X eyes (dizzy) -->
+  <g stroke="#0d1b2e" stroke-width="3.5" stroke-linecap="round">
+    <!-- Left X eye -->
+    <line x1="131" y1="120" x2="149" y2="138"/>
+    <line x1="149" y1="120" x2="131" y2="138"/>
+    <!-- Right X eye -->
+    <line x1="171" y1="120" x2="189" y2="138"/>
+    <line x1="189" y1="120" x2="171" y2="138"/>
+  </g>
+
+  <!-- Worried eyebrows -->
+  <path d="M122,108 Q135,115 152,110" stroke="#0d1b2e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M168,110 Q185,115 198,108" stroke="#0d1b2e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+  <!-- Beak (worried frown) -->
+  <path d="M146,160 Q160,168 174,160 Q160,152 146,160Z" fill="url(#beakG)"/>
+  <path d="M148,164 Q160,156 172,164" stroke="#b45309" stroke-width="1.5" fill="none"/>
+
+  <!-- Sweat drop -->
+  <ellipse cx="210" cy="108" rx="5" ry="9" fill="rgba(100,180,255,0.45)"/>
+  <circle cx="210" cy="103" r="4.5" fill="rgba(130,200,255,0.55)"/>
+
+  <!-- Cheeks (subdued) -->
+  <ellipse cx="116" cy="156" rx="16" ry="10" fill="rgba(255,130,130,0.15)"/>
+  <ellipse cx="204" cy="156" rx="16" ry="10" fill="rgba(255,130,130,0.15)"/>
+
+  <!-- Error sparkle / exclamation -->
+  <g transform="translate(58,78)" opacity="0.6">
+    <line x1="0" y1="-10" x2="0" y2="4" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="0" cy="10" r="2" fill="#ef4444"/>
+  </g>
+</svg>

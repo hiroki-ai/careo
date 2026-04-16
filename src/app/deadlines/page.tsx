@@ -5,9 +5,10 @@ import { useEs } from "@/hooks/useEs";
 import { useInterviews } from "@/hooks/useInterviews";
 import { useCompanies } from "@/hooks/useCompanies";
 import { useEvents } from "@/hooks/useEvents";
-import { Badge } from "@/components/ui/Badge";
+import { LegacyBadge as Badge } from "@/components/ui/StatusBadge";
 import { formatDate, formatDateTime, daysUntil } from "@/lib/utils";
 import { COMPANY_EVENT_TYPE_COLORS } from "@/types";
+import { KareoCharacter } from "@/components/kareo/KareoCharacter";
 
 interface DeadlineItem {
   id: string;
@@ -101,12 +102,69 @@ export default function DeadlinesPage() {
     return <Badge variant="default">あと{days}日</Badge>;
   };
 
+  const getUrgencyBorder = (days: number) => {
+    if (days === 0) return "border-l-4 border-l-red-500 border-red-200";
+    if (days === 1) return "border-l-4 border-l-amber-500 border-amber-200";
+    if (days <= 3) return "border-l-4 border-l-blue-500 border-blue-200";
+    return "border-gray-100";
+  };
+
+  const getUrgencyBg = (days: number) => {
+    if (days === 0) return "bg-red-50";
+    if (days === 1) return "bg-amber-50";
+    if (days <= 3) return "bg-blue-50";
+    return "bg-white";
+  };
+
+  // 3日以内の締切
+  const urgentItems = upcoming.filter(i => i.days <= 3);
+
   return (
     <div className="p-4 md:p-8">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">スケジュール</h1>
         <p className="text-sm text-gray-500 mt-1">ES締切・面接・説明会・インターン</p>
       </div>
+
+      {/* 3日以内の締切アラートバナー */}
+      {urgentItems.length > 0 && (
+        <div className={`rounded-2xl p-4 mb-6 ${
+          urgentItems.some(i => i.days === 0) ? "bg-red-50 border border-red-200" :
+          urgentItems.some(i => i.days === 1) ? "bg-amber-50 border border-amber-200" :
+          "bg-blue-50 border border-blue-200"
+        }`}>
+          <div className="flex items-start gap-3">
+            <KareoCharacter expression="encouraging" size={48} className="shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className={`text-sm font-bold ${
+                urgentItems.some(i => i.days === 0) ? "text-red-700" :
+                urgentItems.some(i => i.days === 1) ? "text-amber-700" :
+                "text-blue-700"
+              }`}>
+                {urgentItems.some(i => i.days === 0)
+                  ? "今日が締切の予定があります！"
+                  : urgentItems.some(i => i.days === 1)
+                  ? "明日締切の予定があります"
+                  : `${urgentItems.length}件の予定が3日以内に迫っています`}
+              </p>
+              <div className="mt-2 space-y-1">
+                {urgentItems.slice(0, 5).map((item) => (
+                  <Link key={`urgent-${item.type}-${item.id}`} href={item.link}>
+                    <div className="flex items-center gap-2 text-sm hover:underline">
+                      <span className={`font-bold ${
+                        item.days === 0 ? "text-red-600" : item.days === 1 ? "text-amber-600" : "text-blue-600"
+                      }`}>
+                        {item.days === 0 ? "今日" : item.days === 1 ? "明日" : `${item.days}日後`}
+                      </span>
+                      <span className="text-gray-700">{item.companyName} - {item.title}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {upcoming.length === 0 && past.length === 0 ? (
         <div className="text-center py-16 text-gray-400">直近の締切・予定はありません</div>
@@ -118,7 +176,7 @@ export default function DeadlinesPage() {
               <div className="space-y-3">
                 {upcoming.map((item) => (
                   <Link key={`${item.type}-${item.id}`} href={item.link}>
-                    <div className={`bg-white rounded-xl border p-5 hover:shadow-md transition-shadow cursor-pointer ${item.days <= 3 ? "border-red-200" : "border-gray-100"}`}>
+                    <div className={`rounded-xl border p-5 hover:shadow-md transition-shadow cursor-pointer ${getUrgencyBorder(item.days)} ${getUrgencyBg(item.days)}`}>
                       <div className="flex items-center justify-between">
                         <div>
                           <div className="flex items-center gap-2 mb-1">

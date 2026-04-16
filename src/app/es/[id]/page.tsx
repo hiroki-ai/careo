@@ -7,11 +7,11 @@ import { useEs } from "@/hooks/useEs";
 import { useCompanies } from "@/hooks/useCompanies";
 import { useProfile } from "@/hooks/useProfile";
 import { EsForm } from "@/components/es/EsForm";
-import { Badge } from "@/components/ui/Badge";
+import { LegacyBadge as Badge } from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { formatDate } from "@/lib/utils";
-import { QAPair } from "@/types";
+import { QAPair, EsResult, ES_RESULT_LABELS } from "@/types";
 import type { EsCheckResult } from "@/app/api/ai/es-check/route";
 import type { EsProofreadResult } from "@/app/api/ai/es-proofread/route";
 
@@ -128,7 +128,7 @@ function EsCheckModal({
             <Button variant="secondary" onClick={onClose}>修正する</Button>
             <Button
               onClick={onConfirmSubmit}
-              variant={checkResult.readyToSubmit ? "primary" : "secondary"}
+              variant={checkResult.readyToSubmit ? "default" : "secondary"}
             >
               {checkResult.readyToSubmit ? "このまま提出済みにする" : "改善せずに提出済みにする"}
             </Button>
@@ -337,13 +337,40 @@ export default function EsDetailPage({ params }: { params: Promise<{ id: string 
             </Link>
           )}
           <h1 className="text-2xl font-bold text-gray-900">{es.title}</h1>
-          <div className="flex items-center gap-3 mt-2">
+          <div className="flex items-center gap-3 mt-2 flex-wrap">
             <Badge variant={es.status === "SUBMITTED" ? "success" : "warning"}>
               {es.status === "SUBMITTED" ? "提出済み" : "下書き"}
             </Badge>
             {es.deadline && (
               <span className="text-sm text-gray-500">締切: {formatDate(es.deadline)}</span>
             )}
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-gray-500">結果:</span>
+              <select
+                aria-label="ES結果"
+                value={es.result ?? "unknown"}
+                onChange={(e) => updateEs(id, { result: e.target.value as EsResult })}
+                className={`text-xs border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+                  es.result === "passed" ? "text-green-700 bg-green-50" :
+                  es.result === "failed" ? "text-red-700 bg-red-50" :
+                  es.result === "pending" ? "text-amber-700 bg-amber-50" :
+                  "text-gray-600 bg-white"
+                }`}
+              >
+                {(Object.entries(ES_RESULT_LABELS) as [EsResult, string][]).map(([val, label]) => (
+                  <option key={val} value={val}>{label}</option>
+                ))}
+              </select>
+            </div>
+            <label className="flex items-center gap-1.5 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={es.isSharedAnonymously ?? false}
+                onChange={(e) => updateEs(id, { isSharedAnonymously: e.target.checked })}
+                className="w-3.5 h-3.5 rounded border-gray-300 text-[#00c896] focus:ring-[#00c896]"
+              />
+              <span className="text-[11px] text-gray-500">匿名共有</span>
+            </label>
           </div>
         </div>
         <div className="flex gap-2 flex-wrap justify-end">
@@ -377,7 +404,7 @@ export default function EsDetailPage({ params }: { params: Promise<{ id: string 
             </Button>
           )}
           <Button variant="secondary" size="sm" onClick={() => setIsEditOpen(true)}>編集</Button>
-          <Button variant="danger" size="sm" onClick={() => setIsDeleteConfirm(true)}>削除</Button>
+          <Button variant="destructive" size="sm" onClick={() => setIsDeleteConfirm(true)}>削除</Button>
         </div>
       </div>
 
@@ -423,7 +450,7 @@ export default function EsDetailPage({ params }: { params: Promise<{ id: string 
         <p className="text-sm text-gray-600 mb-6">「{es.title}」を削除しますか？</p>
         <div className="flex justify-end gap-3">
           <Button variant="secondary" onClick={() => setIsDeleteConfirm(false)}>キャンセル</Button>
-          <Button variant="danger" onClick={() => { deleteEs(id); router.push("/es"); }}>削除する</Button>
+          <Button variant="destructive" onClick={() => { deleteEs(id); router.push("/es"); }}>削除する</Button>
         </div>
       </Modal>
 

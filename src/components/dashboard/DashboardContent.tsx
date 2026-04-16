@@ -1,8 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
+} from "recharts";
 import { useCompanies } from "@/hooks/useCompanies";
 import { useEs } from "@/hooks/useEs";
 import { useInterviews } from "@/hooks/useInterviews";
@@ -15,9 +19,10 @@ import { useDeadlineNotifications } from "@/hooks/useDeadlineNotifications";
 import { Button } from "@/components/ui/Button";
 import { InsightsWidget } from "@/components/dashboard/InsightsWidget";
 import { PostOfferWidget } from "@/components/dashboard/PostOfferWidget";
+import { SkeletonCard } from "@/components/ui/SkeletonCard";
 import { createClient } from "@/lib/supabase/client";
 import { daysUntil } from "@/lib/utils";
-import { COMPANY_STATUS_ORDER, JOB_SEARCH_STAGE_LABELS, UserProfile } from "@/types";
+import { COMPANY_STATUS_ORDER, COMPANY_STATUS_LABELS, JOB_SEARCH_STAGE_LABELS, UserProfile, CompanyStatus } from "@/types";
 import { useCoach } from "@/hooks/useCoach";
 import { TutorialModal } from "@/components/dashboard/TutorialModal";
 import { ReviewPromptModal } from "@/components/dashboard/ReviewPromptModal";
@@ -29,14 +34,13 @@ function getGreeting(): string {
   return "お疲れ様です";
 }
 
-// 毎日のコーチCTA（チャット未実施の日は強調表示）
+// Daily coach CTA
 function DailyCoachBanner({ profile }: { profile: UserProfile | null }) {
-  const [chatted, setChatted] = useState(true); // サーバーSSRで不一致しないようデフォルトtrue
+  const [chatted, setChatted] = useState(true);
   const [pdcaIssue, setPdcaIssue] = useState<string | null>(null);
   const { coachName } = useCoach();
 
   useEffect(() => {
-    // Supabaseデータ優先、フォールバックはlocalStorage
     const lastChatDate = profile?.lastChatAt
       ? new Date(profile.lastChatAt).toDateString()
       : (() => { try { return localStorage.getItem("careo_last_chat_date") ?? ""; } catch { return ""; } })();
@@ -64,11 +68,16 @@ function DailyCoachBanner({ profile }: { profile: UserProfile | null }) {
     ? `就活の軸を${coachName}コーチと一緒に言語化しよう`
     : `今日の就活の進捗を${coachName}コーチに報告しよう`;
 
-  if (chatted) return null; // 今日すでに話していれば非表示
+  if (chatted) return null;
 
   return (
     <Link href="/chat">
-      <div className="mb-5 bg-gradient-to-br from-[#00c896] via-[#00b488] to-[#00a87e] rounded-3xl px-4 py-4 flex items-center gap-3 active:opacity-90 transition-opacity cursor-pointer coach-banner-shadow">
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="mb-5 bg-gradient-to-br from-[#00c896] via-[#00b488] to-[#00a87e] rounded-3xl px-4 py-4 flex items-center gap-3 active:opacity-90 transition-opacity cursor-pointer coach-banner-shadow"
+      >
         <div className="w-14 h-14 shrink-0">
           <img src="/kareo.png" alt="カレオ" className="w-full h-full object-contain" />
         </div>
@@ -81,7 +90,7 @@ function DailyCoachBanner({ profile }: { profile: UserProfile | null }) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
           </svg>
         </div>
-      </div>
+      </motion.div>
     </Link>
   );
 }
@@ -117,6 +126,55 @@ const EVENT_TYPE_BADGE: Record<string, string> = {
   その他: "bg-gray-100 text-gray-600",
 };
 
+// Funnel stage config
+const FUNNEL_STAGES: { key: CompanyStatus | CompanyStatus[]; label: string; color: string }[] = [
+  { key: "WISHLIST", label: "気になる", color: "#94a3b8" },
+  { key: ["APPLIED", "INTERN_APPLYING"], label: "応募", color: "#60a5fa" },
+  { key: ["DOCUMENT", "INTERN_DOCUMENT"], label: "書類", color: "#818cf8" },
+  { key: ["INTERVIEW_1", "INTERN_INTERVIEW_1"], label: "1次面接", color: "#a78bfa" },
+  { key: ["INTERVIEW_2", "INTERN_INTERVIEW_2"], label: "2次面接", color: "#c084fc" },
+  { key: ["FINAL", "INTERN_FINAL"], label: "最終", color: "#f472b6" },
+  { key: "OFFERED", label: "内定", color: "#00c896" },
+];
+
+// Stat card icon components
+function BuildingIcon() {
+  return (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+    </svg>
+  );
+}
+function CalendarIcon() {
+  return (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+    </svg>
+  );
+}
+function ClockIcon() {
+  return (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  );
+}
+function TrophyIcon() {
+  return (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+    </svg>
+  );
+}
+
+function formatRelativeDate(dateStr: string): string {
+  const d = daysUntil(dateStr);
+  if (d === 0) return "今日";
+  if (d === 1) return "明日";
+  if (d < 0) return `${Math.abs(d)}日前`;
+  return `${d}日後`;
+}
+
 export function DashboardContent() {
   const { companies } = useCompanies();
   const { esList } = useEs();
@@ -136,7 +194,7 @@ export function DashboardContent() {
     return acc;
   }, {} as Record<string, number>);
 
-  // 締切・面接・説明会・インターンイベント
+  // Calendar events
   const calendarEvents = [
     ...esList
       .filter((e) => e.deadline && e.status === "DRAFT")
@@ -167,25 +225,21 @@ export function DashboardContent() {
       })),
   ];
 
-  // 直近7日の締切
   const upcomingDeadlines = calendarEvents
     .map(e => ({ ...e, days: daysUntil(e.date) }))
-    .filter(d => d.days >= 0 && d.days <= 7)
+    .filter(d => d.days >= 0 && d.days <= 14)
     .sort((a, b) => a.days - b.days)
-    .slice(0, 3);
+    .slice(0, 5);
 
   useDeadlineNotifications(calendarEvents.filter(e => {
     const d = daysUntil(e.date);
     return d >= 0 && d <= 3;
   }));
 
-  // ESの設問データを除いた軽量版（AI分析には件数だけ必要）
   const esListSlim = esList.map(({ questions: _q, ...rest }) => rest);
-  // AI送信用の軽量版（不要フィールドを除外してペイロードを削減）
   const companiesSlim = companies.map(({ name, status, industry, is_intern_offer }) => ({ name, status, industry, is_intern_offer }));
   const interviewsSlim = interviews.map(({ questions: _q, ...rest }) => rest);
 
-  // リトライ付きfetch（失敗時に1回自動リトライ）
   const fetchAI = async (url: string, body: unknown, retries = 1): Promise<Record<string, unknown> | null> => {
     for (let attempt = 0; attempt <= retries; attempt++) {
       try {
@@ -226,9 +280,6 @@ export function DashboardContent() {
     }
   };
 
-  // データが揃ったら自動フェッチ：
-  // ① アイテムが一件もない場合
-  // ② 最後の自動フェッチが今日でない場合（毎日リフレッシュ）
   useEffect(() => {
     if (itemsLoading) return;
     if (hasFetched.current) return;
@@ -264,63 +315,207 @@ export function DashboardContent() {
 
   const hasItems = pendingItems.length > 0 || completedItems.length > 0;
 
-  // ステータスチップのデータ（モバイル・PC共通）
-  const statusItems = [
-    { label: "選考中", icon: "🏃", count: companies.filter(c => !["OFFERED","REJECTED","WISHLIST"].includes(c.status)).length, gradient: "from-teal-500 to-emerald-500", bg: "bg-gradient-to-br from-teal-50/60 to-emerald-50/40", border: "border-teal-100", link: "/companies" },
-    { label: "内定", icon: "🎉", count: statusCounts["OFFERED"] ?? 0, gradient: "from-emerald-500 to-green-500", bg: "bg-gradient-to-br from-emerald-50 to-green-50", border: "border-emerald-100", link: "/companies" },
-    { label: "ES提出待ち", icon: "✍️", count: esList.filter(e => e.status === "DRAFT").length, gradient: "from-amber-500 to-orange-500", bg: "bg-gradient-to-br from-amber-50 to-orange-50", border: "border-amber-100", link: "/es" },
-    { label: "気になる", icon: "🔖", count: statusCounts["WISHLIST"] ?? 0, gradient: "from-gray-400 to-slate-500", bg: "bg-gradient-to-br from-gray-50 to-slate-50", border: "border-gray-200", link: "/companies" },
+  // --- Stat cards ---
+  const interviewsThisWeek = interviews.filter(i => {
+    const d = daysUntil(i.scheduledAt);
+    return i.result === "PENDING" && d >= 0 && d <= 7;
+  });
+  const nextInterview = interviewsThisWeek.sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())[0];
+
+  const esDeadlineSoon = esList.filter(e => {
+    if (!e.deadline || e.status !== "DRAFT") return false;
+    const d = daysUntil(e.deadline);
+    return d >= 0 && d <= 7;
+  });
+  const hasUrgentES = esDeadlineSoon.some(e => daysUntil(e.deadline!) <= 2);
+
+  const offeredCount = statusCounts["OFFERED"] ?? 0;
+
+  const statCards = [
+    {
+      label: "応募企業数",
+      value: companies.length,
+      sub: `${companies.filter(c => !["WISHLIST", "REJECTED", "OFFERED"].includes(c.status)).length}社 選考中`,
+      icon: <BuildingIcon />,
+      color: "text-blue-500",
+      bgColor: "bg-blue-50",
+      borderColor: "border-blue-100",
+      link: "/companies",
+    },
+    {
+      label: "今週の面接",
+      value: interviewsThisWeek.length,
+      sub: nextInterview ? `次: ${formatRelativeDate(nextInterview.scheduledAt)}` : "予定なし",
+      icon: <CalendarIcon />,
+      color: "text-purple-500",
+      bgColor: "bg-purple-50",
+      borderColor: "border-purple-100",
+      link: "/interviews",
+    },
+    {
+      label: "ES締切",
+      value: esDeadlineSoon.length,
+      sub: esDeadlineSoon.length > 0 ? `最短: ${formatRelativeDate(esDeadlineSoon.sort((a, b) => daysUntil(a.deadline!) - daysUntil(b.deadline!))[0].deadline!)}` : "締切なし",
+      icon: <ClockIcon />,
+      color: hasUrgentES ? "text-red-500" : "text-amber-500",
+      bgColor: hasUrgentES ? "bg-red-50" : "bg-amber-50",
+      borderColor: hasUrgentES ? "border-red-200" : "border-amber-100",
+      link: "/deadlines",
+      urgent: hasUrgentES,
+    },
+    {
+      label: "内定",
+      value: offeredCount,
+      sub: offeredCount > 0 ? "おめでとう!" : "まだなし",
+      icon: <TrophyIcon />,
+      color: offeredCount > 0 ? "text-[#00c896]" : "text-gray-400",
+      bgColor: offeredCount > 0 ? "bg-[#00c896]/5" : "bg-gray-50",
+      borderColor: offeredCount > 0 ? "border-[#00c896]/20" : "border-gray-100",
+      link: "/companies",
+    },
   ];
 
+  // --- Selection funnel data ---
+  const funnelData = useMemo(() => {
+    const max = Math.max(companies.length, 1);
+    return FUNNEL_STAGES.map((stage) => {
+      const keys = Array.isArray(stage.key) ? stage.key : [stage.key];
+      const count = companies.filter(c => keys.includes(c.status)).length;
+      return {
+        name: stage.label,
+        count,
+        color: stage.color,
+        pct: Math.round((count / max) * 100),
+      };
+    });
+  }, [companies]);
+
+  // --- Recent activity ---
+  const recentActivity = useMemo(() => {
+    const items: { id: string; text: string; time: string; icon: string; color: string }[] = [];
+
+    companies.slice(0, 3).forEach(c => {
+      items.push({
+        id: `c-${c.id}`,
+        text: `${c.name} を${COMPANY_STATUS_LABELS[c.status]}に更新`,
+        time: c.updatedAt,
+        icon: "🏢",
+        color: "bg-blue-100",
+      });
+    });
+
+    esList.filter(e => e.status === "SUBMITTED").slice(0, 2).forEach(e => {
+      const company = companies.find(c => c.id === e.companyId);
+      items.push({
+        id: `e-${e.id}`,
+        text: `${company?.name ?? ""} ESを提出`,
+        time: e.updatedAt,
+        icon: "📄",
+        color: "bg-green-100",
+      });
+    });
+
+    interviews.slice(0, 2).forEach(i => {
+      const company = companies.find(c => c.id === i.companyId);
+      items.push({
+        id: `i-${i.id}`,
+        text: `${company?.name ?? ""} ${i.round}次面接`,
+        time: i.updatedAt,
+        icon: "🎙️",
+        color: "bg-purple-100",
+      });
+    });
+
+    return items
+      .sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
+      .slice(0, 5);
+  }, [companies, esList, interviews]);
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.06 },
+    },
+  };
+  const itemVariants = {
+    hidden: { opacity: 0, y: 12 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.35 } },
+  };
+
   return (
-    <div className="bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
+    <div className="bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-[#0f1117] dark:via-[#0f1117] dark:to-[#0f1117] min-h-screen">
       <TutorialModal />
       <ReviewPromptModal />
 
-      {/* ========== モバイルレイアウト ========== */}
+      {/* ========== MOBILE LAYOUT ========== */}
       <div className="md:hidden px-4 pt-5 pb-32">
-
-        {/* グリーティングヘッダー */}
-        <div className="flex items-center justify-between mb-6">
+        {/* Greeting */}
+        <div className="flex items-center justify-between mb-5">
           <div>
-            <p className="text-xs text-gray-400 font-medium mb-1">{getGreeting()}</p>
-            <h1 className="text-[22px] font-black text-gray-900 tracking-tight leading-tight">
+            <p className="text-xs text-gray-400 dark:text-gray-500 font-medium mb-1">{getGreeting()}</p>
+            <h1 className="text-[22px] font-black text-gray-900 dark:text-gray-100 tracking-tight leading-tight">
               {profile?.username ? `${profile.username}の就活` : "今日の就活"}
             </h1>
           </div>
-          <Link href="/settings">
-            <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center shadow-sm active:scale-95 transition-transform border border-gray-100/80">
-              <svg className="w-4.5 h-4.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                const evt = new KeyboardEvent("keydown", { key: "k", metaKey: true });
+                document.dispatchEvent(evt);
+              }}
+              className="w-10 h-10 bg-white dark:bg-[#1a1d27] rounded-2xl flex items-center justify-center shadow-sm active:scale-95 transition-transform border border-gray-100/80 dark:border-[#2a2d37]"
+              title="検索 (Cmd+K)"
+            >
+              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
-            </div>
-          </Link>
-        </div>
-
-        {/* ステータスチップ — 横スクロール */}
-        <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-hide mb-6 -mx-4 px-4">
-          {statusItems.map((item) => (
-            <Link key={item.label} href={item.link} className="shrink-0">
-              <div className={`${item.bg} border ${item.border} rounded-2xl px-4 py-3 min-w-[88px] active:scale-95 transition-transform`}>
-                <p className={`text-2xl font-black bg-gradient-to-br ${item.gradient} bg-clip-text text-transparent leading-none`}>
-                  {item.count}
-                </p>
-                <p className="text-[11px] text-gray-500 font-semibold mt-1">{item.label}</p>
+            </button>
+            <Link href="/settings">
+              <div className="w-10 h-10 bg-white dark:bg-[#1a1d27] rounded-2xl flex items-center justify-center shadow-sm active:scale-95 transition-transform border border-gray-100/80 dark:border-[#2a2d37]">
+                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
               </div>
             </Link>
-          ))}
+          </div>
         </div>
 
-        {/* コーチCTA */}
+        {/* Top Summary Cards - horizontal scroll */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-hide mb-6 -mx-4 px-4"
+        >
+          {statCards.map((card) => (
+            <motion.div key={card.label} variants={itemVariants}>
+              <Link href={card.link} className="shrink-0">
+                <div className={`${card.bgColor} border ${card.borderColor} rounded-2xl px-4 py-3 min-w-[120px] active:scale-95 transition-transform ${card.urgent ? "ring-1 ring-red-300 animate-pulse" : ""}`}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className={`${card.color} opacity-60`}>{card.icon}</span>
+                  </div>
+                  <p className={`text-2xl font-black ${card.color} leading-none`}>{card.value}</p>
+                  <p className="text-[11px] text-gray-500 font-medium mt-1.5 truncate">{card.label}</p>
+                  <p className="text-[10px] text-gray-400 mt-0.5 truncate">{card.sub}</p>
+                </div>
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Coach CTA */}
         <DailyCoachBanner profile={profile} />
 
-        {/* 今週やること（Next Action）— 最重要 */}
+        {/* Next Actions */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <span className="w-1 h-5 bg-gradient-to-b from-[#00c896] to-[#00a87e] rounded-full" />
-              <h2 className="text-[15px] font-bold text-gray-900">今週やること</h2>
+              <h2 className="text-[15px] font-bold text-gray-900 dark:text-gray-100">今週やること</h2>
             </div>
             <button
               type="button"
@@ -335,19 +530,19 @@ export function DashboardContent() {
           {(aiLoading || itemsLoading) && (
             <div className="space-y-2">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-[68px] bg-gray-100/80 rounded-2xl animate-pulse" />
+                <SkeletonCard key={i} variant="deadline" />
               ))}
             </div>
           )}
 
           {!aiLoading && !itemsLoading && hasItems && (
-            <div className="space-y-2">
+            <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-2">
               {pendingItems.map((item) => (
-                <div
+                <motion.div
                   key={item.id}
+                  variants={itemVariants}
                   className={`relative flex items-start gap-3 rounded-2xl p-4 ${priorityColors[item.priority]}`}
                 >
-                  {/* 上端カラーライン */}
                   <div className={`absolute top-0 left-4 right-4 h-[2px] rounded-full ${priorityAccent[item.priority]}`} />
                   <input
                     type="checkbox"
@@ -370,9 +565,9 @@ export function DashboardContent() {
                         : <Link href={item.link.href} className="text-[10px] font-bold text-[#00a87e] whitespace-nowrap">{item.link.label} →</Link>
                     )}
                   </div>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           )}
 
           {!aiLoading && !itemsLoading && !hasItems && (
@@ -383,45 +578,51 @@ export function DashboardContent() {
           )}
         </div>
 
-        {/* 直近の締切 */}
+        {/* Upcoming deadlines (Stripe style) */}
         {upcomingDeadlines.length > 0 && (
-          <div>
+          <div className="mb-6">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <span className="w-1 h-5 bg-gradient-to-b from-orange-400 to-red-400 rounded-full" />
-                <h2 className="text-[15px] font-bold text-gray-900">直近の締切</h2>
+                <h2 className="text-[15px] font-bold text-gray-900 dark:text-gray-100">直近の締切</h2>
               </div>
               <Link href="/deadlines" className="text-xs font-semibold text-[#00c896]">すべて</Link>
             </div>
-            <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-hide -mx-4 px-4">
+            <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-1.5">
               {upcomingDeadlines.map((d) => (
-                <Link key={`${d.type}-${d.id}`} href={d.link} className="shrink-0">
-                  <div className={`flex flex-col gap-1.5 rounded-2xl px-3.5 py-3 min-w-[140px] active:scale-95 transition-transform ${d.days <= 3 ? "bg-red-50" : "bg-white shadow-sm border border-gray-100/80"}`}>
-                    <div className="flex items-center justify-between gap-2">
-                      <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${EVENT_TYPE_BADGE[d.type] ?? "bg-gray-100 text-gray-600"}`}>
-                        {d.type}
-                      </span>
-                      <span className={`text-[11px] font-black ${d.days === 0 ? "text-red-600" : d.days <= 3 ? "text-orange-500" : "text-gray-400"}`}>
-                        {d.days === 0 ? "今日" : `${d.days}日`}
+                <motion.div key={`${d.type}-${d.id}`} variants={itemVariants}>
+                  <Link href={d.link}>
+                    <div className={`flex items-center gap-3 rounded-xl px-3.5 py-3 active:scale-[0.98] transition-transform ${d.days <= 2 ? "bg-red-50 border border-red-100" : d.days <= 5 ? "bg-amber-50/60 border border-amber-100" : "bg-gray-50 border border-gray-100"}`}>
+                      <div className={`w-1 h-8 rounded-full shrink-0 ${d.days <= 2 ? "bg-red-500" : d.days <= 5 ? "bg-amber-400" : "bg-gray-300"}`} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-gray-900 truncate">{d.title}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-full ${EVENT_TYPE_BADGE[d.type] ?? "bg-gray-100 text-gray-600"}`}>
+                            {d.type}
+                          </span>
+                          <span className="text-[10px] text-gray-400">{new Date(d.date).toLocaleDateString("ja-JP", { month: "short", day: "numeric" })}</span>
+                        </div>
+                      </div>
+                      <span className={`text-xs font-black shrink-0 ${d.days === 0 ? "text-red-600" : d.days <= 2 ? "text-red-500" : d.days <= 5 ? "text-amber-500" : "text-gray-400"}`}>
+                        {formatRelativeDate(d.date)}
                       </span>
                     </div>
-                    <p className="text-xs font-semibold text-gray-900 leading-snug line-clamp-2">{d.title}</p>
-                  </div>
-                </Link>
+                  </Link>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
         )}
       </div>
 
-      {/* ========== PCレイアウト ========== */}
+      {/* ========== PC LAYOUT ========== */}
       <div className="hidden md:block px-6 pt-6 pb-8">
 
-        {/* PCヘッダー */}
+        {/* PC Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
             <p className="text-xs text-gray-400 font-medium mb-1">{getGreeting()}</p>
-            <h1 className="text-[26px] font-black text-gray-900 tracking-tight leading-tight">
+            <h1 className="text-[26px] font-black text-gray-900 dark:text-gray-100 tracking-tight leading-tight">
               {profile?.username ? `${profile.username}の就活` : "ダッシュボード"}
             </h1>
             {profile && (
@@ -431,6 +632,21 @@ export function DashboardContent() {
             )}
           </div>
           <div className="flex items-center gap-2">
+            {/* Cmd+K trigger */}
+            <button
+              type="button"
+              onClick={() => {
+                const evt = new KeyboardEvent("keydown", { key: "k", ctrlKey: true });
+                document.dispatchEvent(evt);
+              }}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-[#2a2d37] bg-white dark:bg-[#1a1d27] hover:bg-gray-50 dark:hover:bg-[#2a2d37] text-gray-400 text-sm transition-colors"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <span className="text-xs">検索...</span>
+              <kbd className="px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 font-mono text-[10px]">Ctrl K</kbd>
+            </button>
             <Link href="/settings">
               <button type="button" className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm font-medium transition-colors">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -446,23 +662,91 @@ export function DashboardContent() {
           </div>
         </div>
 
-        {/* PCステータスグリッド */}
-        <div className="grid grid-cols-4 gap-3 mb-5">
-          {statusItems.map((item) => (
-            <Link key={item.label} href={item.link}>
-              <div className={`${item.bg} border ${item.border} rounded-2xl p-4 hover:scale-[1.02] transition-transform cursor-pointer`}>
-                <p className="text-xs font-semibold text-gray-500 mb-2">{item.label}</p>
-                <p className={`text-3xl font-black bg-gradient-to-br ${item.gradient} bg-clip-text text-transparent leading-none`}>{item.count}</p>
-                <p className="text-[10px] text-gray-400 mt-1.5 font-medium">社 / 件</p>
-              </div>
-            </Link>
+        {/* Top Summary Cards */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-4 gap-3 mb-6"
+        >
+          {statCards.map((card) => (
+            <motion.div key={card.label} variants={itemVariants}>
+              <Link href={card.link}>
+                <div className={`${card.bgColor} border ${card.borderColor} rounded-2xl p-5 hover:scale-[1.02] transition-all cursor-pointer group ${card.urgent ? "ring-1 ring-red-300" : ""}`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-xs font-semibold text-gray-500">{card.label}</p>
+                    <div className={`w-9 h-9 rounded-xl ${card.bgColor} flex items-center justify-center ${card.color} opacity-50 group-hover:opacity-100 transition-opacity`}>
+                      {card.icon}
+                    </div>
+                  </div>
+                  <p className={`text-3xl font-black ${card.color} leading-none`}>{card.value}</p>
+                  <p className="text-[11px] text-gray-400 mt-2 font-medium">{card.sub}</p>
+                </div>
+              </Link>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
-        {/* PCコーチCTA */}
+        {/* Coach CTA */}
         <DailyCoachBanner profile={profile} />
 
-        {/* PC 12カラムグリッド */}
+        {/* Selection Funnel */}
+        {companies.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mb-6 bg-white dark:bg-[#1a1d27] rounded-2xl border border-gray-100 dark:border-[#2a2d37] p-5"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <span className="w-1 h-5 bg-gradient-to-b from-blue-400 to-purple-400 rounded-full" />
+                <h2 className="text-[15px] font-bold text-gray-900 dark:text-gray-100">選考ファネル</h2>
+              </div>
+              <Link href="/companies" className="text-xs font-semibold text-[#00c896] hover:opacity-70 transition-opacity">詳細 →</Link>
+            </div>
+            <div className="h-[180px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={funnelData} layout="vertical" margin={{ left: 50, right: 30, top: 5, bottom: 5 }}>
+                  <XAxis type="number" hide />
+                  <YAxis
+                    type="category"
+                    dataKey="name"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 11, fill: "#6b7280", fontWeight: 600 }}
+                    width={50}
+                  />
+                  <Tooltip
+                    contentStyle={{ borderRadius: 12, border: "1px solid #e5e7eb", fontSize: 12, padding: "8px 12px" }}
+                    formatter={(value) => [`${value}社`, ""]}
+                    cursor={{ fill: "rgba(0,0,0,0.03)" }}
+                  />
+                  <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={20}>
+                    {funnelData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            {/* Drop-off percentages */}
+            <div className="flex items-center justify-between mt-2 px-1">
+              {funnelData.map((stage, i) => (
+                <div key={stage.name} className="text-center">
+                  <p className="text-[10px] font-bold" style={{ color: stage.color }}>{stage.count}</p>
+                  {i > 0 && funnelData[i - 1].count > 0 && (
+                    <p className="text-[9px] text-gray-400">
+                      {Math.round((stage.count / funnelData[i - 1].count) * 100)}%
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        {/* 12-column grid: Actions + Deadlines + Activity */}
         <div className="grid grid-cols-12 gap-5">
 
           {/* Left: Next Action */}
@@ -470,7 +754,7 @@ export function DashboardContent() {
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <span className="w-1 h-5 bg-gradient-to-b from-[#00c896] to-[#00a87e] rounded-full" />
-                <h2 className="text-[15px] font-bold text-gray-900">今週やること</h2>
+                <h2 className="text-[15px] font-bold text-gray-900 dark:text-gray-100">今週やること</h2>
               </div>
               <button
                 type="button"
@@ -488,17 +772,18 @@ export function DashboardContent() {
             {(aiLoading || itemsLoading) && (
               <div className="space-y-2">
                 {[...Array(3)].map((_, i) => (
-                  <div key={i} className="h-[60px] bg-gray-100/80 rounded-2xl animate-pulse" />
+                  <SkeletonCard key={i} variant="deadline" />
                 ))}
               </div>
             )}
 
             {!aiLoading && !itemsLoading && hasItems && (
-              <div className="space-y-2">
+              <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-2">
                 {pendingItems.map((item) => (
-                  <div
+                  <motion.div
                     key={item.id}
-                    className={`relative flex items-start gap-3 rounded-2xl p-3.5 ${priorityColors[item.priority]}`}
+                    variants={itemVariants}
+                    className={`relative flex items-start gap-3 rounded-2xl p-3.5 ${priorityColors[item.priority]} hover:shadow-sm transition-shadow`}
                   >
                     <div className={`absolute top-0 left-4 right-4 h-[2px] rounded-full ${priorityAccent[item.priority]}`} />
                     <input
@@ -522,7 +807,7 @@ export function DashboardContent() {
                           : <Link href={item.link.href} className="text-[10px] font-bold text-[#00a87e] hover:underline whitespace-nowrap">{item.link.label} →</Link>
                       )}
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
                 {completedItems.length > 0 && (
                   <div className="mt-2">
@@ -543,7 +828,7 @@ export function DashboardContent() {
                     ))}
                   </div>
                 )}
-              </div>
+              </motion.div>
             )}
 
             {!aiLoading && !itemsLoading && !hasItems && (
@@ -554,14 +839,15 @@ export function DashboardContent() {
             )}
           </div>
 
-          {/* Right: 締切＋気づき */}
-          <div className="col-span-5 space-y-4">
-            {/* 締切詳細 */}
-            <div>
+          {/* Right column: Deadlines + Activity + Insights */}
+          <div className="col-span-5 space-y-5">
+
+            {/* Upcoming deadlines (Stripe style) */}
+            <div className="bg-white dark:bg-[#1a1d27] rounded-2xl border border-gray-100 dark:border-[#2a2d37] p-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <span className="w-1 h-5 bg-gradient-to-b from-orange-400 to-red-400 rounded-full" />
-                  <h2 className="text-[15px] font-bold text-gray-900">締切</h2>
+                  <h2 className="text-[15px] font-bold text-gray-900 dark:text-gray-100">締切</h2>
                 </div>
                 <Link href="/calendar" className="text-xs font-semibold text-[#00c896] hover:opacity-70 transition-opacity">カレンダー</Link>
               </div>
@@ -569,34 +855,64 @@ export function DashboardContent() {
                 <div className="space-y-1.5">
                   {upcomingDeadlines.map((d) => (
                     <Link key={`${d.type}-${d.id}`} href={d.link}>
-                      <div className={`flex items-center justify-between rounded-2xl px-3.5 py-2.5 hover:scale-[1.01] transition-transform ${d.days <= 3 ? "bg-red-50" : "bg-gray-50 hover:bg-gray-100"}`}>
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className={`text-[9px] font-black px-2 py-0.5 rounded-full shrink-0 ${EVENT_TYPE_BADGE[d.type] ?? "bg-gray-100 text-gray-600"}`}>
+                      <div className={`flex items-center gap-3 rounded-xl px-3 py-2.5 hover:scale-[1.01] transition-transform ${d.days <= 2 ? "bg-red-50" : d.days <= 5 ? "bg-amber-50/50" : "bg-gray-50 hover:bg-gray-100"}`}>
+                        <div className={`w-0.5 h-7 rounded-full shrink-0 ${d.days <= 2 ? "bg-red-500" : d.days <= 5 ? "bg-amber-400" : "bg-gray-300"}`} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-semibold text-gray-900 truncate">{d.title}</p>
+                          <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-full ${EVENT_TYPE_BADGE[d.type] ?? "bg-gray-100 text-gray-600"}`}>
                             {d.type}
                           </span>
-                          <p className="text-xs font-semibold text-gray-900 truncate">{d.title}</p>
                         </div>
-                        <span className={`text-[11px] font-black shrink-0 ml-2 ${d.days === 0 ? "text-red-600" : d.days <= 3 ? "text-orange-500" : "text-gray-400"}`}>
-                          {d.days === 0 ? "今日" : `${d.days}日`}
+                        <span className={`text-[11px] font-black shrink-0 ${d.days === 0 ? "text-red-600" : d.days <= 2 ? "text-red-500" : d.days <= 5 ? "text-amber-500" : "text-gray-400"}`}>
+                          {formatRelativeDate(d.date)}
                         </span>
                       </div>
                     </Link>
                   ))}
                 </div>
               ) : (
-                <div className="bg-gray-50 rounded-2xl p-4 text-center">
-                  <p className="text-xs text-gray-400 font-medium">直近7日に締切はありません</p>
+                <div className="bg-gray-50 rounded-xl p-4 text-center">
+                  <p className="text-xs text-gray-400 font-medium">直近に締切はありません</p>
                 </div>
               )}
             </div>
 
-            {/* カレオからの気づき */}
+            {/* Recent activity timeline */}
+            {recentActivity.length > 0 && (
+              <div className="bg-white dark:bg-[#1a1d27] rounded-2xl border border-gray-100 dark:border-[#2a2d37] p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="w-1 h-5 bg-gradient-to-b from-gray-300 to-gray-400 rounded-full" />
+                  <h2 className="text-[15px] font-bold text-gray-900 dark:text-gray-100">最近の活動</h2>
+                </div>
+                <div className="space-y-0">
+                  {recentActivity.map((activity, i) => (
+                    <div key={activity.id} className="flex items-start gap-3 py-2.5 relative">
+                      {/* Timeline line */}
+                      {i < recentActivity.length - 1 && (
+                        <div className="absolute left-[15px] top-[36px] bottom-0 w-px bg-gray-100" />
+                      )}
+                      <div className={`w-8 h-8 rounded-full ${activity.color} flex items-center justify-center text-sm shrink-0 relative z-10`}>
+                        {activity.icon}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-gray-700 truncate">{activity.text}</p>
+                        <p className="text-[10px] text-gray-400 mt-0.5">
+                          {new Date(activity.time).toLocaleDateString("ja-JP", { month: "short", day: "numeric" })}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Insights widget */}
             <InsightsWidget />
           </div>
         </div>
       </div>
 
-      {/* 内定後コンテンツ（モバイル・PC共通） */}
+      {/* Post-offer content */}
       {companies.filter(c => c.status === "OFFERED").length > 0 && (
         <div className="mt-3 px-4 md:px-5 pb-4">
           <PostOfferWidget offeredCompanies={companies.filter(c => c.status === "OFFERED")} />

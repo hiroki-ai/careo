@@ -8,6 +8,7 @@ import { Modal } from "@/components/ui/Modal";
 import { useToast } from "@/components/ui/Toast";
 import { ObVisit, OB_VISIT_PURPOSE_LABELS, OB_IMPRESSION_LABELS } from "@/types";
 import { formatDate } from "@/lib/utils";
+import { KareoCharacter } from "@/components/kareo/KareoCharacter";
 
 const IMPRESSION_COLORS: Record<string, string> = {
   positive: "bg-green-100 text-green-700",
@@ -73,8 +74,8 @@ export default function ObVisitsPage() {
           {[...Array(3)].map((_, i) => <div key={i} className="h-20 bg-gray-100 rounded-xl animate-pulse" />)}
         </div>
       ) : visits.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
-          <p className="text-4xl mb-3">🤝</p>
+        <div className="text-center py-12 text-gray-400">
+          <KareoCharacter expression="encouraging" size={100} className="mx-auto mb-3" />
           <p className="font-medium mb-1">OB/OG訪問の記録がありません</p>
           <p className="text-sm">訪問後の気づき・印象・情報をメモしておきましょう</p>
           <Button className="mt-4" onClick={() => setIsOpen(true)}>最初の記録を追加</Button>
@@ -229,7 +230,7 @@ export default function ObVisitsPage() {
                 <p className="text-gray-600 whitespace-pre-wrap">{detail.notes}</p>
               </div>
             )}
-            <Button variant="danger" size="sm" onClick={() => handleDelete(detail.id, detail.companyName)}>
+            <Button variant="destructive" size="sm" onClick={() => handleDelete(detail.id, detail.companyName)}>
               削除
             </Button>
           </div>

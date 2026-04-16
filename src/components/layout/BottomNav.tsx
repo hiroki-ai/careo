@@ -52,6 +52,7 @@ const moreCategories = [
       { href: "/companies", label: "企業管理", emoji: "🏢" },
       { href: "/es", label: "ES管理", emoji: "📄" },
       { href: "/interviews", label: "面接ログ", emoji: "👥" },
+      { href: "/interviews/recording", label: "面接録音", emoji: "🎙️" },
       { href: "/calendar", label: "カレンダー", emoji: "📅" },
     ],
   },
@@ -128,7 +129,7 @@ export function BottomNav() {
       {/* More メニュー ボトムシート */}
       {showMore && (
         <div className="fixed bottom-[94px] left-0 right-0 z-50 md:hidden animate-slide-up">
-          <div className="mx-3 bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl shadow-black/12 border border-gray-100/60 overflow-hidden">
+          <div className="mx-3 bg-white/95 dark:bg-[#1a1d27]/95 backdrop-blur-2xl rounded-3xl shadow-2xl shadow-black/12 border border-gray-100/60 dark:border-[#2a2d37]/60 overflow-hidden">
             <div className="px-5 pt-4 pb-2">
               {moreCategories.map((cat) => (
                 <div key={cat.label} className="mb-4">
@@ -145,7 +146,7 @@ export function BottomNav() {
                           className={`relative flex flex-col items-center justify-center gap-1.5 py-3 rounded-2xl text-center transition-all active:scale-95 ${
                             isActive
                               ? "bg-[#00c896]/12 text-[#00a87e]"
-                              : "bg-gray-50 text-gray-600 active:bg-gray-100"
+                              : "bg-gray-50 dark:bg-[#0f1117] text-gray-600 dark:text-gray-400 active:bg-gray-100 dark:active:bg-[#2a2d37]"
                           }`}
                         >
                           <span className="text-[20px] leading-none">{item.emoji}</span>
@@ -171,7 +172,7 @@ export function BottomNav() {
       {/* ボトムナビ本体 */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden safe-area-padding-bottom">
         {/* グラスモーフィズム背景 */}
-        <div className="bg-white/92 backdrop-blur-2xl border-t border-gray-100/80 shadow-[0_-1px_0_rgba(0,0,0,0.04),0_-8px_32px_rgba(0,0,0,0.06)]">
+        <div className="bg-white/92 dark:bg-[#1a1d27]/95 backdrop-blur-2xl border-t border-gray-100/80 dark:border-[#2a2d37]/80 shadow-[0_-1px_0_rgba(0,0,0,0.04),0_-8px_32px_rgba(0,0,0,0.06)]">
           <div className="flex items-center h-[72px] px-1">
 
             {/* ホーム・締切 */}

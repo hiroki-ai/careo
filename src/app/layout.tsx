@@ -6,6 +6,8 @@ import { BottomNav } from "@/components/layout/BottomNav";
 import { PwaInstallBanner } from "@/components/layout/PwaInstallBanner";
 import { ActivityTracker } from "@/components/layout/ActivityTracker";
 import { ToastProvider } from "@/components/ui/Toast";
+import { CommandPalette } from "@/components/CommandPalette";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
 
@@ -121,25 +123,28 @@ const jsonLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ja">
+    <html lang="ja" suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={`${geist.variable} font-sans antialiased bg-gray-50`}>
-        <ToastProvider>
-          <ActivityTracker />
-          <PwaInstallBanner />
-          <div className="flex min-h-screen">
-            <Sidebar />
-            <main className="flex-1 flex flex-col pb-16 md:pb-0 min-w-0">
-              {children}
-            </main>
-          </div>
-          <BottomNav />
-        </ToastProvider>
+      <body className={`${geist.variable} font-sans antialiased bg-gray-50 dark:bg-[#0f1117]`}>
+        <ThemeProvider>
+          <ToastProvider>
+            <ActivityTracker />
+            <PwaInstallBanner />
+            <div className="flex min-h-screen">
+              <Sidebar />
+              <main className="flex-1 flex flex-col pb-16 md:pb-0 min-w-0">
+                {children}
+              </main>
+            </div>
+            <BottomNav />
+            <CommandPalette />
+          </ToastProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

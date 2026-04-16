@@ -189,19 +189,25 @@ const steps = [
     icon: "📝",
     num: "02",
     tag: "就活のたびに",
-    title: "ES・面接・OB訪問を記録",
-    desc: "書いたES、受けた面接、会ったOBのメモをCareoに。コピペするだけでOK。Notionからの移行もAIが自動でやってくれる。",
+    title: "ES・面接・録音・IDを記録",
+    desc: "書いたES、受けた面接を記録。面接は録音するだけでAIがスコアリング。30社以上のマイページIDもワンクリック管理。",
   },
   {
     icon: "🤖",
     num: "03",
     tag: "自動で毎週",
-    title: "あとはAIが全部整理する",
-    desc: "AIコーチが全データを把握して「今週何をすべきか」を毎週自動提案。4種類のコーチキャラから好みのスタイルで伴走してもらえる。",
+    title: "あとはAIが全部整理・分析",
+    desc: "AIコーチが全データを把握して「今週何をすべきか」を毎週自動提案。面接録音のフィードバックやES通過率データも活用して最適化。",
   },
 ];
 
 const differenceItems = [
+  {
+    icon: "🎙️",
+    tag: "New",
+    title: "面接録音→AIフィードバック",
+    desc: "オンライン面接を録音・アップロードするだけ。AIが回答品質をスコアリングし、改善点と模範回答を提示",
+  },
   {
     icon: "🔮",
     tag: "今すぐ使える",
@@ -228,23 +234,32 @@ const differenceItems = [
   },
 ];
 
-const beforeItems = [
-  "Notion/スプレッドシートがごちゃごちゃ",
-  "ES締切をカレンダーで管理→それでも忘れる",
-  "ChatGPTに毎回ゼロから説明し直し",
-  "面接のフィードバックがどこにあるかわからない",
-  "就活全体が見えなくて漠然と不安",
-];
-
-const afterItems = [
-  "企業・ES・面接・OB訪問が全部一か所",
-  "締切3日前に自動通知。見落としゼロ",
-  "カレオコーチが全データを把握して個人化提案",
-  "面接の振り返りがすぐ呼び出せる",
-  "今週やることが毎週自動で届く",
-];
 
 const features = [
+  {
+    icon: "🎙️",
+    title: "面接録音→AIフィードバック",
+    desc: "録音するだけ。AIがスコアリングし改善点を提示。",
+    grad: "from-rose-500/20 to-orange-400/10",
+    border: "border-rose-100",
+    isNew: true,
+  },
+  {
+    icon: "🔑",
+    title: "マイページID一括管理",
+    desc: "30社以上のID・パスワードを一元管理。ワンクリックで開く。",
+    grad: "from-indigo-500/20 to-blue-400/10",
+    border: "border-indigo-100",
+    isNew: true,
+  },
+  {
+    icon: "📊",
+    title: "ES通過率データ",
+    desc: "匿名共有データで設問ごとの通過率がわかる。",
+    grad: "from-teal-500/20 to-cyan-400/10",
+    border: "border-teal-100",
+    isNew: true,
+  },
   {
     icon: "📅",
     title: "締切自動通知",
@@ -281,7 +296,7 @@ const features = [
     border: "border-yellow-100",
   },
   {
-    icon: "📊",
+    icon: "📈",
     title: "進捗ダッシュボード",
     desc: "全企業の選考状況がひと目でわかる。",
     grad: "from-amber-400/20 to-orange-400/10",
@@ -289,74 +304,29 @@ const features = [
   },
 ];
 
-const comparisonRows = [
-  { label: "締切自動通知", notion: "❌", careo: "✅" },
-  { label: "AIコーチング", notion: "❌", careo: "✅" },
-  { label: "選考進捗管理", notion: "△ 手動", careo: "✅" },
-  { label: "ES AI添削・チェック", notion: "❌", careo: "✅" },
-  { label: "自己分析 深掘り12問", notion: "❌", careo: "✅" },
-  { label: "SPI練習・スコア記録", notion: "❌", careo: "✅" },
-  { label: "自由なメモ・資料", notion: "✅", careo: "△" },
-  { label: "完全無料", notion: "△ 制限あり", careo: "✅" },
-];
 
 const faqs = [
   {
     q: "無料で使えますか？",
-    a: "はい、全機能を完全無料でご利用いただけます。クレジットカード不要。メールアドレスだけで今すぐ始められます。学生向けの機能は今後も無料を基本方針とします。将来的に大学キャリアセンターや企業向けのサービスを追加する可能性があります。",
-  },
-  {
-    q: "スマホでも使えますか？",
-    a: "はい、iPhoneでもAndroidでもブラウザから利用できます。ホーム画面に追加するとアプリのように使えます（PWA対応）。",
-  },
-  {
-    q: "NotionのデータをCareoに移せますか？",
-    a: "できます。CSVやPDFをアップロードするとAIが自動抽出して一括インポート。手入力ゼロで移行できます。",
+    a: "はい、全機能を完全無料でご利用いただけます。クレジットカード不要。メールアドレスだけで今すぐ始められます。学生向け機能は今後も無料を基本方針とします。",
   },
   {
     q: "ChatGPTと何が違うんですか？",
     a: "ChatGPTはあなたの就活データを知りません。Careoは今まで書いた全てのES、面接記録、OB訪問の内容、企業のステータスを把握した上でアドバイスします。「あなたがA社に書いたガクチカと、今書いているB社のESで矛盾がある」ような指摘はCareoにしかできません。",
   },
   {
-    q: "BaseMeやSmartESとの違いは？",
-    a: "BaseMe・SmartESは特定機能（スカウト・ES生成）に特化しています。Careoは就活全体のデータを把握したAIコーチが、横断した気づきを届けます。組み合わせて使うのがベスト。",
+    q: "スマホでも使えますか？",
+    a: "はい、iPhoneでもAndroidでもブラウザから利用できます。ホーム画面に追加するとアプリのように使えます（PWA対応）。",
   },
   {
     q: "マイナビやリクナビを使っていても使えますか？",
     a: "はい、Careoはマイナビ・リクナビの代替ではなく補完ツールです。就活サイトで企業を見つけて、管理・AI分析はCareoで。Chrome拡張機能（β）を使えば、就活サイト閲覧中にワンクリックでCareoに企業を追加できます。",
   },
+  {
+    q: "27卒・28卒・29卒でも使えますか？",
+    a: "はい、卒業予定年度を問わずご利用いただけます。登録時に卒業予定年度を設定すると、その年度・フェーズに合わせたAIコーチングが受けられます。",
+  },
 ];
-
-const TAG_COLORS: Record<string, string> = {
-  "ES対策": "bg-blue-50 text-blue-600",
-  "面接対策": "bg-purple-50 text-purple-600",
-  "自己分析": "bg-orange-50 text-orange-600",
-  "OB/OG訪問": "bg-teal-50 text-teal-600",
-  "インターン": "bg-green-50 text-green-600",
-  "就活管理": "bg-indigo-50 text-indigo-600",
-  "AI就活": "bg-[#00c896]/10 text-[#00a87e]",
-  "筆記試験": "bg-yellow-50 text-yellow-600",
-  "業界研究": "bg-rose-50 text-rose-600",
-};
-
-const TAG_GRADIENTS: Record<string, [string, string]> = {
-  "ES対策":     ["#3b82f6", "#06b6d4"],
-  "面接対策":   ["#8b5cf6", "#ec4899"],
-  "自己分析":   ["#f97316", "#eab308"],
-  "OB/OG訪問": ["#14b8a6", "#10b981"],
-  "インターン": ["#22c55e", "#16a34a"],
-  "就活管理":   ["#6366f1", "#8b5cf6"],
-  "AI就活":     ["#00c896", "#0ea5e9"],
-  "筆記試験":   ["#eab308", "#f97316"],
-  "業界研究":   ["#f43f5e", "#e11d48"],
-};
-
-function getThumbnailColors(tags: string[]): [string, string] {
-  for (const tag of tags) {
-    if (TAG_GRADIENTS[tag]) return TAG_GRADIENTS[tag];
-  }
-  return ["#6366f1", "#8b5cf6"];
-}
 
 // ─── Mobile Voice Section ─────────────────────────────────────────────────────
 const MOBILE_AVATAR_COLORS = [
@@ -464,12 +434,21 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
               Careo
             </span>
           </div>
-          <Link
-            href="/signup"
-            className="text-xs text-white font-bold px-4 py-2.5 rounded-xl bg-[#00c896] shadow-md shadow-[#00c896]/30 active:scale-95 transition-transform"
-          >
-            無料で始める
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/features"
+              className="text-[10px] font-semibold px-2.5 py-2 rounded-lg transition-colors duration-300"
+              style={{ color: scrollY > 50 ? "#6b7280" : "rgba(255,255,255,0.7)" }}
+            >
+              機能詳細
+            </Link>
+            <Link
+              href="/signup"
+              className="text-xs text-white font-bold px-4 py-2.5 rounded-xl bg-[#00c896] shadow-md shadow-[#00c896]/30 active:scale-95 transition-transform"
+            >
+              無料で始める
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -501,7 +480,7 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
         </div>
 
         <p className="text-gray-400 text-sm leading-relaxed mb-8">
-          ES・面接・OB訪問・筆記試験——あなたの就活データを全部把握したAIが、本当に必要なアドバイスだけを届ける。
+          就活データ全体を把握したAIが、本当に必要なアドバイスだけを届ける。ES・面接・OB訪問・筆記試験——すべてを知ったAIだからできること。
         </p>
 
         <Link
@@ -590,6 +569,7 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
                     "あなたの就活データを知らない",
                     "毎回ゼロから説明し直しが必要",
                     "就活全体の矛盾に気づけない",
+                    "面接録音の分析ができない",
                   ].map((t) => (
                     <li key={t} className="flex gap-2 text-xs text-gray-500">
                       <span className="text-gray-300 shrink-0 font-bold">✕</span>{t}
@@ -607,6 +587,7 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
                     "全就活データを把握して個人化提案",
                     "ES・面接・OB訪問を横断して記憶",
                     "「あなたのA社のES」を参照できる",
+                    "面接録音をAIがスコアリング",
                   ].map((t) => (
                     <li key={t} className="flex gap-2 text-xs text-[#0D0B21]">
                       <span className="text-[#00c896] shrink-0 font-bold">✓</span>{t}
@@ -697,7 +678,9 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
                   <div className="min-w-0">
                     <span
                       className={`inline-block text-[9px] font-bold px-2 py-0.5 rounded-full mb-1.5 ${
-                        item.tag === "近日公開"
+                        item.tag === "New"
+                          ? "bg-amber-400/20 text-amber-300"
+                          : item.tag === "近日公開"
                           ? "bg-indigo-500/20 text-indigo-300"
                           : "bg-[#00c896]/20 text-[#00c896]"
                       }`}
@@ -724,9 +707,12 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
         </Reveal>
 
         <div className="grid grid-cols-2 gap-3">
-          {features.map((f, i) => (
+          {features.map((f: { icon: string; title: string; desc: string; grad: string; border: string; isNew?: boolean }, i) => (
             <Reveal key={f.title} delay={i * 60}>
-              <div className={`bg-gradient-to-br ${f.grad} border ${f.border} rounded-2xl p-4 h-full`}>
+              <div className={`bg-gradient-to-br ${f.grad} border ${f.border} rounded-2xl p-4 h-full relative`}>
+                {f.isNew && (
+                  <span className="absolute top-2 right-2 text-[8px] font-black bg-amber-400 text-white px-1.5 py-0.5 rounded-full">New</span>
+                )}
                 <span className="text-2xl mb-3 block">{f.icon}</span>
                 <p className="font-black text-gray-900 text-sm mb-1.5 leading-snug">{f.title}</p>
                 <p className="text-xs text-gray-500 leading-relaxed">{f.desc}</p>
@@ -736,150 +722,18 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
         </div>
       </section>
 
-      {/* ── 楽しくなる新機能 ────────────────────────────────────────────────── */}
-      <section className="px-6 py-16 bg-[#0D0B21] overflow-hidden">
-        <Reveal className="mb-8">
-          <p className="text-[#00c896] text-[10px] font-black tracking-widest uppercase mb-2">Fun & Engaging</p>
-          <h2 className="text-3xl font-black text-white leading-tight">
-            就活が、<br /><span className="text-[#00c896]">楽しくなる</span>仕掛け
-          </h2>
-          <p className="text-gray-400 text-sm mt-3 leading-relaxed">
-            記録するのが楽しくなると、データが貯まる。<br />データが貯まると、AIの精度が上がる。
-          </p>
-        </Reveal>
-        <div className="space-y-3">
-          {[
-            {
-              emoji: "🏆",
-              title: "内定でコンフェッティ演出",
-              desc: "内定・インターン合格のステータスを記録するとお祝い演出。小さな達成を一緒に喜ぶ。",
-              color: "from-amber-500/20 to-yellow-400/10 border-amber-500/20",
-            },
-            {
-              emoji: "😊",
-              title: "感情タグで面接を記録",
-              desc: "面接後に「😊楽しかった」「🔥手応えあり」をワンタップ。感情パターンがAI分析に活かされる。",
-              color: "from-purple-500/20 to-pink-400/10 border-purple-500/20",
-            },
-            {
-              emoji: "🏅",
-              title: "マイルストーンバッジ",
-              desc: "「初ES提出」「初面接通過」「10社登録」など、就活の節目を達成バッジで可視化。",
-              color: "from-[#00c896]/20 to-emerald-400/10 border-[#00c896]/20",
-            },
-            {
-              emoji: "🗺️",
-              title: "就活ジャーニーマップ",
-              desc: "WISHLIST→応募→面接→内定まで、自分の就活の旅路がグラフで一目でわかる。",
-              color: "from-blue-500/20 to-cyan-400/10 border-blue-500/20",
-            },
-            {
-              emoji: "🏃",
-              title: "週次コーチセッション",
-              desc: "毎週AIが先週を振り返り、今週のフォーカスとアクションを3つ提案。感情データも分析に活用。",
-              color: "from-indigo-500/20 to-violet-400/10 border-indigo-500/20",
-            },
-          ].map((item, i) => (
-            <Reveal key={item.title} delay={i * 60}>
-              <div className={`bg-gradient-to-br ${item.color} border rounded-2xl p-4 flex gap-3`}>
-                <span className="text-3xl shrink-0">{item.emoji}</span>
-                <div>
-                  <p className="font-black text-white text-sm mb-1">{item.title}</p>
-                  <p className="text-gray-400 text-xs leading-relaxed">{item.desc}</p>
-                </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-
-      {/* ── Before / After ─────────────────────────────────────────────────── */}
-      <section className="px-6 py-14 bg-gray-50">
-        <Reveal className="mb-8">
-          <p className="text-[#00c896] text-[10px] font-black tracking-widest uppercase mb-2">Before / After</p>
-          <h2 className="text-3xl font-black text-gray-900 leading-tight">
-            Careoを使うと、<br /><span className="text-[#00c896]">何が変わる？</span>
-          </h2>
-        </Reveal>
-
-        <div className="space-y-3">
-          <Reveal from="left">
-            <div className="bg-white border border-gray-200 rounded-2xl p-5">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-xl">😮‍💨</span>
-                <p className="font-black text-gray-600 text-sm">今まで</p>
-              </div>
-              <ul className="space-y-2.5">
-                {beforeItems.map((t) => (
-                  <li key={t} className="flex gap-2.5 text-xs text-gray-500">
-                    <span className="text-gray-300 shrink-0 font-bold mt-0.5">−</span>{t}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </Reveal>
-
-          <Reveal from="right" delay={100}>
-            <div className="bg-gradient-to-br from-[#00c896]/6 to-emerald-50 border border-[#00c896]/20 rounded-2xl p-5">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-xl">🚀</span>
-                <p className="font-black text-[#0D0B21] text-sm">Careoを使ったら</p>
-              </div>
-              <ul className="space-y-2.5">
-                {afterItems.map((t) => (
-                  <li key={t} className="flex gap-2.5 text-xs text-[#0D0B21]">
-                    <span className="text-[#00c896] shrink-0 font-bold mt-0.5">✓</span>{t}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ── Comparison ─────────────────────────────────────────────────────── */}
-      <section className="px-6 py-16 bg-white">
-        <Reveal className="mb-8">
-          <p className="text-[#00c896] text-[10px] font-black tracking-widest uppercase mb-2">Compare</p>
-          <h2 className="text-3xl font-black text-gray-900 leading-tight mb-2">
-            Notionと<br />何が違うの？
-          </h2>
-          <p className="text-gray-500 text-sm leading-relaxed">
-            Notionは自由度が高くて便利。<br />でも、就活専用AIは持っていない。
-          </p>
-        </Reveal>
-
+      {/* ── Features link ──────────────────────────────────────────────────── */}
+      <section className="px-6 py-8 bg-white">
         <Reveal>
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className="grid grid-cols-3 bg-gray-50 border-b border-gray-100">
-              <div className="p-3" />
-              <div className="p-3 text-center border-r border-gray-100">
-                <p className="text-[11px] font-bold text-gray-400">Notion</p>
-              </div>
-              <div className="p-3 text-center bg-[#00c896]/5">
-                <p className="text-[11px] font-bold text-[#00c896]">Careo</p>
-              </div>
-            </div>
-            {comparisonRows.map((row, i) => (
-              <div
-                key={row.label}
-                className={`grid grid-cols-3 border-b border-gray-50 ${i % 2 === 0 ? "bg-white" : "bg-gray-50/40"}`}
-              >
-                <div className="p-3 border-r border-gray-50">
-                  <p className="text-xs text-gray-700 font-medium leading-snug">{row.label}</p>
-                </div>
-                <div className="p-3 text-center border-r border-gray-50">
-                  <p className="text-sm text-gray-400">{row.notion}</p>
-                </div>
-                <div className="p-3 text-center bg-[#00c896]/5">
-                  <p className="text-sm">{row.careo}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-          <p className="text-[11px] text-gray-400 text-center mt-3 leading-relaxed px-2">
-            Notionで書いた企業研究メモは消さなくてOK。<br />Careoは「管理・AI分析の部分だけ」担当します。
-          </p>
+          <Link
+            href="/features"
+            className="flex items-center justify-center gap-2 text-sm font-bold text-[#00a87e] active:opacity-70 transition-opacity"
+          >
+            全機能一覧・比較表を見る
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
         </Reveal>
       </section>
 
@@ -914,30 +768,6 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
         </Reveal>
       </section>
 
-      {/* ── Career Center ──────────────────────────────────────────────────── */}
-      <section className="px-6 py-10 bg-white">
-        <Reveal>
-          <div className="rounded-2xl border border-[#00c896]/20 bg-gradient-to-br from-[#00c896]/5 to-emerald-50/40 p-5">
-            <div className="flex items-start gap-3 mb-4">
-              <span className="text-2xl shrink-0">🏫</span>
-              <div>
-                <span className="inline-block text-[9px] bg-indigo-500/15 text-indigo-500 font-bold px-2 py-0.5 rounded-full mb-1">大学・キャリアセンター向け</span>
-                <h3 className="font-black text-[#0D0B21] text-base leading-snug">Careoは大学との連携を準備中</h3>
-              </div>
-            </div>
-            <p className="text-gray-500 text-xs leading-relaxed mb-4">
-              学生のCareoデータをPDF1枚にまとめ、キャリアセンターとの面談を効率化。現在、複数の大学と提携に向けた準備を進めています。
-            </p>
-            <Link
-              href="/for-career-center"
-              className="inline-flex items-center gap-1.5 text-sm font-bold text-[#00a87e] active:opacity-70 transition-opacity"
-            >
-              キャリアセンターご担当者様はこちら →
-            </Link>
-          </div>
-        </Reveal>
-      </section>
-
       {/* ── Voice ──────────────────────────────────────────────────────────── */}
       <MobileVoiceSection reviews={reviews} />
 
@@ -953,74 +783,6 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
           ))}
         </div>
       </section>
-
-      {/* ── Blog Preview ───────────────────────────────────────────────────── */}
-      {recentPosts.length > 0 && (
-        <section className="px-5 py-14 bg-gray-50">
-          <Reveal className="mb-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="inline-flex items-center gap-1.5 bg-[#00c896]/8 text-[#00a87e] text-[10px] font-bold px-3 py-1 rounded-full mb-2">
-                  <span className="w-1 h-1 bg-[#00c896] rounded-full animate-pulse" />
-                  毎朝8時更新
-                </div>
-                <h2 className="text-2xl font-black text-gray-900">就活ブログ</h2>
-              </div>
-              <Link href="/blog" className="text-xs font-bold text-[#00a87e]">
-                一覧 →
-              </Link>
-            </div>
-          </Reveal>
-          <div className="space-y-3">
-            {recentPosts.map((post, i) => {
-              const [c1, c2] = getThumbnailColors(post.tags);
-              return (
-              <Reveal key={post.id} delay={i * 80}>
-                <Link
-                  href={`/blog/${post.slug}`}
-                  className="block bg-white rounded-2xl border border-gray-100 overflow-hidden active:scale-[0.99] transition-transform"
-                >
-                  <div
-                    className="relative w-full overflow-hidden"
-                    style={{ aspectRatio: "1200/630", background: `linear-gradient(135deg, ${c1} 0%, ${c2} 100%)` }}
-                  >
-                    <div style={{ position: "absolute", top: "-30%", right: "-10%", width: "55%", paddingBottom: "55%", borderRadius: "50%", background: "rgba(255,255,255,0.10)" }} />
-                    <div style={{ position: "absolute", bottom: "-25%", left: "-8%", width: "42%", paddingBottom: "42%", borderRadius: "50%", background: "rgba(255,255,255,0.07)" }} />
-                    <div className="absolute top-3 left-3">
-                      <span className="text-[10px] font-bold text-white/90 bg-white/20 px-2 py-0.5 rounded-full backdrop-blur-sm">
-                        {post.tags[0] ?? "就活"}
-                      </span>
-                    </div>
-                    <div className="absolute inset-0 flex items-center px-4 pt-7 pb-8">
-                      <p className="text-white font-bold text-xs leading-snug line-clamp-3 drop-shadow-sm">{post.title}</p>
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 flex items-center gap-1.5 px-4 py-2 border-t border-white/20">
-                      <img src="/icon-192.png" alt="" className="w-3 h-3 brightness-0 invert opacity-80" />
-                      <span className="text-[9px] text-white/80 font-semibold">Careo</span>
-                      <span className="text-[9px] text-white/50 ml-auto">{post.reading_time_min}分で読める</span>
-                    </div>
-                  </div>
-                  <div className="p-4">
-                    <div className="flex items-center gap-1.5 mb-2">
-                      {post.tags.slice(0, 1).map((tag) => (
-                        <span key={tag} className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${TAG_COLORS[tag] ?? "bg-gray-100 text-gray-600"}`}>
-                          {tag}
-                        </span>
-                      ))}
-                      {i === 0 && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#00c896]/10 text-[#00a87e]">NEW</span>
-                      )}
-                    </div>
-                    <p className="text-sm font-bold text-gray-900 leading-snug line-clamp-2">{post.title}</p>
-                    <p className="text-[10px] text-gray-400 mt-1.5">{post.reading_time_min}分で読める</p>
-                  </div>
-                </Link>
-              </Reveal>
-              );
-            })}
-          </div>
-        </section>
-      )}
 
       {/* ── Final CTA ──────────────────────────────────────────────────────── */}
       <section className="px-6 py-24 bg-[#0D0B21] relative overflow-hidden">
@@ -1047,49 +809,6 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
         </div>
       </section>
 
-      {/* ── SNS フォローセクション ───────────────────────────────────────────── */}
-      <section className="px-5 py-14 bg-[#0a0820]">
-        <p className="text-center text-xs font-bold text-gray-600 uppercase tracking-widest mb-1">Follow & Read</p>
-        <h2 className="text-center text-lg font-black text-white mb-6">就活リアルを発信中</h2>
-        <div className="flex flex-col gap-4">
-
-          {/* X カード */}
-          <a
-            href="https://x.com/hiroki_careo"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-2xl p-4 active:scale-[.98] transition-transform"
-          >
-            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-content-center flex-shrink-0 flex items-center justify-center">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="black"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.91-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-white font-bold text-sm">@hiroki_careo</div>
-              <div className="text-gray-400 text-xs mt-0.5">就活ノウハウ・体験談を毎日投稿</div>
-            </div>
-            <span className="text-[#1d9bf0] text-xs font-bold flex-shrink-0">フォロー →</span>
-          </a>
-
-          {/* Note カード */}
-          <a
-            href="https://note.com/hiroki_careo"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-2xl p-4 active:scale-[.98] transition-transform"
-          >
-            <div className="w-10 h-10 bg-[#41c9b0] rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M20.24 0H3.76A3.76 3.76 0 0 0 0 3.76v16.48A3.76 3.76 0 0 0 3.76 24h16.48A3.76 3.76 0 0 0 24 20.24V3.76A3.76 3.76 0 0 0 20.24 0zM8.95 17.3H6.67V6.7h2.28zm7.08 0h-2.07l-3.36-6.86V17.3H8.32V6.7h2.28l3.16 6.44V6.7h2.27z"/></svg>
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-white font-bold text-sm">hiroki_careo</div>
-              <div className="text-gray-400 text-xs mt-0.5">就活ノウハウ記事を週3本更新</div>
-            </div>
-            <span className="text-[#41c9b0] text-xs font-bold flex-shrink-0">読む →</span>
-          </a>
-
-        </div>
-      </section>
-
       {/* ── Footer ─────────────────────────────────────────────────────────── */}
       <footer className="px-6 py-8 bg-[#080618] border-t border-white/5">
         <div className="flex items-center gap-2 mb-4">
@@ -1097,6 +816,15 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
           <span className="font-bold text-sm text-gray-500">Careo</span>
         </div>
         <div className="flex flex-wrap gap-x-5 gap-y-2 mb-5">
+          <Link href="/features" className="text-gray-600 text-xs hover:text-gray-300 transition-colors">
+            機能詳細
+          </Link>
+          <Link href="/for-career-center" className="text-gray-600 text-xs hover:text-gray-300 transition-colors">
+            キャリアセンター向け
+          </Link>
+          <Link href="/blog" className="text-gray-600 text-xs hover:text-gray-300 transition-colors">
+            ブログ
+          </Link>
           <a href="https://x.com/hiroki_careo" target="_blank" rel="noopener noreferrer" className="text-gray-600 text-xs hover:text-gray-300 transition-colors flex items-center gap-1">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.91-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
             X
@@ -1105,16 +833,15 @@ export function MobileLandingPage({ recentPosts = [], userCount = 0, reviews = [
             <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M20.24 0H3.76A3.76 3.76 0 0 0 0 3.76v16.48A3.76 3.76 0 0 0 3.76 24h16.48A3.76 3.76 0 0 0 24 20.24V3.76A3.76 3.76 0 0 0 20.24 0zM8.95 17.3H6.67V6.7h2.28zm7.08 0h-2.07l-3.36-6.86V17.3H8.32V6.7h2.28l3.16 6.44V6.7h2.27z"/></svg>
             Note
           </a>
-          {[
-            { label: "利用規約", href: "/terms" },
-            { label: "プライバシーポリシー", href: "/privacy" },
-            { label: "比較ページ", href: "/compare" },
-            { label: "ログイン", href: "/login" },
-          ].map(({ label, href }) => (
-            <Link key={href} href={href} className="text-gray-600 text-xs hover:text-gray-300 transition-colors">
-              {label}
-            </Link>
-          ))}
+          <Link href="/terms" className="text-gray-600 text-xs hover:text-gray-300 transition-colors">
+            利用規約
+          </Link>
+          <Link href="/privacy" className="text-gray-600 text-xs hover:text-gray-300 transition-colors">
+            プライバシーポリシー
+          </Link>
+          <Link href="/login" className="text-gray-600 text-xs hover:text-gray-300 transition-colors">
+            ログイン
+          </Link>
         </div>
         <p className="text-gray-700 text-[10px]">© 2026 Careo. All rights reserved.</p>
       </footer>

@@ -5,10 +5,11 @@ import { useAptitudeTests } from "@/hooks/useAptitudeTests";
 import { useCompanies } from "@/hooks/useCompanies";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
-import { Badge } from "@/components/ui/Badge";
+import { LegacyBadge as Badge } from "@/components/ui/StatusBadge";
 import { useToast } from "@/components/ui/Toast";
 import { AptitudeTest, APTITUDE_TEST_TYPES } from "@/types";
 import { formatDate } from "@/lib/utils";
+import { KareoCharacter } from "@/components/kareo/KareoCharacter";
 
 const RESULT_VARIANTS: Record<AptitudeTest["result"], "success" | "danger" | "default"> = {
   PASS: "success", FAIL: "danger", PENDING: "default",
@@ -105,8 +106,8 @@ export default function TestsPage() {
           {[...Array(3)].map((_, i) => <div key={i} className="h-16 bg-gray-100 rounded-xl animate-pulse" />)}
         </div>
       ) : tests.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
-          <p className="text-4xl mb-3">📝</p>
+        <div className="text-center py-12 text-gray-400">
+          <KareoCharacter expression="encouraging" size={100} className="mx-auto mb-3" />
           <p className="font-medium mb-1">筆記試験の記録がありません</p>
           <p className="text-sm">SPI・玉手箱・CABなどの受験記録を管理しましょう</p>
           <Button className="mt-4" onClick={() => setIsOpen(true)}>最初の記録を追加</Button>

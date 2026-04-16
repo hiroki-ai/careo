@@ -53,6 +53,9 @@ export interface Company {
   industry: string;
   url?: string;
   mypage_url?: string;
+  mypage_login_id?: string;
+  mypage_password_encrypted?: string;
+  mypage_notes?: string;
   status: CompanyStatus;
   notes?: string;
   ai_research?: string | null;
@@ -62,6 +65,15 @@ export interface Company {
   updatedAt: string;
 }
 
+export type EsResult = "passed" | "failed" | "pending" | "unknown";
+
+export const ES_RESULT_LABELS: Record<EsResult, string> = {
+  passed: "通過",
+  failed: "不通過",
+  pending: "保留",
+  unknown: "不明",
+};
+
 export interface ES {
   id: string;
   companyId: string;
@@ -69,8 +81,17 @@ export interface ES {
   questions: QAPair[];
   deadline?: string;
   status: EsStatus;
+  result: EsResult;
+  isSharedAnonymously: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface EsCommunityInsight {
+  question: string;
+  totalCount: number;
+  passedCount: number;
+  passRate: number;
 }
 
 export interface Interview {
@@ -564,3 +585,40 @@ export const COMPANY_EVENT_TYPE_COLORS: Record<CompanyEventType, string> = {
 };
 
 export const COMPANY_EVENT_TYPES: CompanyEventType[] = ["説明会", "インターン", "セミナー", "その他"];
+
+// ── 面接録音AI ─────────────────────────────────────────────────
+
+export interface InterviewRecording {
+  id: string;
+  userId: string;
+  interviewId: string | null;
+  companyName: string | null;
+  recordingType: 'audio_upload' | 'text_paste' | 'audio_record';
+  transcript: string | null;
+  aiFeedback: InterviewAIFeedback | null;
+  durationSeconds: number | null;
+  status: 'pending' | 'transcribing' | 'analyzing' | 'completed' | 'error';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface InterviewAIFeedback {
+  overallScore: number;
+  summary: string;
+  strengths: string[];
+  improvements: string[];
+  questionAnalysis: {
+    question: string;
+    answer: string;
+    score: number;
+    feedback: string;
+    improvedAnswer: string;
+  }[];
+  communicationScore: {
+    clarity: number;
+    structure: number;
+    enthusiasm: number;
+    specificity: number;
+  };
+  tips: string[];
+}

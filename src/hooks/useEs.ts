@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { ES } from "@/types";
+import { ES, EsResult, EsCommunityInsight } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 
 function rowToEs(row: Record<string, unknown>, questions: Record<string, unknown>[] = []): ES {
@@ -11,6 +11,8 @@ function rowToEs(row: Record<string, unknown>, questions: Record<string, unknown
     title: row.title as string,
     deadline: row.deadline as string | undefined,
     status: row.status as ES["status"],
+    result: (row.result as EsResult) ?? "unknown",
+    isSharedAnonymously: (row.is_shared_anonymously as boolean) ?? false,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
     questions: questions.map((q) => ({
@@ -43,7 +45,7 @@ export function useEs() {
     const { data: { user } } = await supabase.auth.getUser();
     const { data: entry } = await supabase
       .from("es_entries")
-      .insert({ company_id: data.companyId, title: data.title, deadline: data.deadline || null, status: data.status, user_id: user!.id })
+      .insert({ company_id: data.companyId, title: data.title, deadline: data.deadline || null, status: data.status, result: data.result ?? "unknown", is_shared_anonymously: data.isSharedAnonymously ?? false, user_id: user!.id })
       .select()
       .single();
     if (!entry) throw new Error("Failed to create ES");
@@ -59,12 +61,14 @@ export function useEs() {
   }, []);
 
   const updateEs = useCallback(async (id: string, data: Partial<ES>) => {
-    await supabase.from("es_entries").update({
-      company_id: data.companyId,
-      title: data.title,
-      deadline: data.deadline || null,
-      status: data.status,
-    }).eq("id", id);
+    const updatePayload: Record<string, unknown> = {};
+    if (data.companyId !== undefined) updatePayload.company_id = data.companyId;
+    if (data.title !== undefined) updatePayload.title = data.title;
+    if (data.deadline !== undefined) updatePayload.deadline = data.deadline || null;
+    if (data.status !== undefined) updatePayload.status = data.status;
+    if (data.result !== undefined) updatePayload.result = data.result;
+    if (data.isSharedAnonymously !== undefined) updatePayload.is_shared_anonymously = data.isSharedAnonymously;
+    await supabase.from("es_entries").update(updatePayload).eq("id", id);
 
     if (data.questions) {
       await supabase.from("es_questions").delete().eq("es_id", id);
@@ -85,5 +89,20 @@ export function useEs() {
   const getEsById = useCallback((id: string) => esList.find((e) => e.id === id), [esList]);
   const getEsByCompany = useCallback((companyId: string) => esList.filter((e) => e.companyId === companyId), [esList]);
 
-  return { esList, loading, addEs, updateEs, deleteEs, getEsById, getEsByCompany };
+  const fetchCommunityInsights = useCallback(async (): Promise<EsCommunityInsight[]> => {
+    const { data } = await supabase
+      .from("es_community_insights")
+      .select("*")
+      .order("total_count", { ascending: false })
+      .limit(20);
+    if (!data) return [];
+    return (data as Record<string, unknown>[]).map((row) => ({
+      question: row.question as string,
+      totalCount: row.total_count as number,
+      passedCount: row.passed_count as number,
+      passRate: row.pass_rate as number,
+    }));
+  }, []);
+
+  return { esList, loading, addEs, updateEs, deleteEs, getEsById, getEsByCompany, fetchCommunityInsights };
 }

@@ -1,17 +1,40 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
+import {
+  DndContext,
+  DragOverlay,
+  closestCorners,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragStartEvent,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { createClient } from "@/lib/supabase/client";
 import { useCompanies } from "@/hooks/useCompanies";
 import { useProfile } from "@/hooks/useProfile";
+import { useEs } from "@/hooks/useEs";
+import { useInterviews } from "@/hooks/useInterviews";
 import { CompanyForm } from "@/components/companies/CompanyForm";
 import { CsvImportModal } from "@/components/companies/CsvImportModal";
-import { StatusBadge } from "@/components/ui/Badge";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
+import { SkeletonCard } from "@/components/ui/SkeletonCard";
 import { useToast } from "@/components/ui/Toast";
 import { Company, CompanyStatus, COMPANY_STATUS_LABELS, COMPANY_STATUS_ORDER } from "@/types";
+import { KareoCharacter } from "@/components/kareo/KareoCharacter";
+import { daysUntil } from "@/lib/utils";
 
 // モバイル：左スワイプでクイックアクション
 function SwipeableCompanyCard({ company, onDelete, onStatusChange }: {
@@ -98,7 +121,14 @@ function SwipeableCompanyCard({ company, onDelete, onStatusChange }: {
         <Link href={isOpen ? "#" : `/companies/${company.id}`} onClick={isOpen ? (e) => { e.preventDefault(); close(); } : undefined}>
           <div className="bg-white rounded-xl border border-gray-100 p-5 hover:shadow-md transition-shadow cursor-pointer">
             <div className="flex items-start justify-between mb-2">
-              <h3 className="font-semibold text-gray-900 leading-tight">{company.name}</h3>
+              <div className="flex items-center gap-1.5 min-w-0">
+                <h3 className="font-semibold text-gray-900 leading-tight truncate">{company.name}</h3>
+                {company.mypage_url && (
+                  <svg className="w-3.5 h-3.5 text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                  </svg>
+                )}
+              </div>
               <StatusBadge
                 status={company.status}
                 label={company.status === "OFFERED" ? (company.is_intern_offer ? "インターン合格" : "内定") : undefined}
@@ -113,6 +143,74 @@ function SwipeableCompanyCard({ company, onDelete, onStatusChange }: {
     </div>
   );
 }
+
+// Kanban column definitions
+const KANBAN_COLUMNS: { id: string; label: string; statuses: CompanyStatus[]; color: string }[] = [
+  { id: "wishlist", label: "気になる", statuses: ["WISHLIST"], color: "bg-gray-400" },
+  { id: "applying", label: "応募中", statuses: ["APPLIED", "INTERN_APPLYING"], color: "bg-blue-500" },
+  { id: "document", label: "書類選考", statuses: ["DOCUMENT", "INTERN_DOCUMENT"], color: "bg-yellow-500" },
+  { id: "interview", label: "面接中", statuses: ["INTERVIEW_1", "INTERVIEW_2", "FINAL", "INTERN_INTERVIEW_1", "INTERN_INTERVIEW_2", "INTERN_FINAL"], color: "bg-purple-500" },
+  { id: "result", label: "内定 / 不合格", statuses: ["OFFERED", "INTERN", "REJECTED"], color: "bg-green-500" },
+];
+
+function SortableKanbanCard({ company, nextDeadline }: { company: Company; nextDeadline?: string }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: company.id, data: { company } });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      <Link href={`/companies/${company.id}`}>
+        <div className="bg-white rounded-xl border border-gray-100 p-3.5 hover:shadow-md transition-all cursor-pointer group">
+          <div className="flex items-start justify-between mb-1.5">
+            <h4 className="text-sm font-semibold text-gray-900 leading-tight truncate flex-1">{company.name}</h4>
+            <StatusBadge
+              status={company.status}
+              label={company.status === "OFFERED" ? (company.is_intern_offer ? "インターン合格" : "内定") : undefined}
+              className="ml-1.5 shrink-0 text-[10px]"
+            />
+          </div>
+          {company.industry && (
+            <p className="text-[11px] text-gray-400 mb-1.5 truncate">{company.industry}</p>
+          )}
+          {nextDeadline && (
+            <div className="flex items-center gap-1 mt-1.5">
+              <svg className="w-3 h-3 text-orange-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-[10px] text-orange-500 font-medium">{nextDeadline}</span>
+            </div>
+          )}
+        </div>
+      </Link>
+    </div>
+  );
+}
+
+function KanbanOverlayCard({ company }: { company: Company }) {
+  return (
+    <div className="bg-white rounded-xl border-2 border-[#00c896] p-3.5 shadow-xl kanban-card-dragging">
+      <div className="flex items-start justify-between mb-1.5">
+        <h4 className="text-sm font-semibold text-gray-900 leading-tight truncate flex-1">{company.name}</h4>
+        <StatusBadge status={company.status} className="ml-1.5 shrink-0 text-[10px]" />
+      </div>
+      {company.industry && <p className="text-[11px] text-gray-400 truncate">{company.industry}</p>}
+    </div>
+  );
+}
+
+type ViewMode = "list" | "kanban";
 
 const SUGGEST_CACHE_KEY = "careo_company_suggestions";
 const SUGGEST_CACHE_TTL = 24 * 60 * 60 * 1000; // 24h
@@ -145,11 +243,93 @@ const TAG_STYLES: Record<string, string> = {
 export default function CompaniesPage() {
   const { companies, addCompany, deleteCompany, updateStatus, updateCompany } = useCompanies();
   const { profile } = useProfile();
+  const { esList } = useEs();
+  const { interviews } = useInterviews();
   const { showToast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<CompanyStatus | "ALL">("ALL");
   const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    if (typeof window !== "undefined") {
+      return (localStorage.getItem("careo_companies_view") as ViewMode) || "list";
+    }
+    return "list";
+  });
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [filterIndustry, setFilterIndustry] = useState<string | "ALL">("ALL");
+
+  // Persist view mode
+  useEffect(() => {
+    localStorage.setItem("careo_companies_view", viewMode);
+  }, [viewMode]);
+
+  // DnD sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor),
+  );
+
+  // Next deadline per company
+  const companyDeadlines = useMemo(() => {
+    const map: Record<string, string> = {};
+    companies.forEach(c => {
+      const esDeadlines = esList
+        .filter(e => e.companyId === c.id && e.deadline && e.status === "DRAFT")
+        .map(e => ({ date: e.deadline!, days: daysUntil(e.deadline!) }))
+        .filter(d => d.days >= 0);
+      const interviewDates = interviews
+        .filter(i => i.companyId === c.id && i.result === "PENDING")
+        .map(i => ({ date: i.scheduledAt, days: daysUntil(i.scheduledAt) }))
+        .filter(d => d.days >= 0);
+      const all = [...esDeadlines, ...interviewDates].sort((a, b) => a.days - b.days);
+      if (all.length > 0) {
+        const d = all[0].days;
+        map[c.id] = d === 0 ? "今日" : d === 1 ? "明日" : `${d}日後`;
+      }
+    });
+    return map;
+  }, [companies, esList, interviews]);
+
+  // Kanban drag handlers
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    setActiveId(null);
+    const { active, over } = event;
+    if (!over) return;
+
+    const company = companies.find(c => c.id === active.id);
+    if (!company) return;
+
+    // Find which column it was dropped on
+    const targetColumn = KANBAN_COLUMNS.find(col => col.id === over.id);
+    if (targetColumn) {
+      // Map to the first status in that column (or OFFERED for result column)
+      const currentColStatuses = KANBAN_COLUMNS.find(col => col.statuses.includes(company.status))?.statuses;
+      const targetStatuses = targetColumn.statuses;
+      // If already in this column, do nothing
+      if (currentColStatuses && targetStatuses.some(s => currentColStatuses.includes(s))) return;
+      // Pick the most appropriate target status
+      let newStatus = targetStatuses[0];
+      if (targetColumn.id === "result") {
+        // Default to OFFERED when dropping to result
+        newStatus = "OFFERED";
+      }
+      updateStatus(company.id, newStatus);
+      if (newStatus === "OFFERED" || newStatus === "INTERN") {
+        void fireConfetti();
+      }
+    }
+  };
+
+  // Industries present in current companies
+  const presentIndustries = useMemo(() => {
+    const set = new Set(companies.map(c => c.industry).filter(Boolean));
+    return Array.from(set).sort();
+  }, [companies]);
 
   // コミュニティ平均登録数
   const [communityAvg, setCommunityAvg] = useState(22); // fallback: 日本就活統計ベース
@@ -284,6 +464,7 @@ export default function CompaniesPage() {
 
   const filtered = companies
     .filter((c) => filterStatus === "ALL" || c.status === filterStatus)
+    .filter((c) => filterIndustry === "ALL" || c.industry === filterIndustry)
     .filter((c) => {
       if (!searchQuery.trim()) return true;
       const q = searchQuery.toLowerCase();
@@ -294,14 +475,43 @@ export default function CompaniesPage() {
     (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
   );
 
+  const activeCompany = activeId ? companies.find(c => c.id === activeId) : null;
+
   return (
     <div className="p-4 md:p-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">企業管理</h1>
-          <p className="text-sm text-gray-500 mt-1">{companies.length}社を管理中</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">企業管理</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{companies.length}社を管理中</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
+          {/* View toggle (PC only) */}
+          <div className="hidden md:flex items-center bg-gray-100 rounded-xl p-0.5">
+            <button
+              type="button"
+              onClick={() => setViewMode("list")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                viewMode === "list" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              <svg className="w-3.5 h-3.5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+              リスト
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("kanban")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                viewMode === "kanban" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              <svg className="w-3.5 h-3.5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+              </svg>
+              カンバン
+            </button>
+          </div>
           <Button variant="secondary" onClick={() => setIsImportOpen(true)}>
             <span className="hidden sm:inline">一括インポート</span>
             <span className="sm:hidden">インポート</span>
@@ -323,7 +533,7 @@ export default function CompaniesPage() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="企業名・業界で検索..."
-          className="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100"
+          className="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-[#00c896] focus:ring-1 focus:ring-[#00c896]/20"
         />
         {searchQuery && (
           <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -334,12 +544,15 @@ export default function CompaniesPage() {
         )}
       </div>
 
-      {/* フィルター */}
-      <div className="flex gap-2 flex-wrap mb-6">
+      {/* Filter chips (Stripe style) */}
+      <div className="flex gap-2 flex-wrap mb-4">
+        {/* Status filters */}
         <button
           onClick={() => setFilterStatus("ALL")}
-          className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors cursor-pointer ${
-            filterStatus === "ALL" ? "bg-blue-600 text-white" : "bg-white text-gray-600 border border-gray-300 hover:bg-gray-50"
+          className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+            filterStatus === "ALL"
+              ? "bg-[#00c896] text-white shadow-sm"
+              : "bg-white text-gray-600 border border-gray-200 hover:border-gray-300 hover:bg-gray-50"
           }`}
         >
           すべて ({companies.length})
@@ -351,8 +564,10 @@ export default function CompaniesPage() {
             <button
               key={s}
               onClick={() => setFilterStatus(s)}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors cursor-pointer ${
-                filterStatus === s ? "bg-blue-600 text-white" : "bg-white text-gray-600 border border-gray-300 hover:bg-gray-50"
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                filterStatus === s
+                  ? "bg-[#00c896] text-white shadow-sm"
+                  : "bg-white text-gray-600 border border-gray-200 hover:border-gray-300 hover:bg-gray-50"
               }`}
             >
               {COMPANY_STATUS_LABELS[s]} ({count})
@@ -360,6 +575,36 @@ export default function CompaniesPage() {
           );
         })}
       </div>
+
+      {/* Industry filter chips */}
+      {presentIndustries.length > 1 && (
+        <div className="flex gap-1.5 flex-wrap mb-6">
+          <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider self-center mr-1">業界</span>
+          <button
+            onClick={() => setFilterIndustry("ALL")}
+            className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all cursor-pointer ${
+              filterIndustry === "ALL"
+                ? "bg-gray-800 text-white"
+                : "bg-gray-50 text-gray-500 hover:bg-gray-100"
+            }`}
+          >
+            すべて
+          </button>
+          {presentIndustries.map((ind) => (
+            <button
+              key={ind}
+              onClick={() => setFilterIndustry(ind === filterIndustry ? "ALL" : ind!)}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all cursor-pointer ${
+                filterIndustry === ind
+                  ? "bg-gray-800 text-white"
+                  : "bg-gray-50 text-gray-500 hover:bg-gray-100"
+              }`}
+            >
+              {ind}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* AI企業提案バナー */}
       {showSuggestBanner && (
@@ -574,15 +819,79 @@ export default function CompaniesPage() {
         </div>
       )}
 
-      {/* 企業一覧 */}
-      {sorted.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
-          <p>企業が登録されていません</p>
+      {/* 企業一覧 / カンバンビュー */}
+      {sorted.length === 0 && viewMode === "list" ? (
+        <div className="text-center py-12">
+          <KareoCharacter expression="encouraging" size={100} className="mx-auto mb-3" />
+          <p className="text-gray-400 font-medium">企業が登録されていません</p>
+          <p className="text-sm text-gray-300 mt-1">まずは気になる企業を追加してみよう!</p>
         </div>
+      ) : viewMode === "kanban" ? (
+        /* ===== Kanban View ===== */
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCorners}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
+            {KANBAN_COLUMNS.map((col) => {
+              const colCompanies = filtered.filter(c => col.statuses.includes(c.status));
+              return (
+                <div
+                  key={col.id}
+                  id={col.id}
+                  className="flex-shrink-0 w-[260px] md:w-[240px] md:flex-1"
+                >
+                  <div className="bg-gray-50/80 rounded-2xl p-3 kanban-column border border-gray-100">
+                    {/* Column header */}
+                    <div className="flex items-center gap-2 mb-3 px-1">
+                      <div className={`w-2 h-2 rounded-full ${col.color}`} />
+                      <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wide">{col.label}</h3>
+                      <span className="text-[10px] text-gray-400 font-semibold bg-white px-1.5 py-0.5 rounded-full ml-auto">
+                        {colCompanies.length}
+                      </span>
+                    </div>
+
+                    {/* Cards */}
+                    <SortableContext
+                      items={colCompanies.map(c => c.id)}
+                      strategy={verticalListSortingStrategy}
+                      id={col.id}
+                    >
+                      <div className="space-y-2 min-h-[80px]">
+                        {colCompanies.map((company) => (
+                          <SortableKanbanCard
+                            key={company.id}
+                            company={company}
+                            nextDeadline={companyDeadlines[company.id]}
+                          />
+                        ))}
+                        {colCompanies.length === 0 && (
+                          <div className="text-center py-6 text-[11px] text-gray-300 font-medium">
+                            ドラッグして移動
+                          </div>
+                        )}
+                      </div>
+                    </SortableContext>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <DragOverlay>
+            {activeCompany ? <KanbanOverlayCard company={activeCompany} /> : null}
+          </DragOverlay>
+        </DndContext>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        /* ===== List View ===== */
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
+        >
           {sorted.map((company) => (
-            // モバイル：スワイプカード / PC：通常リンク
+            // Mobile: swipeable card
             <div key={company.id} className="md:hidden">
               <SwipeableCompanyCard
                 company={company}
@@ -592,10 +901,20 @@ export default function CompaniesPage() {
             </div>
           ))}
           {sorted.map((company) => (
-            <Link key={`pc-${company.id}`} href={`/companies/${company.id}`} className="hidden md:block">
-              <div className="bg-white rounded-xl border border-gray-100 p-5 hover:shadow-md transition-shadow cursor-pointer">
+            // PC: hover with quick actions
+            <Link key={`pc-${company.id}`} href={`/companies/${company.id}`} className="hidden md:block group">
+              <div className="bg-white rounded-xl border border-gray-100 p-5 hover:shadow-md hover:border-gray-200 transition-all cursor-pointer relative">
                 <div className="flex items-start justify-between mb-2">
-                  <h3 className="font-semibold text-gray-900 leading-tight">{company.name}</h3>
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <h3 className="font-semibold text-gray-900 leading-tight truncate">{company.name}</h3>
+                    {company.mypage_url && (
+                      <span title="マイページあり" className="shrink-0">
+                        <svg className="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                        </svg>
+                      </span>
+                    )}
+                  </div>
                   <StatusBadge
                     status={company.status}
                     label={company.status === "OFFERED" ? (company.is_intern_offer ? "インターン合格" : "内定") : undefined}
@@ -604,10 +923,44 @@ export default function CompaniesPage() {
                 </div>
                 {company.industry && <p className="text-sm text-gray-500 mb-2">{company.industry}</p>}
                 {company.notes && <p className="text-sm text-gray-600 line-clamp-2">{company.notes}</p>}
+                {companyDeadlines[company.id] && (
+                  <div className="flex items-center gap-1 mt-2 pt-2 border-t border-gray-50">
+                    <svg className="w-3 h-3 text-orange-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-[11px] text-orange-500 font-medium">次の予定: {companyDeadlines[company.id]}</span>
+                  </div>
+                )}
+                {company.mypage_url && (
+                  <div className="flex items-center gap-1 mt-1.5">
+                    <a
+                      href={company.mypage_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-[11px] text-blue-500 hover:text-blue-700 font-medium hover:underline"
+                    >
+                      マイページを開く →
+                    </a>
+                  </div>
+                )}
+                {/* Hover quick actions */}
+                <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                  <button
+                    type="button"
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); deleteCompany(company.id); }}
+                    className="w-7 h-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-400 hover:text-red-600 flex items-center justify-center transition-colors"
+                    title="削除"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </Link>
           ))}
-        </div>
+        </motion.div>
       )}
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="企業を追加">

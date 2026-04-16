@@ -11,18 +11,7 @@ import { useActionItems } from "@/hooks/useActionItems";
 import { useToast } from "@/components/ui/Toast";
 import { parseCompanySuggestions } from "@/lib/chatUtils";
 import { useCoach } from "@/hooks/useCoach";
-
-export function KareoCharacter({ size = 56 }: { size?: number }) {
-  return (
-    <img
-      src="/kareo.png"
-      alt="カレオ"
-      width={size}
-      height={size}
-      style={{ objectFit: "contain" }}
-    />
-  );
-}
+import { KareoCharacter } from "@/components/kareo/KareoCharacter";
 
 interface StreamingMessage {
   role: "user" | "assistant";

@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useInterviews } from "@/hooks/useInterviews";
 import { useCompanies } from "@/hooks/useCompanies";
-import { Badge } from "@/components/ui/Badge";
+import { LegacyBadge as Badge } from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/Button";
 import { formatDateTime } from "@/lib/utils";
 import { INTERVIEW_MOOD_LABELS } from "@/types";
 import { Interview } from "@/types";
+import { KareoCharacter } from "@/components/kareo/KareoCharacter";
 
 export default function InterviewsPage() {
   const router = useRouter();
@@ -55,8 +56,7 @@ export default function InterviewsPage() {
 
       {sorted.length === 0 ? (
         <div className="text-center py-12">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/kareo.png" alt="カレオ" className="w-28 h-auto mx-auto mb-4 opacity-80" />
+          <KareoCharacter expression="encouraging" size={100} className="mx-auto mb-3" />
           <p className="text-gray-400 font-medium">面接がまだ登録されていません</p>
           <p className="text-sm text-gray-300 mt-1">企業ページから面接を追加してみよう！</p>
         </div>
