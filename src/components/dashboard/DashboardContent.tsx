@@ -13,8 +13,6 @@ import { useInterviews } from "@/hooks/useInterviews";
 import { useEvents } from "@/hooks/useEvents";
 import { useProfile } from "@/hooks/useProfile";
 import { useActionItems } from "@/hooks/useActionItems";
-import { KareoCharacter } from "@/components/kareo/KareoCharacter";
-import { useChat } from "@/hooks/useChat";
 import { useToast } from "@/components/ui/Toast";
 import { useDeadlineNotifications } from "@/hooks/useDeadlineNotifications";
 import { Button } from "@/components/ui/Button";
@@ -23,8 +21,7 @@ import { PostOfferWidget } from "@/components/dashboard/PostOfferWidget";
 import { SkeletonCard } from "@/components/ui/SkeletonCard";
 import { createClient } from "@/lib/supabase/client";
 import { daysUntil } from "@/lib/utils";
-import { COMPANY_STATUS_ORDER, COMPANY_STATUS_LABELS, JOB_SEARCH_STAGE_LABELS, UserProfile, CompanyStatus } from "@/types";
-import { useCoach } from "@/hooks/useCoach";
+import { COMPANY_STATUS_ORDER, COMPANY_STATUS_LABELS, JOB_SEARCH_STAGE_LABELS, CompanyStatus } from "@/types";
 import { TutorialModal } from "@/components/dashboard/TutorialModal";
 import { ReviewPromptModal } from "@/components/dashboard/ReviewPromptModal";
 
@@ -33,67 +30,6 @@ function getGreeting(): string {
   if (h >= 5 && h < 12) return "おはようございます";
   if (h >= 12 && h < 18) return "こんにちは";
   return "お疲れ様です";
-}
-
-// Daily coach CTA
-function DailyCoachBanner({ profile }: { profile: UserProfile | null }) {
-  const [chatted, setChatted] = useState(true);
-  const [pdcaIssue, setPdcaIssue] = useState<string | null>(null);
-  const { coachName } = useCoach();
-
-  useEffect(() => {
-    const lastChatDate = profile?.lastChatAt
-      ? new Date(profile.lastChatAt).toDateString()
-      : (() => { try { return localStorage.getItem("careo_last_chat_date") ?? ""; } catch { return ""; } })();
-    setChatted(lastChatDate === new Date().toDateString());
-
-    const pdca = profile?.lastPdca ?? (() => {
-      try {
-        const raw = localStorage.getItem("careo_last_pdca");
-        if (!raw) return null;
-        const parsed = JSON.parse(raw);
-        return parsed?.data ?? (parsed?.check ? parsed : null);
-      } catch { return null; }
-    })();
-    if (pdca) {
-      const issue = pdca?.check?.issues?.[0] ?? pdca?.act?.nextWeekFocus ?? null;
-      setPdcaIssue(issue);
-    }
-  }, [profile?.lastChatAt, profile?.lastPdca]);
-
-  const topic = pdcaIssue
-    ? `「${pdcaIssue}」について一緒に考えよう`
-    : !profile?.gakuchika
-    ? `ガクチカを${coachName}コーチと一緒に整理しよう`
-    : !profile?.careerAxis
-    ? `就活の軸を${coachName}コーチと一緒に言語化しよう`
-    : `今日の就活の進捗を${coachName}コーチに報告しよう`;
-
-  if (chatted) return null;
-
-  return (
-    <Link href="/chat">
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="mb-5 bg-gradient-to-br from-[#00c896] via-[#00b488] to-[#00a87e] rounded-3xl px-4 py-4 flex items-center gap-3 active:opacity-90 transition-opacity cursor-pointer coach-banner-shadow"
-      >
-        <div className="w-14 h-14 shrink-0">
-          <KareoCharacter expression="default" size={56} animate={false} />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-white/80 text-[11px] font-semibold tracking-wide mb-0.5">今日の{coachName}コーチ</p>
-          <p className="text-white font-bold text-sm truncate">{topic}</p>
-        </div>
-        <div className="shrink-0 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-          </svg>
-        </div>
-      </motion.div>
-    </Link>
-  );
 }
 
 interface NextActionResult {
@@ -183,7 +119,6 @@ export function DashboardContent() {
   const { events } = useEvents();
   const { profile } = useProfile();
   const { pendingItems, completedItems, loading: itemsLoading, replaceItems, toggleItem } = useActionItems();
-  const { recentUserMessages } = useChat();
   const { showToast } = useToast();
   const router = useRouter();
   const [aiSummary, setAiSummary] = useState<string>("");
@@ -266,7 +201,6 @@ export function DashboardContent() {
       const completedActions = completed ?? completedItems.map(i => i.action);
       const data = await fetchAI("/api/ai/next-action", {
         companies: companiesSlim, esList: esListSlim, interviews: interviewsSlim, profile, completedActions,
-        recentChatMessages: recentUserMessages,
       }) as NextActionResult | null;
       if (!data) { showToast("AIアドバイスの取得に失敗しました", "error"); return; }
       if (!("error" in data)) {
@@ -508,9 +442,6 @@ export function DashboardContent() {
           ))}
         </motion.div>
 
-        {/* Coach CTA */}
-        <DailyCoachBanner profile={profile} />
-
         {/* Next Actions */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
@@ -687,9 +618,6 @@ export function DashboardContent() {
             </motion.div>
           ))}
         </motion.div>
-
-        {/* Coach CTA */}
-        <DailyCoachBanner profile={profile} />
 
         {/* Selection Funnel */}
         {companies.length > 0 && (

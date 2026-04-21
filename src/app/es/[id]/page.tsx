@@ -5,15 +5,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useEs } from "@/hooks/useEs";
 import { useCompanies } from "@/hooks/useCompanies";
-import { useProfile } from "@/hooks/useProfile";
 import { EsForm } from "@/components/es/EsForm";
 import { LegacyBadge as Badge } from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { formatDate } from "@/lib/utils";
 import { QAPair, EsResult, ES_RESULT_LABELS } from "@/types";
-import type { EsCheckResult } from "@/app/api/ai/es-check/route";
-import type { EsProofreadResult } from "@/app/api/ai/es-proofread/route";
 
 function EsQuestionCard({
   qa,
@@ -43,185 +40,15 @@ function EsQuestionCard({
   );
 }
 
-// ES提出前チェックモーダル
-function EsCheckModal({
-  isOpen,
-  onClose,
-  onConfirmSubmit,
-  checkResult,
-  loading,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirmSubmit: () => void;
-  checkResult: EsCheckResult | null;
-  loading: boolean;
-}) {
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} title="📋 ES提出前チェック" size="lg">
-      {loading && (
-        <div className="py-8 text-center">
-          <div className="w-10 h-10 border-4 border-indigo-300 border-t-indigo-600 rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm text-gray-500">カレオがESをチェック中...</p>
-          <p className="text-xs text-gray-400 mt-1">自己分析との整合性・文体・具体性を確認しています</p>
-        </div>
-      )}
-
-      {!loading && checkResult && (
-        <div>
-          {/* スコア */}
-          <div className="flex items-center gap-4 mb-5 p-4 bg-gray-50 rounded-xl">
-            <div className="text-center">
-              <p className={`text-4xl font-bold ${
-                checkResult.score >= 75 ? "text-emerald-600" :
-                checkResult.score >= 60 ? "text-amber-500" :
-                "text-red-500"
-              }`}>
-                {checkResult.score}
-              </p>
-              <p className="text-xs text-gray-500">/ 100点</p>
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-gray-900 mb-1">{checkResult.summary}</p>
-              <div className={`inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full ${
-                checkResult.readyToSubmit
-                  ? "bg-emerald-100 text-emerald-700"
-                  : "bg-amber-100 text-amber-700"
-              }`}>
-                {checkResult.readyToSubmit ? "✓ 提出OK" : "⚠ 改善推奨"}
-              </div>
-            </div>
-          </div>
-
-          {/* チェックリスト */}
-          <div className="space-y-2 mb-4">
-            {checkResult.checks.map((check, i) => (
-              <div key={i} className={`flex items-start gap-2.5 p-3 rounded-lg ${
-                check.passed ? "bg-green-50" : "bg-red-50"
-              }`}>
-                <span className={`shrink-0 mt-0.5 font-bold text-sm ${check.passed ? "text-green-600" : "text-red-500"}`}>
-                  {check.passed ? "✓" : "✕"}
-                </span>
-                <div>
-                  <p className="text-xs font-semibold text-gray-800">{check.label}</p>
-                  <p className="text-[11px] text-gray-500 mt-0.5">{check.detail}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* 改善提案 */}
-          {checkResult.suggestions.length > 0 && (
-            <div className="mb-5 bg-amber-50 border border-amber-200 rounded-xl p-3">
-              <p className="text-xs font-semibold text-amber-800 mb-2">💡 カレオの改善提案</p>
-              <ul className="space-y-1">
-                {checkResult.suggestions.map((s, i) => (
-                  <li key={i} className="text-xs text-amber-700 flex gap-1.5">
-                    <span className="shrink-0">•</span>{s}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          <div className="flex justify-end gap-3">
-            <Button variant="secondary" onClick={onClose}>修正する</Button>
-            <Button
-              onClick={onConfirmSubmit}
-              variant={checkResult.readyToSubmit ? "default" : "secondary"}
-            >
-              {checkResult.readyToSubmit ? "このまま提出済みにする" : "改善せずに提出済みにする"}
-            </Button>
-          </div>
-        </div>
-      )}
-    </Modal>
-  );
-}
-
-// AI添削パネル
-function ProofreadPanel({
-  result,
-  onApply,
-}: {
-  result: EsProofreadResult;
-  onApply: (index: number, improved: string) => void;
-}) {
-  const [applied, setApplied] = useState<Record<number, boolean>>({});
-
-  return (
-    <div className="mt-6 bg-indigo-50 border border-indigo-200 rounded-xl p-5">
-      <div className="flex items-center gap-2 mb-1">
-        <span className="text-indigo-600 font-bold text-base">✏️</span>
-        <h3 className="font-semibold text-indigo-900 text-sm">AI添削結果</h3>
-      </div>
-      <p className="text-xs text-indigo-700 mb-4">{result.overallComment}</p>
-
-      <div className="space-y-5">
-        {result.answers.map((a) => (
-          <div key={a.questionIndex} className="bg-white rounded-xl border border-indigo-100 p-4">
-            <p className="text-xs font-semibold text-gray-500 mb-2">設問 {a.questionIndex + 1}: {a.question}</p>
-
-            {/* 改善ポイント */}
-            {a.points.length > 0 && (
-              <div className="mb-3 flex flex-wrap gap-1.5">
-                {a.points.map((pt, i) => (
-                  <span key={i} className="text-[11px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">{pt}</span>
-                ))}
-              </div>
-            )}
-
-            {/* 添削前後 */}
-            <div className="grid md:grid-cols-2 gap-3 mb-3">
-              <div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">添削前</p>
-                <p className="text-xs text-gray-500 whitespace-pre-wrap bg-gray-50 rounded-lg p-3 leading-relaxed">{a.original}</p>
-              </div>
-              <div>
-                <p className="text-[10px] font-bold text-indigo-500 uppercase mb-1">添削後</p>
-                <p className="text-xs text-gray-800 whitespace-pre-wrap bg-indigo-50 rounded-lg p-3 leading-relaxed border border-indigo-100">{a.improved}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <p className="text-xs text-gray-400 italic">{a.feedback}</p>
-              {applied[a.questionIndex] ? (
-                <span className="text-xs text-emerald-600 font-medium">✓ 反映済み</span>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    onApply(a.questionIndex, a.improved);
-                    setApplied((prev) => ({ ...prev, [a.questionIndex]: true }));
-                  }}
-                  className="text-xs font-medium bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors"
-                >
-                  この添削を反映する
-                </button>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export default function EsDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
   const { esList, updateEs, deleteEs } = useEs();
   const { companies } = useCompanies();
-  const { profile } = useProfile();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
-  const [isCheckOpen, setIsCheckOpen] = useState(false);
-  const [checkResult, setCheckResult] = useState<EsCheckResult | null>(null);
-  const [checkLoading, setCheckLoading] = useState(false);
   const [reviewRequesting, setReviewRequesting] = useState(false);
   const [reviewSent, setReviewSent] = useState(false);
-  const [proofreadResult, setProofreadResult] = useState<EsProofreadResult | null>(null);
-  const [proofreadLoading, setProofreadLoading] = useState(false);
 
   const es = esList.find((e) => e.id === id);
   const company = es ? companies.find((c) => c.id === es.companyId) : null;
@@ -235,51 +62,8 @@ export default function EsDetailPage({ params }: { params: Promise<{ id: string 
     );
   }
 
-  // ES提出ボタン: チェックを走らせてからモーダル表示
-  const handleSubmitClick = async () => {
-    setIsCheckOpen(true);
-    setCheckResult(null);
-    setCheckLoading(true);
-
-    // 過去ESの回答を集める（重複チェック用）
-    const previousAnswers = esList
-      .filter(e => e.id !== id && e.status === "SUBMITTED")
-      .flatMap(e => e.questions.map(q => q.answer))
-      .filter(Boolean)
-      .slice(0, 6);
-
-    try {
-      const res = await fetch("/api/ai/es-check", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          es: {
-            title: es.title,
-            questions: es.questions.map(q => ({ question: q.question, answer: q.answer })),
-          },
-          profile,
-          companyName: company?.name ?? "不明",
-          previousEsAnswers: previousAnswers,
-        }),
-      });
-      const data = await res.json() as EsCheckResult;
-      setCheckResult(data);
-    } catch {
-      setCheckResult({
-        score: 0,
-        readyToSubmit: true,
-        checks: [],
-        summary: "チェックを取得できませんでした",
-        suggestions: [],
-      });
-    } finally {
-      setCheckLoading(false);
-    }
-  };
-
-  const handleConfirmSubmit = () => {
+  const handleMarkSubmitted = () => {
     updateEs(id, { ...es, status: "SUBMITTED" });
-    setIsCheckOpen(false);
   };
 
   const handleReviewRequest = async () => {
@@ -294,35 +78,6 @@ export default function EsDetailPage({ params }: { params: Promise<{ id: string 
     } finally {
       setReviewRequesting(false);
     }
-  };
-
-  const handleProofread = async () => {
-    setProofreadLoading(true);
-    setProofreadResult(null);
-    try {
-      const res = await fetch("/api/ai/es-proofread", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          questions: es.questions.map((q) => ({ question: q.question, answer: q.answer })),
-          companyName: company?.name ?? "不明",
-          industry: company?.industry,
-        }),
-      });
-      const data = await res.json() as EsProofreadResult;
-      setProofreadResult(data);
-    } catch {
-      // silent
-    } finally {
-      setProofreadLoading(false);
-    }
-  };
-
-  const handleApplyProofread = (questionIndex: number, improved: string) => {
-    const updated = es.questions.map((q, i) =>
-      i === questionIndex ? { ...q, answer: improved } : q
-    );
-    updateEs(id, { ...es, questions: updated });
   };
 
   return (
@@ -377,20 +132,12 @@ export default function EsDetailPage({ params }: { params: Promise<{ id: string 
           {es.status === "DRAFT" && (
             <Button
               size="sm"
-              onClick={handleSubmitClick}
+              onClick={handleMarkSubmitted}
               className="bg-indigo-600 hover:bg-indigo-700 text-white"
             >
-              📋 提出前チェック
+              提出済みにする
             </Button>
           )}
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={handleProofread}
-            disabled={proofreadLoading}
-          >
-            {proofreadLoading ? "添削中..." : "✏️ AI添削"}
-          </Button>
           {reviewSent ? (
             <span className="text-xs text-emerald-600 font-medium self-center">✓ 添削依頼済み</span>
           ) : (
@@ -419,21 +166,6 @@ export default function EsDetailPage({ params }: { params: Promise<{ id: string 
         ))}
       </div>
 
-      {/* AI添削パネル */}
-      {proofreadLoading && (
-        <div className="mt-6 bg-indigo-50 border border-indigo-200 rounded-xl p-6 text-center">
-          <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm text-indigo-700">AIがESを添削中...</p>
-          <p className="text-xs text-indigo-500 mt-1">表現の改善・具体化・自然な文体に修正します</p>
-        </div>
-      )}
-      {proofreadResult && !proofreadLoading && (
-        <ProofreadPanel
-          result={proofreadResult}
-          onApply={handleApplyProofread}
-        />
-      )}
-
       <Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} title="ESを編集" size="lg">
         <EsForm
           companies={companies}
@@ -453,15 +185,6 @@ export default function EsDetailPage({ params }: { params: Promise<{ id: string 
           <Button variant="destructive" onClick={() => { deleteEs(id); router.push("/es"); }}>削除する</Button>
         </div>
       </Modal>
-
-      {/* ES提出前チェックモーダル（戦略3）*/}
-      <EsCheckModal
-        isOpen={isCheckOpen}
-        onClose={() => setIsCheckOpen(false)}
-        onConfirmSubmit={handleConfirmSubmit}
-        checkResult={checkResult}
-        loading={checkLoading}
-      />
     </div>
   );
 }

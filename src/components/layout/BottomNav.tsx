@@ -6,13 +6,6 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { QuickAddModal } from "./QuickAddModal";
 
-function hasChatToday(): boolean {
-  try {
-    const last = localStorage.getItem("careo_last_chat_date");
-    return last === new Date().toDateString();
-  } catch { return false; }
-}
-
 const mainItems = [
   {
     href: "/",
@@ -34,11 +27,11 @@ const mainItems = [
   },
   // center: QuickAdd FAB
   {
-    href: "/chat",
-    label: "コーチ",
+    href: "/report",
+    label: "PDCA",
     icon: (active: boolean) => (
       <svg className="w-6 h-6" fill={active ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={active ? 0 : 1.75} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={active ? 0 : 1.75} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
       </svg>
     ),
   },
@@ -52,7 +45,7 @@ const moreCategories = [
       { href: "/companies", label: "企業管理", emoji: "🏢" },
       { href: "/es", label: "ES管理", emoji: "📄" },
       { href: "/interviews", label: "面接ログ", emoji: "👥" },
-      { href: "/interviews/recording", label: "面接録音", emoji: "🎙️" },
+      { href: "/interviews/recording", label: "文字起こし", emoji: "📝" },
       { href: "/calendar", label: "カレンダー", emoji: "📅" },
     ],
   },
@@ -91,11 +84,6 @@ export function BottomNav() {
   const [isAuth, setIsAuth] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
-  const [chatBadge, setChatBadge] = useState(false);
-
-  useEffect(() => {
-    setChatBadge(!hasChatToday());
-  }, [pathname]);
 
   useEffect(() => {
     const supabase = createClient();
@@ -210,10 +198,9 @@ export function BottomNav() {
               <span className="text-[10px] font-bold text-gray-400 -mt-0.5">記録</span>
             </button>
 
-            {/* コーチ */}
+            {/* PDCA */}
             {mainItems.slice(2).map((item) => {
               const isActive = pathname.startsWith(item.href);
-              const showBadge = item.href === "/chat" && chatBadge && !isActive;
               return (
                 <Link
                   key={item.href}
@@ -223,12 +210,7 @@ export function BottomNav() {
                   <span className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-2xl transition-all duration-200 ${
                     isActive ? "bg-[#00c896]/12 text-[#00c896]" : "text-gray-400"
                   }`}>
-                    <span className="relative">
-                      {item.icon(isActive)}
-                      {showBadge && (
-                        <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full border border-white" />
-                      )}
-                    </span>
+                    {item.icon(isActive)}
                     <span className={`text-xs font-bold tracking-tight ${isActive ? "text-[#00c896]" : "text-gray-400"}`}>
                       {item.label}
                     </span>

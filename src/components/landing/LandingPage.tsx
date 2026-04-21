@@ -230,7 +230,7 @@ function Hero({ userCount }: { userCount: number }) {
 
           <p style={{ fontSize: 16, lineHeight: 1.9, color: "#4b5563", marginBottom: 26, maxWidth: 520 }}>
             AIコーチ<b style={{ color: INK }}>「カレオ」</b>
-            が、毎日のES・面接・OB訪問・振り返りに伴走。
+            が、君のES・面接・OB訪問データを全部覚えて、次のアクションを提案。
             <br />
             <b style={{ color: INK }}>管理ツールじゃなくて、味方がほしかった。</b>
             そんな君のためのアプリ。
@@ -250,7 +250,7 @@ function Hero({ userCount }: { userCount: number }) {
                 textDecoration: "none",
               }}
             >
-              無料でカレオと話してみる →
+              無料ではじめる →
             </Link>
             <Link
               href="/features"
@@ -416,7 +416,7 @@ function LiveChatScreen({ visible }: { visible: VisibleMsg[] }) {
             color: "#9ca3af",
           }}
         >
-          カレオに話しかける…
+選考データから気づきを…
         </div>
         <div
           style={{
@@ -1316,7 +1316,7 @@ function FinalCTA() {
               textDecoration: "none",
             }}
           >
-            無料でカレオと話す →
+無料ではじめる →
           </Link>
           <button
             type="button"

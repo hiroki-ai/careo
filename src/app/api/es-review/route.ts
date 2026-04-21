@@ -2,9 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/apiAuth";
 import { createClient } from "@/lib/supabase/server";
 import Anthropic from "@anthropic-ai/sdk";
-import { EsCheckResult } from "@/app/api/ai/es-check/route";
 
 export const maxDuration = 30;
+
+interface EsCheckResult {
+  score: number;
+  readyToSubmit: boolean;
+  checks: { passed: boolean; label: string; detail: string }[];
+  summary: string;
+  suggestions: string[];
+}
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 

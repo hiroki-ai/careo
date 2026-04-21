@@ -44,7 +44,6 @@ src/app/**/page.tsx    ← hooks を呼び出してUIへ渡す
 | `ob_visits` | OB/OG訪問ログ |
 | `aptitude_tests` | 筆記試験管理 |
 | `action_items` | AIが提案する週次アクション |
-| `chat_messages` | チャット履歴 |
 
 **`ob_visits` と `aptitude_tests` は `supabase_migration.sql` で実行済み**（2026-03-18実行）。
 
@@ -83,18 +82,34 @@ const json = JSON.parse(raw.match(/\{[\s\S]*\}/)?.[0] ?? raw);
 
 ### AI機能一覧
 
+**方針**: ユーザーの蓄積データ（全選考データ横断）を使う機能のみ残し、単一コンテンツ処理（ChatGPTで代替可能）は全て削除した（2026-04 API コスト削減）。
+
 | ルート | 機能 | 入力の特徴 |
 |-------|------|-----------|
-| `/api/ai/chat` | ストリーミングチャット | profile + companies + ES + interviews + actionItems を全送信 |
-| `/api/ai/company-research` | 企業研究 | 企業名 + profile の軸・志望業界 |
-| `/api/ai/es-generate` | ES文章生成 | 設問 + 文字数制限 + 同ES内の他設問 + profile |
-| `/api/ai/pdca` | PDCA分析（スコア付き） | 全選考データ（設問除外）+ 直近チャット |
+| `/api/ai/pdca` | PDCA分析（スコア付き） | 全選考データ（設問除外） |
 | `/api/ai/next-action` | 週次アクション提案 | 全選考データ（設問除外）+ コミュニティ集計 |
-| `/api/ai/career-suggest` | 自己分析下書き生成 | profile の基本情報のみ |
-| `/api/ai/offer-prediction` | 内定獲得スコア予測 | 全選考データ（設問除外） |
-| `/api/ai/offer-compare` | 内定比較 | OFFERED企業 + career_axis |
+| `/api/ai/insights` | 全データ横断インサイト | companies + ES + interviews + OB訪問 + 筆記試験 |
+| `/api/ai/industry-analysis` | 登録企業の業界分析 | 全登録企業 |
+| `/api/ai/progress-check` | 停滞選考の検知 | 全選考データ |
+| `/api/ai/daily-message` | 毎日のモチベ生成 | 企業数・面接データ・profile |
+| `/api/ai/weekly-coach` | 直近1週間の面接振り返り | 1週間の面接データ |
+| `/api/ai/company-suggest` | プロフィール×登録企業から推薦 | profile + 全登録企業 |
+| `/api/ai/selection-schedule` | 選考日程の自動収集（Tavily） | 企業名 + 業界 |
 
 全AIルートに `getShukatsuContext(graduationYear)` を注入。卒業年フェーズ（インターン期 or 本選考期）に応じてアドバイスの軸が変わる。
+
+### 削除された機能（ChatGPTで代替）
+
+以下はChatGPTで代替可能なため削除済み：
+- `chat` / `chat-sync`（ストリーミングチャット）
+- `company-research`（企業研究）
+- `detect-offer-type`（内定種別判定。`is_intern_offer` は手動選択）
+- `es-check` / `es-proofread`（ES添削）
+- `interview-feedback` / `interview-recording-feedback`（面接フィードバック）
+- `lp-chat`（LPチャットbot）
+- `transcribe`（音声文字起こし）
+
+面接録音機能は削除し、`/interviews/recording` は外部文字起こしサービス（Notta, Rimo Voice等）で作成したテキストをインポートする形に変更。
 
 ### 就活スケジュール（`src/lib/shukatsuSchedule.ts`）
 
