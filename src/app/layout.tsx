@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Yomogi } from "next/font/google";
+import { Geist, Yomogi, Shippori_Mincho } from "next/font/google";
 import "./globals.css";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { BottomNav } from "@/components/layout/BottomNav";
@@ -11,6 +11,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
 const yomogi = Yomogi({ weight: "400", subsets: ["latin"], variable: "--font-yomogi" });
+const shipporiMincho = Shippori_Mincho({ weight: ["500", "600", "700"], subsets: ["latin"], variable: "--font-shippori-mincho", display: "swap" });
 
 const APP_URL = "https://careoai.jp";
 
@@ -131,7 +132,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={`${geist.variable} ${yomogi.variable} font-sans antialiased bg-gray-50 dark:bg-[#0f1117]`}>
+      <body className={`${geist.variable} ${yomogi.variable} ${shipporiMincho.variable} font-sans antialiased bg-gray-50 dark:bg-[#0f1117]`}>
         <ThemeProvider>
           <ToastProvider>
             <ActivityTracker />
