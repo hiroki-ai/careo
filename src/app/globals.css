@@ -92,6 +92,22 @@
   50% { opacity: 1; }
 }
 
+@keyframes fs-typing-dot {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.3; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+@keyframes fs-pop {
+  0% { transform: scale(0.5) rotate(-12deg); opacity: 0; }
+  60% { transform: scale(1.15) rotate(3deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes fs-shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
 .animate-float { animation: float 4s ease-in-out infinite; }
 .animate-float-slow { animation: float-slow 6s ease-in-out infinite; }
 .animate-fade-up { animation: fade-up 0.5s ease-out both; }
@@ -384,6 +400,23 @@
 /* Japanese serif (Shippori Mincho) for landing page headings */
 .font-serif-jp {
   font-family: var(--font-shippori-mincho), "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", "Noto Serif JP", serif;
+}
+
+/* Klee One — 手書き風見出し（学生LPで使用） */
+.font-klee {
+  font-family: var(--font-klee-one), "Yu Mincho", "Hiragino Mincho ProN", "Noto Serif JP", serif;
+}
+
+/* Zen Kaku Gothic New — 本文（学生LPで使用） */
+.font-zen-kaku {
+  font-family: var(--font-zen-kaku), "Hiragino Kaku Gothic ProN", "Yu Gothic UI", sans-serif;
+}
+
+/* Shimmer utility for shared banner */
+.fs-chip-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.25), transparent);
+  background-size: 400px 100%;
+  animation: fs-shimmer 3s infinite;
 }
 
 /* Handwriting-style text */

@@ -1,10 +1,8 @@
-import { headers } from "next/headers";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 
 export const revalidate = 3600; // 1時間ごとに再取得（ブログ新着を反映）
 import { LandingPage } from "@/components/landing/LandingPage";
-import { MobileLandingPage } from "@/components/landing/MobileLandingPage";
 import { DashboardContent } from "@/components/dashboard/DashboardContent";
 
 export type RecentPost = {
@@ -82,16 +80,11 @@ export default async function RootPage() {
     return <DashboardContent />;
   }
 
-  const [headersList, recentPosts, userCount, reviews] = await Promise.all([
-    headers(),
+  const [recentPosts, userCount, reviews] = await Promise.all([
     getRecentPosts(),
     getUserCount(),
     getApprovedReviews(),
   ]);
-  const ua = headersList.get("user-agent") ?? "";
-  const isMobile = /iPhone|Android|Mobile/i.test(ua);
 
-  return isMobile
-    ? <MobileLandingPage recentPosts={recentPosts} userCount={userCount} reviews={reviews} />
-    : <LandingPage recentPosts={recentPosts} userCount={userCount} reviews={reviews} />;
+  return <LandingPage recentPosts={recentPosts} userCount={userCount} reviews={reviews} />;
 }
