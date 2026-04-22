@@ -7,25 +7,27 @@ import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 
 const FREE_FEATURES = [
-  "企業管理（無制限）",
-  "ES管理・AI生成（無制限）",
-  "面接ログ（無制限）",
-  "PDCA週次レポート",
-  "内定予測AI",
-  "カレオコーチ（1日30回まで）",
-  "OB/OG訪問ログ",
-  "筆記試験管理",
-  "カレオからの気づき通知",
-  "進捗ベンチマーク",
+  "企業・ES・面接ログ管理（無制限）",
+  "締切カレンダー・スケジュール自動収集",
+  "基本KPIダッシュボード（通過率・内定状況）",
+  "毎日のモチベメッセージ",
+  "停滞選考の自動検知",
+  "今週やること提案（月2回）",
+  "PDCA分析（月1回）",
+  "横断インサイト（月1回）",
+  "企業推薦（月3回）",
 ];
 
 const PRO_FEATURES = [
-  "カレオコーチ（無制限）✨",
   "Freeプランの全機能",
-  "ES提出前AIチェック（無制限）✨",
-  "キャリアセンター向けレポート出力 ✨",
-  "就活軸の成熟度トラッキング ✨",
-  "（今後）優先サポート",
+  "今週やること提案 無制限（週1自動生成）",
+  "PDCA深掘り分析 無制限",
+  "横断インサイト 無制限",
+  "企業推薦 無制限",
+  "週次コーチレポート ✨",
+  "業界別勝ちパターン分析 ✨",
+  "KPIダッシュボード全業界表示 ✨",
+  "広告非表示",
 ];
 
 export default function UpgradePage() {
@@ -59,31 +61,29 @@ export default function UpgradePage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 pb-24 md:pb-8">
-      {/* ヘッダー */}
       <div className="text-center mb-8">
-        <p className="text-xs font-semibold text-indigo-600 tracking-widest uppercase mb-2">Careo プラン</p>
+        <p className="text-xs font-semibold text-[#00a87e] tracking-widest uppercase mb-2">Careo プラン</p>
         <h1 className="text-2xl font-bold text-gray-900 mb-2">
           {isPro ? "✨ Proプラン利用中" : "Proプランにアップグレード"}
         </h1>
         <p className="text-sm text-gray-500">
           {isPro
-            ? "カレオコーチが無制限で使えます。就活を全力でサポートします。"
-            : "カレオコーチの1日制限をなくして、就活を加速させよう。"}
+            ? "全機能が無制限で使えます。"
+            : "データが貯まるほど精度が上がる分析を、無制限で。"}
         </p>
       </div>
 
-      {/* 料金カード */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         {/* Free */}
-        <div className={`rounded-2xl border-2 p-6 ${!isPro ? "border-indigo-600 bg-indigo-50/40" : "border-gray-200 bg-white"}`}>
+        <div className={`rounded-2xl border-2 p-6 ${!isPro ? "border-[#00c896] bg-[#00c896]/5" : "border-gray-200 bg-white"}`}>
           <div className="flex items-center justify-between mb-1">
             <span className="text-sm font-bold text-gray-700">Free</span>
             {!isPro && (
-              <span className="text-[10px] bg-indigo-100 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">現在のプラン</span>
+              <span className="text-[10px] bg-[#00c896]/15 text-[#00a87e] font-semibold px-2 py-0.5 rounded-full">現在のプラン</span>
             )}
           </div>
           <p className="text-3xl font-bold text-gray-900 mb-1">¥0</p>
-          <p className="text-xs text-gray-400 mb-5">永久無料</p>
+          <p className="text-xs text-gray-400 mb-5">永久無料 + 広告表示</p>
           <ul className="space-y-2">
             {FREE_FEATURES.map((f) => (
               <li key={f} className="flex items-start gap-2 text-xs text-gray-600">
@@ -94,26 +94,27 @@ export default function UpgradePage() {
         </div>
 
         {/* Pro */}
-        <div className={`rounded-2xl border-2 p-6 ${isPro ? "border-indigo-600 bg-indigo-50/40" : "border-gray-200 bg-white"}`}>
+        <div className={`rounded-2xl border-2 p-6 ${isPro ? "border-[#00c896] bg-[#00c896]/5" : "border-gray-200 bg-white"}`}>
           <div className="flex items-center justify-between mb-1">
             <span className="text-sm font-bold text-gray-700">Pro</span>
             {isPro && (
-              <span className="text-[10px] bg-indigo-100 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">現在のプラン</span>
+              <span className="text-[10px] bg-[#00c896]/15 text-[#00a87e] font-semibold px-2 py-0.5 rounded-full">現在のプラン</span>
             )}
           </div>
-          <p className="text-3xl font-bold text-gray-900 mb-1">¥980<span className="text-sm font-normal text-gray-400">/月</span></p>
-          <p className="text-xs text-gray-400 mb-5">クレジットカード決済（近日公開）</p>
+          <p className="text-3xl font-bold text-gray-900 mb-1">¥480<span className="text-sm font-normal text-gray-400">/月</span></p>
+          <p className="text-xs text-gray-400 mb-1">または年払い ¥2,800（41%OFF）</p>
+          <p className="text-xs text-gray-400 mb-5">決済機能は近日公開予定</p>
           <ul className="space-y-2">
             {PRO_FEATURES.map((f) => (
               <li key={f} className="flex items-start gap-2 text-xs text-gray-700">
-                <span className="text-indigo-500 shrink-0 mt-0.5">★</span>{f}
+                <span className="text-[#00a87e] shrink-0 mt-0.5">★</span>{f}
               </li>
             ))}
           </ul>
           {!isPro && (
             <button
               disabled
-              className="mt-5 w-full bg-indigo-200 text-indigo-500 cursor-not-allowed font-semibold py-2.5 rounded-xl text-sm"
+              className="mt-5 w-full bg-gray-100 text-gray-400 cursor-not-allowed font-semibold py-2.5 rounded-xl text-sm"
             >
               決済機能 準備中...
             </button>
@@ -121,7 +122,6 @@ export default function UpgradePage() {
         </div>
       </div>
 
-      {/* クーポンコード入力 */}
       {!isPro && (
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-6">
           <p className="text-sm font-semibold text-amber-800 mb-1">🎟️ クーポンコードをお持ちの方</p>

@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { requireAuth } from "@/lib/apiAuth";
+import { checkAndConsumeAiUsage } from "@/lib/aiUsageLimit";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 export async function POST(req: NextRequest) {
   const { user, errorResponse: authError } = await requireAuth();
   if (authError) return authError;
-  void user;
 
   const { allowed, retryAfter } = checkRateLimit(getClientIp(req), "industry-analysis");
   if (!allowed) {
@@ -16,6 +16,13 @@ export async function POST(req: NextRequest) {
       { error: `リクエストが多すぎます。${retryAfter}秒後に再試行してください。` },
       { status: 429 }
     );
+  }
+  const usage = await checkAndConsumeAiUsage(user.id, "industry-analysis");
+  if (!usage.allowed) {
+    return NextResponse.json({
+      error: "業界分析は有料プラン限定機能です。",
+      limitExceeded: true, feature: "industry-analysis", limit: usage.limit,
+    }, { status: 402 });
   }
 
   const { companies, profile } = await req.json() as {

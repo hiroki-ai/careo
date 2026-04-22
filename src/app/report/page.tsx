@@ -23,12 +23,16 @@ const PDCA_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 const DAILY_MSG_CACHE_KEY = "careo_daily_msg";
 const DAILY_MSG_CACHE_TTL = 8 * 60 * 60 * 1000; // 8時間
 
-async function fetchAI<T>(url: string, body: unknown): Promise<T | null> {
+async function fetchAI<T>(url: string, body: unknown): Promise<T | null | { limitExceeded: true; error: string }> {
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
+  if (res.status === 402) {
+    const data = await res.json().catch(() => ({ error: "今月の無料枠を使い切りました" }));
+    return { limitExceeded: true, error: data.error };
+  }
   const text = await res.text();
   if (!text) return null;
   return JSON.parse(text) as T;
@@ -333,10 +337,18 @@ export default function ReportPage() {
         pendingActions: pendingItems, completedActions: completedItems,
         obVisits: visits, aptitudeTests: tests,
       });
-      if (result?.error) {
+      if (result && "limitExceeded" in result && result.limitExceeded) {
+        showToast(
+          result.error,
+          "warning",
+          { label: "アップグレード", onClick: () => window.location.assign("/upgrade") },
+          10000,
+        );
+        setPdcaError(true);
+      } else if (result && "error" in result && result.error) {
         showToast(result.error.includes("多すぎ") ? result.error : "分析に失敗しました。しばらく後に再試行してください。", "error");
         setPdcaError(true);
-      } else if (result?.check) {
+      } else if (result && "check" in result && result.check) {
         setPdca(result);
         try { localStorage.setItem(PDCA_CACHE_KEY, JSON.stringify({ data: result, ts: Date.now() })); } catch { /* ignore */ }
         saveLastPdca(result);

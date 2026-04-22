@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { useProfile } from "@/hooks/useProfile";
 import { useCompanies } from "@/hooks/useCompanies";
 import { useEs } from "@/hooks/useEs";
@@ -38,6 +39,7 @@ export default function WeeklyCoachPage() {
   const [result, setResult] = useState<WeeklyCoachResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [limitExceeded, setLimitExceeded] = useState(false);
   const hasAutoRun = useRef(false);
 
   useEffect(() => {
@@ -53,6 +55,7 @@ export default function WeeklyCoachPage() {
   const run = async () => {
     setLoading(true);
     setError(false);
+    setLimitExceeded(false);
     try {
       const esListSlim = esList.map(({ questions: _q, ...rest }) => rest);
       const res = await fetch("/api/ai/weekly-coach", {
@@ -60,6 +63,10 @@ export default function WeeklyCoachPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ companies, esList: esListSlim, interviews, profile, obVisits: visits, aptitudeTests: tests }),
       });
+      if (res.status === 402) {
+        setLimitExceeded(true);
+        return;
+      }
       if (!res.ok) throw new Error();
       const data = await res.json() as WeeklyCoachResult;
       if (data.reflection) {
@@ -113,6 +120,15 @@ export default function WeeklyCoachPage() {
         </button>
       </div>
 
+      {limitExceeded && (
+        <div className="bg-[#00c896]/5 border-2 border-[#00c896]/30 rounded-2xl p-6 mb-4 text-center">
+          <p className="text-base font-bold text-gray-900 mb-1">週次コーチは有料プラン限定機能です</p>
+          <p className="text-xs text-gray-500 mb-4">先週の面接ログから、感情パターンと次週の注力ポイントをAIが振り返ります</p>
+          <Link href="/upgrade" className="inline-block px-5 py-2.5 bg-[#00c896] text-white text-sm font-bold rounded-xl hover:bg-[#00b088] transition-colors">
+            有料プランにアップグレード →
+          </Link>
+        </div>
+      )}
       {error && (
         <div className="bg-red-50 border border-red-100 rounded-xl p-4 text-sm text-red-600 mb-4">
           分析に失敗しました。しばらく後に再試行してください。

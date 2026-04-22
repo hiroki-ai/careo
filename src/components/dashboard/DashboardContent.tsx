@@ -185,6 +185,17 @@ export function DashboardContent() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
         });
+        // 制限超過（402）は特別扱い: アップグレード誘導のトーストを表示
+        if (res.status === 402) {
+          const data = await res.json().catch(() => ({}));
+          showToast(
+            data.error ?? "今月の無料枠を使い切りました",
+            "warning",
+            { label: "アップグレード", onClick: () => router.push("/upgrade") },
+            10000,
+          );
+          return { limitExceeded: true };
+        }
         const text = await res.text();
         if (!text) continue;
         return JSON.parse(text);
@@ -213,6 +224,7 @@ export function DashboardContent() {
         try { localStorage.removeItem("careo_initial_worry"); } catch { /* ignore */ }
       }
       if (!data) { showToast("AIアドバイスの取得に失敗しました", "error"); return; }
+      if ("limitExceeded" in data) return; // 402: 既にアップグレード誘導トースト表示済み
       if (!("error" in data)) {
         setAiSummary(data.summary ?? "");
         await replaceItems(data.weeklyActions);

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { requireAuth } from "@/lib/apiAuth";
+import { checkAndConsumeAiUsage } from "@/lib/aiUsageLimit";
 import { Company, ES, Interview, UserProfile } from "@/types";
 import { getShukatsuContext } from "@/lib/shukatsuSchedule";
 
@@ -19,12 +20,19 @@ export interface InsightItem {
 }
 
 export async function POST(req: NextRequest) {
-  const { user: _authUser, errorResponse: authErr } = await requireAuth();
+  const { user, errorResponse: authErr } = await requireAuth();
   if (authErr) return authErr;
 
   const { allowed, retryAfter } = checkRateLimit(getClientIp(req), "insights");
   if (!allowed) {
     return NextResponse.json({ error: `リクエストが多すぎます。${retryAfter}秒後に再試行してください。` }, { status: 429 });
+  }
+  const usage = await checkAndConsumeAiUsage(user.id, "insights");
+  if (!usage.allowed) {
+    return NextResponse.json({
+      error: "今月の無料枠を使い切りました。有料プランで無制限にご利用いただけます。",
+      limitExceeded: true, feature: "insights", limit: usage.limit,
+    }, { status: 402 });
   }
 
   try {

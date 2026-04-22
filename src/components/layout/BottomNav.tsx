@@ -52,6 +52,7 @@ const moreCategories = [
   {
     label: "分析",
     items: [
+      { href: "/metrics", label: "KPI", emoji: "📈" },
       { href: "/report", label: "PDCA", emoji: "📊" },
       { href: "/weekly-coach", label: "週次コーチ", emoji: "🏃" },
       { href: "/insights", label: "みんなの就活", emoji: "🌐" },

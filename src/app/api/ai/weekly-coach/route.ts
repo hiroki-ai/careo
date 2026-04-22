@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+import { requireAuth } from "@/lib/apiAuth";
+import { checkAndConsumeAiUsage } from "@/lib/aiUsageLimit";
 
 export const maxDuration = 60;
 
@@ -15,9 +17,18 @@ const MOOD_LABELS: Record<string, string> = {
 };
 
 export async function POST(req: NextRequest) {
+  const { user, errorResponse: authErr } = await requireAuth();
+  if (authErr) return authErr;
   const { allowed } = checkRateLimit(getClientIp(req), "weekly-coach");
   if (!allowed) {
     return NextResponse.json({ error: "リクエストが多すぎます。しばらく後に再試行してください。" }, { status: 429 });
+  }
+  const usage = await checkAndConsumeAiUsage(user.id, "weekly-coach");
+  if (!usage.allowed) {
+    return NextResponse.json({
+      error: "週次コーチは有料プラン限定機能です。",
+      limitExceeded: true, feature: "weekly-coach", limit: usage.limit,
+    }, { status: 402 });
   }
 
   try {

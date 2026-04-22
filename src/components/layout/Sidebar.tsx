@@ -30,6 +30,16 @@ const navGroups = [
         ),
       },
       {
+        href: "/metrics",
+        label: "KPI",
+        badge: "New",
+        icon: (
+          <svg className="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M3 3v18h18M7 14l4-4 4 4 6-6" />
+          </svg>
+        ),
+      },
+      {
         href: "/weekly-coach",
         label: "週次コーチ",
         badge: "New",

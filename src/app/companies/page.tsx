@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   DndContext,
@@ -247,6 +248,16 @@ export default function CompaniesPage() {
   const { esList } = useEs();
   const { interviews } = useInterviews();
   const { showToast } = useToast();
+  const router = useRouter();
+
+  const showLimitExceededToast = useCallback((data: { error?: string }) => {
+    showToast(
+      data.error ?? "今月の無料枠を使い切りました",
+      "warning",
+      { label: "アップグレード", onClick: () => router.push("/upgrade") },
+      10000,
+    );
+  }, [showToast, router]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<CompanyStatus | "ALL">("ALL");
@@ -386,6 +397,11 @@ export default function CompaniesPage() {
           companies: companies.map(c => ({ name: c.name, industry: c.industry, status: c.status })),
         }),
       });
+      if (res.status === 402) {
+        const data = await res.json().catch(() => ({}));
+        showLimitExceededToast(data);
+        return;
+      }
       if (!res.ok) return;
       const json = await res.json() as { suggestions?: Suggestion[] };
       const data = json.suggestions ?? [];
@@ -444,6 +460,12 @@ export default function CompaniesPage() {
           profile: { careerAxis: profile?.careerAxis, targetIndustries: profile?.targetIndustries },
         }),
       });
+      if (res.status === 402) {
+        const data = await res.json().catch(() => ({}));
+        showLimitExceededToast(data);
+        setIndustryOpen(false);
+        return;
+      }
       if (!res.ok) return;
       const data = await res.json() as IndustryResult;
       setIndustryResult(data);

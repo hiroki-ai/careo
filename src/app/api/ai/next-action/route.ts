@@ -5,6 +5,7 @@ import { createClient } from "@supabase/supabase-js";
 export const maxDuration = 60;
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { requireAuth } from "@/lib/apiAuth";
+import { checkAndConsumeAiUsage } from "@/lib/aiUsageLimit";
 import { Company, ES, Interview, UserProfile } from "@/types";
 import { getShukatsuContext } from "@/lib/shukatsuSchedule";
 
@@ -16,11 +17,21 @@ const supabase = createClient(
 );
 
 export async function POST(req: NextRequest) {
-  const { user: _authUser, errorResponse: authErr } = await requireAuth();
+  const { user: authUser, errorResponse: authErr } = await requireAuth();
   if (authErr) return authErr;
   const { allowed, retryAfter } = checkRateLimit(getClientIp(req), "next-action");
   if (!allowed) {
     return NextResponse.json({ error: `リクエストが多すぎます。${retryAfter}秒後に再試行してください。` }, { status: 429 });
+  }
+  // 月次使用回数チェック（無料ユーザーのみ）
+  const usage = await checkAndConsumeAiUsage(authUser.id, "next-action");
+  if (!usage.allowed) {
+    return NextResponse.json({
+      error: "今月の無料枠を使い切りました。有料プランで無制限にご利用いただけます。",
+      limitExceeded: true,
+      feature: "next-action",
+      limit: usage.limit,
+    }, { status: 402 });
   }
   try {
   const { companies, esList, interviews, profile, completedActions, initialWorry }: {
