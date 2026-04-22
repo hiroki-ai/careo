@@ -23,14 +23,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: `リクエストが多すぎます。${retryAfter}秒後に再試行してください。` }, { status: 429 });
   }
   try {
-  const { companies, esList, interviews, profile, completedActions, recentChatMessages }: {
+  const { companies, esList, interviews, profile, completedActions, initialWorry }: {
     companies: Company[];
     esList: ES[];
     interviews: Interview[];
     profile: UserProfile | null;
     completedActions: string[];
-    recentChatMessages?: string[];
+    initialWorry?: string | null;
   } = await req.json();
+
+  const WORRY_LABELS: Record<string, string> = {
+    what_to_do: "何をすべきか分からない",
+    deadlines: "締切管理が追いつかない",
+    pass_rate: "選考通過率を上げたい",
+    matching: "自分に合う企業が分からない",
+  };
+  const worrySummary = initialWorry && WORRY_LABELS[initialWorry]
+    ? `\nユーザーが登録時に挙げた悩み（最優先で解決すべき）: 「${WORRY_LABELS[initialWorry]}」\n→ 今週のアクションはこの悩みを解消する方向で提案すること。1つ目のpriorityはhighで、この悩みに直接対応すること。`
+    : "";
 
   // 集合知を取得
   let aggregateSummary = "";
@@ -77,10 +87,6 @@ export async function POST(req: NextRequest) {
     ? `\n完了済みタスク（これらはすでに達成済みなので提案しないこと）:\n${completedActions.map(a => `- ${a}`).join("\n")}`
     : "";
 
-  const chatSummary = recentChatMessages && recentChatMessages.length > 0
-    ? `\nユーザーの最近の相談・悩み（チャット履歴より）:\n${recentChatMessages.map(m => `- 「${m.slice(0, 80)}」`).join("\n")}\n→ これらの悩みや関心事を踏まえてアドバイスすること。`
-    : "";
-
   const offeredCos = companies.filter(c => c.status === "OFFERED");
   const internOfferCount = offeredCos.filter(c => (c as { is_intern_offer?: boolean | null }).is_intern_offer === true).length;
   const jobOfferCount = offeredCos.filter(c => (c as { is_intern_offer?: boolean | null }).is_intern_offer !== true).length;
@@ -111,7 +117,7 @@ ${selfAnalysis ? `\n【自己分析（ユーザーが入力した情報）】\n$
 
 ${activitySummary}
 ${completedSummary}
-${chatSummary}
+${worrySummary}
 ${aggregateSummary}
 
 【重要】JSONのみ出力すること。前後に説明文・マークダウン・コードブロックを一切含めないこと。

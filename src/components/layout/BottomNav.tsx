@@ -50,28 +50,18 @@ const moreCategories = [
     ],
   },
   {
-    label: "リサーチ・準備",
-    items: [
-      { href: "/events", label: "説明会", emoji: "🎯" },
-      { href: "/ob-visits", label: "OB訪問", emoji: "🤝" },
-      { href: "/tests", label: "筆記試験", emoji: "📝" },
-      { href: "/career", label: "自己分析", emoji: "💡" },
-    ],
-  },
-  {
-    label: "分析・コミュニティ",
+    label: "分析",
     items: [
       { href: "/report", label: "PDCA", emoji: "📊" },
       { href: "/weekly-coach", label: "週次コーチ", emoji: "🏃" },
       { href: "/insights", label: "みんなの就活", emoji: "🌐" },
+      { href: "/events", label: "説明会", emoji: "🎯" },
     ],
   },
   {
     label: "その他",
     items: [
       { href: "/import", label: "インポート", emoji: "📥" },
-      { href: "/career-center", label: "キャリアセンター", emoji: "🖨️" },
-      { href: "/appointments", label: "相談予約", emoji: "📅" },
       { href: "/settings", label: "設定", emoji: "⚙️" },
     ],
   },

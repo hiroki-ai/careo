@@ -199,9 +199,19 @@ export function DashboardContent() {
     setAiLoading(true);
     try {
       const completedActions = completed ?? completedItems.map(i => i.action);
+      // オンボーディングで選んだ初回悩みを初回fetch時のみ反映
+      let initialWorry: string | null = null;
+      try {
+        initialWorry = localStorage.getItem("careo_initial_worry");
+      } catch { /* ignore */ }
       const data = await fetchAI("/api/ai/next-action", {
         companies: companiesSlim, esList: esListSlim, interviews: interviewsSlim, profile, completedActions,
+        initialWorry,
       }) as NextActionResult | null;
+      // 使ったら消す（以降のfetchでは影響しない）
+      if (initialWorry) {
+        try { localStorage.removeItem("careo_initial_worry"); } catch { /* ignore */ }
+      }
       if (!data) { showToast("AIアドバイスの取得に失敗しました", "error"); return; }
       if (!("error" in data)) {
         setAiSummary(data.summary ?? "");

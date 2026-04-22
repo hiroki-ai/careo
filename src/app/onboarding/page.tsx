@@ -3,163 +3,212 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useProfile } from "@/hooks/useProfile";
-import { ProfileForm } from "@/components/profile/ProfileForm";
-import { CsvImportModal } from "@/components/companies/CsvImportModal";
-import { UserProfile } from "@/types";
+import { JobSearchStage } from "@/types";
 import { KareoCharacter } from "@/components/kareo/KareoCharacter";
 
-type Step = 1 | 2 | 3;
+type WorryKey = "what_to_do" | "deadlines" | "pass_rate" | "matching";
 
-type FormData = Omit<UserProfile, "id" | "createdAt" | "updatedAt">;
+const CURRENT_YEAR = new Date().getFullYear();
+
+// グラデーション年を選んだら、そこから grade を推定
+function inferGradeFromGradYear(gradYear: number): string {
+  const yearsUntilGrad = gradYear - CURRENT_YEAR;
+  if (yearsUntilGrad <= 0) return "学部4年";
+  if (yearsUntilGrad === 1) return "学部3年";
+  if (yearsUntilGrad === 2) return "学部2年";
+  return "学部1年";
+}
+
+const GRAD_YEARS = [
+  { value: CURRENT_YEAR + 2, label: `${(CURRENT_YEAR + 2) % 100}卒`, sub: "現在 大学3年" },
+  { value: CURRENT_YEAR + 3, label: `${(CURRENT_YEAR + 3) % 100}卒`, sub: "現在 大学2年" },
+  { value: CURRENT_YEAR + 1, label: `${(CURRENT_YEAR + 1) % 100}卒`, sub: "現在 大学4年" },
+  { value: CURRENT_YEAR + 4, label: "その他", sub: "院生・1年生など" },
+];
+
+const STAGES: { value: JobSearchStage; title: string; desc: string }[] = [
+  { value: "not_started", title: "まだ始めてない", desc: "何から手をつければいいか分からない" },
+  { value: "just_started", title: "動き出したところ", desc: "数社リサーチ中、ES書き始めた" },
+  { value: "in_progress", title: "複数社で選考中", desc: "面接・ESを並行で走らせている" },
+];
+
+const WORRIES: { value: WorryKey; emoji: string; title: string; desc: string }[] = [
+  { value: "what_to_do", emoji: "🤔", title: "何をすべきか分からない", desc: "今週やるべきことが見えない" },
+  { value: "deadlines", emoji: "⏰", title: "締切管理が追いつかない", desc: "サマーインターン締切を逃しそう" },
+  { value: "pass_rate", emoji: "📉", title: "選考通過率を上げたい", desc: "ESや面接で落ちる原因を知りたい" },
+  { value: "matching", emoji: "🎯", title: "合う企業が分からない", desc: "自分の軸と相性の良い業界を知りたい" },
+];
 
 export default function OnboardingPage() {
   const router = useRouter();
   const { saveProfile } = useProfile();
-  const [step, setStep] = useState<Step>(1);
-  const [importOpen, setImportOpen] = useState(false);
-  const [importTab, setImportTab] = useState<"csv" | "pdf" | "text">("csv");
-  const [importedCount, setImportedCount] = useState(0);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [graduationYear, setGraduationYear] = useState<number | null>(null);
+  const [stage, setStage] = useState<JobSearchStage | null>(null);
+  const [worry, setWorry] = useState<WorryKey | null>(null);
+  const [saving, setSaving] = useState(false);
 
-  const openImport = (tab: "csv" | "pdf" | "text") => {
-    setImportTab(tab);
-    setImportOpen(true);
-  };
-
-  const handleProfileSave = async (data: FormData) => {
-    await saveProfile(data);
+  const handleGradYear = (year: number) => {
+    setGraduationYear(year);
     setStep(2);
   };
-
+  const handleStage = (s: JobSearchStage) => {
+    setStage(s);
+    setStep(3);
+  };
+  const handleWorry = async (w: WorryKey) => {
+    setWorry(w);
+    setSaving(true);
+    try {
+      await saveProfile({
+        university: "",
+        faculty: "",
+        grade: graduationYear ? inferGradeFromGradYear(graduationYear) : "学部3年",
+        graduationYear: graduationYear!,
+        targetIndustries: [],
+        targetJobs: [],
+        jobSearchStage: stage!,
+      });
+      // worry は localStorage に保存してダッシュボードで使う
+      try { localStorage.setItem("careo_initial_worry", w); } catch { /* ignore */ }
+      router.push("/");
+    } catch {
+      setSaving(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      {/* ステップインジケーター */}
+    <div className="min-h-screen bg-gradient-to-br from-[#00c896]/5 via-white to-blue-50/30 flex items-center justify-center p-4">
       <div className="w-full max-w-lg">
-        <div className="flex items-center justify-center gap-2 mb-8">
+        {/* プログレスバー */}
+        <div className="flex items-center justify-center gap-1.5 mb-8">
           {[1, 2, 3].map((s) => (
-            <div key={s} className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
-                step === s
-                  ? "bg-[#00c896] text-white"
-                  : step > s
-                  ? "bg-[#00c896]/20 text-[#00c896]"
-                  : "bg-gray-200 text-gray-400"
-              }`}>
-                {step > s ? "✓" : s}
-              </div>
-              {s < 3 && (
-                <div className={`w-12 h-0.5 ${step > s ? "bg-[#00c896]" : "bg-gray-200"}`} />
-              )}
-            </div>
+            <div
+              key={s}
+              className={`h-1 rounded-full transition-all duration-300 ${
+                s === step ? "w-12 bg-[#00c896]" : step > s ? "w-8 bg-[#00c896]/40" : "w-8 bg-gray-200"
+              }`}
+            />
           ))}
         </div>
 
-        {/* Step 1: プロフィール */}
-        {step === 1 && (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-            <div className="text-center mb-8">
-              <div className="mx-auto mb-1"><KareoCharacter expression="waving" size={144} /></div>
-              <div className="inline-block bg-[#00c896]/8 border border-[#00c896]/20 rounded-2xl px-4 py-2 mb-4">
-                <p className="text-sm font-semibold text-[#00a87e]">はじめまして！カレオです 🎉</p>
-              </div>
-              <p className="text-gray-900 font-semibold">あなたのことを教えてください</p>
-              <p className="text-sm text-gray-400 mt-1">就活データを全部知ったうえで、本当に役立つアドバイスをします</p>
-            </div>
-            <ProfileForm onSubmit={handleProfileSave} submitLabel="次へ →" showSelfAnalysis />
-          </div>
-        )}
-
-        {/* Step 2: データインポート */}
-        {step === 2 && (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-            <div className="text-center mb-8">
-              <div className="flex items-end justify-center gap-3 mb-3">
-                <KareoCharacter expression="encouraging" size={112} animate={false} />
-                <div className="bg-[#00c896]/10 border border-[#00c896]/20 rounded-2xl rounded-bl-none px-4 py-3 mb-6 text-left">
-                  <p className="text-sm text-[#00a87e] font-semibold leading-relaxed">今まで使ってたデータ、<br />そのまま持ってきて！</p>
+        <div className="bg-white rounded-3xl shadow-xl shadow-[#00c896]/5 border border-gray-100 p-6 md:p-8">
+          {/* Step 1: 卒業年 */}
+          {step === 1 && (
+            <>
+              <div className="text-center mb-6">
+                <div className="mx-auto mb-2"><KareoCharacter expression="waving" size={120} /></div>
+                <div className="inline-block bg-[#00c896]/10 rounded-full px-3 py-1 mb-3">
+                  <p className="text-xs font-bold text-[#00a87e]">はじめまして、カレオです 🎉</p>
                 </div>
+                <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-1.5">
+                  卒業は何年？
+                </h1>
+                <p className="text-sm text-gray-500">就活スケジュールに合わせてアドバイスします</p>
               </div>
-              <p className="text-gray-900 font-semibold">今まで管理していたデータを取り込もう</p>
-              <p className="text-sm text-gray-400 mt-1">NotionやスプレッドシートのデータをそのままCareoに移行できます</p>
-            </div>
-            <div className="space-y-3">
+
+              <div className="grid grid-cols-2 gap-3">
+                {GRAD_YEARS.map((g) => (
+                  <button
+                    key={g.value}
+                    type="button"
+                    onClick={() => handleGradYear(g.value)}
+                    className="flex flex-col items-center justify-center py-5 rounded-2xl border-2 border-gray-100 hover:border-[#00c896] hover:bg-[#00c896]/5 transition-all active:scale-[0.98]"
+                  >
+                    <span className="text-xl font-black text-gray-900">{g.label}</span>
+                    <span className="text-[11px] text-gray-400 mt-1">{g.sub}</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+
+          {/* Step 2: 就活フェーズ */}
+          {step === 2 && (
+            <>
+              <div className="text-center mb-6">
+                <div className="mx-auto mb-2"><KareoCharacter expression="default" size={96} animate={false} /></div>
+                <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-1.5">
+                  今の就活はどんな感じ？
+                </h1>
+                <p className="text-sm text-gray-500">状況に合わせてサポートの仕方を調整します</p>
+              </div>
+
+              <div className="space-y-2.5">
+                {STAGES.map((s) => (
+                  <button
+                    key={s.value}
+                    type="button"
+                    onClick={() => handleStage(s.value)}
+                    className="w-full flex flex-col items-start p-4 rounded-2xl border-2 border-gray-100 hover:border-[#00c896] hover:bg-[#00c896]/5 transition-all text-left active:scale-[0.99]"
+                  >
+                    <span className="text-base font-bold text-gray-900">{s.title}</span>
+                    <span className="text-xs text-gray-500 mt-0.5">{s.desc}</span>
+                  </button>
+                ))}
+              </div>
+
               <button
                 type="button"
-                onClick={() => openImport("csv")}
-                className="w-full py-4 rounded-xl font-semibold border-2 border-[#00c896] text-[#00c896] hover:bg-[#00c896]/5 transition-colors flex items-center justify-center gap-2 text-base"
+                onClick={() => setStep(1)}
+                className="block mx-auto mt-5 text-xs text-gray-400 hover:text-gray-600"
               >
-                <span>📂</span>
-                CSV・PDFでインポートする
+                ← 戻る
               </button>
-              <p className="text-xs text-gray-400 text-center">
-                AIが企業名・ステータス・OB訪問・筆記試験を自動で読み取ります
-              </p>
-              <button
-                type="button"
-                onClick={() => openImport("text")}
-                className="w-full py-3 rounded-xl font-semibold border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
-              >
-                <span>✏️</span>
-                企業名をテキストで入力する
-              </button>
-              <button
-                type="button"
-                onClick={() => setStep(3)}
-                className="w-full py-3 rounded-xl text-sm text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                スキップして後で追加する →
-              </button>
-            </div>
-          </div>
-        )}
+            </>
+          )}
 
-        <CsvImportModal
-          isOpen={importOpen}
-          onClose={() => setImportOpen(false)}
-          onImportComplete={(counts) => {
-            setImportedCount(counts.companies ?? 0);
-            setImportOpen(false);
-            setStep(3);
-          }}
-          defaultTab={importTab}
-        />
-
-        {/* Step 3: 完了・ウェルカム */}
-        {step === 3 && (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
-            <div className="relative inline-block mb-2">
-              <KareoCharacter expression="celebrating" size={160} />
-              <div className="absolute -top-2 -right-2 w-8 h-8 bg-[#00c896] rounded-full flex items-center justify-center text-white text-lg shadow-lg">🎉</div>
-            </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-1">準備完了！</h2>
-            <p className="text-sm text-[#00a87e] font-medium mb-4">一緒に内定、取りに行こう！</p>
-
-            {/* AIウェルカムメッセージ */}
-            <div className="bg-gray-50 rounded-xl p-4 my-6 text-left">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-[#00c896] rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-white text-xs font-bold">AI</span>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-700 leading-relaxed">
-                    {importedCount > 0
-                      ? `${importedCount}社をインポートしましたね。データがそろったので、すぐにAI分析を始められます。ダッシュボードで「今週何をすべきか」を確認しましょう。`
-                      : `登録ありがとうございます！ダッシュボードで企業を追加したら、AIが選考状況を分析して「今週何をすべきか」を具体的に教えます。まずは気になる企業を追加してみましょう。`
-                    }
-                  </p>
-                </div>
+          {/* Step 3: 一番の悩み */}
+          {step === 3 && (
+            <>
+              <div className="text-center mb-6">
+                <div className="mx-auto mb-2"><KareoCharacter expression="encouraging" size={96} animate={false} /></div>
+                <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-1.5">
+                  今、一番モヤモヤしてるのは？
+                </h1>
+                <p className="text-sm text-gray-500">まずそれを解決するところからサポートします</p>
               </div>
-            </div>
 
-            <button
-              type="button"
-              onClick={() => router.push("/")}
-              className="w-full py-3 rounded-xl font-semibold text-white transition-all hover:opacity-90 bg-[#00c896]"
-            >
-              ダッシュボードへ →
-            </button>
-          </div>
-        )}
+              <div className="grid grid-cols-1 gap-2.5">
+                {WORRIES.map((w) => (
+                  <button
+                    key={w.value}
+                    type="button"
+                    disabled={saving}
+                    onClick={() => handleWorry(w.value)}
+                    className="w-full flex items-center gap-3 p-4 rounded-2xl border-2 border-gray-100 hover:border-[#00c896] hover:bg-[#00c896]/5 transition-all text-left active:scale-[0.99] disabled:opacity-50"
+                  >
+                    <span className="text-2xl shrink-0">{w.emoji}</span>
+                    <div className="flex-1">
+                      <div className="text-sm font-bold text-gray-900">{w.title}</div>
+                      <div className="text-xs text-gray-500 mt-0.5">{w.desc}</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              {saving && (
+                <div className="text-center mt-5 text-sm text-[#00a87e] font-semibold">
+                  ダッシュボードを準備中...
+                </div>
+              )}
+
+              {!saving && (
+                <button
+                  type="button"
+                  onClick={() => setStep(2)}
+                  className="block mx-auto mt-5 text-xs text-gray-400 hover:text-gray-600"
+                >
+                  ← 戻る
+                </button>
+              )}
+            </>
+          )}
+        </div>
+
+        <p className="text-center text-xs text-gray-400 mt-5">
+          詳しいプロフィール（大学・学部等）は後から設定できます
+        </p>
       </div>
     </div>
   );
