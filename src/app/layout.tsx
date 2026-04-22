@@ -4,6 +4,7 @@ import "./globals.css";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { PwaInstallBanner } from "@/components/layout/PwaInstallBanner";
+import { ServiceWorkerRegister } from "@/components/layout/ServiceWorkerRegister";
 import { ActivityTracker } from "@/components/layout/ActivityTracker";
 import { ToastProvider } from "@/components/ui/Toast";
 import { CommandPalette } from "@/components/CommandPalette";
@@ -63,6 +64,10 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#00c896" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f1117" },
+  ],
 };
 
 const jsonLd = {
@@ -106,20 +111,6 @@ const jsonLd = {
           "url": `${APP_URL}/signup`,
           "description": "Careoに無料で新規登録する",
         },
-        {
-          "@type": "ListItem",
-          "position": 3,
-          "name": "キャリアセンター担当者ログイン",
-          "url": `${APP_URL}/login?next=/career-portal`,
-          "description": "大学キャリアセンター担当者向けポータルにログイン",
-        },
-        {
-          "@type": "ListItem",
-          "position": 4,
-          "name": "大学キャリアセンター向けサービス",
-          "url": `${APP_URL}/for-career-center`,
-          "description": "大学キャリアセンターとの提携・連携について",
-        },
       ],
     },
   ],
@@ -138,6 +129,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           <ToastProvider>
             <ActivityTracker />
+            <ServiceWorkerRegister />
             <PwaInstallBanner />
             <div className="flex min-h-screen">
               <Sidebar />

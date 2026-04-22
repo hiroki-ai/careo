@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useProfile } from "@/hooks/useProfile";
 import { useToast } from "@/components/ui/Toast";
 import { Button } from "@/components/ui/Button";
@@ -30,16 +31,71 @@ const PRO_FEATURES = [
   "広告非表示",
 ];
 
-export default function UpgradePage() {
+function UpgradeInner() {
   const { profile, refetch } = useProfile();
   const { showToast } = useToast();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [coupon, setCoupon] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState<null | "monthly" | "yearly">(null);
+  const [portalLoading, setPortalLoading] = useState(false);
+  const [cycle, setCycle] = useState<"monthly" | "yearly">("yearly");
   const isPro = profile?.plan === "pro";
+
+  // Stripe successから戻ってきたらrefetchしてProに切り替わっているか確認
+  useEffect(() => {
+    if (searchParams.get("success") === "1") {
+      showToast("決済が完了しました！Proプランをお楽しみください 🎉", "success");
+      // webhook処理を待つため少し遅延させてrefetch
+      setTimeout(() => void refetch(), 2000);
+    } else if (searchParams.get("canceled") === "1") {
+      showToast("決済がキャンセルされました", "info");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  const handleCheckout = async (plan: "monthly" | "yearly") => {
+    setCheckoutLoading(plan);
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan }),
+      });
+      const data = await res.json() as { url?: string; error?: string };
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        showToast(data.error ?? "決済ページへの遷移に失敗しました", "error");
+      }
+    } catch {
+      showToast("決済ページへの遷移に失敗しました", "error");
+    } finally {
+      setCheckoutLoading(null);
+    }
+  };
+
+  const handlePortal = async () => {
+    setPortalLoading(true);
+    try {
+      const res = await fetch("/api/stripe/portal", { method: "POST" });
+      const data = await res.json() as { url?: string; error?: string };
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        showToast(data.error ?? "契約管理画面を開けませんでした", "error");
+      }
+    } catch {
+      showToast("契約管理画面を開けませんでした", "error");
+    } finally {
+      setPortalLoading(false);
+    }
+  };
 
   const handleCoupon = async () => {
     if (!coupon.trim()) return;
-    setLoading(true);
+    setCouponLoading(true);
     try {
       const res = await fetch("/api/coupon", {
         method: "POST",
@@ -55,7 +111,7 @@ export default function UpgradePage() {
         showToast(data.error ?? "エラーが発生しました", "error");
       }
     } finally {
-      setLoading(false);
+      setCouponLoading(false);
     }
   };
 
@@ -73,13 +129,39 @@ export default function UpgradePage() {
         </p>
       </div>
 
+      {/* 月額/年額 切替 */}
+      {!isPro && (
+        <div className="flex justify-center mb-6">
+          <div className="inline-flex bg-gray-100 rounded-full p-1">
+            <button
+              type="button"
+              onClick={() => setCycle("monthly")}
+              className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-all ${
+                cycle === "monthly" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500"
+              }`}
+            >
+              月額
+            </button>
+            <button
+              type="button"
+              onClick={() => setCycle("yearly")}
+              className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-all ${
+                cycle === "yearly" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500"
+              }`}
+            >
+              年額 <span className="text-[10px] ml-1 bg-[#00c896]/15 text-[#00a87e] px-1.5 py-0.5 rounded-full">41%OFF</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         {/* Free */}
-        <div className={`rounded-2xl border-2 p-6 ${!isPro ? "border-[#00c896] bg-[#00c896]/5" : "border-gray-200 bg-white"}`}>
+        <div className={`rounded-2xl border-2 p-6 ${!isPro ? "border-gray-200 bg-white" : "border-gray-200 bg-white"}`}>
           <div className="flex items-center justify-between mb-1">
             <span className="text-sm font-bold text-gray-700">Free</span>
             {!isPro && (
-              <span className="text-[10px] bg-[#00c896]/15 text-[#00a87e] font-semibold px-2 py-0.5 rounded-full">現在のプラン</span>
+              <span className="text-[10px] bg-gray-100 text-gray-600 font-semibold px-2 py-0.5 rounded-full">現在のプラン</span>
             )}
           </div>
           <p className="text-3xl font-bold text-gray-900 mb-1">¥0</p>
@@ -94,29 +176,48 @@ export default function UpgradePage() {
         </div>
 
         {/* Pro */}
-        <div className={`rounded-2xl border-2 p-6 ${isPro ? "border-[#00c896] bg-[#00c896]/5" : "border-gray-200 bg-white"}`}>
+        <div className={`rounded-2xl border-2 p-6 ${isPro ? "border-[#00c896] bg-[#00c896]/5" : "border-[#00c896] bg-[#00c896]/5"}`}>
           <div className="flex items-center justify-between mb-1">
             <span className="text-sm font-bold text-gray-700">Pro</span>
             {isPro && (
               <span className="text-[10px] bg-[#00c896]/15 text-[#00a87e] font-semibold px-2 py-0.5 rounded-full">現在のプラン</span>
             )}
           </div>
-          <p className="text-3xl font-bold text-gray-900 mb-1">¥480<span className="text-sm font-normal text-gray-400">/月</span></p>
-          <p className="text-xs text-gray-400 mb-1">または年払い ¥2,800（41%OFF）</p>
-          <p className="text-xs text-gray-400 mb-5">決済機能は近日公開予定</p>
-          <ul className="space-y-2">
+          {cycle === "monthly" ? (
+            <>
+              <p className="text-3xl font-bold text-gray-900 mb-1">¥480<span className="text-sm font-normal text-gray-400">/月</span></p>
+              <p className="text-xs text-gray-400 mb-5">いつでも解約可能</p>
+            </>
+          ) : (
+            <>
+              <p className="text-3xl font-bold text-gray-900 mb-1">¥2,800<span className="text-sm font-normal text-gray-400">/年</span></p>
+              <p className="text-xs text-gray-400 mb-5">月換算 約¥233 / 41%OFF</p>
+            </>
+          )}
+          <ul className="space-y-2 mb-4">
             {PRO_FEATURES.map((f) => (
               <li key={f} className="flex items-start gap-2 text-xs text-gray-700">
                 <span className="text-[#00a87e] shrink-0 mt-0.5">★</span>{f}
               </li>
             ))}
           </ul>
-          {!isPro && (
+          {!isPro ? (
             <button
-              disabled
-              className="mt-5 w-full bg-gray-100 text-gray-400 cursor-not-allowed font-semibold py-2.5 rounded-xl text-sm"
+              type="button"
+              onClick={() => handleCheckout(cycle)}
+              disabled={checkoutLoading !== null}
+              className="w-full bg-[#00c896] hover:bg-[#00b088] disabled:opacity-60 text-white font-bold py-3 rounded-xl text-sm transition-colors"
             >
-              決済機能 準備中...
+              {checkoutLoading === cycle ? "決済画面へ遷移中..." : cycle === "yearly" ? "年額プランにアップグレード" : "月額プランにアップグレード"}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handlePortal}
+              disabled={portalLoading}
+              className="w-full bg-gray-100 hover:bg-gray-200 disabled:opacity-60 text-gray-700 font-semibold py-2.5 rounded-xl text-sm transition-colors"
+            >
+              {portalLoading ? "契約管理画面を開いています..." : "契約管理・解約はこちら"}
             </button>
           )}
         </div>
@@ -135,8 +236,8 @@ export default function UpgradePage() {
               className="flex-1 bg-white border border-amber-300 rounded-xl px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-amber-400"
               onKeyDown={(e) => e.key === "Enter" && handleCoupon()}
             />
-            <Button onClick={handleCoupon} disabled={loading || !coupon.trim()} size="sm">
-              {loading ? "確認中..." : "適用"}
+            <Button onClick={handleCoupon} disabled={couponLoading || !coupon.trim()} size="sm">
+              {couponLoading ? "確認中..." : "適用"}
             </Button>
           </div>
         </div>
@@ -146,5 +247,13 @@ export default function UpgradePage() {
         <Link href="/" className="text-xs text-gray-400 hover:text-gray-600">← ダッシュボードに戻る</Link>
       </div>
     </div>
+  );
+}
+
+export default function UpgradePage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-gray-400">読み込み中...</div>}>
+      <UpgradeInner />
+    </Suspense>
   );
 }

@@ -1,12 +1,17 @@
 {
-  "name": "Careo - 就活管理アプリ",
+  "name": "Careo（カレオ）- 就活管理アプリ",
   "short_name": "Careo",
-  "description": "企業・ES・面接を一元管理する就活支援アプリ",
+  "description": "AI就活コーチが選考・ES・面接を一元管理。PDCAを自動で回す就活アプリ",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#0d1b2e",
-  "theme_color": "#1a2f4e",
-  "orientation": "portrait",
+  "display_override": ["standalone", "minimal-ui"],
+  "background_color": "#ffffff",
+  "theme_color": "#00c896",
+  "orientation": "portrait-primary",
+  "categories": ["productivity", "education", "business"],
+  "lang": "ja",
+  "dir": "ltr",
   "icons": [
     {
       "src": "/favicon-32.png",
@@ -23,7 +28,34 @@
       "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "今日やること",
+      "short_name": "今日",
+      "description": "今週のTodoとKPIを確認",
+      "url": "/",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "企業管理",
+      "short_name": "企業",
+      "url": "/companies",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "締切一覧",
+      "short_name": "締切",
+      "url": "/deadlines",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }

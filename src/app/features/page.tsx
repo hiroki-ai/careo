@@ -219,8 +219,8 @@ export default function FeaturesPage() {
             <Link href="/" className="text-sm text-gray-500 hover:text-gray-900 font-medium transition-colors">
               トップ
             </Link>
-            <Link href="/for-career-center" className="text-sm text-gray-500 hover:text-gray-900 font-medium transition-colors">
-              キャリアセンター
+            <Link href="/compare" className="text-sm text-gray-500 hover:text-gray-900 font-medium transition-colors">
+              他サービス比較
             </Link>
             <Link href="/blog" className="text-sm text-[#00a87e] hover:text-[#008f6a] font-semibold transition-colors">
               ブログ
@@ -522,7 +522,7 @@ export default function FeaturesPage() {
           </div>
           <div className="flex items-center gap-5 text-xs text-gray-400">
             <Link href="/" className="hover:text-gray-700 transition-colors">トップ</Link>
-            <Link href="/for-career-center" className="hover:text-gray-700 transition-colors">キャリアセンター向け</Link>
+            <Link href="/compare" className="hover:text-gray-700 transition-colors">他サービス比較</Link>
             <Link href="/blog" className="hover:text-gray-700 transition-colors">ブログ</Link>
             <a href="https://x.com/hiroki_careo" target="_blank" rel="noopener noreferrer" className="hover:text-gray-700 transition-colors">X</a>
             <a href="https://note.com/hiroki_careo" target="_blank" rel="noopener noreferrer" className="hover:text-gray-700 transition-colors">Note</a>

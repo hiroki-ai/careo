@@ -1369,8 +1369,8 @@ function FinalCTA() {
           <Link href="/terms" style={{ color: "inherit" }}>
             利用規約
           </Link>
-          <Link href="/for-career-center" style={{ color: "inherit" }}>
-            大学キャリアセンターの方へ
+          <Link href="/compare" style={{ color: "inherit" }}>
+            他サービスとの比較
           </Link>
           <a href="mailto:hello@careo.jp" style={{ color: "inherit" }}>
             お問い合わせ

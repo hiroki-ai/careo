@@ -11,7 +11,6 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next") ?? "/";
-  const isStaffLogin = nextPath.startsWith("/career-portal");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,7 +31,7 @@ function LoginForm() {
       }
       setLoading(false);
     } else {
-      if (!isStaffLogin) {
+      {
         // Chrome拡張機能にトークンを送信（インストール済みの場合のみ動作）
         try {
           const supabase2 = createClient();
@@ -50,20 +49,17 @@ function LoginForm() {
   };
 
   return (
-    <div className={`min-h-screen flex items-center justify-center p-4 ${isStaffLogin ? "bg-[#0d1b2a]" : "bg-[#0a1628]"}`}>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-[#0a1628]">
       <div className="w-full max-w-sm">
-        {/* カレオ welcome (student login only) */}
-        {!isStaffLogin && (
-          <div className="flex flex-col items-center mb-5">
-            <KareoCharacter expression="waving" size={96} />
-            <div className="bg-white rounded-2xl rounded-tl-none px-5 py-3 shadow-lg max-w-xs relative -mt-1">
-              <div className="absolute -top-3 left-0 w-4 h-4 bg-white rotate-[-35deg] rounded-tl-sm" />
-              <p className="text-sm font-semibold text-[#0D0B21] leading-relaxed">
-                おかえり！<span className="text-[#00a87e]">就活の続き、一緒にやろう。</span>
-              </p>
-            </div>
+        <div className="flex flex-col items-center mb-5">
+          <KareoCharacter expression="waving" size={96} />
+          <div className="bg-white rounded-2xl rounded-tl-none px-5 py-3 shadow-lg max-w-xs relative -mt-1">
+            <div className="absolute -top-3 left-0 w-4 h-4 bg-white rotate-[-35deg] rounded-tl-sm" />
+            <p className="text-sm font-semibold text-[#0D0B21] leading-relaxed">
+              おかえり！<span className="text-[#00a87e]">就活の続き、一緒にやろう。</span>
+            </p>
           </div>
-        )}
+        </div>
         <div className="bg-white rounded-2xl shadow-xl p-8">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-2">
@@ -71,14 +67,7 @@ function LoginForm() {
             <img src="/icon-192.png" alt="Careo" className="w-8 h-8 rounded-xl" />
             <h1 className="text-2xl font-bold text-[#0a1628]">Careo</h1>
           </div>
-          {isStaffLogin ? (
-            <div>
-              <p className="text-sm font-medium text-gray-700">キャリアセンター担当者ログイン</p>
-              <p className="text-xs text-gray-400 mt-1">ポータル管理画面にアクセスします</p>
-            </div>
-          ) : (
-            <p className="text-sm text-gray-400">ログイン</p>
-          )}
+          <p className="text-sm text-gray-400">ログイン</p>
         </div>
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
