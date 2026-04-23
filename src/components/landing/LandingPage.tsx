@@ -248,7 +248,7 @@ function Hero({ userCount }: { userCount: number }) {
               無料ではじめる →
             </Link>
             <Link
-              href="/features"
+              href="/diagnosis"
               style={{
                 background: "white",
                 color: INK,
@@ -260,7 +260,7 @@ function Hero({ userCount }: { userCount: number }) {
                 textDecoration: "none",
               }}
             >
-              できること一覧 →
+              3分で就活タイプ診断 →
             </Link>
           </div>
 
@@ -1469,6 +1469,15 @@ function FinalCTA() {
           </Link>
           <Link href="/compare" style={{ color: "inherit" }}>
             他サービスとの比較
+          </Link>
+          <Link href="/diagnosis" style={{ color: "inherit" }}>
+            就活タイプ診断
+          </Link>
+          <Link href="/simulator" style={{ color: "inherit" }}>
+            内定確率シミュレータ
+          </Link>
+          <Link href="/stats" style={{ color: "inherit" }}>
+            リアルタイム統計
           </Link>
           <a href="mailto:hello@careo.jp" style={{ color: "inherit" }}>
             お問い合わせ
