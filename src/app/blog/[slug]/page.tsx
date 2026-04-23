@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import type { Metadata } from "next";
+import { AdSlot } from "@/components/ads/AdSlot";
 
 type Post = {
   id: string;
@@ -209,6 +210,11 @@ export default async function BlogPostPage({ params }: Props) {
             className="blog-body"
             dangerouslySetInnerHTML={{ __html: post.body }}
           />
+
+          {/* ─── 広告（AdSense審査通過後に表示） ───── */}
+          <div className="mt-8">
+            <AdSlot slotId={process.env.NEXT_PUBLIC_ADSENSE_SLOT_BLOG} format="auto" />
+          </div>
 
           {/* ─── 記事末尾CTA ───────────────────────── */}
           <div className="mt-10 md:mt-14 bg-gradient-to-br from-[#0D0B21] to-[#1a1830] rounded-2xl md:rounded-3xl px-6 md:px-10 py-8 md:py-12 text-center">

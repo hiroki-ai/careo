@@ -18,6 +18,8 @@ import { useDeadlineNotifications } from "@/hooks/useDeadlineNotifications";
 import { Button } from "@/components/ui/Button";
 import { InsightsWidget } from "@/components/dashboard/InsightsWidget";
 import { PostOfferWidget } from "@/components/dashboard/PostOfferWidget";
+import { AdSlot } from "@/components/ads/AdSlot";
+import { UpgradeNudge } from "@/components/ads/UpgradeNudge";
 import { SkeletonCard } from "@/components/ui/SkeletonCard";
 import { createClient } from "@/lib/supabase/client";
 import { daysUntil } from "@/lib/utils";
@@ -869,6 +871,12 @@ export function DashboardContent() {
           <PostOfferWidget offeredCompanies={companies.filter(c => c.status === "OFFERED")} />
         </div>
       )}
+
+      {/* 広告（Free ユーザーのみ、AdSense審査通過後に表示） */}
+      <div className="px-4 md:px-5 pb-6">
+        <AdSlot slotId={process.env.NEXT_PUBLIC_ADSENSE_SLOT_DASHBOARD} format="auto" />
+        <UpgradeNudge message="広告非表示＋PDCA無制限のProプランで、就活を加速。" />
+      </div>
     </div>
   );
 }

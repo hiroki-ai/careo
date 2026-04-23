@@ -37,8 +37,8 @@ export default function PrivacyPage() {
               <li>不正アクセスの防止</li>
             </ul>
             <p className="mt-2 text-gray-500">
-              収集した情報を第三者への販売・マーケティング目的で利用することはありません。
-              広告メールやスカウト電話は一切送付しません。
+              収集した情報を第三者への販売目的で利用することはありません。
+              広告メールやスカウト電話は一切送付しません（無料プランでは、文脈に関係ない外部広告がページ内に表示される場合があります）。
               将来的に企業向けサービスを提供する場合は、その目的・提供範囲を明示した上で別途同意を取得します。
             </p>
           </section>
@@ -111,6 +111,23 @@ export default function PrivacyPage() {
                   操作ログが送信される場合があります。個人を特定できる情報の意図的な送信はしません。
                 </p>
               </div>
+              <div className="bg-gray-50 rounded-xl p-4">
+                <p className="font-semibold text-gray-800 mb-1">Stripe（決済）</p>
+                <p className="text-gray-600 text-xs">
+                  Proプランの有料決済を安全に処理するために使用。カード情報はStripeが保持し、
+                  当サービスのサーバーには保存しません。Stripeのプライバシーポリシーが適用されます。
+                </p>
+              </div>
+              <div className="bg-gray-50 rounded-xl p-4">
+                <p className="font-semibold text-gray-800 mb-1">Google AdSense（広告配信）</p>
+                <p className="text-gray-600 text-xs">
+                  無料プランのユーザーに対して広告を配信するために使用します。
+                  Googleおよび第三者のベンダーが、当サイトへのユーザーの過去のアクセス情報に基づいて広告を配信するため、
+                  Cookieを使用する場合があります。広告パーソナライズは
+                  <a href="https://adssettings.google.com/" target="_blank" rel="noopener noreferrer" className="underline">Google広告設定</a>
+                  から無効にできます。Proプラン（有料）では広告は表示されません。
+                </p>
+              </div>
             </div>
             <p className="mt-3 text-xs text-gray-500">
               法令に基づく要請がある場合を除き、上記以外の第三者に個人情報を提供しません。
@@ -130,10 +147,15 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="font-bold text-gray-900 mb-2">6. Cookieおよびローカルストレージ</h2>
-            <p>
+            <p className="mb-2">
               当サービスはセッション管理にCookieを使用します。
-              また、最終チャット日時などの設定情報をブラウザのLocalStorageに保存します。
-              追跡目的のCookieや広告Cookieは使用しません。
+              また、設定情報・キャッシュ等をブラウザのLocalStorageに保存します。
+            </p>
+            <p>
+              無料プランでは広告配信のため、Google AdSenseおよび第三者ベンダーのCookie（DoubleClick Cookie等）が使用される場合があります。
+              これらCookieはユーザーの興味に沿った広告を配信するために使われますが、
+              <a href="https://adssettings.google.com/" target="_blank" rel="noopener noreferrer" className="underline">Google広告設定</a>
+              からパーソナライズ広告を無効にできます。
             </p>
           </section>
 

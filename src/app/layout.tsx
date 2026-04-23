@@ -5,6 +5,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { PwaInstallBanner } from "@/components/layout/PwaInstallBanner";
 import { ServiceWorkerRegister } from "@/components/layout/ServiceWorkerRegister";
+import { AdSenseScript } from "@/components/ads/AdSenseScript";
 import { ActivityTracker } from "@/components/layout/ActivityTracker";
 import { ToastProvider } from "@/components/ui/Toast";
 import { CommandPalette } from "@/components/CommandPalette";
@@ -124,6 +125,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        <AdSenseScript />
       </head>
       <body className={`${geist.variable} ${yomogi.variable} ${shipporiMincho.variable} ${kleeOne.variable} ${zenKaku.variable} font-sans antialiased bg-gray-50 dark:bg-[#0f1117]`}>
         <ThemeProvider>
