@@ -265,7 +265,7 @@ export default function ComparePage() {
         : <span className="text-amber-500 text-[11px] font-semibold leading-tight">{v}</span>;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen font-zen-kaku" style={{ background: "#fcfbf8" }}>
 
       {/* ── ナビ ────────────────────────────────────────────────────────────── */}
       <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
@@ -325,7 +325,7 @@ export default function ComparePage() {
       </section>
 
       {/* ── 各サービスの正直な紹介 ──────────────────────────────────────────── */}
-      <section className="px-6 py-20 bg-gray-50/60">
+      <section className="px-6 py-20 bg-[#f5f3ee]/60">
         <div className="max-w-5xl mx-auto">
           <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">Honest Review</p>
           <h2 className="text-2xl md:text-4xl font-bold text-center mb-4 tracking-tight">
@@ -376,7 +376,7 @@ export default function ComparePage() {
       </section>
 
       {/* ── 比較テーブル ────────────────────────────────────────────────────── */}
-      <section id="compare" className="px-6 py-20 bg-white">
+      <section id="compare" className="px-6 py-20" style={{ background: "#fcfbf8" }}>
         <div className="max-w-5xl mx-auto">
           <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">Feature Matrix</p>
           <h2 className="text-2xl md:text-4xl font-bold text-center mb-4 tracking-tight">
@@ -732,7 +732,7 @@ export default function ComparePage() {
       </section>
 
       {/* ── よくある質問 ─────────────────────────────────────────────────────── */}
-      <section className="px-6 py-20 bg-gray-50/60">
+      <section className="px-6 py-20 bg-[#f5f3ee]/60">
         <div className="max-w-3xl mx-auto">
           <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">FAQ</p>
           <h2 className="text-2xl md:text-4xl font-bold text-center mb-12 tracking-tight">

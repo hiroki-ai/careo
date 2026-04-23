@@ -52,12 +52,14 @@ export default function SignupPage() {
 
   if (emailSent) {
     return (
-      <div className="min-h-screen bg-[#0a1628] flex items-center justify-center p-4">
-        <div className="w-full max-w-sm text-center">
+      <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" style={{ background: "#fcfbf8" }}>
+        <div className="absolute pointer-events-none" style={{ top: 40, right: -60, width: 300, height: 300, background: "radial-gradient(circle, rgba(0,200,150,0.12), transparent 65%)", filter: "blur(40px)" }} />
+        <div className="absolute pointer-events-none" style={{ bottom: 0, left: -80, width: 280, height: 280, background: "radial-gradient(circle, rgba(255,200,100,0.18), transparent 65%)", filter: "blur(40px)" }} />
+        <div className="w-full max-w-sm text-center relative">
           <div className="mx-auto mb-4">
             <KareoCharacter expression="waving" size={112} />
           </div>
-          <div className="bg-white rounded-3xl rounded-tl-none px-6 py-5 shadow-xl mb-4 text-left relative">
+          <div className="bg-white rounded-3xl rounded-tl-none px-6 py-5 shadow-xl mb-4 text-left relative" style={{ border: "1px solid rgba(0,200,150,0.2)" }}>
             <div className="absolute -top-3 left-0 w-4 h-4 bg-white rotate-[-35deg] rounded-tl-sm" />
             <p className="font-bold text-gray-900 mb-1">確認メールを送ったよ！📬</p>
             <p className="text-sm text-gray-500">
@@ -100,11 +102,11 @@ export default function SignupPage() {
         )}
 
         {/* Form card */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white rounded-3xl shadow-xl p-8" style={{ border: "1px solid rgba(13,11,33,0.06)" }}>
           <div className="flex items-center justify-center gap-2 mb-6">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/icon-192.png" alt="Careo" className="w-7 h-7 rounded-xl" />
-            <h1 className="text-xl font-bold text-[#0a1628]">Careo — 無料で始める</h1>
+            <h1 className="font-klee text-xl font-bold text-[#0D0B21]">Careo — 無料で始める</h1>
           </div>
           <form onSubmit={handleSignup} className="space-y-4">
             <div>

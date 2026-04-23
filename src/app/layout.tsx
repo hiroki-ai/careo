@@ -127,7 +127,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <AdSenseScript />
       </head>
-      <body className={`${geist.variable} ${yomogi.variable} ${shipporiMincho.variable} ${kleeOne.variable} ${zenKaku.variable} font-sans antialiased bg-gray-50 dark:bg-[#0f1117]`}>
+      <body className={`${geist.variable} ${yomogi.variable} ${shipporiMincho.variable} ${kleeOne.variable} ${zenKaku.variable} font-zen-kaku antialiased text-[#0D0B21]`} style={{ background: "#fcfbf8" }}>
         <ThemeProvider>
           <ToastProvider>
             <ActivityTracker />

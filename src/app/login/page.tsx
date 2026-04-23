@@ -49,23 +49,31 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-[#0a1628]">
-      <div className="w-full max-w-sm">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: "#fcfbf8" }}>
+      <div
+        className="absolute pointer-events-none"
+        style={{ top: 40, right: -60, width: 300, height: 300, background: "radial-gradient(circle, rgba(0,200,150,0.12), transparent 65%)", filter: "blur(40px)" }}
+      />
+      <div
+        className="absolute pointer-events-none"
+        style={{ bottom: 0, left: -80, width: 280, height: 280, background: "radial-gradient(circle, rgba(255,200,100,0.18), transparent 65%)", filter: "blur(40px)" }}
+      />
+      <div className="w-full max-w-sm relative">
         <div className="flex flex-col items-center mb-5">
           <KareoCharacter expression="waving" size={96} />
-          <div className="bg-white rounded-2xl rounded-tl-none px-5 py-3 shadow-lg max-w-xs relative -mt-1">
-            <div className="absolute -top-3 left-0 w-4 h-4 bg-white rotate-[-35deg] rounded-tl-sm" />
+          <div className="bg-white rounded-2xl rounded-tl-none px-5 py-3 shadow-lg max-w-xs relative -mt-1" style={{ border: "1px solid rgba(0,200,150,0.2)" }}>
+            <div className="absolute -top-3 left-0 w-4 h-4 bg-white rotate-[-35deg] rounded-tl-sm" style={{ borderLeft: "1px solid rgba(0,200,150,0.2)", borderTop: "1px solid rgba(0,200,150,0.2)" }} />
             <p className="text-sm font-semibold text-[#0D0B21] leading-relaxed">
               おかえり！<span className="text-[#00a87e]">就活の続き、一緒にやろう。</span>
             </p>
           </div>
         </div>
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white rounded-3xl shadow-xl p-8" style={{ border: "1px solid rgba(13,11,33,0.06)" }}>
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/icon-192.png" alt="Careo" className="w-8 h-8 rounded-xl" />
-            <h1 className="text-2xl font-bold text-[#0a1628]">Careo</h1>
+            <h1 className="font-klee text-2xl font-bold text-[#0D0B21]">Careo</h1>
           </div>
           <p className="text-sm text-gray-400">ログイン</p>
         </div>

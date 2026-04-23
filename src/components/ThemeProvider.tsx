@@ -70,21 +70,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return () => mq.removeEventListener("change", handler);
   }, []);
 
-  const resolvedDark =
-    settings.colorMode === "dark" ||
-    (settings.colorMode === "auto" && systemDark);
+  // ダークモード廃止: 常に light を強制
+  const resolvedDark = false;
+  void systemDark;
 
   // Apply dark class and font class to <html>
   useEffect(() => {
     if (!mounted) return;
     const html = document.documentElement;
 
-    // Dark mode
-    if (resolvedDark) {
-      html.classList.add("dark");
-    } else {
-      html.classList.remove("dark");
-    }
+    // Dark mode は無効化（LP統一デザインのため）
+    html.classList.remove("dark");
 
     // Font style
     Object.values(FONT_CLASSES).forEach((cls) => {

@@ -154,7 +154,7 @@ function Hero({ userCount }: { userCount: number }) {
   const chipLabel = `${formatUserCount(userCount)}の28/29卒が使ってる`;
 
   return (
-    <section className="relative overflow-hidden" style={{ padding: "44px 20px 56px" }}>
+    <section className="relative overflow-hidden px-4 pt-7 pb-10 md:px-5 md:pt-11 md:pb-14">
       <div
         className="absolute pointer-events-none"
         style={{
@@ -178,7 +178,7 @@ function Hero({ userCount }: { userCount: number }) {
         }}
       />
       <div
-        className="relative grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-9 items-center"
+        className="relative grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-6 md:gap-9 items-center"
         style={{ maxWidth: 1160, margin: "0 auto" }}
       >
         <div>
@@ -210,11 +210,11 @@ function Hero({ userCount }: { userCount: number }) {
           <h1
             className="font-klee"
             style={{
-              fontSize: "min(12vw, 56px)",
+              fontSize: "min(10vw, 56px)",
               fontWeight: 600,
               lineHeight: 1.18,
-              letterSpacing: -1.2,
-              marginBottom: 20,
+              letterSpacing: -0.8,
+              marginBottom: 16,
             }}
           >
             就活の
@@ -224,7 +224,7 @@ function Hero({ userCount }: { userCount: number }) {
             データで見える化。
           </h1>
 
-          <p style={{ fontSize: 16, lineHeight: 1.9, color: "#4b5563", marginBottom: 26, maxWidth: 520 }}>
+          <p className="text-[15px] md:text-base leading-[1.8] md:leading-[1.9]" style={{ color: "#4b5563", marginBottom: 22, maxWidth: 520 }}>
             <b style={{ color: INK }}>ES・面接・OB訪問を全部ひとつに。</b>
             通過率もボトルネックも自動で可視化。
             <br />
@@ -274,9 +274,9 @@ function Hero({ userCount }: { userCount: number }) {
           </div>
         </div>
 
-        <div className="relative flex justify-center" style={{ paddingTop: 8 }}>
-          <div className="animate-float absolute" style={{ top: -10, right: "18%", zIndex: 3 }}>
-            <CareoKun size={84} mood="cheer" />
+        <div className="relative flex justify-center pt-2 md:pt-2">
+          <div className="animate-float absolute" style={{ top: -14, right: "16%", zIndex: 3 }}>
+            <CareoKun size={72} mood="cheer" />
           </div>
           <div
             className="absolute"
@@ -308,38 +308,10 @@ function Hero({ userCount }: { userCount: number }) {
 
 function PhoneMockup({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ position: "relative", width: 280, maxWidth: "100%" }}>
-      <div
-        style={{
-          background: INK,
-          borderRadius: 36,
-          padding: 8,
-          boxShadow:
-            "0 30px 60px -20px rgba(0,0,0,.3), 0 0 0 1px rgba(0,0,0,.1)",
-        }}
-      >
-        <div
-          style={{
-            background: "white",
-            borderRadius: 28,
-            overflow: "hidden",
-            height: 520,
-            position: "relative",
-          }}
-        >
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: "50%",
-              transform: "translateX(-50%)",
-              width: 100,
-              height: 22,
-              background: INK,
-              borderRadius: "0 0 14px 14px",
-              zIndex: 10,
-            }}
-          />
+    <div className="lp-phone-mockup">
+      <div className="lp-phone-mockup-frame">
+        <div className="lp-phone-mockup-screen">
+          <div className="lp-phone-mockup-notch" />
           {children}
         </div>
       </div>
