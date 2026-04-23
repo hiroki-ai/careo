@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { CareoKun } from "./CareoKun";
@@ -12,7 +12,6 @@ import {
   BEFORE_AFTER_SCENES,
   UNIVERSITY_MARQUEE,
   FALLBACK_REVIEWS,
-  HERO_CHAT_SCRIPT,
 } from "./studentContent";
 import type { RecentPost, UserReview } from "@/app/page";
 
@@ -39,6 +38,13 @@ export function LandingPage({ recentPosts, userCount, reviews }: Props) {
   const refId = search?.get("ref") ?? null;
   const showSharedBanner = Boolean(refId);
 
+  // 紹介コードをlocalStorageに保存（signup時に送信される）
+  useEffect(() => {
+    if (refId) {
+      try { localStorage.setItem("careo_referral_code", refId); } catch { /* ignore */ }
+    }
+  }, [refId]);
+
   const displayReviews: ReadonlyArray<UserReview | (typeof FALLBACK_REVIEWS)[number]> =
     reviews.length > 0 ? reviews.slice(0, 5) : FALLBACK_REVIEWS;
 
@@ -53,6 +59,7 @@ export function LandingPage({ recentPosts, userCount, reviews }: Props) {
       <DailyWithCareo />
       <FeatureGrid />
       <WorriesChat />
+      <PricingSection />
       <StudentVoices reviews={displayReviews} userCount={userCount} />
       {recentPosts.length > 0 && <RecentPostsSection recentPosts={recentPosts} />}
       <BuiltByStudent />
@@ -144,17 +151,6 @@ function Header() {
 }
 
 function Hero({ userCount }: { userCount: number }) {
-  const [step, setStep] = useState(0);
-  const total = HERO_CHAT_SCRIPT.length;
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setStep((s) => (s + 1) % (total + 2));
-    }, 1800);
-    return () => clearInterval(timer);
-  }, [total]);
-
-  const visible = HERO_CHAT_SCRIPT.slice(0, Math.min(step + 1, total));
   const chipLabel = `${formatUserCount(userCount)}の28/29卒が使ってる`;
 
   return (
@@ -221,19 +217,18 @@ function Hero({ userCount }: { userCount: number }) {
               marginBottom: 20,
             }}
           >
-            就活、
+            就活の
+            <span style={{ color: ACCENT_DEEP }}>勝ち方</span>
+            を、
             <br />
-            <span style={{ color: ACCENT_DEEP }}>ひとりでやらなくて</span>
-            <br />
-            いいんだよ。
+            データで見える化。
           </h1>
 
           <p style={{ fontSize: 16, lineHeight: 1.9, color: "#4b5563", marginBottom: 26, maxWidth: 520 }}>
-            AIコーチ<b style={{ color: INK }}>「カレオ」</b>
-            が、君のES・面接・OB訪問データを全部覚えて、次のアクションを提案。
+            <b style={{ color: INK }}>ES・面接・OB訪問を全部ひとつに。</b>
+            通過率もボトルネックも自動で可視化。
             <br />
-            <b style={{ color: INK }}>管理ツールじゃなくて、味方がほしかった。</b>
-            そんな君のためのアプリ。
+            AIコーチ「カレオ」が君のデータから、<b style={{ color: INK }}>今週やるべきことTOP3</b>を提案する、就活専用のCRM。
           </p>
 
           <div className="flex flex-wrap gap-2.5" style={{ marginBottom: 24 }}>
@@ -303,7 +298,7 @@ function Hero({ userCount }: { userCount: number }) {
             ● LIVE
           </div>
           <PhoneMockup>
-            <LiveChatScreen visible={visible} />
+            <DashboardScreen />
           </PhoneMockup>
         </div>
       </div>
@@ -352,138 +347,269 @@ function PhoneMockup({ children }: { children: React.ReactNode }) {
   );
 }
 
-type VisibleMsg = (typeof HERO_CHAT_SCRIPT)[number];
-
-function LiveChatScreen({ visible }: { visible: VisibleMsg[] }) {
-  const scrollRef = useRef<HTMLDivElement | null>(null);
-  useEffect(() => {
-    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [visible.length]);
-
+function DashboardScreen() {
   return (
     <div
       style={{
         padding: 0,
-        background: `linear-gradient(180deg, ${ACCENT}11, transparent 30%)`,
+        background: "#fafaf7",
         height: "100%",
         display: "flex",
         flexDirection: "column",
       }}
     >
+      {/* ステータスバー風のヘッダー */}
       <div
         className="flex items-center gap-2.5"
         style={{
           padding: "28px 14px 10px",
-          borderBottom: "1px solid rgba(0,0,0,.06)",
           background: "white",
+          borderBottom: "1px solid rgba(0,0,0,.05)",
         }}
       >
-        <CareoKun size={34} mood="default" />
+        <CareoKun size={30} mood="cheer" />
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 13, fontWeight: 800 }}>カレオ</div>
-          <div className="flex items-center gap-1" style={{ fontSize: 10, color: ACCENT_DEEP }}>
-            <span style={{ width: 6, height: 6, borderRadius: 3, background: ACCENT }} />
-            オンライン · あなたの就活に同行中
-          </div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "#6b7280" }}>おかえり、</div>
+          <div style={{ fontSize: 13, fontWeight: 900, color: INK }}>今日やること 3件</div>
+        </div>
+        <div
+          style={{
+            fontSize: 10,
+            fontWeight: 800,
+            background: `${ACCENT}18`,
+            color: ACCENT_DEEP,
+            padding: "3px 8px",
+            borderRadius: 999,
+          }}
+        >
+          28卒
         </div>
       </div>
 
-      <div
-        ref={scrollRef}
-        className="flex flex-col gap-2"
-        style={{ flex: 1, padding: 14, overflow: "hidden", background: "#fafaf7" }}
-      >
-        {visible.map((m, i) => (
-          <ChatBubble key={i} m={m} />
+      {/* KPIカード（3つ） */}
+      <div style={{ padding: "12px 12px 8px", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6 }}>
+        {[
+          { label: "応募", value: "12", tint: "#60a5fa", bg: "rgba(96,165,250,.1)" },
+          { label: "ES通過", value: "67%", tint: ACCENT_DEEP, bg: `${ACCENT}14` },
+          { label: "内定", value: "2", tint: "#f59e0b", bg: "rgba(245,158,11,.12)" },
+        ].map((k) => (
+          <div key={k.label} style={{ background: k.bg, borderRadius: 10, padding: "8px 8px 6px" }}>
+            <div style={{ fontSize: 9, fontWeight: 700, color: "#6b7280" }}>{k.label}</div>
+            <div style={{ fontSize: 18, fontWeight: 900, color: k.tint, lineHeight: 1 }}>{k.value}</div>
+          </div>
         ))}
       </div>
 
-      <div
-        className="flex items-center gap-2"
-        style={{
-          padding: "10px 12px",
-          borderTop: "1px solid rgba(0,0,0,.06)",
-          background: "white",
-        }}
-      >
+      {/* 今週やること */}
+      <div style={{ padding: "6px 12px 4px" }}>
         <div
-          style={{
-            flex: 1,
-            background: "#f4f4f1",
-            borderRadius: 999,
-            padding: "8px 14px",
-            fontSize: 12,
-            color: "#9ca3af",
-          }}
+          className="flex items-center gap-1.5"
+          style={{ fontSize: 10, fontWeight: 800, color: "#6b7280", letterSpacing: 1, marginBottom: 6 }}
         >
-選考データから気づきを…
+          <span style={{ width: 3, height: 10, background: ACCENT, borderRadius: 2 }} />
+          今週やること
         </div>
+        {[
+          { label: "サマーインターン3社のES提出", tag: "緊急", tint: "#ef4444", bg: "rgba(239,68,68,.08)" },
+          { label: "A社1次面接の振り返りログ", tag: "推奨", tint: "#f59e0b", bg: "rgba(245,158,11,.08)" },
+          { label: "B社 企業研究（OB訪問予定）", tag: "情報", tint: "#3b82f6", bg: "rgba(59,130,246,.08)" },
+        ].map((t) => (
+          <div
+            key={t.label}
+            className="flex items-start gap-2"
+            style={{
+              background: t.bg,
+              borderRadius: 10,
+              padding: "7px 9px",
+              marginBottom: 4,
+            }}
+          >
+            <div
+              style={{
+                width: 11,
+                height: 11,
+                border: "1.5px solid #cbd5e1",
+                borderRadius: 3,
+                background: "white",
+                marginTop: 1,
+                flexShrink: 0,
+              }}
+            />
+            <div style={{ flex: 1, fontSize: 10, fontWeight: 700, color: INK, lineHeight: 1.35 }}>{t.label}</div>
+            <span style={{ fontSize: 8, fontWeight: 900, color: t.tint, flexShrink: 0, marginTop: 1 }}>{t.tag}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* 選考パイプライン */}
+      <div style={{ padding: "4px 12px 10px" }}>
         <div
-          style={{
-            width: 32,
-            height: 32,
-            borderRadius: 16,
-            background: `linear-gradient(135deg, ${ACCENT}, ${ACCENT_DEEP})`,
-            display: "grid",
-            placeItems: "center",
-            color: "white",
-            fontSize: 13,
-          }}
+          className="flex items-center gap-1.5"
+          style={{ fontSize: 10, fontWeight: 800, color: "#6b7280", letterSpacing: 1, marginBottom: 6 }}
         >
-          ↑
+          <span style={{ width: 3, height: 10, background: "#a78bfa", borderRadius: 2 }} />
+          選考パイプライン
+        </div>
+        <div style={{ background: "white", borderRadius: 10, padding: "8px 10px", border: "1px solid rgba(0,0,0,.04)" }}>
+          {[
+            { stage: "書類", count: 3, color: "#60a5fa" },
+            { stage: "1次面接", count: 4, color: "#a78bfa" },
+            { stage: "最終", count: 2, color: "#f472b6" },
+            { stage: "内定", count: 2, color: ACCENT },
+          ].map((s) => (
+            <div key={s.stage} className="flex items-center gap-2" style={{ marginBottom: 4 }}>
+              <div style={{ fontSize: 9, fontWeight: 700, color: "#6b7280", width: 48, flexShrink: 0 }}>{s.stage}</div>
+              <div style={{ flex: 1, height: 6, background: "#f3f4f6", borderRadius: 999, overflow: "hidden" }}>
+                <div style={{ width: `${Math.min(s.count * 20, 100)}%`, height: "100%", background: s.color, borderRadius: 999 }} />
+              </div>
+              <div style={{ fontSize: 10, fontWeight: 800, color: INK, width: 18, textAlign: "right" }}>{s.count}</div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
   );
 }
 
-function ChatBubble({ m }: { m: VisibleMsg }) {
-  if ("typing" in m && m.typing) {
-    return (
-      <div
-        className="flex gap-1"
-        style={{
-          alignSelf: "flex-start",
-          background: "white",
-          border: "1px solid #eef2ed",
-          borderRadius: "4px 14px 14px 14px",
-          padding: "10px 14px",
-        }}
-      >
-        {[0, 1, 2].map((i) => (
-          <span
-            key={i}
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: 3,
-              background: "#9ca3af",
-              animation: `fs-typing-dot 1.2s ${i * 0.15}s infinite`,
-            }}
-          />
-        ))}
-      </div>
-    );
-  }
-  const mine = m.who === "me";
+function PricingSection() {
   return (
-    <div
-      style={{
-        alignSelf: mine ? "flex-end" : "flex-start",
-        maxWidth: "86%",
-        background: mine ? ACCENT : "white",
-        color: mine ? "white" : INK,
-        border: mine ? "none" : "1px solid #eef2ed",
-        borderRadius: mine ? "14px 4px 14px 14px" : "4px 14px 14px 14px",
-        padding: "9px 13px",
-        fontSize: 12.5,
-        lineHeight: 1.55,
-        animation: "fs-pop 0.4s both",
-        boxShadow: mine ? `0 4px 14px ${ACCENT}44` : "0 2px 8px rgba(0,0,0,.04)",
-      }}
-    >
-      {"text" in m ? m.text : ""}
-    </div>
+    <section style={{ padding: "72px 20px 64px", background: SURFACE }}>
+      <div style={{ maxWidth: 900, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 36 }}>
+          <p style={{ fontSize: 11, color: ACCENT_DEEP, fontWeight: 800, letterSpacing: 3, marginBottom: 10 }}>
+            PRICING
+          </p>
+          <h2 className="font-klee" style={{ fontSize: "min(8vw, 34px)", fontWeight: 600, letterSpacing: -0.6, marginBottom: 12, lineHeight: 1.3 }}>
+            学生に、無理のない価格で。
+          </h2>
+          <p style={{ fontSize: 13.5, color: "#6b7280", lineHeight: 1.9, maxWidth: 520, margin: "0 auto" }}>
+            基本機能は全部無料。データが貯まるほど精度が上がる分析だけを、有料プランで。
+          </p>
+        </div>
+
+        <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
+          {/* Free */}
+          <div style={{ background: "white", border: "1px solid rgba(0,0,0,.06)", borderRadius: 20, padding: 26 }}>
+            <div className="flex items-center justify-between" style={{ marginBottom: 4 }}>
+              <span style={{ fontSize: 13, fontWeight: 800, color: INK }}>Free</span>
+              <span style={{ fontSize: 10, fontWeight: 700, background: "#f3f4f6", color: "#6b7280", padding: "2px 8px", borderRadius: 999 }}>
+                永久無料
+              </span>
+            </div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 14 }}>
+              <span style={{ fontSize: 34, fontWeight: 900, color: INK, lineHeight: 1 }}>¥0</span>
+              <span style={{ fontSize: 12, color: "#9ca3af" }}>/ 無期限</span>
+            </div>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 7 }}>
+              {[
+                "企業・ES・面接ログ管理（無制限）",
+                "締切カレンダー・日程自動収集",
+                "基本KPIダッシュボード",
+                "今週やること提案（月2回）",
+                "PDCA分析（月1回）",
+                "横断インサイト（月1回）",
+                "広告表示あり",
+              ].map((f) => (
+                <li key={f} className="flex items-start gap-1.5" style={{ fontSize: 12, color: "#4b5563" }}>
+                  <span style={{ color: ACCENT_DEEP, marginTop: 1 }}>✓</span>
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <Link
+              href="/signup"
+              style={{
+                display: "block",
+                textAlign: "center",
+                marginTop: 18,
+                padding: "11px",
+                background: "white",
+                border: `1.5px solid ${ACCENT}`,
+                color: ACCENT_DEEP,
+                borderRadius: 12,
+                fontWeight: 800,
+                fontSize: 13,
+                textDecoration: "none",
+              }}
+            >
+              無料ではじめる
+            </Link>
+          </div>
+
+          {/* Pro */}
+          <div style={{ background: "white", border: `2px solid ${ACCENT}`, borderRadius: 20, padding: 26, position: "relative", boxShadow: `0 20px 48px -20px ${ACCENT}55` }}>
+            <div
+              style={{
+                position: "absolute",
+                top: -10,
+                right: 18,
+                background: `linear-gradient(135deg, ${ACCENT}, ${ACCENT_DEEP})`,
+                color: "white",
+                fontSize: 10,
+                fontWeight: 900,
+                padding: "4px 10px",
+                borderRadius: 999,
+                letterSpacing: 1,
+              }}
+            >
+              推奨
+            </div>
+            <div className="flex items-center justify-between" style={{ marginBottom: 4 }}>
+              <span style={{ fontSize: 13, fontWeight: 800, color: INK }}>Pro</span>
+              <span style={{ fontSize: 10, fontWeight: 800, background: `${ACCENT}18`, color: ACCENT_DEEP, padding: "2px 8px", borderRadius: 999 }}>
+                年払いで41%OFF
+              </span>
+            </div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 2 }}>
+              <span style={{ fontSize: 34, fontWeight: 900, color: INK, lineHeight: 1 }}>¥480</span>
+              <span style={{ fontSize: 12, color: "#9ca3af" }}>/ 月</span>
+            </div>
+            <p style={{ fontSize: 11, color: "#6b7280", marginBottom: 14 }}>
+              年払い ¥2,800 （月換算 ¥233）
+            </p>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 7 }}>
+              {[
+                "Freeプランの全機能",
+                "今週やること提案 無制限（週1自動）",
+                "PDCA深掘り分析 無制限",
+                "横断インサイト 無制限",
+                "週次コーチレポート",
+                "業界別勝ちパターン分析",
+                "KPIダッシュボード全業界表示",
+                "広告非表示",
+              ].map((f) => (
+                <li key={f} className="flex items-start gap-1.5" style={{ fontSize: 12, color: "#111827" }}>
+                  <span style={{ color: ACCENT_DEEP, marginTop: 1 }}>★</span>
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <Link
+              href="/signup"
+              style={{
+                display: "block",
+                textAlign: "center",
+                marginTop: 18,
+                padding: "11px",
+                background: `linear-gradient(135deg, ${ACCENT}, ${ACCENT_DEEP})`,
+                color: "white",
+                borderRadius: 12,
+                fontWeight: 900,
+                fontSize: 13,
+                textDecoration: "none",
+                boxShadow: `0 8px 20px ${ACCENT}44`,
+              }}
+            >
+              登録してProを試す →
+            </Link>
+          </div>
+        </div>
+
+        <p style={{ textAlign: "center", fontSize: 11, color: "#9ca3af", marginTop: 18 }}>
+          いつでも解約できます · クレジットカード決済（Stripe）
+        </p>
+      </div>
+    </section>
   );
 }
 

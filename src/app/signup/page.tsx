@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -16,6 +16,15 @@ export default function SignupPage() {
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+
+  // LPから来た場合の紹介コードをlocalStorageから読み込み
+  useEffect(() => {
+    try {
+      const code = localStorage.getItem("careo_referral_code");
+      if (code) setReferralCode(code);
+    } catch { /* ignore */ }
+  }, []);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,6 +91,14 @@ export default function SignupPage() {
           </div>
         </div>
 
+        {/* 紹介コードバナー */}
+        {referralCode && (
+          <div className="bg-gradient-to-r from-[#00c896] to-[#00a87e] text-white rounded-2xl px-4 py-3 mb-3 text-center shadow-lg">
+            <p className="text-xs font-bold">🎁 友達の紹介で登録中</p>
+            <p className="text-[11px] opacity-90 mt-0.5">登録完了で<b>あなたと友達にProプラン30日分</b>がもらえます</p>
+          </div>
+        )}
+
         {/* Form card */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="flex items-center justify-center gap-2 mb-6">
@@ -100,9 +117,6 @@ export default function SignupPage() {
                 placeholder="you@example.com"
                 required
               />
-              <p className="mt-1.5 text-xs text-[#00c896] font-medium">
-                キャリアセンターと連携するには大学のメールアドレス（〜.ac.jp）が必要です
-              </p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">パスワード（6文字以上）</label>

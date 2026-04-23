@@ -62,6 +62,7 @@ const moreCategories = [
   {
     label: "その他",
     items: [
+      { href: "/invite", label: "友達招待", emoji: "🎁" },
       { href: "/import", label: "インポート", emoji: "📥" },
       { href: "/settings", label: "設定", emoji: "⚙️" },
     ],

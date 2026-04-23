@@ -239,6 +239,28 @@ export function DashboardContent() {
     }
   };
 
+  // 初回ログイン時に紹介コードがあれば特典を付与
+  useEffect(() => {
+    let code: string | null = null;
+    try { code = localStorage.getItem("careo_referral_code"); } catch { /* ignore */ }
+    if (!code) return;
+    // 即座にlocalStorageから削除して二重実行を防ぐ
+    try { localStorage.removeItem("careo_referral_code"); } catch { /* ignore */ }
+    void fetch("/api/referral/claim", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code }),
+    }).then(async (res) => {
+      const data = await res.json().catch(() => ({}));
+      if (data.success) {
+        showToast(data.message ?? "Proプラン30日分が付与されました！🎉", "success", undefined, 10000);
+      } else if (data.error && !data.error.includes("すでに")) {
+        showToast(data.error, "info");
+      }
+    }).catch(() => { /* silent */ });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     if (itemsLoading) return;
     if (hasFetched.current) return;
