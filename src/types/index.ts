@@ -104,6 +104,7 @@ export interface Interview {
   notes?: string;
   result: InterviewResult;
   mood?: InterviewMood;
+  isSharedAnonymously?: boolean;
   createdAt: string;
   updatedAt: string;
 }

@@ -14,6 +14,7 @@ function rowToInterview(row: Record<string, unknown>, questions: Record<string, 
     notes: row.notes as string | undefined,
     result: row.result as Interview["result"],
     mood: row.mood as InterviewMood | undefined,
+    isSharedAnonymously: (row.is_shared_anonymously as boolean | undefined) ?? false,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
     questions: questions.map((q) => ({
@@ -62,15 +63,16 @@ export function useInterviews() {
   }, []);
 
   const updateInterview = useCallback(async (id: string, data: Partial<Interview>) => {
-    await supabase.from("interviews").update({
-      company_id: data.companyId,
-      round: data.round,
-      scheduled_at: data.scheduledAt,
-      interviewers: data.interviewers || null,
-      notes: data.notes || null,
-      result: data.result,
-      mood: data.mood ?? null,
-    }).eq("id", id);
+    const updateFields: Record<string, unknown> = {};
+    if (data.companyId !== undefined) updateFields.company_id = data.companyId;
+    if (data.round !== undefined) updateFields.round = data.round;
+    if (data.scheduledAt !== undefined) updateFields.scheduled_at = data.scheduledAt;
+    if (data.interviewers !== undefined) updateFields.interviewers = data.interviewers || null;
+    if (data.notes !== undefined) updateFields.notes = data.notes || null;
+    if (data.result !== undefined) updateFields.result = data.result;
+    if (data.mood !== undefined) updateFields.mood = data.mood ?? null;
+    if (data.isSharedAnonymously !== undefined) updateFields.is_shared_anonymously = data.isSharedAnonymously;
+    await supabase.from("interviews").update(updateFields).eq("id", id);
 
     if (data.questions) {
       await supabase.from("interview_questions").delete().eq("interview_id", id);

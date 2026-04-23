@@ -71,6 +71,16 @@ export default function InterviewDetailPage({ params }: { params: Promise<{ id: 
                 </button>
               ))}
             </div>
+            {/* 匿名共有トグル */}
+            <label className="flex items-center gap-1.5 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={interview.isSharedAnonymously ?? false}
+                onChange={(e) => updateInterview(id, { isSharedAnonymously: e.target.checked })}
+                className="w-3.5 h-3.5 rounded border-gray-300 text-[#00c896] focus:ring-[#00c896]"
+              />
+              <span className="text-[11px] text-gray-500">後輩に匿名共有</span>
+            </label>
           </div>
         </div>
         <div className="flex gap-2 flex-wrap justify-end">
