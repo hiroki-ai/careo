@@ -54,10 +54,6 @@ export function inferActionLink(action: string): ActionLink | undefined {
     return { href: "/tests", label: "記録 →", external: false };
   if (/企業|応募|リサーチ|調べ|受験/.test(a))
     return { href: "/companies", label: "やる →", external: false };
-  if (/自己分析|ガクチカ|自己PR|強み|弱み|就活の軸/.test(a))
-    return { href: "/career", label: "やる →", external: false };
-  if (/コーチ|チャット|相談|カレオ|話/.test(a))
-    return { href: "/chat", label: "やる →", external: false };
   if (/PDCA|振り返り|レポート/.test(a))
     return { href: "/report", label: "やる →", external: false };
   if (/締切|スケジュール|カレンダー/.test(a))

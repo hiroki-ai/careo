@@ -17,8 +17,8 @@ const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6時間キャッシュ
 
 // AIが生成するlinkのホワイトリスト（存在しないページへのリンクを防ぐ）
 const VALID_INSIGHT_LINKS = new Set([
-  "/", "/chat", "/companies", "/es", "/interviews",
-  "/ob-visits", "/tests", "/career", "/deadlines",
+  "/", "/companies", "/es", "/interviews",
+  "/ob-visits", "/tests", "/deadlines",
   "/report", "/settings",
 ]);
 

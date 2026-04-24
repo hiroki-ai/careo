@@ -28,7 +28,6 @@ const NAV_ITEMS = [
   { label: "カレンダー", href: "/calendar", icon: "📅", keywords: "calendar 予定" },
   { label: "締切一覧", href: "/deadlines", icon: "⏰", keywords: "deadline 締切 期限" },
   { label: "説明会・インターン", href: "/events", icon: "🎯", keywords: "event 説明会 インターン" },
-  { label: "自己分析", href: "/career", icon: "💡", keywords: "career 自己分析 強み" },
   { label: "OB/OG訪問", href: "/ob-visits", icon: "🤝", keywords: "ob og 訪問" },
   { label: "筆記試験", href: "/tests", icon: "📝", keywords: "test 筆記 spi" },
   { label: "みんなの就活", href: "/insights", icon: "🌐", keywords: "insights community コミュニティ" },
@@ -39,7 +38,6 @@ const QUICK_ACTIONS = [
   { label: "企業を追加", href: "/companies?action=add", icon: "➕", keywords: "add 追加 新規" },
   { label: "ESを作成", href: "/es?action=add", icon: "✍️", keywords: "create 作成 新規" },
   { label: "面接を記録", href: "/interviews?action=add", icon: "🎙️", keywords: "record 記録 面接" },
-  { label: "コーチに相談", href: "/chat", icon: "🗣️", keywords: "coach 相談 アドバイス" },
 ];
 
 export function CommandPalette() {
