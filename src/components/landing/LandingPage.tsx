@@ -1160,10 +1160,14 @@ function StudentVoices({
   reviews,
   userCount,
 }: {
-  reviews: ReadonlyArray<UserReview | (typeof FALLBACK_REVIEWS)[number]>;
+  reviews: ReadonlyArray<UserReview>;
   userCount: number;
 }) {
-  const countLabel = userCount >= 100 ? `${formatUserCount(userCount)} ` : "3,200+ ";
+  void userCount;
+  // 平均レート計算（実レビューのみ、1件もなければ表示しない）
+  const avg = reviews.length > 0
+    ? reviews.reduce((s, r) => s + (r.rating ?? 5), 0) / reviews.length
+    : null;
   return (
     <section style={{ padding: "56px 20px", background: "white" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
@@ -1191,10 +1195,12 @@ function StudentVoices({
           >
             使っている学生の声
           </h2>
-          <div style={{ fontSize: 12.5, color: "#6b7280" }}>
-            <span style={{ color: "#f59e0b", fontSize: 14, letterSpacing: 2 }}>★★★★★</span>
-            <span style={{ marginLeft: 8 }}>4.8 / 5.0 （{countLabel}レビュー）</span>
-          </div>
+          {avg !== null && (
+            <div style={{ fontSize: 12.5, color: "#6b7280" }}>
+              <span style={{ color: "#f59e0b", fontSize: 14, letterSpacing: 2 }}>★★★★★</span>
+              <span style={{ marginLeft: 8 }}>{avg.toFixed(1)} / 5.0 （{reviews.length}件）</span>
+            </div>
+          )}
         </div>
         <div
           className="grid gap-3.5"
