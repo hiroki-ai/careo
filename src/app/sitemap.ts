@@ -14,6 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: "https://careoai.jp/diagnosis", lastModified: new Date(), changeFrequency: "monthly", priority: 0.9 },
     { url: "https://careoai.jp/simulator", lastModified: new Date(), changeFrequency: "monthly", priority: 0.9 },
     { url: "https://careoai.jp/stats", lastModified: new Date(), changeFrequency: "daily", priority: 0.6 },
+    { url: "https://careoai.jp/story", lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
     { url: "https://careoai.jp/summer-intern", lastModified: new Date(), changeFrequency: "weekly", priority: 0.85 },
     { url: "https://careoai.jp/glossary", lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
     {

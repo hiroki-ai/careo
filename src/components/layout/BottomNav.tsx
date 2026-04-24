@@ -25,7 +25,6 @@ const mainItems = [
       </svg>
     ),
   },
-  // center: QuickAdd FAB
   {
     href: "/report",
     label: "PDCA",
@@ -37,7 +36,6 @@ const mainItems = [
   },
 ];
 
-// カテゴリ別に整理
 const moreCategories = [
   {
     label: "企業・選考",
@@ -70,7 +68,14 @@ const moreCategories = [
   },
 ];
 
-const moreItems = moreCategories.flatMap(c => c.items);
+const moreItems = moreCategories.flatMap((c) => c.items);
+
+const ACCENT = "var(--app-accent)";
+const ACCENT_DEEP = "var(--app-accent-deep)";
+const ACCENT_SOFT = "var(--app-accent-soft)";
+const SURFACE_0 = "var(--app-surface-0)";
+const SURFACE_1 = "var(--app-surface-1)";
+const TEXT_MUTED = "var(--app-text-muted)";
 
 export function BottomNav() {
   const pathname = usePathname();
@@ -93,29 +98,44 @@ export function BottomNav() {
 
   if (!isAuth) return null;
 
-  const isMoreActive = moreItems.some(item => pathname.startsWith(item.href));
+  const isMoreActive = moreItems.some((item) => pathname.startsWith(item.href));
 
   return (
     <>
       <QuickAddModal isOpen={showQuickAdd} onClose={() => setShowQuickAdd(false)} />
 
-      {/* More メニュー バックドロップ */}
       {showMore && (
         <div
-          className="fixed inset-0 z-40 bg-black/30 backdrop-blur-[2px]"
+          className="fixed inset-0 z-40 md:hidden"
+          style={{ background: "rgba(13,11,33,.35)" }}
           onClick={() => setShowMore(false)}
         />
       )}
 
-      {/* More メニュー ボトムシート */}
       {showMore && (
-        <div className="fixed bottom-[94px] left-0 right-0 z-50 md:hidden animate-slide-up">
-          <div className="mx-3 bg-white/95 dark:bg-[#1a1d27]/95 backdrop-blur-2xl rounded-3xl shadow-2xl shadow-black/12 border border-gray-100/60 dark:border-[#2a2d37]/60 overflow-hidden">
-            <div className="px-5 pt-4 pb-2">
+        <div className="fixed bottom-[88px] left-0 right-0 z-50 md:hidden animate-slide-up">
+          <div
+            className="mx-3 overflow-hidden"
+            style={{
+              background: SURFACE_0,
+              border: "1px solid var(--app-border)",
+              borderRadius: 24,
+              boxShadow: "var(--app-shadow-float)",
+            }}
+          >
+            <div style={{ padding: "16px 18px 8px" }}>
               {moreCategories.map((cat) => (
-                <div key={cat.label} className="mb-4">
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 px-0.5">
-                    {cat.label}
+                <div key={cat.label} style={{ marginBottom: 14 }}>
+                  <p
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 800,
+                      color: "var(--app-text-dim)",
+                      letterSpacing: 1.5,
+                      margin: "0 0 8px 2px",
+                    }}
+                  >
+                    {cat.label.toUpperCase()}
                   </p>
                   <div className="grid grid-cols-4 gap-2">
                     {cat.items.map((item) => {
@@ -124,21 +144,26 @@ export function BottomNav() {
                         <Link
                           key={item.href}
                           href={item.href}
-                          className={`relative flex flex-col items-center justify-center gap-1.5 py-3 rounded-2xl text-center transition-all active:scale-95 ${
-                            isActive
-                              ? "bg-[#00c896]/12 text-[#00a87e]"
-                              : "bg-gray-50 dark:bg-[#0f1117] text-gray-600 dark:text-gray-400 active:bg-gray-100 dark:active:bg-[#2a2d37]"
-                          }`}
+                          className="relative flex flex-col items-center justify-center text-center transition-all active:scale-95"
+                          style={{
+                            padding: "12px 4px",
+                            gap: 4,
+                            borderRadius: "var(--app-r-lg)",
+                            background: isActive ? ACCENT_SOFT : SURFACE_1,
+                            color: isActive ? ACCENT_DEEP : "var(--app-text)",
+                          }}
                         >
-                          <span className="text-[20px] leading-none">{item.emoji}</span>
-                          <span className={`text-[10px] font-semibold leading-tight ${isActive ? "text-[#00a87e]" : "text-gray-500"}`}>
+                          <span style={{ fontSize: 20, lineHeight: 1 }}>{item.emoji}</span>
+                          <span
+                            style={{
+                              fontSize: 10,
+                              fontWeight: 700,
+                              lineHeight: 1.2,
+                              color: isActive ? ACCENT_DEEP : TEXT_MUTED,
+                            }}
+                          >
                             {item.label}
                           </span>
-                          {(item as { comingSoon?: boolean }).comingSoon && (
-                            <span className="absolute top-1.5 right-1.5 text-[7px] font-black bg-gradient-to-r from-amber-400 to-orange-400 text-white px-1 py-0.5 rounded-full leading-none">
-                              近日
-                            </span>
-                          )}
                         </Link>
                       );
                     })}
@@ -150,93 +175,156 @@ export function BottomNav() {
         </div>
       )}
 
-      {/* ボトムナビ本体 */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden safe-area-padding-bottom">
-        {/* グラスモーフィズム背景 */}
-        <div className="bg-white/92 dark:bg-[#1a1d27]/95 backdrop-blur-2xl border-t border-gray-100/80 dark:border-[#2a2d37]/80 shadow-[0_-1px_0_rgba(0,0,0,0.04),0_-8px_32px_rgba(0,0,0,0.06)]">
-          <div className="flex items-center h-[72px] px-1">
-
-            {/* ホーム・締切 */}
-            {mainItems.slice(0, 2).map((item) => {
-              const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-colors"
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
+        style={{
+          background: SURFACE_0,
+          borderTop: "1px solid var(--app-border)",
+          boxShadow: "0 -4px 14px rgba(13,11,33,.04)",
+          paddingBottom: "env(safe-area-inset-bottom)",
+        }}
+      >
+        <div className="flex items-center px-1" style={{ height: 72 }}>
+          {/* ホーム・締切 */}
+          {mainItems.slice(0, 2).map((item) => {
+            const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="flex flex-col items-center justify-center flex-1 h-full transition-colors"
+                style={{ gap: 2 }}
+              >
+                <span
+                  className="flex flex-col items-center transition-all"
+                  style={{
+                    gap: 2,
+                    padding: "6px 14px",
+                    borderRadius: 18,
+                    background: isActive ? ACCENT_SOFT : "transparent",
+                    color: isActive ? ACCENT_DEEP : TEXT_MUTED,
+                  }}
                 >
-                  <span className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-2xl transition-all duration-200 ${
-                    isActive ? "bg-[#00c896]/12 text-[#00c896]" : "text-gray-400"
-                  }`}>
-                    {item.icon(isActive)}
-                    <span className={`text-xs font-bold tracking-tight ${isActive ? "text-[#00c896]" : "text-gray-400"}`}>
-                      {item.label}
-                    </span>
+                  {item.icon(isActive)}
+                  <span
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      letterSpacing: 0.3,
+                      color: isActive ? ACCENT_DEEP : TEXT_MUTED,
+                    }}
+                  >
+                    {item.label}
                   </span>
-                </Link>
-              );
-            })}
-
-            {/* 中央 FAB（クイック追加） */}
-            <button
-              type="button"
-              onClick={() => setShowQuickAdd(true)}
-              className="relative flex flex-col items-center justify-center flex-1 gap-0.5 h-full"
-            >
-              <span className="fab-shadow w-[54px] h-[54px] bg-gradient-to-br from-[#00c896] to-[#00a87e] rounded-full flex items-center justify-center -mt-4 active:scale-90 transition-transform duration-150">
-                <svg className="w-[22px] h-[22px] text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-                </svg>
-              </span>
-              <span className="text-[10px] font-bold text-gray-400 -mt-0.5">記録</span>
-            </button>
-
-            {/* PDCA */}
-            {mainItems.slice(2).map((item) => {
-              const isActive = pathname.startsWith(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-colors"
-                >
-                  <span className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-2xl transition-all duration-200 ${
-                    isActive ? "bg-[#00c896]/12 text-[#00c896]" : "text-gray-400"
-                  }`}>
-                    {item.icon(isActive)}
-                    <span className={`text-xs font-bold tracking-tight ${isActive ? "text-[#00c896]" : "text-gray-400"}`}>
-                      {item.label}
-                    </span>
-                  </span>
-                </Link>
-              );
-            })}
-
-            {/* もっと */}
-            <button
-              type="button"
-              onClick={() => setShowMore((v) => !v)}
-              className="flex flex-col items-center justify-center flex-1 h-full gap-0.5"
-            >
-              <span className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-2xl transition-all duration-200 ${
-                showMore || isMoreActive ? "bg-[#00c896]/12 text-[#00c896]" : "text-gray-400"
-              }`}>
-                {showMore ? (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                ) : (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
-                )}
-                <span className={`text-xs font-bold tracking-tight ${showMore || isMoreActive ? "text-[#00c896]" : "text-gray-400"}`}>
-                  もっと
                 </span>
-              </span>
-            </button>
+              </Link>
+            );
+          })}
 
-          </div>
+          {/* 中央 FAB（クイック追加） */}
+          <button
+            type="button"
+            onClick={() => setShowQuickAdd(true)}
+            aria-label="クイック追加"
+            className="relative flex flex-col items-center justify-center flex-1 h-full"
+            style={{ gap: 2 }}
+          >
+            <span
+              className="flex items-center justify-center active:scale-90 transition-transform"
+              style={{
+                width: 54,
+                height: 54,
+                background: `linear-gradient(135deg, ${ACCENT}, ${ACCENT_DEEP})`,
+                borderRadius: "50%",
+                marginTop: -22,
+                color: "white",
+                boxShadow: "var(--app-shadow-teal), var(--app-shadow-md)",
+                border: `4px solid ${SURFACE_0}`,
+              }}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+              </svg>
+            </span>
+            <span style={{ fontSize: 10, fontWeight: 700, color: TEXT_MUTED, marginTop: -4 }}>記録</span>
+          </button>
+
+          {/* PDCA */}
+          {mainItems.slice(2).map((item) => {
+            const isActive = pathname.startsWith(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="flex flex-col items-center justify-center flex-1 h-full transition-colors"
+                style={{ gap: 2 }}
+              >
+                <span
+                  className="flex flex-col items-center transition-all"
+                  style={{
+                    gap: 2,
+                    padding: "6px 14px",
+                    borderRadius: 18,
+                    background: isActive ? ACCENT_SOFT : "transparent",
+                    color: isActive ? ACCENT_DEEP : TEXT_MUTED,
+                  }}
+                >
+                  {item.icon(isActive)}
+                  <span
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      letterSpacing: 0.3,
+                      color: isActive ? ACCENT_DEEP : TEXT_MUTED,
+                    }}
+                  >
+                    {item.label}
+                  </span>
+                </span>
+              </Link>
+            );
+          })}
+
+          {/* もっと */}
+          <button
+            type="button"
+            onClick={() => setShowMore((v) => !v)}
+            aria-label="もっと"
+            aria-expanded={showMore ? "true" : "false"}
+            className="flex flex-col items-center justify-center flex-1 h-full"
+            style={{ gap: 2 }}
+          >
+            <span
+              className="flex flex-col items-center transition-all"
+              style={{
+                gap: 2,
+                padding: "6px 14px",
+                borderRadius: 18,
+                background: showMore || isMoreActive ? ACCENT_SOFT : "transparent",
+                color: showMore || isMoreActive ? ACCENT_DEEP : TEXT_MUTED,
+              }}
+            >
+              {showMore ? (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: 0.3,
+                  color: showMore || isMoreActive ? ACCENT_DEEP : TEXT_MUTED,
+                }}
+              >
+                もっと
+              </span>
+            </span>
+          </button>
         </div>
       </nav>
     </>

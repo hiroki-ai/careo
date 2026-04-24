@@ -11,7 +11,6 @@ import {
   CAREO_TRAITS,
   BEFORE_AFTER_SCENES,
   UNIVERSITY_MARQUEE,
-  FALLBACK_REVIEWS,
 } from "./studentContent";
 import type { RecentPost, UserReview } from "@/app/page";
 
@@ -34,6 +33,7 @@ function formatUserCount(n: number): string {
 }
 
 export function LandingPage({ recentPosts, userCount, reviews }: Props) {
+  void reviews;
   const search = useSearchParams();
   const refId = search?.get("ref") ?? null;
   const showSharedBanner = Boolean(refId);
@@ -44,9 +44,6 @@ export function LandingPage({ recentPosts, userCount, reviews }: Props) {
       try { localStorage.setItem("careo_referral_code", refId); } catch { /* ignore */ }
     }
   }, [refId]);
-
-  const displayReviews: ReadonlyArray<UserReview | (typeof FALLBACK_REVIEWS)[number]> =
-    reviews.length > 0 ? reviews.slice(0, 5) : FALLBACK_REVIEWS;
 
   return (
     <div className="font-zen-kaku" style={{ background: BG, color: INK, minHeight: "100%" }}>
@@ -60,7 +57,7 @@ export function LandingPage({ recentPosts, userCount, reviews }: Props) {
       <FeatureGrid />
       <WorriesChat />
       <PricingSection />
-      <StudentVoices reviews={displayReviews} userCount={userCount} />
+      {/* StudentVoices: 実レビューが一定数集まったら復活（現在は非表示）*/}
       {recentPosts.length > 0 && <RecentPostsSection recentPosts={recentPosts} />}
       <BuiltByStudent />
       <FinalCTA />
@@ -1559,6 +1556,9 @@ function FinalCTA() {
           </Link>
           <Link href="/stats" style={{ color: "inherit" }}>
             リアルタイム統計
+          </Link>
+          <Link href="/story" style={{ color: "inherit" }}>
+            開発者ストーリー
           </Link>
           <Link href="/summer-intern" style={{ color: "inherit" }}>
             サマーインターン締切

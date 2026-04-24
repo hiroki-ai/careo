@@ -5,9 +5,17 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useCoach } from "@/hooks/useCoach";
+import { CareoKun } from "@/components/landing/CareoKun";
 
-// ナビアイテム（カテゴリ分け）
-const navGroups = [
+type NavItemDef = {
+  href: string;
+  label: string;
+  icon: React.ReactNode;
+  badge?: string;
+  isCoach?: boolean;
+};
+
+const navGroups: { label: string; items: NavItemDef[] }[] = [
   {
     label: "ホーム",
     items: [
@@ -145,7 +153,7 @@ const navGroups = [
   },
 ];
 
-const bottomItems = [
+const bottomItems: NavItemDef[] = [
   {
     href: "/invite",
     label: "友達を招待",
@@ -209,31 +217,51 @@ export function Sidebar() {
 
   if (!isAuth || isMobile) return null;
 
-  const allNavItems = navGroups.flatMap(g => g.items);
+  const allNavItems = navGroups.flatMap((g) => g.items);
+  const wideWidth = 240;
+  const narrowWidth = 60;
 
   return (
     <aside
-      className={`sidebar-bg flex flex-col sticky top-0 h-screen transition-all duration-200 shrink-0 ${
-        collapsed ? "w-[58px]" : "w-[220px]"
-      }`}
+      className="flex flex-col sticky top-0 h-screen transition-all duration-200 shrink-0"
+      style={{
+        width: collapsed ? narrowWidth : wideWidth,
+        background: "var(--app-surface-0)",
+        borderRight: "1px solid var(--app-border)",
+        color: "var(--app-text)",
+      }}
     >
-      {/* ロゴエリア */}
-      <div className={`flex items-center shrink-0 ${collapsed ? "justify-center py-4 px-0" : "px-4 pt-5 pb-4"}`}>
+      {/* ロゴ + 折り畳みトグル */}
+      <div
+        className="flex items-center shrink-0"
+        style={{ padding: collapsed ? "16px 0" : "18px 18px 14px", justifyContent: collapsed ? "center" : "space-between" }}
+      >
         {!collapsed ? (
           <>
-            <div className="flex items-center gap-2.5 flex-1 min-w-0">
-              <div className="w-8 h-8 rounded-xl overflow-hidden shrink-0 ring-1 ring-white/10">
-                <img src="/icon-192.png" alt="Careo" className="w-full h-full" />
-              </div>
+            <Link href="/" className="flex items-center gap-2.5 flex-1 min-w-0" style={{ textDecoration: "none", color: "inherit" }}>
+              <CareoKun size={34} mood="cheer" />
               <div>
-                <span className="font-black text-[17px] tracking-tight leading-none"><span className="text-white">Care</span><span className="text-[#00c896]">o</span></span>
-                <p className="text-white/30 text-[9px] tracking-widest uppercase mt-0.5">AI Career</p>
+                <div className="font-klee" style={{ fontSize: 20, fontWeight: 700, lineHeight: 1, letterSpacing: -0.5 }}>
+                  Careo
+                </div>
+                <div
+                  style={{
+                    fontSize: 9.5,
+                    color: "var(--app-text-dim)",
+                    letterSpacing: 1,
+                    marginTop: 3,
+                    fontWeight: 700,
+                  }}
+                >
+                  AI CAREER COACH
+                </div>
               </div>
-            </div>
+            </Link>
             <button
               type="button"
               onClick={toggle}
-              className="shrink-0 w-6 h-6 flex items-center justify-center rounded-lg text-white/25 hover:text-white/70 hover:bg-white/8 transition-all"
+              className="shrink-0 w-6 h-6 flex items-center justify-center rounded-lg transition-all"
+              style={{ color: "var(--app-text-dim)" }}
               title="折り畳む"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -245,21 +273,61 @@ export function Sidebar() {
           <button
             type="button"
             onClick={toggle}
-            className="w-8 h-8 rounded-xl overflow-hidden ring-1 ring-white/10 hover:ring-white/30 transition-all"
+            className="transition-all"
             title="展開"
+            aria-label="サイドバーを展開"
           >
-            <img src="/icon-192.png" alt="Careo" className="w-full h-full" />
+            <CareoKun size={32} mood="cheer" />
           </button>
         )}
       </div>
 
-      {/* 区切り線 */}
-      <div className="mx-3 mb-2 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+      {/* 検索ショートカット */}
+      {!collapsed && (
+        <div style={{ padding: "0 12px 10px" }}>
+          <button
+            type="button"
+            onClick={() => {
+              const evt = new KeyboardEvent("keydown", { key: "k", ctrlKey: true });
+              document.dispatchEvent(evt);
+            }}
+            className="flex items-center gap-2 w-full transition-all"
+            style={{
+              padding: "8px 10px",
+              background: "var(--app-surface-1)",
+              border: "1px solid var(--app-border)",
+              borderRadius: "var(--app-r-md)",
+              color: "var(--app-text-muted)",
+              fontSize: 12,
+              cursor: "pointer",
+            }}
+          >
+            <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <span className="flex-1 text-left">検索...</span>
+            <kbd
+              className="font-mono"
+              style={{
+                fontSize: 9,
+                padding: "1px 5px",
+                background: "var(--app-surface-2)",
+                borderRadius: 4,
+                color: "var(--app-text-dim)",
+              }}
+            >
+              ⌘K
+            </kbd>
+          </button>
+        </div>
+      )}
 
       {/* メインナビ */}
-      <nav className={`flex-1 overflow-y-auto py-1 space-y-0 ${collapsed ? "px-2" : "px-2.5"}`}>
+      <nav
+        className="flex-1 overflow-y-auto"
+        style={{ padding: collapsed ? "4px 8px" : "4px 10px", display: "flex", flexDirection: "column", gap: 1 }}
+      >
         {collapsed ? (
-          // 折り畳み時：アイコンのみ
           <>
             {allNavItems.map((item) => {
               const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
@@ -268,14 +336,28 @@ export function Sidebar() {
                   key={item.href}
                   href={item.href}
                   title={item.label}
-                  className={`relative flex items-center justify-center w-full p-2.5 my-0.5 rounded-xl transition-all duration-150 ${
-                    isActive
-                      ? "bg-[#00c896]/20 text-[#00e6ad]"
-                      : "text-white/40 hover:text-white/80 hover:bg-white/6"
-                  }`}
+                  className="relative flex items-center justify-center w-full transition-all"
+                  style={{
+                    padding: "10px 0",
+                    margin: "2px 0",
+                    borderRadius: "var(--app-r-md)",
+                    background: isActive ? "var(--app-accent-soft)" : "transparent",
+                    color: isActive ? "var(--app-accent-deep)" : "var(--app-text-muted)",
+                  }}
                 >
                   {isActive && (
-                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-[#00c896] rounded-r-full" />
+                    <span
+                      style={{
+                        position: "absolute",
+                        left: 0,
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        width: 3,
+                        height: 18,
+                        background: "var(--app-accent)",
+                        borderRadius: 2,
+                      }}
+                    />
                   )}
                   {item.icon}
                 </Link>
@@ -283,34 +365,65 @@ export function Sidebar() {
             })}
           </>
         ) : (
-          // 展開時：グループ別表示
           <>
             {navGroups.map((group, gi) => (
-              <div key={group.label} className={gi > 0 ? "mt-3" : ""}>
-                <p className="text-[9.5px] font-bold text-white/20 uppercase tracking-widest px-3 py-1.5">
-                  {group.label}
-                </p>
+              <div key={group.label} style={{ marginTop: gi > 0 ? 12 : 0 }}>
+                <div
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 800,
+                    color: "var(--app-text-dim)",
+                    letterSpacing: 1.5,
+                    padding: "10px 10px 6px",
+                  }}
+                >
+                  {group.label.toUpperCase()}
+                </div>
                 {group.items.map((item) => {
                   const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+                  const label = item.isCoach ? `${coachName}コーチ` : item.label;
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
-                      className={`relative flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all duration-150 text-[13px] font-medium ${
-                        isActive
-                          ? "bg-[#00c896]/15 text-[#00e6ad]"
-                          : "text-white/50 hover:text-white/85 hover:bg-white/5"
-                      }`}
+                      className="relative flex items-center gap-2.5 transition-all"
+                      style={{
+                        padding: "9px 12px",
+                        borderRadius: "var(--app-r-md)",
+                        background: isActive ? "var(--app-accent-soft)" : "transparent",
+                        color: isActive ? "var(--app-accent-deep)" : "var(--app-text)",
+                        fontSize: 13,
+                        fontWeight: isActive ? 700 : 600,
+                      }}
                     >
                       {isActive && (
-                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-[#00c896] rounded-r-full" />
+                        <span
+                          style={{
+                            position: "absolute",
+                            left: 0,
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            width: 3,
+                            height: 18,
+                            background: "var(--app-accent)",
+                            borderRadius: 2,
+                          }}
+                        />
                       )}
                       {item.icon}
-                      <span className="flex-1 min-w-0 truncate">
-                        {"isCoach" in item && item.isCoach ? `${coachName}コーチ` : item.label}
-                      </span>
-                      {"badge" in item && item.badge && (
-                        <span className="text-[8px] font-black px-1.5 py-0.5 rounded-full bg-[#00c896]/20 text-[#00c896] leading-none shrink-0 tracking-wide">
+                      <span className="flex-1 min-w-0 truncate">{label}</span>
+                      {item.badge && (
+                        <span
+                          style={{
+                            fontSize: 9,
+                            fontWeight: 800,
+                            padding: "2px 6px",
+                            background: "var(--app-accent-soft)",
+                            color: "var(--app-accent-deep)",
+                            borderRadius: "var(--app-r-pill)",
+                            letterSpacing: 0.3,
+                          }}
+                        >
                           {item.badge}
                         </span>
                       )}
@@ -323,31 +436,13 @@ export function Sidebar() {
         )}
       </nav>
 
-      {/* 検索ショートカット */}
-      {!collapsed && (
-        <div className="mx-2.5 mb-2">
-          <button
-            type="button"
-            onClick={() => {
-              const evt = new KeyboardEvent("keydown", { key: "k", ctrlKey: true });
-              document.dispatchEvent(evt);
-            }}
-            className="flex items-center gap-2 w-full px-3 py-2 rounded-xl bg-white/5 hover:bg-white/8 text-white/30 hover:text-white/50 transition-all text-[12px]"
-          >
-            <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <span className="flex-1 text-left">検索...</span>
-            <kbd className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white/10 text-white/30">Ctrl K</kbd>
-          </button>
-        </div>
-      )}
-
-      {/* 区切り線 */}
-      <div className="mx-3 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-
       {/* ボトムアイテム */}
-      <div className={`py-3 space-y-0.5 ${collapsed ? "px-2" : "px-2.5"}`}>
+      <div
+        style={{
+          padding: collapsed ? "8px 8px 12px" : "8px 10px 12px",
+          borderTop: "1px solid var(--app-border)",
+        }}
+      >
         {bottomItems.map((item) => {
           const isActive = pathname.startsWith(item.href);
           return (
@@ -355,19 +450,35 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               title={collapsed ? item.label : undefined}
-              className={`relative flex items-center rounded-xl transition-all duration-150 ${
-                collapsed ? "justify-center p-2.5" : "gap-2.5 px-3 py-2"
-              } text-[13px] font-medium ${
-                isActive
-                  ? "bg-[#00c896]/15 text-[#00e6ad]"
-                  : "text-white/40 hover:text-white/80 hover:bg-white/5"
-              }`}
+              className="relative flex items-center transition-all"
+              style={{
+                padding: collapsed ? "9px 0" : "8px 12px",
+                margin: "1px 0",
+                borderRadius: "var(--app-r-md)",
+                justifyContent: collapsed ? "center" : "flex-start",
+                gap: collapsed ? 0 : 10,
+                background: isActive ? "var(--app-accent-soft)" : "transparent",
+                color: isActive ? "var(--app-accent-deep)" : "var(--app-text-muted)",
+                fontSize: 12.5,
+                fontWeight: isActive ? 700 : 600,
+              }}
             >
-              {isActive && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-[#00c896] rounded-r-full" />
+              {isActive && !collapsed && (
+                <span
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    width: 3,
+                    height: 16,
+                    background: "var(--app-accent)",
+                    borderRadius: 2,
+                  }}
+                />
               )}
               {item.icon}
-              {!collapsed && item.label}
+              {!collapsed && <span>{item.label}</span>}
             </Link>
           );
         })}
