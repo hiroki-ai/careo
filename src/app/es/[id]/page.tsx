@@ -6,37 +6,71 @@ import Link from "next/link";
 import { useEs } from "@/hooks/useEs";
 import { useCompanies } from "@/hooks/useCompanies";
 import { EsForm } from "@/components/es/EsForm";
-import { LegacyBadge as Badge } from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { formatDate } from "@/lib/utils";
 import { QAPair, EsResult, ES_RESULT_LABELS } from "@/types";
+import { AppCard } from "@/components/ui/app";
 
-function EsQuestionCard({
-  qa,
-  index,
-}: {
-  qa: QAPair;
-  index: number;
-}) {
+function EsQuestionCard({ qa, index }: { qa: QAPair; index: number }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-6">
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex-1">
-          <p className="text-xs text-gray-400 mb-1">設問 {index + 1}</p>
-          <p className="font-medium text-gray-900">{qa.question || "(設問未入力)"}</p>
+    <AppCard padded>
+      <div className="flex items-start gap-2.5" style={{ marginBottom: 10 }}>
+        <div
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: 14,
+            background: "var(--app-accent-soft)",
+            color: "var(--app-accent-deep)",
+            display: "grid",
+            placeItems: "center",
+            fontSize: 12,
+            fontWeight: 800,
+            flexShrink: 0,
+          }}
+        >
+          Q{index + 1}
+        </div>
+        <div
+          style={{
+            fontSize: 13.5,
+            fontWeight: 700,
+            color: "var(--app-text)",
+            lineHeight: 1.6,
+            flex: 1,
+          }}
+        >
+          {qa.question || "(設問未入力)"}
         </div>
       </div>
-
-      <div className="bg-gray-50 rounded-lg p-4 mb-2">
-        <p className="text-sm text-gray-700 whitespace-pre-wrap">
-          {qa.answer || "(回答未入力)"}
-        </p>
+      <div
+        style={{
+          padding: 14,
+          background: "var(--app-surface-1)",
+          borderRadius: "var(--app-r-sm)",
+          fontSize: 13,
+          color: "var(--app-text)",
+          lineHeight: 1.9,
+          whiteSpace: "pre-wrap",
+        }}
+      >
+        {qa.answer || "(回答未入力)"}
       </div>
       {qa.answer && (
-        <p className="text-xs text-gray-400 text-right">{qa.answer.length}字</p>
+        <div
+          style={{
+            fontSize: 10.5,
+            color: "var(--app-text-dim)",
+            textAlign: "right",
+            marginTop: 6,
+            fontFamily: "ui-monospace, monospace",
+          }}
+        >
+          {qa.answer.length}字
+        </div>
       )}
-    </div>
+    </AppCard>
   );
 }
 
@@ -55,9 +89,24 @@ export default function EsDetailPage({ params }: { params: Promise<{ id: string 
 
   if (!es) {
     return (
-      <div className="p-8 text-center">
-        <p className="text-gray-500">ESが見つかりません</p>
-        <Link href="/es" className="text-blue-600 text-sm mt-2 inline-block">← ES一覧に戻る</Link>
+      <div
+        className="text-center"
+        style={{ padding: 40, background: "var(--app-surface-1)", minHeight: "100vh" }}
+      >
+        <div style={{ color: "var(--app-text-muted)", fontSize: 14 }}>ESが見つかりません</div>
+        <Link
+          href="/es"
+          style={{
+            color: "var(--app-accent-deep)",
+            fontSize: 13,
+            fontWeight: 700,
+            marginTop: 10,
+            display: "inline-block",
+            textDecoration: "none",
+          }}
+        >
+          ← ES一覧に戻る
+        </Link>
       </div>
     );
   }
@@ -80,111 +129,192 @@ export default function EsDetailPage({ params }: { params: Promise<{ id: string 
     }
   };
 
-  return (
-    <div className="p-4 md:p-8">
-      <Link href="/es" className="text-sm text-gray-400 hover:text-gray-600 mb-3 inline-block">← ES一覧</Link>
+  const statusColor =
+    es.status === "SUBMITTED"
+      ? { bg: "var(--app-success-soft)", fg: "var(--app-success)" }
+      : { bg: "var(--app-warning-soft)", fg: "var(--app-warning)" };
 
-      <div className="flex items-start justify-between mb-6">
-        <div>
-          {company && (
-            <Link href={`/companies/${company.id}`} className="text-sm text-blue-500 hover:underline mb-1 inline-block">
-              {company.name}
-            </Link>
-          )}
-          <h1 className="text-2xl font-bold text-gray-900">{es.title}</h1>
-          <div className="flex items-center gap-3 mt-2 flex-wrap">
-            <Badge variant={es.status === "SUBMITTED" ? "success" : "warning"}>
-              {es.status === "SUBMITTED" ? "提出済み" : "下書き"}
-            </Badge>
-            {es.deadline && (
-              <span className="text-sm text-gray-500">締切: {formatDate(es.deadline)}</span>
-            )}
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs text-gray-500">結果:</span>
-              <select
-                aria-label="ES結果"
-                value={es.result ?? "unknown"}
-                onChange={(e) => updateEs(id, { result: e.target.value as EsResult })}
-                className={`text-xs border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 ${
-                  es.result === "passed" ? "text-green-700 bg-green-50" :
-                  es.result === "failed" ? "text-red-700 bg-red-50" :
-                  es.result === "pending" ? "text-amber-700 bg-amber-50" :
-                  "text-gray-600 bg-white"
-                }`}
+  return (
+    <div style={{ background: "var(--app-surface-1)", minHeight: "100vh", color: "var(--app-text)" }}>
+      <div
+        className="flex flex-col"
+        style={{ padding: "18px 16px 120px", maxWidth: 1080, margin: "0 auto", gap: 16 }}
+      >
+        <Link
+          href="/es"
+          style={{
+            fontSize: 13,
+            color: "var(--app-text-muted)",
+            textDecoration: "none",
+            fontWeight: 600,
+          }}
+        >
+          ← ES一覧
+        </Link>
+
+        {/* Header */}
+        <div className="flex items-start justify-between flex-wrap gap-3">
+          <div>
+            {company && (
+              <Link
+                href={`/companies/${company.id}`}
+                style={{
+                  fontSize: 12,
+                  color: "var(--app-accent-deep)",
+                  fontWeight: 700,
+                  textDecoration: "none",
+                  marginBottom: 4,
+                  display: "inline-block",
+                }}
               >
-                {(Object.entries(ES_RESULT_LABELS) as [EsResult, string][]).map(([val, label]) => (
-                  <option key={val} value={val}>{label}</option>
-                ))}
-              </select>
+                {company.name} →
+              </Link>
+            )}
+            <h1
+              className="font-klee"
+              style={{ fontSize: 26, fontWeight: 700, margin: 0, letterSpacing: -0.5 }}
+            >
+              {es.title}
+            </h1>
+            <div className="flex items-center gap-2.5 flex-wrap" style={{ marginTop: 10 }}>
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 800,
+                  padding: "3px 9px",
+                  background: statusColor.bg,
+                  color: statusColor.fg,
+                  borderRadius: 4,
+                }}
+              >
+                {es.status === "SUBMITTED" ? "提出済み" : "下書き"}
+              </span>
+              {es.deadline && (
+                <span style={{ fontSize: 12, color: "var(--app-text-muted)" }}>
+                  締切: {formatDate(es.deadline)}
+                </span>
+              )}
+              <div className="flex items-center gap-1.5">
+                <span style={{ fontSize: 11, color: "var(--app-text-muted)" }}>結果:</span>
+                <select
+                  aria-label="ES結果"
+                  value={es.result ?? "unknown"}
+                  onChange={(e) => updateEs(id, { result: e.target.value as EsResult })}
+                  style={{
+                    fontSize: 11,
+                    border: "1px solid var(--app-border-strong)",
+                    borderRadius: 8,
+                    padding: "3px 8px",
+                    outline: "none",
+                    background: "var(--app-surface-0)",
+                    color: "var(--app-text)",
+                  }}
+                >
+                  {(Object.entries(ES_RESULT_LABELS) as [EsResult, string][]).map(
+                    ([val, label]) => (
+                      <option key={val} value={val}>
+                        {label}
+                      </option>
+                    )
+                  )}
+                </select>
+              </div>
+              <label className="flex items-center gap-1.5" style={{ cursor: "pointer" }}>
+                <input
+                  type="checkbox"
+                  checked={es.isSharedAnonymously ?? false}
+                  onChange={(e) => updateEs(id, { isSharedAnonymously: e.target.checked })}
+                  style={{
+                    width: 14,
+                    height: 14,
+                    accentColor: "var(--app-accent)",
+                    cursor: "pointer",
+                  }}
+                />
+                <span style={{ fontSize: 11, color: "var(--app-text-muted)" }}>匿名共有</span>
+              </label>
             </div>
-            <label className="flex items-center gap-1.5 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={es.isSharedAnonymously ?? false}
-                onChange={(e) => updateEs(id, { isSharedAnonymously: e.target.checked })}
-                className="w-3.5 h-3.5 rounded border-gray-300 text-[#00c896] focus:ring-[#00c896]"
-              />
-              <span className="text-[11px] text-gray-500">匿名共有</span>
-            </label>
+          </div>
+          <div className="flex gap-2 flex-wrap justify-end">
+            {es.status === "DRAFT" && (
+              <Button size="sm" onClick={handleMarkSubmitted}>
+                提出済みにする
+              </Button>
+            )}
+            {reviewSent ? (
+              <span
+                style={{
+                  fontSize: 11,
+                  color: "var(--app-success)",
+                  fontWeight: 700,
+                  alignSelf: "center",
+                }}
+              >
+                ✓ 添削依頼済み
+              </span>
+            ) : (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleReviewRequest}
+                disabled={reviewRequesting}
+              >
+                {reviewRequesting ? "送信中..." : "📝 添削依頼"}
+              </Button>
+            )}
+            <Button variant="secondary" size="sm" onClick={() => setIsEditOpen(true)}>
+              編集
+            </Button>
+            <Button variant="destructive" size="sm" onClick={() => setIsDeleteConfirm(true)}>
+              削除
+            </Button>
           </div>
         </div>
-        <div className="flex gap-2 flex-wrap justify-end">
-          {es.status === "DRAFT" && (
-            <Button
-              size="sm"
-              onClick={handleMarkSubmitted}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white"
-            >
-              提出済みにする
-            </Button>
-          )}
-          {reviewSent ? (
-            <span className="text-xs text-emerald-600 font-medium self-center">✓ 添削依頼済み</span>
-          ) : (
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={handleReviewRequest}
-              disabled={reviewRequesting}
-            >
-              {reviewRequesting ? "送信中..." : "📝 添削依頼"}
-            </Button>
-          )}
-          <Button variant="secondary" size="sm" onClick={() => setIsEditOpen(true)}>編集</Button>
-          <Button variant="destructive" size="sm" onClick={() => setIsDeleteConfirm(true)}>削除</Button>
-        </div>
-      </div>
 
-      {/* 設問・回答 */}
-      <div className="space-y-4">
-        {es.questions.map((q, i) => (
-          <EsQuestionCard
-            key={q.id}
-            qa={q}
-            index={i}
+        {/* Q&A */}
+        <div className="flex flex-col gap-2.5">
+          {es.questions.map((q, i) => (
+            <EsQuestionCard key={q.id} qa={q} index={i} />
+          ))}
+        </div>
+
+        <Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} title="ESを編集" size="lg">
+          <EsForm
+            companies={companies}
+            initialData={es}
+            onSubmit={(data) => {
+              updateEs(id, data);
+              setIsEditOpen(false);
+            }}
+            onCancel={() => setIsEditOpen(false)}
           />
-        ))}
+        </Modal>
+
+        <Modal
+          isOpen={isDeleteConfirm}
+          onClose={() => setIsDeleteConfirm(false)}
+          title="ESを削除"
+          size="sm"
+        >
+          <p style={{ fontSize: 13, color: "var(--app-text-muted)", marginBottom: 20 }}>
+            「{es.title}」を削除しますか？
+          </p>
+          <div className="flex justify-end gap-3">
+            <Button variant="secondary" onClick={() => setIsDeleteConfirm(false)}>
+              キャンセル
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                deleteEs(id);
+                router.push("/es");
+              }}
+            >
+              削除する
+            </Button>
+          </div>
+        </Modal>
       </div>
-
-      <Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} title="ESを編集" size="lg">
-        <EsForm
-          companies={companies}
-          initialData={es}
-          onSubmit={(data) => {
-            updateEs(id, data);
-            setIsEditOpen(false);
-          }}
-          onCancel={() => setIsEditOpen(false)}
-        />
-      </Modal>
-
-      <Modal isOpen={isDeleteConfirm} onClose={() => setIsDeleteConfirm(false)} title="ESを削除" size="sm">
-        <p className="text-sm text-gray-600 mb-6">「{es.title}」を削除しますか？</p>
-        <div className="flex justify-end gap-3">
-          <Button variant="secondary" onClick={() => setIsDeleteConfirm(false)}>キャンセル</Button>
-          <Button variant="destructive" onClick={() => { deleteEs(id); router.push("/es"); }}>削除する</Button>
-        </div>
-      </Modal>
     </div>
   );
 }
