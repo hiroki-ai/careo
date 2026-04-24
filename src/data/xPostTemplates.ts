@@ -137,7 +137,7 @@ export const COMMUNITY_TEMPLATES: XTemplate[] = [
   {
     id: "community-call-senpai",
     category: "community",
-    text: "27卒の先輩、内定取れた人いたら、CareoでES・面接ログを匿名共有してほしい。\n\n後輩29卒・30卒が見て本当に助かる。\n\ncareoai.jp/senpai で公開できる。",
+    text: "27卒の先輩、内定取れた人いたら、CareoでES・面接ログを匿名共有してほしい。\n\n後輩が見て本当に助かる。\n\ncareoai.jp/senpai で公開できる。",
   },
 ];
 

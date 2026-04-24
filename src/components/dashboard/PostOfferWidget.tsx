@@ -55,7 +55,7 @@ const POST_OFFER_CONTENT: { intern: OfferContent; main: OfferContent } = {
       {
         icon: "🎓",
         title: "ESを後輩に匿名共有する",
-        desc: "あなたの通過ESが29卒の参考データになる",
+        desc: "あなたの通過ESが後輩の参考データになる",
         link: "/es",
       },
       {

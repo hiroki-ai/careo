@@ -35,7 +35,7 @@ function calcProbability(a: Answers): { percent: number; rank: "S" | "A" | "B" |
   else if (a.grad === "28" && a.stage === "in_progress") { score += 10; }
   else if (a.grad === "28" && a.stage === "just_started") { score += 5; insights.push("28卒ならもう少しペースを上げたい時期"); }
   else if (a.grad === "28" && a.stage === "not_started") { score -= 10; insights.push("28卒で未着手は急ぐ必要あり"); }
-  if (a.grad === "29") { score += 5; insights.push("29卒なら早期動き出しは大きなアドバンテージ"); }
+  if (a.grad === "29" || a.grad === "30") { score += 5; insights.push("早期動き出しは大きなアドバンテージ"); }
 
   // 応募企業数
   if (a.companies === "16+") { score += 15; insights.push("16社以上応募はポートフォリオとして十分"); }
@@ -75,9 +75,7 @@ function calcProbability(a: Answers): { percent: number; rank: "S" | "A" | "B" |
 const OPTS = {
   grad: [
     { value: "28" as GradYear, label: "28卒（現 大学3年）" },
-    { value: "29" as GradYear, label: "29卒（現 大学2年）" },
-    { value: "30" as GradYear, label: "30卒（現 大学1年）" },
-    { value: "other" as GradYear, label: "その他・院生" },
+    { value: "other" as GradYear, label: "その他（院生・他学年）" },
   ],
   stage: [
     { value: "not_started" as Stage, label: "まだ何もしてない" },

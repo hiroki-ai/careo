@@ -21,9 +21,8 @@ function inferGradeFromGradYear(gradYear: number): string {
 
 const GRAD_YEARS = [
   { value: CURRENT_YEAR + 2, label: `${(CURRENT_YEAR + 2) % 100}卒`, sub: "現在 大学3年" },
-  { value: CURRENT_YEAR + 3, label: `${(CURRENT_YEAR + 3) % 100}卒`, sub: "現在 大学2年" },
   { value: CURRENT_YEAR + 1, label: `${(CURRENT_YEAR + 1) % 100}卒`, sub: "現在 大学4年" },
-  { value: CURRENT_YEAR + 4, label: "その他", sub: "院生・1年生など" },
+  { value: CURRENT_YEAR + 4, label: "その他", sub: "院生など" },
 ];
 
 const STAGES: { value: JobSearchStage; title: string; desc: string }[] = [
@@ -107,16 +106,16 @@ export default function OnboardingPage() {
                 <p className="text-sm text-gray-500">就活スケジュールに合わせてアドバイスします</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3">
                 {GRAD_YEARS.map((g) => (
                   <button
                     key={g.value}
                     type="button"
                     onClick={() => handleGradYear(g.value)}
-                    className="flex flex-col items-center justify-center py-5 rounded-2xl border-2 border-gray-100 hover:border-[#00c896] hover:bg-[#00c896]/5 transition-all active:scale-[0.98]"
+                    className="flex items-center justify-between py-4 px-5 rounded-2xl border-2 border-gray-100 hover:border-[#00c896] hover:bg-[#00c896]/5 transition-all active:scale-[0.99]"
                   >
-                    <span className="text-xl font-black text-gray-900">{g.label}</span>
-                    <span className="text-[11px] text-gray-400 mt-1">{g.sub}</span>
+                    <span className="text-lg font-black text-gray-900">{g.label}</span>
+                    <span className="text-[11px] text-gray-400">{g.sub}</span>
                   </button>
                 ))}
               </div>

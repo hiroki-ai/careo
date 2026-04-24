@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "Careo",
   },
-  keywords: ["就活管理", "AI就活", "就活アプリ", "ES管理", "面接管理", "就活PDCA", "就活ツール", "就活コーチ", "AIコーチ", "就活サポート", "Careo", "カレオ", "27卒", "28卒", "29卒", "30卒"],
+  keywords: ["就活管理", "AI就活", "就活アプリ", "ES管理", "面接管理", "就活PDCA", "就活ツール", "就活コーチ", "AIコーチ", "就活サポート", "Careo", "カレオ", "28卒"],
   openGraph: {
     type: "website",
     url: APP_URL,

@@ -30,7 +30,7 @@ const SURFACE = "#f5f3ee";
 function formatUserCount(n: number): string {
   if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}k+`;
   if (n >= 100) return `${n}+`;
-  return "28/29卒向け";
+  return "28卒向け";
 }
 
 export function LandingPage({ recentPosts, userCount, reviews }: Props) {
@@ -151,7 +151,7 @@ function Header() {
 }
 
 function Hero({ userCount }: { userCount: number }) {
-  const chipLabel = `${formatUserCount(userCount)}の28/29卒が使ってる`;
+  const chipLabel = `${formatUserCount(userCount)}の28卒が使ってる`;
 
   return (
     <section className="relative overflow-hidden px-4 pt-7 pb-10 md:px-5 md:pt-11 md:pb-14">

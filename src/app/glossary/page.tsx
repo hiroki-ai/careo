@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { GLOSSARY } from "@/data/glossary";
 
 export const metadata: Metadata = {
-  title: "就活用語辞典 | Careo - 28卒・29卒の就活生のための用語集",
+  title: "就活用語辞典 | Careo - 28卒の就活生のための用語集",
   description: "ガクチカ・ES・OB訪問・ケース面接など、就活でよく使われる用語を分かりやすく解説。新しい用語が出てくるたびに追加しています。",
   openGraph: {
     title: "就活用語辞典 | Careo",
