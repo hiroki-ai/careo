@@ -40,8 +40,26 @@ function UpgradeInner() {
   const [couponLoading, setCouponLoading] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState<null | "monthly" | "yearly">(null);
   const [portalLoading, setPortalLoading] = useState(false);
+  const [trialLoading, setTrialLoading] = useState(false);
   const [cycle, setCycle] = useState<"monthly" | "yearly">("yearly");
   const isPro = profile?.plan === "pro";
+  const canStartTrial = !isPro && !(profile as { trial_started_at?: string | null } | null)?.trial_started_at;
+
+  const handleStartTrial = async () => {
+    setTrialLoading(true);
+    try {
+      const res = await fetch("/api/trial/start", { method: "POST" });
+      const data = await res.json() as { success?: boolean; message?: string; error?: string };
+      if (data.success) {
+        showToast(data.message ?? "トライアルを開始しました 🎉", "success");
+        await refetch();
+      } else {
+        showToast(data.error ?? "トライアルの開始に失敗しました", "error");
+      }
+    } finally {
+      setTrialLoading(false);
+    }
+  };
 
   // Stripe successから戻ってきたらrefetchしてProに切り替わっているか確認
   useEffect(() => {
@@ -202,14 +220,30 @@ function UpgradeInner() {
             ))}
           </ul>
           {!isPro ? (
-            <button
-              type="button"
-              onClick={() => handleCheckout(cycle)}
-              disabled={checkoutLoading !== null}
-              className="w-full bg-[#00c896] hover:bg-[#00b088] disabled:opacity-60 text-white font-bold py-3 rounded-xl text-sm transition-colors"
-            >
-              {checkoutLoading === cycle ? "決済画面へ遷移中..." : cycle === "yearly" ? "年額プランにアップグレード" : "月額プランにアップグレード"}
-            </button>
+            <>
+              {canStartTrial && (
+                <button
+                  type="button"
+                  onClick={handleStartTrial}
+                  disabled={trialLoading}
+                  className="w-full font-black py-3 rounded-xl text-[15px] text-white mb-2"
+                  style={{ background: "linear-gradient(135deg, #00c896, #00a87e)", boxShadow: "0 8px 24px rgba(0,200,150,0.35)" }}
+                >
+                  {trialLoading ? "開始中..." : "🎁 30日間 無料トライアル"}
+                </button>
+              )}
+              {canStartTrial && (
+                <p className="text-[10px] text-gray-400 text-center mb-3">クレカ不要 · いつでも解約可 · 1人1回</p>
+              )}
+              <button
+                type="button"
+                onClick={() => handleCheckout(cycle)}
+                disabled={checkoutLoading !== null}
+                className={`w-full ${canStartTrial ? "bg-white border border-[#00c896]/40 text-[#00a87e] hover:bg-[#00c896]/5" : "bg-[#00c896] hover:bg-[#00b088] text-white"} disabled:opacity-60 font-bold py-3 rounded-xl text-sm transition-colors`}
+              >
+                {checkoutLoading === cycle ? "決済画面へ遷移中..." : canStartTrial ? "今すぐ有料プランで始める" : cycle === "yearly" ? "年額プランにアップグレード" : "月額プランにアップグレード"}
+              </button>
+            </>
           ) : (
             <button
               type="button"

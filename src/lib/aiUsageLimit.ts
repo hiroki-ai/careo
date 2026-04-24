@@ -36,16 +36,25 @@ function service() {
 }
 
 /**
- * ユーザーが Pro プランかを判定
+ * ユーザーが Pro プラン（有効期限内）かを判定
+ * plan が 'pro' でも plan_period_end が過ぎていれば free 扱い
  */
 export async function isProUser(userId: string): Promise<boolean> {
   const supabase = service();
   const { data } = await supabase
     .from("user_profiles")
-    .select("plan")
+    .select("plan, plan_period_end, stripe_subscription_id")
     .eq("id", userId)
     .single();
-  return (data?.plan ?? "free") === "pro";
+  if (!data) return false;
+  if ((data.plan ?? "free") !== "pro") return false;
+  // Stripeで継続課金中なら期限チェック不要
+  if (data.stripe_subscription_id) return true;
+  // 期限が設定されていて過ぎている場合は free 扱い
+  if (data.plan_period_end && new Date(data.plan_period_end as string) < new Date()) {
+    return false;
+  }
+  return true;
 }
 
 export interface UsageResult {
