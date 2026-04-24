@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { motion, type Variants } from "framer-motion";
-import Image from "next/image";
+import { CareoKun } from "@/components/landing/CareoKun";
 
 export type KareoExpression =
   | "default"
@@ -22,14 +21,29 @@ interface KareoCharacterProps {
   className?: string;
 }
 
+// KareoExpression → CareoKun mood にマッピング（LP と完全にデザイン統一）
+function toMood(expression: KareoExpression): "default" | "cheer" | "think" | "celebrate" | "sleep" {
+  switch (expression) {
+    case "thinking":
+    case "loading":
+      return "think";
+    case "celebrating":
+      return "celebrate";
+    case "encouraging":
+    case "waving":
+      return "cheer";
+    case "sad":
+    case "error":
+    case "default":
+    default:
+      return "default";
+  }
+}
+
 const floatingVariants: Variants = {
   animate: {
     y: [0, -8, 0],
-    transition: {
-      duration: 2.5,
-      repeat: Infinity,
-      ease: "easeInOut",
-    },
+    transition: { duration: 2.5, repeat: Infinity, ease: "easeInOut" },
   },
 };
 
@@ -38,14 +52,15 @@ const walkingVariants: Variants = {
     x: [0, 4, 0, -4, 0],
     y: [0, -3, 0, -3, 0],
     rotate: [0, 3, 0, -3, 0],
-    transition: {
-      duration: 0.8,
-      repeat: Infinity,
-      ease: "easeInOut",
-    },
+    transition: { duration: 0.8, repeat: Infinity, ease: "easeInOut" },
   },
 };
 
+/**
+ * LP の CareoKun に統一されたマスコット。
+ * 既存の KareoCharacter API（expression プロップ等）はラッパーとして維持し、
+ * 内部で CareoKun（LP版）を描画することでデザインを統一する。
+ */
 export function KareoCharacter({
   expression = "default",
   size = 120,
@@ -53,33 +68,21 @@ export function KareoCharacter({
   walking = false,
   className,
 }: KareoCharacterProps) {
-  const [useFallback, setUseFallback] = useState(false);
   const variants = walking ? walkingVariants : animate ? floatingVariants : undefined;
+  const mood = toMood(expression);
 
-  // Try PNG first (AI-generated), fallback to SVG
-  const pngSrc = `/kareo/kareo-${expression}.png`;
-  const svgSrc = `/kareo/kareo-${expression}.svg`;
-  const imageSrc = useFallback ? svgSrc : pngSrc;
+  if (!variants) {
+    return <CareoKun size={size} mood={mood} className={className} />;
+  }
 
   return (
     <motion.div
-      className={className}
-      style={{ width: size, height: size * (380 / 320) }}
       variants={variants}
-      animate={animate || walking ? "animate" : undefined}
+      animate="animate"
+      className={className}
+      style={{ display: "inline-block", lineHeight: 0 }}
     >
-      <Image
-        src={imageSrc}
-        alt="カレオ"
-        width={size}
-        height={Math.round(size * (380 / 320))}
-        style={{ objectFit: "contain" }}
-        priority={expression === "default"}
-        onError={() => {
-          if (!useFallback) setUseFallback(true);
-        }}
-        unoptimized={!useFallback}
-      />
+      <CareoKun size={size} mood={mood} />
     </motion.div>
   );
 }

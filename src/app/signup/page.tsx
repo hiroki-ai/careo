@@ -78,14 +78,16 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a1628] flex items-center justify-center p-4">
-      <div className="w-full max-w-sm">
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden font-zen-kaku" style={{ background: "#fcfbf8" }}>
+      <div className="absolute pointer-events-none" style={{ top: 40, right: -60, width: 300, height: 300, background: "radial-gradient(circle, rgba(0,200,150,0.12), transparent 65%)", filter: "blur(40px)" }} />
+      <div className="absolute pointer-events-none" style={{ bottom: 0, left: -80, width: 280, height: 280, background: "radial-gradient(circle, rgba(255,200,100,0.18), transparent 65%)", filter: "blur(40px)" }} />
+      <div className="w-full max-w-sm relative">
 
         {/* カレオ + speech bubble */}
         <div className="flex flex-col items-center mb-6">
           <KareoCharacter expression="waving" size={112} />
-          <div className="bg-white rounded-2xl rounded-tl-none px-5 py-3 shadow-lg max-w-xs relative -mt-1">
-            <div className="absolute -top-3 left-0 w-4 h-4 bg-white rotate-[-35deg] rounded-tl-sm" />
+          <div className="bg-white rounded-2xl rounded-tl-none px-5 py-3 shadow-lg max-w-xs relative -mt-1" style={{ border: "1px solid rgba(0,200,150,0.2)" }}>
+            <div className="absolute -top-3 left-0 w-4 h-4 bg-white rotate-[-35deg] rounded-tl-sm" style={{ borderLeft: "1px solid rgba(0,200,150,0.2)", borderTop: "1px solid rgba(0,200,150,0.2)" }} />
             <p className="text-sm font-semibold text-[#0D0B21] leading-relaxed">
               一緒に就活、始めよう！<br />
               <span className="text-[#00a87e]">登録は1分でできるよ。</span>
@@ -161,9 +163,18 @@ export default function SignupPage() {
                 </label>
               </div>
             </div>
-            <Button type="submit" className="w-full" disabled={loading || !agreedTerms || !agreedPrivacy}>
-              {loading ? "登録中..." : "アカウントを作成"}
-            </Button>
+            <button
+              type="submit"
+              disabled={loading || !agreedTerms || !agreedPrivacy}
+              className="w-full text-white font-black py-3 rounded-xl text-[15px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                background: "linear-gradient(135deg, #00c896, #00a87e)",
+                boxShadow: "0 8px 24px rgba(0,200,150,0.33)",
+              }}
+            >
+              {loading ? "登録中..." : "無料で Careo を始める →"}
+            </button>
+            <p className="text-[10px] text-gray-400 text-center">登録30秒 · クレカ不要 · 完全無料</p>
           </form>
           <p className="text-center text-sm text-gray-500 mt-5">
             すでにアカウントをお持ちの方は{" "}

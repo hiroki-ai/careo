@@ -101,9 +101,17 @@ function LoginForm() {
             />
           </div>
           {error && <p className="text-sm text-red-500">{error}</p>}
-          <Button type="submit" className="w-full" disabled={loading}>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full text-white font-black py-3 rounded-xl text-[15px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              background: "linear-gradient(135deg, #00c896, #00a87e)",
+              boxShadow: "0 8px 24px rgba(0,200,150,0.33)",
+            }}
+          >
             {loading ? "ログイン中..." : "ログイン"}
-          </Button>
+          </button>
         </form>
         <p className="text-center text-sm mt-3">
           <Link href="/forgot-password" className="text-[#00c896] hover:underline">

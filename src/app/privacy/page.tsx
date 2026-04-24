@@ -12,7 +12,7 @@ export default function PrivacyPage() {
         </div>
 
         <h1 className="text-2xl font-bold text-gray-900 mb-2">プライバシーポリシー</h1>
-        <p className="text-xs text-gray-400 mb-8">最終更新日：2026年3月23日（大学キャリアセンター連携に関する条項を追記）</p>
+        <p className="text-xs text-gray-400 mb-8">最終更新日：2026年4月24日</p>
 
         <div className="space-y-8 text-sm text-gray-700 leading-relaxed">
           <section>
@@ -32,7 +32,6 @@ export default function PrivacyPage() {
             <ul className="list-disc pl-5 space-y-1">
               <li>就活管理機能の提供（企業管理・ES管理・面接記録等）</li>
               <li>AIコーチング機能の提供（PDCA分析・気づき通知・ES提出前チェック等）</li>
-              <li>大学キャリアセンターとの連携機能の提供（提携大学のみ・詳細は第4条）</li>
               <li>サービスの改善・開発</li>
               <li>不正アクセスの防止</li>
             </ul>
@@ -44,38 +43,16 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="font-bold text-gray-900 mb-2">3. 大学キャリアセンターへの情報提供（大学連携機能）</h2>
-            <p className="mb-3">
-              当サービスでは、提携する大学のキャリアセンターと連携し、学生の就活サポートを向上させる機能を提供しています（以下「大学連携機能」）。
-            </p>
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-3 text-xs text-amber-800">
-              現在、提携大学は準備中です。正式に提携が成立した際にはアプリ内でお知らせします。
-              提携のない大学に在籍するユーザーには本条項は適用されません。
-            </div>
-            <p className="font-semibold text-gray-800 mb-2 text-xs">3-1. 提供先</p>
+            <h2 className="font-bold text-gray-900 mb-2">3. 公開プロフィール機能（任意）</h2>
             <p className="mb-3 text-xs text-gray-600">
-              ユーザーが在籍する大学のキャリアセンターのみ。他大学や外部の第三者には提供しません。
+              ユーザーは設定画面から「公開プロフィール」を有効にすることで、
+              自身のユーザー名・大学/学部・志望業界等の任意情報と、応募企業数・ES数・面接数などの集計値を
+              <code className="font-mono text-gray-800">careoai.jp/u/[username]</code> で公開できます。
+              この機能は<strong>デフォルトで無効</strong>で、設定で明示的にONにした場合のみ動作します。
+              いつでも設定からOFFに戻せます。
             </p>
-            <p className="font-semibold text-gray-800 mb-2 text-xs">3-2. 提供される情報の範囲（デフォルト）</p>
-            <ul className="list-disc pl-5 space-y-1 text-xs text-gray-600 mb-3">
-              <li>氏名・学籍番号・学部・学年（大学マスタと連携）</li>
-              <li>志望業界・職種</li>
-              <li>選考中の企業名・選考フェーズ</li>
-              <li>ES・自己分析の内容</li>
-              <li>OB/OG訪問の実施件数・訪問先業界</li>
-              <li>筆記試験スコア</li>
-              <li>内定の有無（学生が報告した場合）</li>
-            </ul>
-            <p className="font-semibold text-gray-800 mb-2 text-xs">3-3. ユーザーによるコントロール</p>
-            <p className="mb-3 text-xs text-gray-600">
-              上記の情報は設定ページから項目ごとに非公開に変更できます。
-              キャリアセンターがユーザーに「公開リクエスト」を送ることはできますが、
-              ユーザーの同意なく強制的に開示されることはありません。
-            </p>
-            <p className="font-semibold text-gray-800 mb-2 text-xs">3-4. キャリアセンターの利用目的</p>
-            <p className="text-xs text-gray-600">
-              提供された情報は当該大学のキャリアセンターによる学生の就活支援にのみ使用されます。
-              外部への再提供・マーケティング利用は禁止しています。
+            <p className="text-xs text-gray-600 mb-3">
+              <strong>公開プロフィールに出ない情報</strong>：企業名、ES本文、面接の質疑応答、メールアドレス、決済情報、その他の詳細な就活データは公開されません。
             </p>
           </section>
 
