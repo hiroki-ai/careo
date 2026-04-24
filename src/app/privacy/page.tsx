@@ -165,7 +165,8 @@ export default function PrivacyPage() {
             <h2 className="font-bold text-gray-900 mb-2">10. お問い合わせ</h2>
             <p>
               個人情報の取り扱いに関するご質問・ご要望は、
-              当サービス内のフィードバック機能よりお問い合わせください。
+              <a href="mailto:hiroki.abe.career@gmail.com" className="text-[#00c896] hover:underline">hiroki.abe.career@gmail.com</a>
+              までご連絡ください。
             </p>
           </section>
         </div>

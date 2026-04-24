@@ -1485,7 +1485,7 @@ function FinalCTA() {
           <Link href="/glossary" style={{ color: "inherit" }}>
             就活用語辞典
           </Link>
-          <a href="mailto:hello@careo.jp" style={{ color: "inherit" }}>
+          <a href="mailto:hiroki.abe.career@gmail.com" style={{ color: "inherit" }}>
             お問い合わせ
           </a>
           <span>© 2026 Careo</span>

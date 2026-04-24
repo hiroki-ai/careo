@@ -122,7 +122,9 @@ export default function TermsPage() {
           <section>
             <h2 className="font-bold text-gray-900 mb-2">第10条（お問い合わせ）</h2>
             <p>
-              本規約に関するご質問は、当サービス内のフィードバック機能よりお問い合わせください。
+              本規約に関するご質問は、
+              <a href="mailto:hiroki.abe.career@gmail.com" className="text-[#00c896] hover:underline">hiroki.abe.career@gmail.com</a>
+              までご連絡ください。
             </p>
           </section>
         </div>
