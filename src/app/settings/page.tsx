@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useProfile } from "@/hooks/useProfile";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
@@ -59,7 +60,7 @@ function ColorModePreview({ mode }: { mode: ColorMode }) {
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { profile, loading, saveProfile, saveCareerCenterVisibility, saveUsername } = useProfile();
+  const { profile, loading, saveProfile, saveCareerCenterVisibility, saveUsername, savePublicProfile } = useProfile();
   const { permission, isSubscribed, isSupported, loading: pushLoading, subscribe, unsubscribe } = usePushNotifications();
   const { settings, updateSettings } = useTheme();
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -71,6 +72,18 @@ export default function SettingsPage() {
   const [deleteInput, setDeleteInput] = useState("");
   const [deleting, setDeleting] = useState(false);
   const [visibilitySaving, setVisibilitySaving] = useState(false);
+  const [publicProfileSaving, setPublicProfileSaving] = useState(false);
+  const [publicBio, setPublicBio] = useState("");
+  const [publicX, setPublicX] = useState("");
+  const [publicLinkedin, setPublicLinkedin] = useState("");
+
+  useEffect(() => {
+    if (profile) {
+      setPublicBio(profile.publicBio ?? "");
+      setPublicX(profile.publicXHandle ?? "");
+      setPublicLinkedin(profile.publicLinkedinUrl ?? "");
+    }
+  }, [profile?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleLogout = async () => {
     const supabase = createClient();
@@ -230,6 +243,91 @@ export default function SettingsPage() {
             </Button>
           </div>
         )}
+      </section>
+
+      {/* 公開プロフィール */}
+      <section className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="font-semibold text-gray-900">公開プロフィール</h2>
+            <p className="text-xs text-gray-400 mt-0.5">
+              有効にすると `/u/{profile?.username || "your-name"}` で就活サマリーが公開される（企業名・ES・面接の中身は出ない）
+            </p>
+          </div>
+          <label className="inline-flex items-center gap-2 cursor-pointer">
+            <span className="text-xs text-gray-500">{profile?.isProfilePublic ? "公開中" : "非公開"}</span>
+            <input
+              type="checkbox"
+              className="w-9 h-5 accent-[#00c896]"
+              checked={profile?.isProfilePublic ?? false}
+              onChange={async (e) => {
+                await savePublicProfile({ isProfilePublic: e.target.checked });
+              }}
+              disabled={!profile?.username}
+            />
+          </label>
+        </div>
+        {!profile?.username && (
+          <p className="text-xs text-amber-600 bg-amber-50 border border-amber-100 rounded-lg p-3 mb-3">
+            ⚠️ 先にユーザー名を設定してください（上のセクション）
+          </p>
+        )}
+        {profile?.username && profile?.isProfilePublic && (
+          <div className="mb-3 bg-[#00c896]/5 border border-[#00c896]/20 rounded-lg p-3 text-xs text-[#00a87e]">
+            公開URL: <Link href={`/u/${profile.username}`} className="font-bold underline" target="_blank">/u/{profile.username} ↗</Link>
+          </div>
+        )}
+        <div className="space-y-3">
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 mb-1">自己紹介（任意・200字以内）</label>
+            <textarea
+              value={publicBio}
+              onChange={(e) => setPublicBio(e.target.value.slice(0, 200))}
+              placeholder="例: 28卒・早期選考挑戦中。IT業界志望。"
+              rows={2}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896]"
+            />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1">X（Twitter）ハンドル</label>
+              <input
+                type="text"
+                value={publicX}
+                onChange={(e) => setPublicX(e.target.value)}
+                placeholder="例: hiroki_careo"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1">LinkedIn URL</label>
+              <input
+                type="url"
+                value={publicLinkedin}
+                onChange={(e) => setPublicLinkedin(e.target.value)}
+                placeholder="https://linkedin.com/in/..."
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00c896]"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end">
+            <Button
+              size="sm"
+              disabled={publicProfileSaving}
+              onClick={async () => {
+                setPublicProfileSaving(true);
+                await savePublicProfile({
+                  publicBio,
+                  publicXHandle: publicX.replace(/^@/, ""),
+                  publicLinkedinUrl: publicLinkedin,
+                });
+                setPublicProfileSaving(false);
+              }}
+            >
+              {publicProfileSaving ? "保存中..." : "保存"}
+            </Button>
+          </div>
+        </div>
       </section>
 
       {/* プロフィール */}

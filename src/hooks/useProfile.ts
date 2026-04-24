@@ -23,6 +23,10 @@ function rowToProfile(row: Record<string, unknown>): UserProfile {
     weaknesses: (row.weaknesses as string) ?? "",
     aiSelfAnalysis: (row.ai_self_analysis as UserProfile["aiSelfAnalysis"]) ?? {},
     careerCenterVisibility: (row.career_center_visibility as CareerCenterVisibility) ?? DEFAULT_CAREER_CENTER_VISIBILITY,
+    isProfilePublic: (row.is_profile_public as boolean | undefined) ?? false,
+    publicBio: (row.public_bio as string) ?? "",
+    publicXHandle: (row.public_x_handle as string) ?? "",
+    publicLinkedinUrl: (row.public_linkedin_url as string) ?? "",
     coachId: (row.coach_id as string) ?? undefined,
     lastPdca: (row.last_pdca as PdcaResult) ?? null,
     lastPdcaAt: (row.last_pdca_at as string) ?? null,
@@ -182,6 +186,27 @@ export function useProfile() {
     return !!saved;
   }, []);
 
+  const savePublicProfile = useCallback(async (
+    fields: Partial<Pick<UserProfile, "isProfilePublic" | "publicBio" | "publicXHandle" | "publicLinkedinUrl">>
+  ): Promise<boolean> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return false;
+    const row: Record<string, unknown> = {};
+    if (fields.isProfilePublic !== undefined) row.is_profile_public = fields.isProfilePublic;
+    if (fields.publicBio !== undefined) row.public_bio = fields.publicBio || null;
+    if (fields.publicXHandle !== undefined) row.public_x_handle = fields.publicXHandle || null;
+    if (fields.publicLinkedinUrl !== undefined) row.public_linkedin_url = fields.publicLinkedinUrl || null;
+    if (Object.keys(row).length === 0) return false;
+    const { data: saved } = await supabase
+      .from("user_profiles")
+      .update(row)
+      .eq("id", user.id)
+      .select()
+      .single();
+    if (saved) setProfile(rowToProfile(saved as Record<string, unknown>));
+    return !!saved;
+  }, []);
+
   const saveCoachId = useCallback(async (coachId: string): Promise<boolean> => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return false;
@@ -233,5 +258,5 @@ export function useProfile() {
     return !!saved;
   }, []);
 
-  return { profile, loading, saveProfile, patchSelfAnalysis, patchProfileBasics, saveAiSelfAnalysis, saveCareerCenterVisibility, saveCoachId, saveUsername, saveLastPdca, saveLastChatAt, refetch: fetch };
+  return { profile, loading, saveProfile, patchSelfAnalysis, patchProfileBasics, saveAiSelfAnalysis, saveCareerCenterVisibility, savePublicProfile, saveCoachId, saveUsername, saveLastPdca, saveLastChatAt, refetch: fetch };
 }
