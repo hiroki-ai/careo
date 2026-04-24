@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
+import { KareoCharacter, type KareoExpression } from "@/components/kareo/KareoCharacter";
+import { useProfile } from "@/hooks/useProfile";
 
 export interface TutorialStep {
   title: string;
@@ -19,22 +20,36 @@ interface PageTutorialProps {
   /** Tutorial steps */
   steps: readonly TutorialStep[];
   /** Kareo expression for the tutorial */
-  kareoExpression?: string;
+  kareoExpression?: KareoExpression;
+  /** このチュートリアルのバージョン（機能大幅変更時に bump すると再表示される）*/
+  version?: string;
 }
 
-export function PageTutorial({ pageKey, pageTitle, steps, kareoExpression = "waving" }: PageTutorialProps) {
+// 新規ユーザーと判定する期間（日数）
+const NEW_USER_WINDOW_DAYS = 14;
+
+export function PageTutorial({ pageKey, pageTitle, steps, kareoExpression = "waving", version = "v1" }: PageTutorialProps) {
+  const { profile, loading } = useProfile();
   const [show, setShow] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
-  const storageKey = `careo_tutorial_${pageKey}`;
+  const storageKey = `careo_tutorial_${pageKey}_${version}`;
 
   useEffect(() => {
+    if (loading) return;
+    if (!profile?.createdAt) return;
     try {
-      if (!localStorage.getItem(storageKey)) {
+      if (localStorage.getItem(storageKey)) return;
+      // 登録から14日以内の新規ユーザーのみ表示
+      const accountAgeDays = (Date.now() - new Date(profile.createdAt).getTime()) / (1000 * 60 * 60 * 24);
+      if (accountAgeDays <= NEW_USER_WINDOW_DAYS) {
         setShow(true);
+      } else {
+        // 古参ユーザーは見ない扱いに（同じバージョンは二度と出さない）
+        try { localStorage.setItem(storageKey, "auto-dismissed-existing-user"); } catch {}
       }
     } catch {}
-  }, [storageKey]);
+  }, [storageKey, profile?.createdAt, loading]);
 
   const dismiss = () => {
     setShow(false);
@@ -90,14 +105,8 @@ export function PageTutorial({ pageKey, pageTitle, steps, kareoExpression = "wav
                 <p className="text-white/70 text-xs font-medium mb-1">はじめてのガイド</p>
                 <h2 className="text-xl font-bold">{pageTitle}</h2>
               </div>
-              <div className="w-16 h-16 shrink-0 -mr-1 -mt-1">
-                <Image
-                  src={`/kareo/kareo-${kareoExpression}.svg`}
-                  alt="カレオ"
-                  width={64}
-                  height={64}
-                  className="drop-shadow-lg"
-                />
+              <div className="w-16 h-16 shrink-0 -mr-1 -mt-1 drop-shadow-lg">
+                <KareoCharacter expression={kareoExpression} size={64} animate={false} />
               </div>
             </div>
           </div>

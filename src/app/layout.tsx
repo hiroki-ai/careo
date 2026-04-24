@@ -23,15 +23,7 @@ export const metadata: Metadata = {
   title: "Careo（カレオ）| AIで就活を管理するアプリ",
   description: "AI就活コーチ「カレオ」が選考・ES・面接・OB訪問を全部把握。就活のPDCAを自動で回すAI就活アプリ。無料・登録5分。",
   manifest: "/manifest.json",
-  icons: {
-    icon: [
-      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
-      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
-    ],
-    apple: "/apple-touch-icon.png",
-    shortcut: "/favicon-32.png",
-  },
+  // icon / apple-icon は src/app/icon.tsx / apple-icon.tsx で動的生成（CareoKun）
   verification: {
     google: "2kjrzj66CrgHoAlDoUYL7CzhahsRlfXmZSyK7v2QBVc",
   },

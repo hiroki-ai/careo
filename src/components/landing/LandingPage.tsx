@@ -54,7 +54,7 @@ export function LandingPage({ recentPosts, userCount, reviews }: Props) {
       <Header />
       <Hero userCount={userCount} />
       <SocialProofStrip />
-      <CareoPersonality />
+      <SummerInternTeaser />
       <BeforeAfterScenes />
       <DailyWithCareo />
       <FeatureGrid />
@@ -300,6 +300,81 @@ function Hero({ userCount }: { userCount: number }) {
           <PhoneMockup>
             <DashboardScreen />
           </PhoneMockup>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SummerInternTeaser() {
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  const targetYear = now.getMonth() >= 8 ? now.getFullYear() + 1 : now.getFullYear();
+
+  // 見やすいサンプル（LPは静的なのでDB呼び出しせず、代表企業を固定表示）
+  const highlight = [
+    { name: "マッキンゼー", industry: "戦略コンサル", deadline: "5月上旬" },
+    { name: "ゴールドマン・サックス", industry: "外資投資銀行", deadline: "5月中旬" },
+    { name: "三菱商事", industry: "総合商社", deadline: "6月中旬" },
+    { name: "電通", industry: "広告", deadline: "6月中旬" },
+    { name: "リクルート", industry: "HR・Web", deadline: "6月中旬" },
+    { name: "楽天グループ", industry: "国内IT", deadline: "6月下旬" },
+  ];
+
+  return (
+    <section style={{ padding: "56px 20px 64px", background: "white", borderTop: "1px solid rgba(0,0,0,.04)" }}>
+      <div style={{ maxWidth: 960, margin: "0 auto" }}>
+        <div className="flex items-center justify-between flex-wrap gap-3 mb-6">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-2" style={{ background: `${ACCENT}18`, color: ACCENT_DEEP, fontSize: 11, fontWeight: 800, letterSpacing: 1 }}>
+              <span className="relative inline-flex w-2 h-2">
+                <span className="absolute inline-flex w-full h-full rounded-full opacity-60 animate-ping" style={{ background: ACCENT }} />
+                <span className="relative inline-flex w-2 h-2 rounded-full" style={{ background: ACCENT }} />
+              </span>
+              <span>LIVE · 毎週月曜に自動更新</span>
+            </div>
+            <h2 className="font-klee" style={{ fontSize: "min(8vw, 32px)", fontWeight: 600, letterSpacing: -0.6, lineHeight: 1.25 }}>
+              {targetYear}年{month <= 7 ? " · サマーインターン" : " · 秋冬インターン"}締切、<br className="sm:hidden" />
+              <span style={{ color: ACCENT_DEEP }}>見逃すな。</span>
+            </h2>
+            <p style={{ fontSize: 13, color: "#6b7280", marginTop: 6 }}>
+              主要36社の締切を AI が自動リサーチ。毎週月曜に最新版に更新。
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(0,0,0,.06)" }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-px" style={{ background: "#f3f4f6" }}>
+            {highlight.map((c) => (
+              <div key={c.name} className="bg-white p-4">
+                <div className="flex items-start justify-between gap-2 mb-1">
+                  <span style={{ fontSize: 13, fontWeight: 800, color: INK }}>{c.name}</span>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: ACCENT_DEEP, background: `${ACCENT}12`, padding: "2px 8px", borderRadius: 999, whiteSpace: "nowrap" }}>
+                    {c.deadline}
+                  </span>
+                </div>
+                <div style={{ fontSize: 10, color: "#9ca3af" }}>{c.industry}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-center mt-5">
+          <Link
+            href="/summer-intern"
+            style={{
+              background: `linear-gradient(135deg, ${ACCENT}, ${ACCENT_DEEP})`,
+              color: "white",
+              fontWeight: 800,
+              padding: "12px 28px",
+              borderRadius: 999,
+              fontSize: 14,
+              boxShadow: `0 8px 24px ${ACCENT}55`,
+              textDecoration: "none",
+            }}
+          >
+            全36社の締切を見る →
+          </Link>
         </div>
       </div>
     </section>

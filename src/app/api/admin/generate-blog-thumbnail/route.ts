@@ -77,20 +77,35 @@ export async function generateAndUploadThumbnail(
     } as Record<string, unknown>,
   });
 
-  const prompt = `Create a modern, clean blog thumbnail illustration for a Japanese job hunting (就活) article.
+  const prompt = `You are a senior editorial illustrator for a Japanese career-tech media brand "Careo" targeting university students (28卒). Create a premium blog thumbnail illustration.
 
-Title: "${title}"
-Tag: "${tag}"
+ARTICLE CONTEXT
+- Title: "${title}"
+- Primary topic tag: "${tag}"
 
-Requirements:
-- Modern flat illustration style, NOT photorealistic
-- Relevant to the topic (e.g., for "ES対策" show documents/writing, for "面接対策" show interview scene)
-- Include a small cute penguin character wearing a green tie somewhere in the illustration
-- Color palette: primarily use emerald green (#00c896), dark navy (#0d1b2e), white, with accent colors
-- Clean, professional look suitable for a career-focused blog
-- No text in the image (text will be overlaid separately)
-- 16:9 aspect ratio composition
-- Minimalist Japanese illustration style
+VISUAL DIRECTION (critical)
+- Style: refined editorial flat illustration; Japanese Webtoon-adjacent aesthetic; clean vector-like lines; soft grain/paper texture OK; absolutely NOT 3D, NOT photorealistic, NOT AI-looking generic stock art
+- Composition: 16:9 horizontal, clear focal point on the left 2/3, breathing room on the right for potential text overlay (do NOT draw text — text will be overlaid separately)
+- Subject: visually represent the article topic literally and specifically. Examples:
+  * ES/自己PR/ガクチカ → a desk scene with a laptop + handwritten notebook + a cup of coffee; light coming from a window
+  * 面接対策/逆質問 → an interview meeting scene from a calm angle, soft focus, no threatening mood
+  * インターン/選考スケジュール → a calendar or timeline on a wall with sticky notes
+  * 業界研究/企業分析 → bookshelves, magnifying glass over a document, stylized company buildings silhouette
+  * 自己分析/軸づくり → a person looking at a mirror of graphs; a journey path or compass
+- Mascot (MANDATORY): include a small mint-green bean-shaped character called "Careo-kun" somewhere in the scene — shape is a rounded vertical oval bean, mint green (#00c896) body with a soft lighter-green face, tiny black dot eyes, a subtle small smile. Keep it simple and cute, NOT cartoonish, NOT a penguin, NOT a mascot with limbs or clothing. It should feel like a friendly supporting character, not the main subject.
+
+COLOR PALETTE (strict)
+- Primary accent: #00c896 (Careo mint green) and #00a87e (deep teal)
+- Ink/text-like elements: #0D0B21
+- Background/paper: warm off-white #fcfbf8 or beige #f5f3ee
+- Allowed accent hues only when meaningful: soft amber (#f59e0b tints), soft blue (#60a5fa tints), muted rose for warmth. Avoid bright neon, avoid pure black.
+
+QUALITY BAR
+- Treat this like a cover for a high-end media company. Every element should have editorial intent.
+- Avoid clichés: no laptops with fake code screens, no random confetti, no generic briefcase-suit businessmen, no American-style office.
+- Texture: a faint paper grain is welcome. Harsh digital gradients are not.
+- The mascot must not dominate the frame. The topic is the hero, the mascot is a supportive grace note.
+- No text, no logos, no watermarks, no signatures in the image.
 `;
 
   const result = await model.generateContent(prompt);

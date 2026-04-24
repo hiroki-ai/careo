@@ -8,61 +8,13 @@ import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { Button } from "@/components/ui/Button";
 import { createClient } from "@/lib/supabase/client";
-import { JOB_SEARCH_STAGE_LABELS, CareerCenterVisibility, DEFAULT_CAREER_CENTER_VISIBILITY } from "@/types";
-import { useTheme, type ColorMode, type FontStyle } from "@/components/ThemeProvider";
+import { JOB_SEARCH_STAGE_LABELS } from "@/types";
 import { PageTutorial, PAGE_TUTORIALS } from "@/components/PageTutorial";
-
-const colorModeOptions: { value: ColorMode; label: string }[] = [
-  { value: "light", label: "ライト" },
-  { value: "auto", label: "自動" },
-  { value: "dark", label: "ダーク" },
-];
-
-const fontOptions: { value: FontStyle; label: string; preview: string }[] = [
-  { value: "default", label: "デフォルト", preview: "Aa" },
-  { value: "sans", label: "Sans", preview: "Aa" },
-  { value: "system", label: "システム", preview: "Aa" },
-  { value: "dyslexic", label: "ディスレクシア対応", preview: "Aa" },
-];
-
-function ColorModePreview({ mode }: { mode: ColorMode }) {
-  const isDark = mode === "dark";
-  const bg = isDark ? "#0f1117" : "#ffffff";
-  const bar = isDark ? "#2a2d37" : "#e5e7eb";
-  const line1 = isDark ? "#3a3d47" : "#d1d5db";
-  const line2 = isDark ? "#2a2d37" : "#e5e7eb";
-  return (
-    <svg viewBox="0 0 48 36" className="w-full h-auto rounded-md overflow-hidden border border-gray-200 dark:border-[#2a2d37]">
-      <rect width="48" height="36" fill={bg} />
-      <rect x="0" y="0" width="48" height="6" fill={bar} />
-      {mode === "auto" ? (
-        <>
-          <rect x="0" y="0" width="24" height="36" fill="#ffffff" />
-          <rect x="24" y="0" width="24" height="36" fill="#0f1117" />
-          <rect x="0" y="0" width="24" height="6" fill="#e5e7eb" />
-          <rect x="24" y="0" width="24" height="6" fill="#2a2d37" />
-          <rect x="4" y="10" width="14" height="2" rx="1" fill="#d1d5db" />
-          <rect x="4" y="14" width="10" height="2" rx="1" fill="#e5e7eb" />
-          <rect x="28" y="10" width="14" height="2" rx="1" fill="#3a3d47" />
-          <rect x="28" y="14" width="10" height="2" rx="1" fill="#2a2d37" />
-        </>
-      ) : (
-        <>
-          <rect x="4" y="10" width="28" height="2" rx="1" fill={line1} />
-          <rect x="4" y="14" width="20" height="2" rx="1" fill={line2} />
-          <rect x="4" y="18" width="24" height="2" rx="1" fill={line2} />
-          <rect x="4" y="24" width="16" height="3" rx="1.5" fill="#00c896" />
-        </>
-      )}
-    </svg>
-  );
-}
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { profile, loading, saveProfile, saveCareerCenterVisibility, saveUsername, savePublicProfile } = useProfile();
+  const { profile, loading, saveProfile, saveUsername, savePublicProfile } = useProfile();
   const { permission, isSubscribed, isSupported, loading: pushLoading, subscribe, unsubscribe } = usePushNotifications();
-  const { settings, updateSettings } = useTheme();
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [saved, setSaved] = useState(false);
   const [isEditingUsername, setIsEditingUsername] = useState(false);
@@ -71,7 +23,6 @@ export default function SettingsPage() {
   const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
   const [deleteInput, setDeleteInput] = useState("");
   const [deleting, setDeleting] = useState(false);
-  const [visibilitySaving, setVisibilitySaving] = useState(false);
   const [publicProfileSaving, setPublicProfileSaving] = useState(false);
   const [publicBio, setPublicBio] = useState("");
   const [publicX, setPublicX] = useState("");
@@ -115,88 +66,6 @@ export default function SettingsPage() {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">設定</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">プロフィールとアカウントを管理</p>
       </div>
-
-      {/* 外観 */}
-      <section className="bg-white dark:bg-[#1a1d27] rounded-xl border border-gray-100 dark:border-[#2a2d37] p-6 mb-6">
-        <h2 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">外観</h2>
-        <p className="text-xs text-gray-400 dark:text-gray-500 mb-5">テーマとフォントをカスタマイズ</p>
-
-        {/* カラーモード */}
-        <div className="mb-6">
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">カラーモード</p>
-          <div className="grid grid-cols-3 gap-3">
-            {colorModeOptions.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => updateSettings({ colorMode: opt.value })}
-                className={`rounded-xl p-2 border-2 transition-all ${
-                  settings.colorMode === opt.value
-                    ? "border-[#00c896] bg-[#00c896]/5"
-                    : "border-gray-200 dark:border-[#2a2d37] hover:border-gray-300 dark:hover:border-[#3a3d47]"
-                }`}
-              >
-                <ColorModePreview mode={opt.value} />
-                <p className={`text-xs font-medium mt-2 text-center ${
-                  settings.colorMode === opt.value ? "text-[#00c896]" : "text-gray-600 dark:text-gray-400"
-                }`}>
-                  {opt.label}
-                </p>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* フォント */}
-        <div className="mb-6">
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">フォント</p>
-          <div className="grid grid-cols-4 gap-2">
-            {fontOptions.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => updateSettings({ fontStyle: opt.value })}
-                className={`rounded-xl p-3 border-2 transition-all ${
-                  settings.fontStyle === opt.value
-                    ? "border-[#00c896] bg-[#00c896]/5"
-                    : "border-gray-200 dark:border-[#2a2d37] hover:border-gray-300 dark:hover:border-[#3a3d47]"
-                }`}
-              >
-                <p className={`text-lg font-semibold text-center mb-1 text-gray-700 dark:text-gray-300 ${
-                  opt.value === "sans" ? "font-[system-ui]" :
-                  opt.value === "system" ? "font-[system-ui]" :
-                  opt.value === "dyslexic" ? "font-[cursive]" : ""
-                }`}>
-                  {opt.preview}
-                </p>
-                <p className={`text-[10px] font-medium text-center leading-tight ${
-                  settings.fontStyle === opt.value ? "text-[#00c896]" : "text-gray-500 dark:text-gray-400"
-                }`}>
-                  {opt.label}
-                </p>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* アニメーション */}
-        <div>
-          <div className="flex items-center justify-between py-2">
-            <div>
-              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">アニメーション</p>
-              <p className="text-xs text-gray-400 dark:text-gray-500">UIのトランジションやアニメーション効果</p>
-            </div>
-            <button
-              type="button"
-              title={settings.animationsEnabled ? "アニメーションをオフにする" : "アニメーションをオンにする"}
-              onClick={() => updateSettings({ animationsEnabled: !settings.animationsEnabled })}
-              className={`relative w-12 h-6 rounded-full transition-colors shrink-0 ${settings.animationsEnabled ? "bg-[#00c896]" : "bg-gray-200 dark:bg-[#2a2d37]"}`}
-            >
-              <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${settings.animationsEnabled ? "translate-x-6" : ""}`} />
-            </button>
-          </div>
-        </div>
-      </section>
 
       {/* ユーザー名 */}
       <section className="bg-white dark:bg-[#1a1d27] rounded-xl border border-gray-100 dark:border-[#2a2d37] p-6 mb-6">
@@ -437,53 +306,6 @@ export default function SettingsPage() {
           </div>
         </section>
       )}
-
-      {/* キャリアセンターへの公開設定 */}
-      <section className="bg-white dark:bg-[#1a1d27] rounded-xl border border-gray-100 dark:border-[#2a2d37] p-6 mb-6">
-        <h2 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">キャリアセンターへの公開設定</h2>
-        <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">提携大学のキャリアセンターに公開する情報を選択できます</p>
-        <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-4 text-xs text-amber-700">
-          現在、提携大学は準備中です。提携成立後に有効になります。
-        </div>
-        {(() => {
-          const visibility: CareerCenterVisibility = profile?.careerCenterVisibility ?? DEFAULT_CAREER_CENTER_VISIBILITY;
-          const items: { key: keyof CareerCenterVisibility; label: string; desc: string }[] = [
-            { key: "targetIndustriesJobs", label: "志望業界・職種", desc: "志望している業界・職種" },
-            { key: "companies", label: "選考状況", desc: "選考中の企業名・選考フェーズ" },
-            { key: "esSelfAnalysis", label: "ES・自己分析", desc: "ESの内容・自己分析テキスト" },
-            { key: "obVisits", label: "OB/OG訪問", desc: "訪問件数・訪問先業界" },
-            { key: "aptitudeTests", label: "筆記試験スコア", desc: "SPI等のスコア・結果" },
-            { key: "offerStatus", label: "内定の有無", desc: "内定企業情報" },
-          ];
-          const toggle = async (key: keyof CareerCenterVisibility) => {
-            const next = { ...visibility, [key]: !visibility[key] };
-            setVisibilitySaving(true);
-            await saveCareerCenterVisibility(next);
-            setVisibilitySaving(false);
-          };
-          return (
-            <div className="space-y-1">
-              {items.map(({ key, label, desc }) => (
-                <div key={key} className="flex items-center justify-between py-2.5 border-b border-gray-50 last:border-0">
-                  <div>
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500">{desc}</p>
-                  </div>
-                  <button
-                    type="button"
-                    title={visibility[key] ? "非公開にする" : "公開にする"}
-                    disabled={visibilitySaving}
-                    onClick={() => toggle(key)}
-                    className={`relative w-12 h-6 rounded-full transition-colors shrink-0 ${visibility[key] ? "bg-[#00c896]" : "bg-gray-200"} disabled:opacity-60`}
-                  >
-                    <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${visibility[key] ? "translate-x-6" : ""}`} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          );
-        })()}
-      </section>
 
       {/* アカウント */}
       <section className="bg-white dark:bg-[#1a1d27] rounded-xl border border-gray-100 dark:border-[#2a2d37] p-6">
