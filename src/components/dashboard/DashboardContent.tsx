@@ -894,6 +894,40 @@ export function DashboardContent() {
         </div>
       )}
 
+      {/* SNS共有カード */}
+      {profile?.username && (
+        <div className="px-4 md:px-5 pb-3">
+          <div className="bg-white border border-gray-100 rounded-2xl p-4 flex items-center gap-3">
+            <span className="text-2xl">🎨</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold text-gray-900 mb-0.5">就活ログをSNSで共有</p>
+              <p className="text-[11px] text-gray-500">自分の就活記録を1枚の画像に、Xで投稿できる</p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <a
+                href={`/api/og/summary?username=${profile.username}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs font-bold px-3 py-1.5 rounded-lg bg-[#00c896]/10 text-[#00a87e] hover:bg-[#00c896]/20 transition-colors text-center whitespace-nowrap"
+              >
+                画像を見る
+              </a>
+              <button
+                type="button"
+                onClick={() => {
+                  const imgUrl = `${window.location.origin}/api/og/summary?username=${profile.username}`;
+                  const text = `私の就活の軌跡、Careoで可視化中 📊\n${imgUrl}`;
+                  window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`, "_blank");
+                }}
+                className="text-xs font-bold px-3 py-1.5 rounded-lg bg-black text-white hover:opacity-80 transition-opacity whitespace-nowrap"
+              >
+                𝕏 で投稿
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 広告（Free ユーザーのみ、AdSense審査通過後に表示） */}
       <div className="px-4 md:px-5 pb-6">
         <AdSlot slotId={process.env.NEXT_PUBLIC_ADSENSE_SLOT_DASHBOARD} format="auto" />

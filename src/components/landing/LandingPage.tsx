@@ -1479,6 +1479,12 @@ function FinalCTA() {
           <Link href="/stats" style={{ color: "inherit" }}>
             リアルタイム統計
           </Link>
+          <Link href="/summer-intern" style={{ color: "inherit" }}>
+            サマーインターン締切
+          </Link>
+          <Link href="/glossary" style={{ color: "inherit" }}>
+            就活用語辞典
+          </Link>
           <a href="mailto:hello@careo.jp" style={{ color: "inherit" }}>
             お問い合わせ
           </a>
