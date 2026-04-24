@@ -501,12 +501,16 @@ export default function CompaniesPage() {
   const activeCompany = activeId ? companies.find(c => c.id === activeId) : null;
 
   return (
-    <div className="p-4 md:p-8">
+    <div style={{ background: "var(--app-surface-1)", minHeight: "100vh" }} className="p-4 md:p-8">
       <PageTutorial {...PAGE_TUTORIALS["companies"]} pageKey="companies" />
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">企業管理</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{companies.length}社を管理中</p>
+          <div style={{ fontSize: 12, color: "var(--app-text-muted)", fontWeight: 600, marginBottom: 4 }}>
+            選考管理
+          </div>
+          <h1 className="font-klee" style={{ fontSize: 26, fontWeight: 700, letterSpacing: -0.5, margin: 0, color: "var(--app-text)" }}>
+            志望企業 <span style={{ color: "var(--app-text-muted)", fontSize: 16, fontWeight: 500 }}>{companies.length}社</span>
+          </h1>
         </div>
         <div className="flex gap-2 items-center">
           {/* View toggle (PC only) */}
@@ -725,8 +729,13 @@ export default function CompaniesPage() {
             <div className="flex items-center gap-2 min-w-0">
               <span className="text-lg shrink-0">📊</span>
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-gray-800">業界分析</p>
-                <p className="text-xs text-gray-500 mt-0.5">ポートフォリオの偏り・リスクをAIが診断</p>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <p className="text-sm font-semibold text-gray-800">業界分析</p>
+                  <span className="text-[9px] font-bold text-blue-700 bg-blue-100 border border-blue-200 rounded-full px-1.5 py-0.5">
+                    採用コンサル視点
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 mt-0.5">ポートフォリオの偏り・リスクをプロ視点で診断</p>
               </div>
             </div>
             <button

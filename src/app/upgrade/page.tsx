@@ -277,6 +277,19 @@ function UpgradeInner() {
         </div>
       )}
 
+      <div className="rounded-2xl bg-[#00c896]/5 border border-[#00c896]/20 p-5 mb-6">
+        <p className="text-sm font-bold text-[#00a87e] mb-2">🛡 Careoの「売らない」宣言</p>
+        <ul className="space-y-1.5 text-xs text-gray-600">
+          <li className="flex items-start gap-2"><span className="text-[#00a87e] shrink-0">✓</span>あなたのデータは1円にも換金しません。広告主にも人材会社にも売りません</li>
+          <li className="flex items-start gap-2"><span className="text-[#00a87e] shrink-0">✓</span>スカウト・営業電話は一切発生しません</li>
+          <li className="flex items-start gap-2"><span className="text-[#00a87e] shrink-0">✓</span>収益源はこの¥480課金と文脈非連動の広告（無料プランのみ）だけ</li>
+        </ul>
+        <p className="text-[11px] text-gray-400 mt-2">
+          あなたが顧客です。企業側の都合で設計を曲げることはありません。
+          <Link href="/privacy" className="text-[#00a87e] underline">詳細</Link>
+        </p>
+      </div>
+
       <div className="text-center">
         <Link href="/" className="text-xs text-gray-400 hover:text-gray-600">← ダッシュボードに戻る</Link>
       </div>

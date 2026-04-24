@@ -7,6 +7,7 @@ import { UserProfile } from "@/types";
 import { useToast } from "@/components/ui/Toast";
 import { useCoach } from "@/hooks/useCoach";
 import { PageTutorial, PAGE_TUTORIALS } from "@/components/PageTutorial";
+import { ShareImageButton } from "@/components/share/ShareImageButton";
 
 type CareerFields = Pick<UserProfile, "careerAxis" | "gakuchika" | "selfPr" | "strengths" | "weaknesses">;
 
@@ -103,12 +104,26 @@ export default function CareerPage() {
     setApplyingField(null);
   };
 
+  const shareParams = new URLSearchParams({
+    axis: (current.careerAxis ?? "").slice(0, 90),
+    strengths: (current.strengths ?? "").slice(0, 160),
+    weaknesses: (current.weaknesses ?? "").slice(0, 120),
+    univ: profile?.university ?? "",
+  });
+  const shareImageUrl = `/api/og/self-analysis?${shareParams.toString()}`;
+  const shareTweetText = `🧭 自己分析マップを更新した。\n「${(current.careerAxis ?? "").slice(0, 40) || "就活の軸を言語化中"}」\n\nCareoで就活の軸・強み・弱みを1枚にまとめてる。#Careo就活ログ`;
+
   return (
     <div className="p-4 md:p-8">
       <PageTutorial {...PAGE_TUTORIALS["career"]} pageKey="career" />
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">自己分析</h1>
-        <p className="text-sm text-gray-500 mt-1">就活の軸・ガクチカ・自己PRを整理してESや面接のAI支援に活かします</p>
+      <div className="mb-6 flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">自己分析</h1>
+          <p className="text-sm text-gray-500 mt-1">就活の軸・ガクチカ・自己PRを整理してESや面接のAI支援に活かします</p>
+        </div>
+        {hasAnyContent && (
+          <ShareImageButton imageUrl={shareImageUrl} tweetText={shareTweetText} label="自己分析マップを共有" />
+        )}
       </div>
 
       {/* 深掘りモードへのリンク */}

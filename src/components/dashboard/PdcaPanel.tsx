@@ -1,5 +1,7 @@
 "use client";
 
+import { ShareImageButton } from "@/components/share/ShareImageButton";
+
 interface PdcaResult {
   plan: { weeklyGoal: string; taskCompletion: string };
   do: { highlights: string[]; totalActivity: string };
@@ -78,6 +80,16 @@ const pdcaCards = [
 ];
 
 export function PdcaPanel({ result }: PdcaPanelProps) {
+  const params = new URLSearchParams({
+    score: String(result.check.score),
+    focus: result.act.nextWeekFocus ?? "",
+    goal: result.plan.weeklyGoal ?? "",
+    good: result.check.goodPoints?.[0] ?? "",
+    improve: result.act.improvements?.[0] ?? "",
+  });
+  const imageUrl = `/api/og/pdca?${params.toString()}`;
+  const tweetText = `📊 今週のPDCAスコア ${result.check.score}/100\n来週の注力: ${result.act.nextWeekFocus}\n\n就活を「採用コンサル視点」で毎週振り返ってる。#Careo就活ログ`;
+
   return (
     <div className="bg-white rounded-2xl border border-gray-200/60 shadow-sm overflow-hidden">
       {/* ヘッダー */}
@@ -96,7 +108,12 @@ export function PdcaPanel({ result }: PdcaPanelProps) {
             </div>
             <h2 className="font-semibold text-white text-sm">週次レポート</h2>
           </div>
-          <span className="text-xs text-white/40">AIが自動分析</span>
+          <div className="flex items-center gap-2">
+            <span className="hidden sm:inline text-[10px] font-semibold text-white/80 bg-white/10 border border-white/15 rounded-full px-2 py-0.5">
+              採用コンサル視点 × AI
+            </span>
+            <ShareImageButton imageUrl={imageUrl} tweetText={tweetText} label="共有" />
+          </div>
         </div>
         <div className="mt-3">
           <ScoreBar score={result.check.score} />

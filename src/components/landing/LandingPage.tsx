@@ -56,6 +56,7 @@ export function LandingPage({ recentPosts, userCount, reviews }: Props) {
       <DailyWithCareo />
       <FeatureGrid />
       <WorriesChat />
+      <CleanPromise />
       <PricingSection />
       {/* StudentVoices: 実レビューが一定数集まったら復活（現在は非表示）*/}
       {recentPosts.length > 0 && <RecentPostsSection recentPosts={recentPosts} />}
@@ -512,6 +513,50 @@ function DashboardScreen() {
         </div>
       </div>
     </div>
+  );
+}
+
+function CleanPromise() {
+  const items = [
+    { icon: "🚫", title: "スカウト・電話一切なし", body: "人材会社への登録や営業電話は絶対に発生しません。" },
+    { icon: "💾", title: "データを1円にも換金しない", body: "入力データを広告主・人材会社・第三者に売ることはありません。あなたの成長のためだけに使います。" },
+    { icon: "🛡", title: "学生だけを向いた設計", body: "Careoの顧客はあなた（学生）です。企業側の都合で設計を曲げることはありません。" },
+  ];
+  return (
+    <section style={{ padding: "72px 20px 40px", background: BG }}>
+      <div style={{ maxWidth: 760, margin: "0 auto", textAlign: "center" }}>
+        <p style={{ fontSize: 11, color: ACCENT_DEEP, fontWeight: 800, letterSpacing: 3, marginBottom: 10 }}>
+          OUR PROMISE
+        </p>
+        <h2 className="font-klee" style={{ fontSize: "min(8vw, 32px)", fontWeight: 600, letterSpacing: -0.6, marginBottom: 10, lineHeight: 1.35 }}>
+          「売らない」宣言
+        </h2>
+        <p style={{ fontSize: 13.5, color: "#6b7280", lineHeight: 1.9, maxWidth: 560, margin: "0 auto 28px" }}>
+          就活サービスの多くは「学生＝商材」として企業に情報を売ることで成立しています。Careoは違います。
+        </p>
+        <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+          {items.map((it) => (
+            <div
+              key={it.title}
+              style={{
+                background: "white",
+                border: "1px solid rgba(0,0,0,.06)",
+                borderRadius: 18,
+                padding: 20,
+                textAlign: "left",
+              }}
+            >
+              <div style={{ fontSize: 22, marginBottom: 8 }}>{it.icon}</div>
+              <p style={{ fontSize: 13, fontWeight: 800, color: INK, marginBottom: 6 }}>{it.title}</p>
+              <p style={{ fontSize: 12, color: "#6b7280", lineHeight: 1.75 }}>{it.body}</p>
+            </div>
+          ))}
+        </div>
+        <p style={{ fontSize: 11, color: "#9ca3af", marginTop: 20 }}>
+          詳細は <Link href="/privacy" style={{ color: ACCENT_DEEP, textDecoration: "underline" }}>プライバシーポリシー</Link> と <Link href="/terms" style={{ color: ACCENT_DEEP, textDecoration: "underline" }}>利用規約</Link> をご覧ください
+        </p>
+      </div>
+    </section>
   );
 }
 

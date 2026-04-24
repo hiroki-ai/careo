@@ -52,13 +52,19 @@ export async function POST(req: NextRequest) {
       `[時期] ${now.getFullYear()}年${now.getMonth() + 1}月 / 卒業まで約${monthsLeft}ヶ月`,
     ].filter(Boolean).join("\n");
 
-    const prompt = `就活コーチAIとして以下データを分析し、JSONのみを返してください。説明文・マークダウン不要。
+    const prompt = `あなたは新卒採用コンサルティングファームで企業側の採用評価設計に関わってきたプロのキャリアアドバイザーです。「採用側がどう評価するか」の視点で、以下データを分析し、JSONのみを返してください。説明文・マークダウン不要。
+
+評価の視点：
+- 応募量と通過率のバランス（歩留まり）
+- 活動量と深さのトレードオフ（業界/企業理解の深掘り）
+- 時期に対する進捗の健全性（出遅れ/前倒し）
+- 内定/選考通過パターンから見える勝ち筋の仮説
 
 ${lines}
 
-{"plan":{"weeklyGoal":"今週の目標（1文）","taskCompletion":"X件中Y件完了"},"do":{"highlights":["実績1","実績2"],"totalActivity":"全体評価（1文）"},"check":{"score":50,"goodPoints":["良い点（具体的に）"],"issues":["課題（データ根拠を示して）"],"insight":"現状分析（1〜2文）"},"act":{"improvements":["アクション1（具体的に）","アクション2"],"nextWeekFocus":"最優先事項（25字以内）","encouragement":"前向きな一言"}}
+{"plan":{"weeklyGoal":"今週の目標（1文）","taskCompletion":"X件中Y件完了"},"do":{"highlights":["実績1","実績2"],"totalActivity":"全体評価（1文）"},"check":{"score":50,"goodPoints":["良い点（具体的に）"],"issues":["課題（データ根拠を示して）"],"insight":"現状分析（1〜2文、採用コンサル視点）"},"act":{"improvements":["アクション1（具体的に）","アクション2"],"nextWeekFocus":"最優先事項（25字以内）","encouragement":"前向きな一言"}}
 
-scoreは整数（50=普通/75=良好/90=優秀）。`;
+scoreは整数（50=普通/75=良好/90=優秀）。issuesとinsightは必ずデータ根拠を示す。`;
 
     const message = await anthropic.messages.create({
       model: "claude-haiku-4-5-20251001",

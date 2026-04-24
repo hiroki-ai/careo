@@ -42,6 +42,23 @@ export default function PrivacyPage() {
             </p>
           </section>
 
+          <section className="rounded-2xl bg-[#00c896]/5 border border-[#00c896]/20 p-5">
+            <h2 className="font-bold text-gray-900 mb-2">2-1. 「売らない」宣言</h2>
+            <p className="mb-2 text-xs text-gray-600">
+              当サービスは、大手就活ナビとは異なり、<strong>学生ユーザーだけを顧客</strong>としています。以下を明確に宣言します。
+            </p>
+            <ul className="list-disc pl-5 space-y-1 text-xs text-gray-600">
+              <li><strong>データを1円にも換金しません</strong>：就活データ（企業情報・ES・面接記録・プロフィール等）を広告主・人材会社・第三者に販売しません</li>
+              <li><strong>スカウト・営業電話は発生しません</strong>：登録企業からの勧誘電話、提携人材会社からのスカウトメール等は一切ありません</li>
+              <li><strong>人材紹介ビジネスは行いません</strong>：あなたを企業に紹介することで対価を得るモデルは採用していません</li>
+              <li><strong>収益源は明示</strong>：Proプラン課金と、文脈非連動のGoogle AdSense広告（無料プランのみ）のみです</li>
+              <li>本宣言を後から狭める形で変更することはありません。拡張する場合は改めて同意を取得します</li>
+            </ul>
+            <p className="mt-3 text-xs text-gray-500">
+              これは、既存の「学生＝商材」という就活市場の構造に対する明確な立場表明です。
+            </p>
+          </section>
+
           <section>
             <h2 className="font-bold text-gray-900 mb-2">3. 公開プロフィール機能（任意）</h2>
             <p className="mb-3 text-xs text-gray-600">

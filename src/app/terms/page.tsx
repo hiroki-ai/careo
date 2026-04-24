@@ -77,6 +77,20 @@ export default function TermsPage() {
             </p>
           </section>
 
+          <section className="rounded-2xl bg-[#00c896]/5 border border-[#00c896]/20 p-5">
+            <h2 className="font-bold text-gray-900 mb-2">第6条の1（「売らない」宣言）</h2>
+            <p className="mb-2">
+              当サービスは、学生ユーザーだけを顧客とする立場を明確にし、以下を宣言します。
+            </p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>ユーザーが入力した就活データ（企業情報・ES・面接記録・プロフィール等）を、広告主・人材会社・第三者に販売しません</li>
+              <li>スカウトメール・営業電話・第三者からの勧誘目的の連絡は一切発生しません</li>
+              <li>ユーザーを企業側へ紹介することで対価を得るビジネスモデル（人材紹介）は採用しません</li>
+              <li>収益源は有料プラン課金と文脈非連動のディスプレイ広告（無料プランのみ）に限定します</li>
+              <li>本宣言に反する形でデータ利用目的を拡張する場合は、目的・範囲を明示した上で改めて同意を取得します</li>
+            </ul>
+          </section>
+
           <section>
             <h2 className="font-bold text-gray-900 mb-2">第6条の2（公開プロフィール機能）</h2>
             <p className="mb-2">
