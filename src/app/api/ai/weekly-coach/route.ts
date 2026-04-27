@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { requireAuth } from "@/lib/apiAuth";
 import { checkAndConsumeAiUsage } from "@/lib/aiUsageLimit";
+import { selectAiModel } from "@/lib/aiModel";
 
 export const maxDuration = 60;
 
@@ -76,8 +77,9 @@ ${lines}
 
 {"reflection":{"summary":"先週の全体評価（2〜3文、採用コンサル視点）","moodAnalysis":"面接の感情パターンから読み取れること（感情データがない場合は省略可）","highlights":["頑張ったこと1","頑張ったこと2"],"challenges":["課題1","課題2"]},"thisWeek":{"focus":"今週の最優先テーマ（20字以内）","actions":["具体的アクション1","具体的アクション2","具体的アクション3"],"encouragement":"個人に向けた前向きな一言（50字以内）"},"insight":"就活全体を通じた気づき・アドバイス（2文、プロ視点で本人が気づきにくいものを示す）"}`;
 
+    const { model } = await selectAiModel(user.id);
     const message = await anthropic.messages.create({
-      model: "claude-haiku-4-5-20251001",
+      model,
       max_tokens: 600,
       messages: [{ role: "user", content: prompt }],
     });

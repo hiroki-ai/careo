@@ -181,7 +181,7 @@ export default function DiagnosisPage() {
             <div className="flex items-center justify-center gap-3 text-xs text-gray-400 mb-5">
               <span>✓ 登録不要</span>
               <span>✓ 3分で終わる</span>
-              <span>✓ 完全無料</span>
+              <span>✓ 無料プランあり</span>
             </div>
             <button
               type="button"
@@ -311,7 +311,7 @@ export default function DiagnosisPage() {
                 >
                   無料で Careo を始める →
                 </Link>
-                <p className="text-white/60 text-[10px] mt-3">登録30秒 · クレカ不要 · 完全無料</p>
+                <p className="text-white/60 text-[10px] mt-3">登録30秒 · クレカ不要 · 無料プランあり</p>
               </div>
 
               <div className="flex items-center justify-center gap-4 mt-5">

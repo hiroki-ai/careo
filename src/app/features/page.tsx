@@ -188,7 +188,7 @@ const comparisonRows = [
   { label: "全データを把握したAIコーチ", careo: true, base: "△", smart: false, riku: false, notion: false },
   { label: "ChatGPT連携（就活データを知ったAI）", careo: true, base: false, smart: false, riku: false, notion: false },
   { label: "キャリアセンターレポート出力", careo: true, base: false, smart: false, riku: false, notion: false },
-  { label: "学生は完全無料", careo: true, base: true, smart: "△制限あり", riku: true, notion: true },
+  { label: "無料プランあり", careo: true, base: true, smart: "△制限あり", riku: true, notion: true },
   { label: "広告・スカウト電話なし", careo: true, base: false, smart: true, riku: false, notion: true },
 ];
 
@@ -498,7 +498,7 @@ export default function FeaturesPage() {
             <h2 className="text-4xl md:text-5xl font-bold mb-5 tracking-tight leading-[1.1] text-white">
               就活、<span className="text-[#00c896]">AIと一緒に</span>始めよう
             </h2>
-            <p className="text-gray-400 text-lg mb-8">完全無料。登録はメールアドレスだけ。</p>
+            <p className="text-gray-400 text-lg mb-8">無料で始められる。登録はメールアドレスだけ。</p>
             <Link
               href="/signup"
               className="inline-flex items-center gap-2 bg-[#00c896] hover:bg-[#00b586] text-white font-bold px-12 py-4 rounded-2xl text-base transition-all duration-200 hover:scale-105 hover:-translate-y-0.5 shadow-xl shadow-[#00c896]/30"

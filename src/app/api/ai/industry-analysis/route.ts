@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { requireAuth } from "@/lib/apiAuth";
 import { checkAndConsumeAiUsage } from "@/lib/aiUsageLimit";
+import { selectAiModel } from "@/lib/aiModel";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -72,8 +73,9 @@ ${profile?.careerAxis ? `【就活の軸】\n${profile.careerAxis.slice(0, 200)}
   "blindspot": "見落としている可能性のある業界・視点（1〜2文）"
 }`;
 
+  const { model } = await selectAiModel(user.id);
   const message = await anthropic.messages.create({
-    model: "claude-haiku-4-5-20251001",
+    model,
     max_tokens: 800,
     messages: [{ role: "user", content: prompt }],
   });

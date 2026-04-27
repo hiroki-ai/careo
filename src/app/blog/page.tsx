@@ -275,7 +275,7 @@ export default async function BlogPage() {
           {/* ─── 登録バナー ────────────────────────── */}
           <div className="mt-16 bg-gradient-to-br from-[#0D0B21] to-[#1a1830] rounded-3xl px-8 py-10 text-center">
             <div className="inline-flex items-center gap-2 border border-[#00c896]/40 bg-[#00c896]/10 text-[#00c896] text-xs font-semibold px-3 py-1.5 rounded-full mb-5">
-              完全無料・クレカ不要
+              無料プランあり・クレカ不要
             </div>
             <h2 className="text-white font-bold text-xl md:text-2xl tracking-tight mb-3">
               読むだけじゃなく、使ってみよう。

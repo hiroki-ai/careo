@@ -284,7 +284,7 @@ export default function StoryPage() {
               𝕏 でフィードバック →
             </a>
           </div>
-          <p className="text-white/60 text-[10px] mt-4">登録30秒 · クレカ不要 · 完全無料</p>
+          <p className="text-white/60 text-[10px] mt-4">登録30秒 · クレカ不要 · 無料プランあり</p>
         </div>
       </section>
     </div>

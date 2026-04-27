@@ -39,6 +39,41 @@ async function syncSubscription(userId: string, sub: Stripe.Subscription) {
     .eq("id", userId);
 }
 
+/**
+ * ピークパック等の単発購入時、plan_period_end を grant_days 日延長する。
+ * - 現在の period_end が未来ならその日付に +grant_days 加算（重ね買い対応）
+ * - 過去 or 未設定なら今日 + grant_days
+ */
+async function applyOneTimeGrant(userId: string, grantDays: number, packType: string | null) {
+  const supabase = service();
+  const { data: profile } = await supabase
+    .from("user_profiles")
+    .select("plan_period_end")
+    .eq("id", userId)
+    .single();
+
+  const now = new Date();
+  const baseEnd = profile?.plan_period_end ? new Date(profile.plan_period_end as string) : null;
+  const startFrom = baseEnd && baseEnd > now ? baseEnd : now;
+  const newEnd = new Date(startFrom.getTime() + grantDays * 24 * 60 * 60 * 1000);
+
+  await supabase
+    .from("user_profiles")
+    .update({
+      plan: "pro",
+      plan_period_end: newEnd.toISOString(),
+    })
+    .eq("id", userId);
+
+  // 監査用ログ（pro_grants テーブルが存在する場合のみ）
+  await supabase.from("pro_grants").insert({
+    user_id: userId,
+    grant_type: packType ? `pack_${packType}` : "pack",
+    grant_days: grantDays,
+    granted_until: newEnd.toISOString(),
+  }).then(() => {}, () => {});
+}
+
 export async function POST(req: NextRequest) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!secret) {
@@ -67,12 +102,22 @@ export async function POST(req: NextRequest) {
         break;
       }
       case "checkout.session.completed": {
-        // 通常は subscription.created が先に来るが、念のためここでもsync
         const session = event.data.object as Stripe.Checkout.Session;
         if (session.mode === "subscription" && session.subscription) {
+          // 通常は subscription.created が先に来るが、念のためここでもsync
           const sub = await getStripe().subscriptions.retrieve(session.subscription as string);
           const userId = await getUserIdFromCustomer(sub.customer as string);
           if (userId) await syncSubscription(userId, sub);
+        } else if (session.mode === "payment" && session.payment_status === "paid") {
+          // ピークパック等の単発購入
+          const md = session.metadata ?? {};
+          const userId = (md.supabase_user_id as string | undefined)
+            ?? (session.customer ? await getUserIdFromCustomer(session.customer as string) : null);
+          const grantDays = Number(md.grant_days ?? "30");
+          const packType = (md.pack_type as string | undefined) ?? null;
+          if (userId && grantDays > 0) {
+            await applyOneTimeGrant(userId, grantDays, packType);
+          }
         }
         break;
       }

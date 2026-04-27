@@ -155,7 +155,7 @@ export default async function StatsPage() {
           >
             無料で Careo を始める →
           </Link>
-          <p className="text-xs text-gray-400 mt-3">登録30秒 · クレカ不要 · 完全無料</p>
+          <p className="text-xs text-gray-400 mt-3">登録30秒 · クレカ不要 · 無料プランあり</p>
         </div>
       </div>
     </div>

@@ -202,7 +202,7 @@ export default async function UserProfilePage({ params }: { params: Promise<{ us
           >
             無料でCareoを始める →
           </Link>
-          <p className="text-white/60 text-[10px] mt-3">登録30秒 · クレカ不要 · 完全無料</p>
+          <p className="text-white/60 text-[10px] mt-3">登録30秒 · クレカ不要 · 無料プランあり</p>
         </div>
 
         <p className="text-center text-[10px] text-gray-400 mt-6">

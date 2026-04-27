@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { requireAuth } from "@/lib/apiAuth";
 import { checkAndConsumeAiUsage } from "@/lib/aiUsageLimit";
+import { selectAiModel } from "@/lib/aiModel";
 import { Company, ES, Interview, UserProfile } from "@/types";
 import { getShukatsuContext } from "@/lib/shukatsuSchedule";
 
@@ -126,8 +127,9 @@ ${shukatsuCtx.phase}フェーズ（${shukatsuCtx.currentAdvice}）`;
 直近の面接結果:
 ${interviews.slice(-5).map(i => `- ${companies.find(c => c.id === i.companyId)?.name ?? "不明"} ${i.round}次: ${i.result}`).join("\n")}`;
 
+    const { model } = await selectAiModel(user.id);
     const response = await anthropic.messages.create({
-      model: "claude-haiku-4-5-20251001",
+      model,
       max_tokens: 800,
       system: systemPrompt,
       messages: [{ role: "user", content: userMessage }],

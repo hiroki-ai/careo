@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { requireAuth } from "@/lib/apiAuth";
 import { checkAndConsumeAiUsage } from "@/lib/aiUsageLimit";
+import { selectAiModel } from "@/lib/aiModel";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -86,8 +87,9 @@ ${companiesContext ? `【選考状況】\n${companiesContext}\n` : ""}
   ]
 }`;
 
+  const { model } = await selectAiModel(user.id);
   const message = await anthropic.messages.create({
-    model: "claude-haiku-4-5-20251001",
+    model,
     max_tokens: 900,
     messages: [{ role: "user", content: prompt }],
   });

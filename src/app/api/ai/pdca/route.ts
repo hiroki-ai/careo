@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { requireAuth } from "@/lib/apiAuth";
 import { checkAndConsumeAiUsage } from "@/lib/aiUsageLimit";
+import { selectAiModel } from "@/lib/aiModel";
 
 export const maxDuration = 60;
 
@@ -66,8 +67,9 @@ ${lines}
 
 scoreは整数（50=普通/75=良好/90=優秀）。issuesとinsightは必ずデータ根拠を示す。`;
 
+    const { model } = await selectAiModel(user.id);
     const message = await anthropic.messages.create({
-      model: "claude-haiku-4-5-20251001",
+      model,
       max_tokens: 1500,
       messages: [{ role: "user", content: prompt }],
     });

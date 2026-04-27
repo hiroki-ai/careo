@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { requireAuth } from "@/lib/apiAuth";
 import { checkAndConsumeAiUsage } from "@/lib/aiUsageLimit";
+import { selectAiModel } from "@/lib/aiModel";
 import { Company, ES, Interview, UserProfile } from "@/types";
 import { getShukatsuContext } from "@/lib/shukatsuSchedule";
 
@@ -111,8 +112,9 @@ export async function POST(req: NextRequest) {
 - 面接: ${interviews.length}件
 - 直近締切: ${esList.filter(e => e.deadline && e.status === "DRAFT").map(e => e.title).slice(0, 3).join("、") || "なし"}`;
 
+  const { model } = await selectAiModel(authUser.id);
   const message = await anthropic.messages.create({
-    model: "claude-haiku-4-5-20251001",
+    model,
     max_tokens: 1024,
     messages: [{
       role: "user",

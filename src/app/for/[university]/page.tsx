@@ -64,7 +64,7 @@ export default async function UniversityLP({ params }: { params: Promise<{ unive
             </Link>
           </div>
           <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500">
-            <span>✓ 学生は完全無料</span>
+            <span>✓ 無料プランあり</span>
             <span>✓ 登録30秒</span>
             <span>✓ 大学メール不要</span>
           </div>

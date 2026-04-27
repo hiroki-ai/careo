@@ -219,7 +219,7 @@ export default async function BlogPostPage({ params }: Props) {
           {/* ─── 記事末尾CTA ───────────────────────── */}
           <div className="mt-10 md:mt-14 bg-gradient-to-br from-[#0D0B21] to-[#1a1830] rounded-2xl md:rounded-3xl px-6 md:px-10 py-8 md:py-12 text-center">
             <div className="inline-flex items-center gap-2 border border-[#00c896]/40 bg-[#00c896]/10 text-[#00c896] text-xs font-semibold px-3 py-1.5 rounded-full mb-4 md:mb-5">
-              完全無料・クレカ不要
+              無料プランあり・クレカ不要
             </div>
             <h2 className="text-white font-bold text-lg md:text-xl tracking-tight mb-3">
               この記事で学んだことを、実践しよう。

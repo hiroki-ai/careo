@@ -174,7 +174,7 @@ export default function SignupPage() {
             >
               {loading ? "登録中..." : "無料で Careo を始める →"}
             </button>
-            <p className="text-[10px] text-gray-400 text-center">登録30秒 · クレカ不要 · 完全無料</p>
+            <p className="text-[10px] text-gray-400 text-center">登録30秒 · クレカ不要 · 無料プランあり</p>
           </form>
           <p className="text-center text-sm text-gray-500 mt-5">
             すでにアカウントをお持ちの方は{" "}
