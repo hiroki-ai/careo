@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 
-export type CalendarEventType = "ES" | "面接" | "説明会" | "インターン" | "セミナー" | "その他";
+export type CalendarEventType = "ES" | "面接" | "説明会" | "インターン" | "セミナー" | "その他" | "マイ予定";
 
 export interface CalendarEvent {
   id: string;
@@ -26,6 +26,7 @@ const EVENT_DOT_COLORS: Record<CalendarEventType, string> = {
   インターン: "bg-green-400",
   セミナー: "bg-indigo-400",
   その他: "bg-gray-400",
+  マイ予定: "bg-pink-400",
 };
 
 const EVENT_BADGE_COLORS: Record<CalendarEventType, string> = {
@@ -35,6 +36,7 @@ const EVENT_BADGE_COLORS: Record<CalendarEventType, string> = {
   インターン: "bg-green-100 text-green-700",
   セミナー: "bg-indigo-100 text-indigo-700",
   その他: "bg-gray-100 text-gray-600",
+  マイ予定: "bg-pink-100 text-pink-700",
 };
 
 export function MiniCalendar({ events }: MiniCalendarProps) {
@@ -84,7 +86,7 @@ export function MiniCalendar({ events }: MiniCalendarProps) {
   const usedTypes = useMemo(() => {
     const seen = new Set<CalendarEventType>();
     events.forEach(e => seen.add(e.type));
-    return (["ES", "面接", "説明会", "インターン", "セミナー", "その他"] as CalendarEventType[]).filter(t => seen.has(t));
+    return (["ES", "面接", "説明会", "インターン", "セミナー", "マイ予定", "その他"] as CalendarEventType[]).filter(t => seen.has(t));
   }, [events]);
 
   const LEGEND_LABELS: Record<CalendarEventType, string> = {
@@ -94,6 +96,7 @@ export function MiniCalendar({ events }: MiniCalendarProps) {
     インターン: "インターン",
     セミナー: "セミナー",
     その他: "その他",
+    マイ予定: "マイ予定",
   };
 
   return (

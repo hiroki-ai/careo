@@ -10,6 +10,10 @@ import { ObVisit, OB_VISIT_PURPOSE_LABELS, OB_IMPRESSION_LABELS } from "@/types"
 import { formatDate } from "@/lib/utils";
 import { KareoCharacter } from "@/components/kareo/KareoCharacter";
 import { PageTutorial, PAGE_TUTORIALS } from "@/components/PageTutorial";
+import { DateTimeField } from "@/components/forms/DateTimeField";
+import { AutoTextarea } from "@/components/forms/AutoTextarea";
+import { SegmentedChoice } from "@/components/forms/SegmentedChoice";
+import { CompanyCombobox } from "@/components/forms/CompanyCombobox";
 
 const IMPRESSION_COLORS: Record<string, string> = {
   positive: "bg-green-100 text-green-700",
@@ -116,92 +120,79 @@ export default function ObVisitsPage() {
       {/* 追加モーダル */}
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="OB/OG訪問を記録">
         <div className="space-y-4">
+          <CompanyCombobox
+            label="企業名"
+            required
+            value={form.companyName}
+            onChange={(name) => setForm({ ...form, companyName: name })}
+            options={companies.map(c => ({ id: c.id, name: c.name }))}
+          />
+
+          <DateTimeField
+            label="日付"
+            required
+            withTime={false}
+            value={form.visitedAt}
+            onChange={(iso) => setForm({ ...form, visitedAt: iso ? iso.split("T")[0] : "" })}
+          />
+
+          <SegmentedChoice
+            label="種別"
+            value={form.purpose}
+            onChange={(v) => setForm({ ...form, purpose: v })}
+            options={[
+              { value: "ob_visit", label: "OB/OG訪問", emoji: "🤝" },
+              { value: "info_session", label: "会社説明会", emoji: "📊" },
+              { value: "internship", label: "インターン", emoji: "💼" },
+            ]}
+          />
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">企業名 *</label>
-            <input
-              list="companies-list"
-              value={form.companyName}
-              onChange={(e) => setForm({ ...form, companyName: e.target.value })}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
-              placeholder="企業名を入力"
-            />
-            <datalist id="companies-list">
-              {companies.map(c => <option key={c.id} value={c.name} />)}
-            </datalist>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">日付 *</label>
-              <input
-                type="date"
-                value={form.visitedAt}
-                onChange={(e) => setForm({ ...form, visitedAt: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">種別</label>
-              <select
-                value={form.purpose}
-                onChange={(e) => setForm({ ...form, purpose: e.target.value as ObVisit["purpose"] })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
-              >
-                {Object.entries(OB_VISIT_PURPOSE_LABELS).map(([k, v]) => (
-                  <option key={k} value={k}>{v}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">担当者名（任意）</label>
+            <label className="block text-xs font-semibold text-gray-600 mb-1.5">担当者名（任意）</label>
             <input
               value={form.personName ?? ""}
               onChange={(e) => setForm({ ...form, personName: e.target.value })}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
+              className="w-full px-3 py-3 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c896] focus:border-transparent"
               placeholder="例: 田中さん（人事）"
             />
           </div>
+
+          <SegmentedChoice
+            label="印象"
+            value={form.impression}
+            onChange={(v) => setForm({ ...form, impression: v })}
+            options={[
+              { value: "positive", label: "好印象", emoji: "😊" },
+              { value: "neutral", label: "普通", emoji: "😐" },
+              { value: "negative", label: "懸念", emoji: "🤔" },
+            ]}
+          />
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">印象</label>
-            <div className="flex gap-2">
-              {(["positive", "neutral", "negative"] as const).map((imp) => (
-                <button
-                  key={imp}
-                  onClick={() => setForm({ ...form, impression: form.impression === imp ? undefined : imp })}
-                  className={`flex-1 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                    form.impression === imp ? IMPRESSION_COLORS[imp] + " border-current" : "border-gray-200 text-gray-500 hover:bg-gray-50"
-                  }`}
-                >
-                  {OB_IMPRESSION_LABELS[imp]}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">得た情報・気づき</label>
-            <textarea
+            <label className="block text-xs font-semibold text-gray-600 mb-1.5">得た情報・気づき</label>
+            <AutoTextarea
               value={form.insights ?? ""}
-              onChange={(e) => setForm({ ...form, insights: e.target.value })}
-              rows={3}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400 resize-none"
+              onChange={(v) => setForm({ ...form, insights: v })}
+              minRows={3}
               placeholder="社風、仕事内容、キャリアパスなど聞いた情報"
             />
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">メモ</label>
-            <textarea
+            <label className="block text-xs font-semibold text-gray-600 mb-1.5">メモ</label>
+            <AutoTextarea
               value={form.notes ?? ""}
-              onChange={(e) => setForm({ ...form, notes: e.target.value })}
-              rows={2}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400 resize-none"
+              onChange={(v) => setForm({ ...form, notes: v })}
+              minRows={2}
               placeholder="次回のアクションや感想など"
             />
           </div>
-          <div className="flex gap-2 pt-2">
+
+          <div className="flex gap-2 pt-2 sticky bottom-0 bg-white pb-1">
+            <Button variant="secondary" onClick={() => setIsOpen(false)} className="flex-1">キャンセル</Button>
             <Button onClick={handleSubmit} disabled={saving} className="flex-1">
               {saving ? "保存中..." : "保存する"}
             </Button>
-            <Button variant="secondary" onClick={() => setIsOpen(false)} className="flex-1">キャンセル</Button>
           </div>
         </div>
       </Modal>

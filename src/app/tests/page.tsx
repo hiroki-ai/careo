@@ -11,6 +11,10 @@ import { AptitudeTest, APTITUDE_TEST_TYPES } from "@/types";
 import { formatDate } from "@/lib/utils";
 import { KareoCharacter } from "@/components/kareo/KareoCharacter";
 import { PageTutorial, PAGE_TUTORIALS } from "@/components/PageTutorial";
+import { DateTimeField } from "@/components/forms/DateTimeField";
+import { AutoTextarea } from "@/components/forms/AutoTextarea";
+import { SegmentedChoice } from "@/components/forms/SegmentedChoice";
+import { CompanyCombobox } from "@/components/forms/CompanyCombobox";
 
 const RESULT_VARIANTS: Record<AptitudeTest["result"], "success" | "danger" | "default"> = {
   PASS: "success", FAIL: "danger", PENDING: "default",
@@ -147,90 +151,85 @@ export default function TestsPage() {
 
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="筆記試験を記録">
         <div className="space-y-4">
+          <CompanyCombobox
+            label="企業名"
+            required
+            value={form.companyName}
+            onChange={(name) => setForm({ ...form, companyName: name })}
+            options={companies.map(c => ({ id: c.id, name: c.name }))}
+          />
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">企業名 *</label>
-            <input
-              list="companies-list-test"
-              value={form.companyName}
-              onChange={(e) => setForm({ ...form, companyName: e.target.value })}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
-              placeholder="企業名を入力"
-            />
-            <datalist id="companies-list-test">
-              {companies.map(c => <option key={c.id} value={c.name} />)}
-            </datalist>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">試験種別</label>
-              <select
-                value={form.testType}
-                onChange={(e) => setForm({ ...form, testType: e.target.value as AptitudeTest["testType"] })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
-              >
-                {APTITUDE_TEST_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">受験日</label>
-              <input
-                type="date"
-                value={form.testDate ?? ""}
-                onChange={(e) => setForm({ ...form, testDate: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
-              />
+            <label className="block text-xs font-semibold text-gray-600 mb-1.5">試験種別</label>
+            <div className="grid grid-cols-4 gap-1.5">
+              {APTITUDE_TEST_TYPES.map((t) => {
+                const sel = form.testType === t;
+                return (
+                  <button
+                    type="button"
+                    key={t}
+                    onClick={() => setForm({ ...form, testType: t })}
+                    className={`py-2.5 px-1 text-xs font-bold rounded-xl border-2 transition-all ${
+                      sel ? "border-[#00c896] bg-[#00c896]/10 text-[#00a87e]" : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+                    }`}
+                  >
+                    {t}
+                  </button>
+                );
+              })}
             </div>
           </div>
+
+          <DateTimeField
+            label="受験日"
+            withTime={false}
+            value={form.testDate ?? null}
+            onChange={(iso) => setForm({ ...form, testDate: iso ? iso.split("T")[0] : "" })}
+          />
+
+          <SegmentedChoice
+            label="結果"
+            value={form.result}
+            onChange={(v) => setForm({ ...form, result: v })}
+            options={[
+              { value: "PENDING", label: "結果待ち", emoji: "⏳" },
+              { value: "PASS", label: "通過", emoji: "✅" },
+              { value: "FAIL", label: "不通過", emoji: "❌" },
+            ]}
+          />
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">結果</label>
-            <div className="flex gap-2">
-              {(["PENDING", "PASS", "FAIL"] as const).map((r) => (
-                <button
-                  key={r}
-                  onClick={() => setForm({ ...form, result: r })}
-                  className={`flex-1 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                    form.result === r
-                      ? r === "PASS" ? "bg-green-100 text-green-700 border-green-300"
-                        : r === "FAIL" ? "bg-red-100 text-red-700 border-red-300"
-                        : "bg-gray-100 text-gray-700 border-gray-300"
-                      : "border-gray-200 text-gray-500 hover:bg-gray-50"
-                  }`}
-                >
-                  {RESULT_LABELS[r]}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">スコア（任意）</label>
+            <label className="block text-xs font-semibold text-gray-600 mb-1.5">スコア（任意）</label>
             <div className="grid grid-cols-3 gap-2">
               {(["scoreVerbal", "scoreNonverbal", "scoreEnglish"] as const).map((field, i) => (
                 <div key={field}>
-                  <p className="text-xs text-gray-400 mb-1">{["言語", "非言語", "英語"][i]}</p>
+                  <p className="text-[10px] text-gray-400 mb-1 font-semibold">{["言語", "非言語", "英語"][i]}</p>
                   <input
                     type="number"
+                    inputMode="numeric"
                     value={form[field] ?? ""}
                     onChange={(e) => setForm({ ...form, [field]: e.target.value ? Number(e.target.value) : undefined })}
-                    className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:border-blue-400"
+                    className="w-full px-2 py-2.5 text-sm border border-gray-200 rounded-xl text-center focus:outline-none focus:ring-2 focus:ring-[#00c896]"
                     placeholder="—"
                   />
                 </div>
               ))}
             </div>
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">メモ</label>
-            <textarea
+            <label className="block text-xs font-semibold text-gray-600 mb-1.5">メモ</label>
+            <AutoTextarea
               value={form.notes ?? ""}
-              onChange={(e) => setForm({ ...form, notes: e.target.value })}
-              rows={2}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400 resize-none"
+              onChange={(v) => setForm({ ...form, notes: v })}
+              minRows={2}
               placeholder="難易度・感想・対策メモなど"
             />
           </div>
-          <div className="flex gap-2 pt-2">
-            <Button onClick={handleSubmit} disabled={saving} className="flex-1">{saving ? "保存中..." : "保存する"}</Button>
+
+          <div className="flex gap-2 pt-2 sticky bottom-0 bg-white pb-1">
             <Button variant="secondary" onClick={() => setIsOpen(false)} className="flex-1">キャンセル</Button>
+            <Button onClick={handleSubmit} disabled={saving} className="flex-1">{saving ? "保存中..." : "保存する"}</Button>
           </div>
         </div>
       </Modal>

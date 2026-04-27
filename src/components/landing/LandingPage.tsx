@@ -51,10 +51,12 @@ export function LandingPage({ recentPosts, userCount, reviews }: Props) {
       <Header />
       <Hero userCount={userCount} />
       <SocialProofStrip />
+      <WhatsNewSection />
       <SummerInternTeaser />
       <BeforeAfterScenes />
       <DailyWithCareo />
       <FeatureGrid />
+      <ComingSoonSection />
       <WorriesChat />
       <CleanPromise />
       <PricingSection />
@@ -1449,6 +1451,206 @@ function BuiltByStudent() {
             Careoは、開発者自身が就活で「もっとこうだったら」と感じたことから生まれました。
             僕もユーザーのひとりとして、毎日カレオと就活してます。
           </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function WhatsNewSection() {
+  const items = [
+    {
+      tag: "NEW",
+      icon: "📅",
+      title: "就活専用カレンダー",
+      desc: "ES締切・面接・説明会・インターン日程を自動で集約。マイ予定も書き込める「紙のカレンダー」感覚。スワイプで月送り、タップで予定追加。",
+    },
+    {
+      tag: "NEW",
+      icon: "🧠",
+      title: "コーチングAI（レベル別）",
+      desc: "「やり始めたばかり」から「もう20社進めてる」まで、現在地に合わせて深度が変わるコーチ。スターター・直前確認・進捗振り返りの3モード。",
+    },
+    {
+      tag: "RENEWED",
+      icon: "✨",
+      title: "記録機能のモバイルUI刷新",
+      desc: "面接・ES・OB訪問・筆記試験・企業登録の入力フォームをモバイルファーストに全面リデザイン。日時ピッカー・自動拡張テキストエリアでスマホでもサクサク。",
+    },
+  ];
+
+  return (
+    <section style={{ background: BG, padding: "80px 24px" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 40 }}>
+          <span
+            style={{
+              display: "inline-block",
+              background: ACCENT,
+              color: "white",
+              padding: "4px 12px",
+              borderRadius: 999,
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: 1,
+              marginBottom: 12,
+            }}
+          >
+            WHAT&apos;S NEW
+          </span>
+          <h2
+            style={{
+              fontSize: "clamp(24px, 5vw, 36px)",
+              fontWeight: 800,
+              lineHeight: 1.3,
+              margin: 0,
+              color: INK,
+            }}
+          >
+            アップデート、続々。
+            <br />
+            就活生の声から生まれた新機能。
+          </h2>
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: 16,
+          }}
+        >
+          {items.map((it) => (
+            <div
+              key={it.title}
+              style={{
+                background: "white",
+                borderRadius: 20,
+                padding: 24,
+                border: `1px solid ${SURFACE}`,
+                boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                <span style={{ fontSize: 28 }}>{it.icon}</span>
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 800,
+                    letterSpacing: 1,
+                    background: it.tag === "NEW" ? ACCENT : "#FFB347",
+                    color: "white",
+                    padding: "2px 8px",
+                    borderRadius: 4,
+                  }}
+                >
+                  {it.tag}
+                </span>
+              </div>
+              <h3 style={{ fontSize: 18, fontWeight: 800, margin: "0 0 8px", color: INK }}>{it.title}</h3>
+              <p style={{ fontSize: 14, lineHeight: 1.7, color: "#555", margin: 0 }}>{it.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ComingSoonSection() {
+  const items = [
+    {
+      icon: "📧",
+      title: "Gmail連携",
+      desc: "企業からのメールを自動で企業ごとに仕分け。「次にやるべきこと」をAIが提案。",
+      eta: "近日公開",
+    },
+    {
+      icon: "💼",
+      title: "Careo for 転職",
+      desc: "新卒で築いたCareoのノウハウを、転職市場に。在籍企業・職務経歴ベースのキャリアコーチング。",
+      eta: "別サイトで準備中",
+    },
+    {
+      icon: "📱",
+      title: "iOS / Android アプリ",
+      desc: "プッシュ通知でES締切や面接前日のリマインドを。アプリストアにて準備中。",
+      eta: "近日リリース",
+    },
+  ];
+
+  return (
+    <section style={{ background: SURFACE, padding: "80px 24px" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 32 }}>
+          <span
+            style={{
+              display: "inline-block",
+              background: "transparent",
+              border: `2px solid ${ACCENT}`,
+              color: ACCENT_DEEP,
+              padding: "4px 12px",
+              borderRadius: 999,
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: 1,
+              marginBottom: 12,
+            }}
+          >
+            COMING SOON
+          </span>
+          <h2
+            style={{
+              fontSize: "clamp(22px, 4.5vw, 32px)",
+              fontWeight: 800,
+              lineHeight: 1.3,
+              margin: 0,
+              color: INK,
+            }}
+          >
+            これから来るアップデート
+          </h2>
+          <p style={{ fontSize: 14, color: "#666", marginTop: 12 }}>
+            Careoは、就活生のリアルな声からアップデートが生まれるプロダクトです。
+          </p>
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+            gap: 16,
+          }}
+        >
+          {items.map((it) => (
+            <div
+              key={it.title}
+              style={{
+                background: "white",
+                borderRadius: 20,
+                padding: 22,
+                border: `1px dashed ${ACCENT}55`,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                <span style={{ fontSize: 28 }}>{it.icon}</span>
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 800,
+                    color: ACCENT_DEEP,
+                    background: `${ACCENT}15`,
+                    padding: "3px 10px",
+                    borderRadius: 999,
+                  }}
+                >
+                  {it.eta}
+                </span>
+              </div>
+              <h3 style={{ fontSize: 17, fontWeight: 800, margin: "0 0 6px", color: INK }}>{it.title}</h3>
+              <p style={{ fontSize: 13, lineHeight: 1.7, color: "#555", margin: 0 }}>{it.desc}</p>
+            </div>
+          ))}
         </div>
       </div>
     </section>

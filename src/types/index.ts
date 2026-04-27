@@ -542,6 +542,42 @@ export const COMPANY_EVENT_TYPE_COLORS: Record<CompanyEventType, string> = {
 
 export const COMPANY_EVENT_TYPES: CompanyEventType[] = ["説明会", "インターン", "セミナー", "その他"];
 
+// ── カスタム予定（マイ予定） ─────────────────────────────────────
+
+export type CustomEventColor = "gray" | "blue" | "green" | "orange" | "pink" | "purple" | "yellow";
+
+export interface CustomEvent {
+  id: string;
+  title: string;
+  scheduledAt: string;
+  endAt?: string | null;
+  location?: string | null;
+  notes?: string | null;
+  color: CustomEventColor;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const CUSTOM_EVENT_COLOR_DOT: Record<CustomEventColor, string> = {
+  gray: "bg-gray-400",
+  blue: "bg-blue-400",
+  green: "bg-green-400",
+  orange: "bg-orange-400",
+  pink: "bg-pink-400",
+  purple: "bg-purple-400",
+  yellow: "bg-yellow-400",
+};
+
+export const CUSTOM_EVENT_COLOR_BADGE: Record<CustomEventColor, string> = {
+  gray: "bg-gray-100 text-gray-700",
+  blue: "bg-blue-100 text-blue-700",
+  green: "bg-green-100 text-green-700",
+  orange: "bg-orange-100 text-orange-700",
+  pink: "bg-pink-100 text-pink-700",
+  purple: "bg-purple-100 text-purple-700",
+  yellow: "bg-yellow-100 text-yellow-700",
+};
+
 // ── 面接録音AI ─────────────────────────────────────────────────
 
 export interface InterviewRecording {

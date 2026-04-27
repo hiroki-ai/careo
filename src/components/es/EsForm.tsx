@@ -4,6 +4,9 @@ import { useState } from "react";
 import { ES, EsStatus, Company, QAPair } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { generateId } from "@/lib/utils";
+import { DateTimeField } from "@/components/forms/DateTimeField";
+import { AutoTextarea } from "@/components/forms/AutoTextarea";
+import { SegmentedChoice } from "@/components/forms/SegmentedChoice";
 
 type FormData = Omit<ES, "id" | "createdAt" | "updatedAt">;
 
@@ -53,13 +56,14 @@ export function EsForm({ companies, initialCompanyId, initialData, onSubmit, onC
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-xs font-semibold text-gray-600 mb-1.5">
           企業 <span className="text-red-500">*</span>
         </label>
         <select
           value={form.companyId}
           onChange={(e) => setForm({ ...form, companyId: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          aria-label="企業を選択"
+          className="w-full px-3 py-3 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c896] focus:border-transparent"
           required
         >
           <option value="">企業を選択</option>
@@ -68,53 +72,48 @@ export function EsForm({ companies, initialCompanyId, initialData, onSubmit, onC
           ))}
         </select>
       </div>
+
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-xs font-semibold text-gray-600 mb-1.5">
           タイトル <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
           value={form.title}
           onChange={(e) => setForm({ ...form, title: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-3 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c896] focus:border-transparent"
           placeholder="例: 2026年新卒ES"
           required
         />
       </div>
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">提出締切</label>
-          <input
-            type="datetime-local"
-            value={form.deadline ? form.deadline.slice(0, 16) : ""}
-            onChange={(e) => setForm({ ...form, deadline: e.target.value ? new Date(e.target.value).toISOString() : "" })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">ステータス</label>
-          <select
-            value={form.status}
-            onChange={(e) => setForm({ ...form, status: e.target.value as EsStatus })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="DRAFT">下書き</option>
-            <option value="SUBMITTED">提出済み</option>
-          </select>
-        </div>
-      </div>
+
+      <DateTimeField
+        label="提出締切"
+        value={form.deadline}
+        onChange={(iso) => setForm({ ...form, deadline: iso })}
+      />
+
+      <SegmentedChoice<EsStatus>
+        label="ステータス"
+        value={form.status}
+        onChange={(v) => setForm({ ...form, status: v })}
+        options={[
+          { value: "DRAFT", label: "下書き", emoji: "📝" },
+          { value: "SUBMITTED", label: "提出済み", emoji: "✅" },
+        ]}
+      />
 
       {/* 設問・回答 */}
       <div>
-        <div className="flex items-center justify-between mb-3">
-          <label className="block text-sm font-medium text-gray-700">設問・回答</label>
-          <Button type="button" variant="ghost" size="sm" onClick={addQuestion}>+ 設問追加</Button>
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-xs font-semibold text-gray-600">設問・回答</label>
+          <Button type="button" variant="ghost" size="sm" onClick={addQuestion}>+ 追加</Button>
         </div>
-        <div className="space-y-4">
+        <div className="space-y-3">
           {form.questions.map((q, i) => (
-            <div key={q.id} className="p-4 bg-gray-50 rounded-lg space-y-2">
+            <div key={q.id} className="p-3 bg-gray-50 rounded-xl space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-gray-500">設問 {i + 1}</span>
+                <span className="text-[10px] font-bold text-gray-500 uppercase">Q{i + 1}</span>
                 {form.questions.length > 1 && (
                   <button
                     type="button"
@@ -129,24 +128,24 @@ export function EsForm({ companies, initialCompanyId, initialData, onSubmit, onC
                 type="text"
                 value={q.question}
                 onChange={(e) => updateQuestion(i, "question", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[#00c896] focus:border-transparent"
                 placeholder="設問内容"
               />
-              <textarea
+              <AutoTextarea
                 value={q.answer}
-                onChange={(e) => updateQuestion(i, "answer", e.target.value)}
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white resize-none"
+                onChange={(v) => updateQuestion(i, "answer", v)}
+                minRows={3}
                 placeholder="回答内容"
+                className="bg-white"
               />
             </div>
           ))}
         </div>
       </div>
 
-      <div className="flex justify-end gap-3 pt-2">
-        <Button type="button" variant="secondary" onClick={onCancel}>キャンセル</Button>
-        <Button type="submit">保存</Button>
+      <div className="flex gap-2 pt-2 sticky bottom-0 bg-white pb-1">
+        <Button type="button" variant="secondary" onClick={onCancel} className="flex-1">キャンセル</Button>
+        <Button type="submit" className="flex-1">保存</Button>
       </div>
     </form>
   );

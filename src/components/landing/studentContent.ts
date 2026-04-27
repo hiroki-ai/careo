@@ -1,4 +1,6 @@
 export const STUDENT_FEATURES = [
+  { icon: "📅", title: "就活カレンダー", desc: "ES締切・面接・説明会を一元表示。マイ予定も書き込める就活専用カレンダー。", tag: "NEW" },
+  { icon: "🧠", title: "コーチングAI", desc: "やり始めの不安にも、先を行くあなたの戦略にも対応。レベル別に最適化されたコーチング。", tag: "NEW" },
   { icon: "📝", title: "ES管理", desc: "企業ごとのESを一元管理。過去のESから使い回しもスムーズに。", tag: "ES" },
   { icon: "🎤", title: "面接ログ", desc: "面接後すぐに記録。蓄積データから次回の改善ポイントを可視化。", tag: "面接" },
   { icon: "☕", title: "OB訪問", desc: "訪問前の質問リストと、訪問後の学びをテンプレで整理。", tag: "OB" },
