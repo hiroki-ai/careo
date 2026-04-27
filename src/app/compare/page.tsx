@@ -9,6 +9,7 @@ import Link from "next/link";
 const serviceProfiles = [
   {
     name: "BaseMe",
+    category: "スカウト型",
     tag: "スカウト型就活 × AI",
     url: "https://baseme.app/",
     color: "from-blue-500/10 to-blue-400/5",
@@ -84,6 +85,7 @@ const serviceProfiles = [
   },
   {
     name: "Notion / スプレッドシート",
+    category: "管理（自作）",
     tag: "汎用管理ツール（自作）",
     url: "https://notion.so/",
     color: "from-gray-500/10 to-gray-400/5",
@@ -96,6 +98,88 @@ const serviceProfiles = [
     ],
     limitation: "就活専用機能はゼロ。AIコーチング・締切通知・分析はすべて手作業。初期設定と維持管理に時間がかかる。",
     careoUse: "Notionに書いた企業情報やESをCareoへ移行すると、AIコーチングがすぐに使えるようになる",
+  },
+];
+
+// 先輩が実際に使っていた「みんな入れてる」系・調査用サービス（追加）
+// 友人ヒアリング (2026-04-27): カテゴリ別に併用される定番サービス
+const supplementaryServices = [
+  // ☆みんな入れる枠
+  {
+    name: "マイナビ",
+    category: "みんな入れる",
+    tag: "求人ポータルの定番",
+    url: "https://job.mynavi.jp/",
+    role: "求人検索・企業エントリー",
+    strength: "国内最大級の求人数。マイキャリアボックスで一括ES提出も可。",
+    careoCombo: "マイナビでエントリーした企業をCareoに登録し、選考進捗・面接ログを管理する。",
+  },
+  {
+    name: "キャリタス就活",
+    category: "みんな入れる",
+    tag: "求人ポータル+合説",
+    url: "https://job.career-tasu.jp/",
+    role: "合同説明会・スケジュール管理",
+    strength: "リアル/オンライン合同説明会が充実。地方企業・中堅企業の求人も豊富。",
+    careoCombo: "キャリタスで参加した説明会をCareoのカレンダーに登録し、参加後の所感をその場で記録する。",
+  },
+  // ☆ES・体験談調べ用
+  {
+    name: "ワンキャリア",
+    category: "ES・体験談調べ",
+    tag: "選考体験記の宝庫",
+    url: "https://www.onecareer.jp/",
+    role: "選考通過ES・面接体験記の閲覧",
+    strength: "通過したESの実物・面接質問・体験記が圧倒的に豊富。志望企業の選考を「予習」できる。",
+    careoCombo: "ワンキャリアで読んだ通過ESや想定質問を、CareoのES下書き・面接準備メモに転記して活用する。",
+  },
+  {
+    name: "就活会議",
+    category: "ES・体験談調べ",
+    tag: "選考クチコミ + 評価",
+    url: "https://syukatsu-kaigi.jp/",
+    role: "ES・面接の体験談 + 企業評価",
+    strength: "選考体験談の口コミと、企業の評判（働きがい・成長環境）の両方を見られる。",
+    careoCombo: "就活会議で集めた質問パターン・評価を、Careoの企業メモに整理してから面接に臨む。",
+  },
+  // ☆社員クチコミ・年収調べ
+  {
+    name: "Openwork",
+    category: "クチコミ・年収",
+    tag: "現役・元社員のリアル",
+    url: "https://www.openwork.jp/",
+    role: "社員クチコミ・年収・働きがい調査",
+    strength: "現役・元社員による評価レポートが豊富。年収・残業時間・成長環境などを多面的に評価。",
+    careoCombo: "Openworkで調べた内部情報・年収レンジをCareoの企業メモに保存し、内定比較の判断材料にする。",
+  },
+  // ☆OBOG訪問用
+  {
+    name: "ビズリーチ・キャンパス",
+    category: "OB訪問",
+    tag: "OB/OG訪問プラットフォーム",
+    url: "https://br-campus.jp/",
+    role: "大学OB/OG訪問のマッチング",
+    strength: "大学・学部別にOB/OGを検索できる、安全で信頼性の高いマッチング。実際に会いやすい。",
+    careoCombo: "ビズリーチ・キャンパスでアポを取り、訪問後の学び・気づきをCareoのOB訪問ログに即記録。後続の面接や志望動機作成に直結する。",
+  },
+  // ☆スカウト用
+  {
+    name: "キャリアチケットスカウト",
+    category: "スカウト",
+    tag: "プロフィール型スカウト",
+    url: "https://careerticket.jp/scout/",
+    role: "プロフィール登録 → スカウト受信",
+    strength: "自己分析を兼ねたプロフィール作成で、志向性に合った企業からスカウトが届く。エージェント支援もある。",
+    careoCombo: "キャリアチケットで届いたスカウト企業をCareoに登録し、選考進捗・面接ログを横断管理。エージェントから貰った情報もCareoのメモに集約。",
+  },
+  {
+    name: "外資就活ドットコム",
+    category: "スカウト",
+    tag: "上位層・外資・コンサル",
+    url: "https://gaishishukatsu.com/",
+    role: "外資・日系トップ企業向けスカウト",
+    strength: "外資金融・コンサル・日系大手を志望する就活生向けの選考情報・スカウト。質の高いコミュニティ。",
+    careoCombo: "外資就活ドットコムで知った早期選考や難関選考のスケジュールをCareoのカレンダーに登録し、専用のES・面接対策ログを蓄積。",
   },
 ];
 
@@ -371,6 +455,80 @@ export default function ComparePage() {
                 </p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 先輩が実際に使ってた定番サービス（カテゴリ別） ───────────────── */}
+      <section className="px-6 py-20 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-[#00c896] text-sm font-bold tracking-widest uppercase mb-3 text-center">
+            Senior&apos;s Stack
+          </p>
+          <h2 className="text-2xl md:text-4xl font-bold text-center mb-4 tracking-tight">
+            先輩が実際に使ってた<span className="text-[#00c896]">定番サービス</span>
+          </h2>
+          <p className="text-gray-500 text-center text-sm mb-12 max-w-2xl mx-auto">
+            就活には「シーン別の定番サービス」があります。Careoはこれら全部のデータを<strong className="text-gray-700">一元管理するハブ</strong>。
+            個別ツールの強みを消さず、全部活かす設計です。
+          </p>
+
+          {(["みんな入れる", "ES・体験談調べ", "クチコミ・年収", "OB訪問", "スカウト"] as const).map((cat) => {
+            const items = supplementaryServices.filter((s) => s.category === cat);
+            if (items.length === 0) return null;
+            return (
+              <div key={cat} className="mb-10">
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-xs font-bold text-[#00c896] bg-[#00c896]/10 px-3 py-1.5 rounded-full">
+                    ☆ {cat}
+                  </span>
+                  <div className="flex-1 h-px bg-gray-100" />
+                </div>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {items.map((s) => (
+                    <div
+                      key={s.name}
+                      className="bg-[#fcfbf8] rounded-2xl p-5 border border-gray-100 hover:border-[#00c896]/30 transition-colors"
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">
+                            {s.tag}
+                          </p>
+                          <h3 className="font-bold text-gray-900 text-lg leading-tight">{s.name}</h3>
+                        </div>
+                        <a
+                          href={s.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[10px] text-gray-400 hover:text-gray-600 border border-gray-200 rounded-lg px-2 py-1 bg-white hover:bg-gray-50 transition-colors shrink-0"
+                        >
+                          公式 ↗
+                        </a>
+                      </div>
+                      <p className="text-xs text-gray-500 mb-2">
+                        <span className="font-semibold text-gray-700">役割：</span>{s.role}
+                      </p>
+                      <p className="text-xs text-gray-600 leading-relaxed mb-3">{s.strength}</p>
+                      <p className="text-xs text-[#00a87e] font-bold border-t border-gray-100 pt-2.5 leading-relaxed">
+                        ▶ Careoとの組み合わせ：{s.careoCombo}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+
+          <div className="bg-gradient-to-br from-[#00c896]/5 to-blue-50/40 rounded-2xl p-6 mt-10 border border-[#00c896]/20">
+            <p className="text-sm font-bold text-gray-900 mb-2">
+              💡 結論：Careoは「個別ツールの上位互換」ではなく「データ集約のハブ」
+            </p>
+            <p className="text-xs text-gray-600 leading-relaxed">
+              マイナビで応募 → ワンキャリアでES予習 → ビズリーチ・キャンパスでOB訪問 → Openworkで年収確認。
+              この流れで集まる情報を <strong className="text-gray-800">Careoに一元化</strong> することで、
+              AIが全データを横断して「次にやるべきこと」を提案できるようになります。
+            </p>
           </div>
         </div>
       </section>
