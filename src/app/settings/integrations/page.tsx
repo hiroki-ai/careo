@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
@@ -13,6 +13,14 @@ interface GmailStatus {
 }
 
 export default function IntegrationsPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-sm text-gray-400">読み込み中...</div>}>
+      <IntegrationsInner />
+    </Suspense>
+  );
+}
+
+function IntegrationsInner() {
   const search = useSearchParams();
   const [status, setStatus] = useState<GmailStatus>({ connected: false });
   const [loading, setLoading] = useState(true);

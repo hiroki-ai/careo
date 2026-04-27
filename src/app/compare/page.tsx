@@ -231,7 +231,7 @@ const comparisonRows = [
     careo: true, base: "△", smart: false, riku: false, offer: false, notion: false, ababa: false,
   },
   {
-    label: "学生は完全無料",
+    label: "無料プランあり",
     note: "",
     careo: true, base: true, smart: "△制限あり", riku: true, offer: true, notion: true, ababa: true,
   },
@@ -922,10 +922,10 @@ export default function ComparePage() {
             無料で始める
           </Link>
           <div className="flex items-center justify-center gap-5 mt-6 text-gray-500 text-xs flex-wrap">
-            <span>✓ 完全無料</span>
+            <span>✓ 無料プランあり</span>
             <span>✓ 登録5分</span>
             <span>✓ カード不要</span>
-            <span>✓ 広告なし</span>
+            <span>✓ Pro広告なし</span>
           </div>
         </div>
       </section>

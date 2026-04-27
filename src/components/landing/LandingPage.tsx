@@ -268,7 +268,7 @@ function Hero({ userCount }: { userCount: number }) {
             className="flex flex-wrap items-center gap-4"
             style={{ fontSize: 12, color: "#6b7280" }}
           >
-            <span>✓ 学生は完全無料</span>
+            <span>✓ 無料プランあり</span>
             <span>✓ 登録30秒</span>
             <span>✓ 大学メール不要</span>
           </div>
@@ -1457,6 +1457,68 @@ function BuiltByStudent() {
   );
 }
 
+function HeroBackdrop({ flip = false }: { flip?: boolean }) {
+  return (
+    <>
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top: flip ? "auto" : 30,
+          bottom: flip ? 0 : "auto",
+          right: flip ? "auto" : -60,
+          left: flip ? -80 : "auto",
+          width: 300,
+          height: 300,
+          background: `radial-gradient(circle, ${ACCENT}22, transparent 65%)`,
+          filter: "blur(40px)",
+        }}
+      />
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top: flip ? 30 : "auto",
+          bottom: flip ? "auto" : 0,
+          left: flip ? "auto" : -80,
+          right: flip ? -60 : "auto",
+          width: 260,
+          height: 260,
+          background: "radial-gradient(circle, rgba(255,200,100,.2), transparent 65%)",
+          filter: "blur(40px)",
+        }}
+      />
+    </>
+  );
+}
+
+function SectionEyebrow({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      className="inline-flex items-center gap-2"
+      style={{
+        padding: "7px 14px",
+        background: "white",
+        border: `1px solid ${ACCENT}44`,
+        borderRadius: 999,
+        fontSize: 12,
+        fontWeight: 700,
+        color: ACCENT_DEEP,
+        marginBottom: 16,
+      }}
+    >
+      <span
+        style={{
+          width: 6,
+          height: 6,
+          borderRadius: 3,
+          background: ACCENT,
+          animation: "fs-typing-dot 1.6s infinite",
+        }}
+      />
+      {children}
+    </div>
+  );
+}
+
 function WhatsNewSection() {
   const items = [
     {
@@ -1474,40 +1536,29 @@ function WhatsNewSection() {
     {
       tag: "RENEWED",
       icon: "✨",
-      title: "記録機能のモバイルUI刷新",
-      desc: "面接・ES・OB訪問・筆記試験・企業登録の入力フォームをモバイルファーストに全面リデザイン。日時ピッカー・自動拡張テキストエリアでスマホでもサクサク。",
+      title: "記録UIをモバイル全面刷新",
+      desc: "面接・ES・OB訪問・筆記試験・企業登録の入力フォームをモバイルファーストに再設計。日時ピッカー・自動拡張テキストエリアでスマホでもサクサク。",
     },
   ];
 
   return (
-    <section style={{ background: BG, padding: "80px 24px" }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <span
-            style={{
-              display: "inline-block",
-              background: ACCENT,
-              color: "white",
-              padding: "4px 12px",
-              borderRadius: 999,
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: 1,
-              marginBottom: 12,
-            }}
-          >
-            WHAT&apos;S NEW
-          </span>
+    <section className="relative overflow-hidden px-4 py-14 md:px-5 md:py-20" style={{ background: BG }}>
+      <HeroBackdrop />
+      <div className="relative" style={{ maxWidth: 1160, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 36 }}>
+          <SectionEyebrow>WHAT&apos;S NEW</SectionEyebrow>
           <h2
+            className="font-klee"
             style={{
-              fontSize: "clamp(24px, 5vw, 36px)",
-              fontWeight: 800,
-              lineHeight: 1.3,
+              fontSize: "min(8vw, 40px)",
+              fontWeight: 600,
+              lineHeight: 1.2,
+              letterSpacing: -0.6,
               margin: 0,
               color: INK,
             }}
           >
-            アップデート、続々。
+            アップデート、<span style={{ color: ACCENT_DEEP }}>続々。</span>
             <br />
             就活生の声から生まれた新機能。
           </h2>
@@ -1527,8 +1578,8 @@ function WhatsNewSection() {
                 background: "white",
                 borderRadius: 20,
                 padding: 24,
-                border: `1px solid ${SURFACE}`,
-                boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+                border: `1px solid ${ACCENT}1a`,
+                boxShadow: `0 8px 24px ${ACCENT}10`,
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
@@ -1538,7 +1589,7 @@ function WhatsNewSection() {
                     fontSize: 10,
                     fontWeight: 800,
                     letterSpacing: 1,
-                    background: it.tag === "NEW" ? ACCENT : "#FFB347",
+                    background: it.tag === "NEW" ? `linear-gradient(135deg, ${ACCENT}, ${ACCENT_DEEP})` : "#FFB347",
                     color: "white",
                     padding: "2px 8px",
                     borderRadius: 4,
@@ -1547,10 +1598,201 @@ function WhatsNewSection() {
                   {it.tag}
                 </span>
               </div>
-              <h3 style={{ fontSize: 18, fontWeight: 800, margin: "0 0 8px", color: INK }}>{it.title}</h3>
-              <p style={{ fontSize: 14, lineHeight: 1.7, color: "#555", margin: 0 }}>{it.desc}</p>
+              <h3 className="font-klee" style={{ fontSize: 18, fontWeight: 600, margin: "0 0 8px", color: INK, letterSpacing: -0.3 }}>
+                {it.title}
+              </h3>
+              <p style={{ fontSize: 14, lineHeight: 1.8, color: "#4b5563", margin: 0 }}>{it.desc}</p>
             </div>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SeniorStackSection() {
+  const groups = [
+    {
+      cat: "みんな入れる枠",
+      icon: "📥",
+      items: [
+        { name: "マイナビ", role: "求人検索・エントリー" },
+        { name: "キャリタス就活", role: "合説・スケジュール" },
+      ],
+    },
+    {
+      cat: "ES・体験談調べ",
+      icon: "📝",
+      items: [
+        { name: "ワンキャリア", role: "通過ES・面接体験記" },
+        { name: "就活会議", role: "選考体験 + 企業評価" },
+      ],
+    },
+    {
+      cat: "クチコミ・年収",
+      icon: "💼",
+      items: [
+        { name: "Openwork", role: "現役・元社員のリアル" },
+      ],
+    },
+    {
+      cat: "OB/OG訪問",
+      icon: "☕",
+      items: [
+        { name: "ビズリーチ・キャンパス", role: "大学OB/OGマッチング" },
+      ],
+    },
+    {
+      cat: "スカウト",
+      icon: "✉️",
+      items: [
+        { name: "キャリアチケット", role: "プロフィール型スカウト" },
+        { name: "外資就活ドットコム", role: "外資・日系トップ" },
+      ],
+    },
+  ];
+
+  return (
+    <section className="relative overflow-hidden px-4 py-14 md:px-5 md:py-20" style={{ background: SURFACE }}>
+      <HeroBackdrop flip />
+      <div className="relative" style={{ maxWidth: 1160, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 36 }}>
+          <SectionEyebrow>SENIOR&apos;S STACK</SectionEyebrow>
+          <h2
+            className="font-klee"
+            style={{
+              fontSize: "min(8vw, 40px)",
+              fontWeight: 600,
+              lineHeight: 1.2,
+              letterSpacing: -0.6,
+              margin: 0,
+              color: INK,
+            }}
+          >
+            先輩たちが実際に使っていた
+            <br />
+            <span style={{ color: ACCENT_DEEP }}>定番サービス</span>と組み合わせる。
+          </h2>
+          <p
+            className="text-[14px] md:text-[15px]"
+            style={{ color: "#4b5563", marginTop: 14, lineHeight: 1.9, maxWidth: 620, marginLeft: "auto", marginRight: "auto" }}
+          >
+            <b style={{ color: INK }}>Careoは「データ集約のハブ」。</b>
+            個別ツールの強みを消さず、出力データをCareoに集めると、AIが横断で次の一手を提案します。
+          </p>
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+            gap: 14,
+            marginBottom: 24,
+          }}
+        >
+          {groups.map((g) => (
+            <div
+              key={g.cat}
+              style={{
+                background: "white",
+                borderRadius: 20,
+                padding: 20,
+                border: `1px solid ${ACCENT}1a`,
+                boxShadow: `0 8px 24px ${ACCENT}10`,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                <span style={{ fontSize: 22 }}>{g.icon}</span>
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 800,
+                    letterSpacing: 1,
+                    color: ACCENT_DEEP,
+                    background: `${ACCENT}14`,
+                    padding: "3px 10px",
+                    borderRadius: 999,
+                  }}
+                >
+                  ☆ {g.cat}
+                </span>
+              </div>
+              <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 8 }}>
+                {g.items.map((it) => (
+                  <li key={it.name} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
+                    <span className="font-klee" style={{ fontSize: 14, fontWeight: 600, color: INK, letterSpacing: -0.2 }}>
+                      {it.name}
+                    </span>
+                    <span style={{ fontSize: 11, color: "#6b7280", textAlign: "right", lineHeight: 1.5 }}>
+                      {it.role}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        <div
+          style={{
+            background: "white",
+            borderRadius: 20,
+            padding: "20px 22px",
+            border: `1px solid ${ACCENT}33`,
+            boxShadow: `0 12px 32px ${ACCENT}1a`,
+            display: "flex",
+            flexDirection: "column",
+            gap: 14,
+          }}
+        >
+          <p
+            className="font-klee"
+            style={{
+              fontSize: 16,
+              fontWeight: 600,
+              margin: 0,
+              color: INK,
+              letterSpacing: -0.3,
+            }}
+          >
+            💡 結論：1サービスでは戦えない。<span style={{ color: ACCENT_DEEP }}>Careoが集める。</span>
+          </p>
+          <p style={{ fontSize: 13, lineHeight: 1.9, color: "#4b5563", margin: 0 }}>
+            マイナビで応募 → ワンキャリアで予習 → ビズリーチ・キャンパスでOB訪問 → Openworkで内部情報。
+            この流れで集まる情報を <b style={{ color: INK }}>Careoに一元化</b> すると、AIが「次にやるべきこと」を自動で提示します。
+          </p>
+          <div className="flex flex-wrap gap-2.5">
+            <Link
+              href="/compare"
+              style={{
+                background: `linear-gradient(135deg, ${ACCENT}, ${ACCENT_DEEP})`,
+                color: "white",
+                fontWeight: 800,
+                padding: "12px 22px",
+                borderRadius: 12,
+                fontSize: 14,
+                boxShadow: `0 8px 20px ${ACCENT}55`,
+                textDecoration: "none",
+              }}
+            >
+              詳しい比較を見る →
+            </Link>
+            <Link
+              href="/blog/shukatsu-services-comparison-2026"
+              style={{
+                background: "white",
+                color: INK,
+                fontWeight: 700,
+                padding: "12px 18px",
+                borderRadius: 12,
+                border: "1px solid #e5e7eb",
+                fontSize: 13,
+                textDecoration: "none",
+              }}
+            >
+              比較ブログを読む →
+            </Link>
+          </div>
         </div>
       </div>
     </section>
@@ -1580,37 +1822,25 @@ function ComingSoonSection() {
   ];
 
   return (
-    <section style={{ background: SURFACE, padding: "80px 24px" }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+    <section className="relative overflow-hidden px-4 py-14 md:px-5 md:py-20" style={{ background: BG }}>
+      <HeroBackdrop />
+      <div className="relative" style={{ maxWidth: 1160, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <span
-            style={{
-              display: "inline-block",
-              background: "transparent",
-              border: `2px solid ${ACCENT}`,
-              color: ACCENT_DEEP,
-              padding: "4px 12px",
-              borderRadius: 999,
-              fontSize: 11,
-              fontWeight: 800,
-              letterSpacing: 1,
-              marginBottom: 12,
-            }}
-          >
-            COMING SOON
-          </span>
+          <SectionEyebrow>COMING SOON</SectionEyebrow>
           <h2
+            className="font-klee"
             style={{
-              fontSize: "clamp(22px, 4.5vw, 32px)",
-              fontWeight: 800,
-              lineHeight: 1.3,
+              fontSize: "min(7.5vw, 36px)",
+              fontWeight: 600,
+              lineHeight: 1.2,
+              letterSpacing: -0.6,
               margin: 0,
               color: INK,
             }}
           >
-            これから来るアップデート
+            これから来る、<span style={{ color: ACCENT_DEEP }}>アップデート。</span>
           </h2>
-          <p style={{ fontSize: 14, color: "#666", marginTop: 12 }}>
+          <p style={{ fontSize: 14, color: "#4b5563", marginTop: 14, lineHeight: 1.9 }}>
             Careoは、就活生のリアルな声からアップデートが生まれるプロダクトです。
           </p>
         </div>
@@ -1630,6 +1860,7 @@ function ComingSoonSection() {
                 borderRadius: 20,
                 padding: 22,
                 border: `1px dashed ${ACCENT}55`,
+                boxShadow: `0 6px 18px ${ACCENT}0a`,
               }}
             >
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
@@ -1647,8 +1878,10 @@ function ComingSoonSection() {
                   {it.eta}
                 </span>
               </div>
-              <h3 style={{ fontSize: 17, fontWeight: 800, margin: "0 0 6px", color: INK }}>{it.title}</h3>
-              <p style={{ fontSize: 13, lineHeight: 1.7, color: "#555", margin: 0 }}>{it.desc}</p>
+              <h3 className="font-klee" style={{ fontSize: 17, fontWeight: 600, margin: "0 0 6px", color: INK, letterSpacing: -0.3 }}>
+                {it.title}
+              </h3>
+              <p style={{ fontSize: 13, lineHeight: 1.8, color: "#4b5563", margin: 0 }}>{it.desc}</p>
             </div>
           ))}
         </div>
@@ -1721,7 +1954,7 @@ function FinalCTA() {
           就活はじめよう。
         </h2>
         <p style={{ fontSize: 13.5, color: "#6b7280", marginBottom: 28, lineHeight: 1.8 }}>
-          登録30秒・学生は完全無料。
+          登録30秒・無料プランあり。
           <br />
           まずは「今日やること」から、話しかけてみて。
         </p>
