@@ -8,6 +8,7 @@ import { useEs } from "@/hooks/useEs";
 import { useInterviews } from "@/hooks/useInterviews";
 import { useProfile } from "@/hooks/useProfile";
 import { CompanyForm } from "@/components/companies/CompanyForm";
+import { CompanyEvaluationCard } from "@/components/companies/CompanyEvaluationCard";
 import { StatusBadge, LegacyBadge as Badge } from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
@@ -192,6 +193,24 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
           </div>
         </div>
       </div>
+
+      {/* 戦略評価（スコア・軸合致度・3圏・ビジョン適合・自分視点メモ）*/}
+      <CompanyEvaluationCard
+        company={company}
+        profile={profile ? {
+          university: profile.university,
+          faculty: profile.faculty,
+          graduationYear: profile.graduationYear,
+          careerAxis: profile.careerAxis,
+          gakuchika: profile.gakuchika,
+          selfPr: profile.selfPr,
+          strengths: profile.strengths,
+          weaknesses: profile.weaknesses,
+          targetIndustries: profile.targetIndustries,
+          targetJobs: profile.targetJobs,
+        } : undefined}
+        onUpdate={(patch) => updateCompany(id, patch)}
+      />
 
       {/* マイページ管理 */}
       <div className="bg-white rounded-xl border border-gray-100 mb-6">

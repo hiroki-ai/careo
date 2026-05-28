@@ -14,6 +14,7 @@ export type AiFeature =
   | "pdca"
   | "insights"
   | "company-suggest"
+  | "company-score"
   | "weekly-coach"
   | "industry-analysis";
 
@@ -24,6 +25,7 @@ export const FREE_MONTHLY_LIMITS: Record<AiFeature, number> = {
   "pdca": 1,
   "insights": 1,
   "company-suggest": 3,
+  "company-score": 3,
   "weekly-coach": 0,       // 完全ロック
   "industry-analysis": 0,  // 完全ロック
 };

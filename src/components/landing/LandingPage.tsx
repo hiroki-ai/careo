@@ -27,9 +27,10 @@ const BG = "#fcfbf8";
 const SURFACE = "#f5f3ee";
 
 function formatUserCount(n: number): string {
-  if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}k+`;
-  if (n >= 100) return `${n}+`;
-  return "28卒向け";
+  if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}k+の28卒が使ってる`;
+  if (n >= 100) return `${n}+の28卒が使ってる`;
+  if (n >= 10) return `${n}人の28卒が使ってる`;
+  return "28卒、続々登録中";
 }
 
 export function LandingPage({ recentPosts, userCount, reviews }: Props) {
@@ -52,10 +53,12 @@ export function LandingPage({ recentPosts, userCount, reviews }: Props) {
       <Hero userCount={userCount} />
       <SocialProofStrip />
       <WhatsNewSection />
+      <PassScoreShowcase />
       <SummerInternTeaser />
       <BeforeAfterScenes />
       <DailyWithCareo />
       <FeatureGrid />
+      <WhyCareoSection />
       <ComingSoonSection />
       <WorriesChat />
       <CleanPromise />
@@ -151,7 +154,7 @@ function Header() {
 }
 
 function Hero({ userCount }: { userCount: number }) {
-  const chipLabel = `${formatUserCount(userCount)}の28卒が使ってる`;
+  const chipLabel = formatUserCount(userCount);
 
   return (
     <section className="relative overflow-hidden px-4 pt-7 pb-10 md:px-5 md:pt-11 md:pb-14">
@@ -1396,61 +1399,585 @@ function RecentPostsSection({ recentPosts }: { recentPosts: RecentPost[] }) {
   );
 }
 
+function PassScoreShowcase() {
+  // 採点軸とサンプル値（例示）
+  const axes = [
+    { label: "学歴フィット", value: 18, max: 20 },
+    { label: "ガクチカ適合", value: 22, max: 25 },
+    { label: "軸の一貫性", value: 17, max: 20 },
+    { label: "競争激しさ", value: 8, max: 15 },
+    { label: "英語必要度", value: 9, max: 10 },
+    { label: "特殊要因", value: 5, max: 10 },
+  ];
+  const total = axes.reduce((s, a) => s + a.value, 0); // 79
+
+  return (
+    <section
+      className="relative overflow-hidden px-4 py-14 md:px-5 md:py-20"
+      style={{ background: SURFACE }}
+    >
+      <HeroBackdrop flip />
+      <div className="relative" style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 36 }}>
+          <SectionEyebrow>EXCLUSIVE FEATURE</SectionEyebrow>
+          <h2
+            className="font-klee"
+            style={{
+              fontSize: "min(8vw, 42px)",
+              fontWeight: 600,
+              lineHeight: 1.18,
+              letterSpacing: -0.6,
+              margin: 0,
+              color: INK,
+            }}
+          >
+            <span style={{ color: ACCENT_DEEP }}>合格可能性スコア</span>を、
+            <br />
+            100点満点で見える化。
+          </h2>
+          <p
+            style={{
+              fontSize: 13.5,
+              color: "#6b7280",
+              lineHeight: 1.9,
+              maxWidth: 620,
+              margin: "16px auto 0",
+            }}
+          >
+            あなたのプロフィール（大学・ガクチカ・軸・強み）と志望企業の特性をAIが照合。
+            <br className="hidden md:block" />
+            <b>採点根拠を6軸で開示</b>するから、なぜそのスコアになったかが一目でわかる。
+          </p>
+        </div>
+
+        {/* スコアカード（サンプル） */}
+        <div
+          className="grid gap-5"
+          style={{ gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1.2fr)", maxWidth: 880, margin: "0 auto" }}
+        >
+          {/* 大きなスコア */}
+          <div
+            style={{
+              background: "white",
+              borderRadius: 24,
+              padding: 32,
+              border: `1px solid ${ACCENT}22`,
+              boxShadow: `0 12px 32px ${ACCENT}18`,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              textAlign: "center",
+              minHeight: 260,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: 2,
+                color: ACCENT_DEEP,
+                marginBottom: 12,
+              }}
+            >
+              SAMPLE · 例: ある企業を採点
+            </div>
+            <div
+              className="font-klee"
+              style={{
+                fontSize: 88,
+                fontWeight: 700,
+                color: ACCENT_DEEP,
+                lineHeight: 1,
+                letterSpacing: -2,
+              }}
+            >
+              {total}
+            </div>
+            <div style={{ fontSize: 14, color: "#9ca3af", marginTop: -4, marginBottom: 12 }}>
+              / 100
+            </div>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                fontSize: 13,
+                fontWeight: 800,
+                background: "#dcfce7",
+                color: "#15803d",
+                padding: "6px 14px",
+                borderRadius: 999,
+              }}
+            >
+              🔵 努力圏（射程）
+            </div>
+            <p
+              style={{
+                fontSize: 11.5,
+                color: "#6b7280",
+                marginTop: 14,
+                lineHeight: 1.6,
+                maxWidth: 240,
+              }}
+            >
+              「重点企業として ES/面接対策を投資すべき」のサインです
+            </p>
+          </div>
+
+          {/* 6軸内訳 */}
+          <div
+            style={{
+              background: "white",
+              borderRadius: 24,
+              padding: 28,
+              border: "1px solid rgba(0,0,0,.05)",
+              boxShadow: "0 6px 20px rgba(0,0,0,.04)",
+            }}
+          >
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: 2,
+                color: ACCENT_DEEP,
+                marginBottom: 14,
+              }}
+            >
+              採点6軸の内訳
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {axes.map((a) => {
+                const ratio = (a.value / a.max) * 100;
+                return (
+                  <div key={a.label}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "baseline",
+                        marginBottom: 4,
+                      }}
+                    >
+                      <span style={{ fontSize: 12, fontWeight: 600, color: "#374151" }}>
+                        {a.label}
+                      </span>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: INK }}>
+                        {a.value}
+                        <span style={{ color: "#9ca3af", fontWeight: 500 }}>/{a.max}</span>
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        height: 6,
+                        background: "#f3f4f6",
+                        borderRadius: 999,
+                        overflow: "hidden",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: `${ratio}%`,
+                          height: "100%",
+                          background: `linear-gradient(90deg, ${ACCENT}, ${ACCENT_DEEP})`,
+                          borderRadius: 999,
+                        }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div
+              style={{
+                marginTop: 18,
+                paddingTop: 14,
+                borderTop: "1px dashed rgba(0,0,0,.08)",
+                fontSize: 11,
+                color: "#6b7280",
+                lineHeight: 1.7,
+              }}
+            >
+              <b style={{ color: ACCENT_DEEP }}>採点ロジックを開示</b>しているので、なぜそのスコアになったか・何を磨けば上がるかが構造的にわかる。
+            </div>
+          </div>
+        </div>
+
+        {/* 5段階ゾーン */}
+        <div
+          className="grid gap-2"
+          style={{
+            gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+            maxWidth: 880,
+            margin: "32px auto 0",
+          }}
+        >
+          {[
+            { emoji: "🟢", label: "射程圏", range: "80-100", color: "#15803d", bg: "#dcfce7" },
+            { emoji: "🔵", label: "努力圏", range: "65-79", color: "#1e40af", bg: "#dbeafe" },
+            { emoji: "🟡", label: "挑戦圏", range: "50-64", color: "#854d0e", bg: "#fef9c3" },
+            { emoji: "🟠", label: "超リーチ", range: "35-49", color: "#9a3412", bg: "#ffedd5" },
+            { emoji: "🔴", label: "撤退検討", range: "0-34", color: "#991b1b", bg: "#fee2e2" },
+          ].map((z) => (
+            <div
+              key={z.label}
+              style={{
+                background: z.bg,
+                padding: "10px 12px",
+                borderRadius: 12,
+                textAlign: "center",
+              }}
+            >
+              <div style={{ fontSize: 18 }}>{z.emoji}</div>
+              <div style={{ fontSize: 11.5, fontWeight: 800, color: z.color, marginTop: 2 }}>
+                {z.label}
+              </div>
+              <div style={{ fontSize: 10, color: z.color, opacity: 0.7, marginTop: 1 }}>
+                {z.range}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ textAlign: "center", marginTop: 32 }}>
+          <Link
+            href="/signup"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              background: `linear-gradient(135deg, ${ACCENT}, ${ACCENT_DEEP})`,
+              color: "white",
+              fontWeight: 800,
+              padding: "14px 28px",
+              borderRadius: 12,
+              fontSize: 14,
+              boxShadow: `0 8px 24px ${ACCENT}55`,
+              textDecoration: "none",
+            }}
+          >
+            自分の登録企業を採点する →
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function WhyCareoSection() {
+  const principles = [
+    {
+      emoji: "🎯",
+      title: "売らない宣言",
+      desc: "就活はビジネスじゃない。広告で釣ったり、出会いを煽ったりしない。ユーザー本位を貫きます。",
+    },
+    {
+      emoji: "🧬",
+      title: "あなただけのキャリアOS",
+      desc: "テンプレ的なノウハウじゃなく、軸・ガクチカ・強みから「あなた専用」のアドバイスを返す。",
+    },
+    {
+      emoji: "📊",
+      title: "全部、構造化する",
+      desc: "感覚や根性論じゃなく、データと採点ロジックで意思決定。20代でハマる罠を可視化します。",
+    },
+    {
+      emoji: "🔒",
+      title: "プライバシー第一",
+      desc: "Supabase RLS で自分のデータは自分のものに。AIに渡す情報も最小限。",
+    },
+  ];
+
+  return (
+    <section
+      className="relative overflow-hidden px-4 py-14 md:px-5 md:py-20"
+      style={{ background: BG }}
+    >
+      <HeroBackdrop />
+      <div className="relative" style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 36 }}>
+          <SectionEyebrow>WHY CAREO</SectionEyebrow>
+          <h2
+            className="font-klee"
+            style={{
+              fontSize: "min(8vw, 40px)",
+              fontWeight: 600,
+              lineHeight: 1.2,
+              letterSpacing: -0.6,
+              margin: 0,
+              color: INK,
+            }}
+          >
+            就活アプリは<span style={{ color: ACCENT_DEEP }}>道具じゃなく、伴走者</span>。
+          </h2>
+          <p
+            style={{
+              fontSize: 13.5,
+              color: "#6b7280",
+              lineHeight: 1.9,
+              maxWidth: 640,
+              margin: "16px auto 0",
+            }}
+          >
+            広告で釣る就活サービスでも、感覚と根性論のテンプレでもない。
+            <br className="hidden md:block" />
+            あなたのキャリア20代を一緒に設計するための、本気の<b>キャリアOS</b>です。
+          </p>
+        </div>
+
+        <div
+          className="grid gap-3.5"
+          style={{ gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}
+        >
+          {principles.map((p) => (
+            <div
+              key={p.title}
+              style={{
+                background: "white",
+                borderRadius: 20,
+                padding: 24,
+                border: `1px solid ${ACCENT}1a`,
+                boxShadow: `0 4px 14px ${ACCENT}10`,
+              }}
+            >
+              <div style={{ fontSize: 28, marginBottom: 10 }}>{p.emoji}</div>
+              <div
+                className="font-klee"
+                style={{ fontSize: 17, fontWeight: 700, color: INK, marginBottom: 8 }}
+              >
+                {p.title}
+              </div>
+              <div style={{ fontSize: 12.5, lineHeight: 1.8, color: "#6b7280" }}>{p.desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function BuiltByStudent() {
+  const stats = [
+    { value: "292+", label: "コミット", note: "毎日改良中" },
+    { value: "12", label: "AIエンドポイント", note: "Claudeで実装" },
+    { value: "50+", label: "機能ページ", note: "ES/面接/OB/カレンダー…" },
+  ];
+  const stack = [
+    "Next.js 16 (App Router)",
+    "TypeScript",
+    "Tailwind CSS v4",
+    "Supabase (PostgreSQL + RLS)",
+    "Anthropic Claude",
+    "Vercel / Sentry / Stripe",
+  ];
+  const pillars = [
+    {
+      icon: "🏆",
+      title: "リーダーシップ",
+      desc: "113名規模のサークルで幹部。新歓動員・運動会立上げ・マネ層3倍化など、人を動かす経験。",
+    },
+    {
+      icon: "💼",
+      title: "ビジネス",
+      desc: "AIスタートアップで長期インターン。500社×2000名のリサーチ自動化、記事生成の工数75%削減。",
+    },
+    {
+      icon: "💻",
+      title: "個人開発",
+      desc: "Careoはゼロから設計・実装・運用まで一人で。Claude Codeで開発速度を最大化。",
+    },
+  ];
+
   return (
     <section
       className="relative overflow-hidden"
-      style={{ padding: "56px 20px", background: INK, color: "white" }}
+      style={{ padding: "72px 20px 80px", background: INK, color: "white" }}
     >
       <div
         className="absolute pointer-events-none"
         style={{
           top: 0,
           right: 0,
-          width: 320,
-          height: 320,
-          background: `radial-gradient(circle, ${ACCENT}22, transparent 65%)`,
-          filter: "blur(40px)",
+          width: 360,
+          height: 360,
+          background: `radial-gradient(circle, ${ACCENT}28, transparent 65%)`,
+          filter: "blur(50px)",
         }}
       />
       <div
-        className="relative flex flex-wrap items-center justify-center gap-7"
-        style={{ maxWidth: 720, margin: "0 auto" }}
-      >
-        <div style={{ flexShrink: 0 }}>
-          <CareoKun size={108} mood="think" />
-        </div>
-        <div style={{ flex: 1, minWidth: 260 }}>
+        className="absolute pointer-events-none"
+        style={{
+          bottom: 0,
+          left: 0,
+          width: 320,
+          height: 320,
+          background: "radial-gradient(circle, rgba(255,200,100,.15), transparent 65%)",
+          filter: "blur(50px)",
+        }}
+      />
+
+      <div className="relative" style={{ maxWidth: 980, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 36 }}>
           <p
             style={{
               fontSize: 11,
               color: ACCENT,
               fontWeight: 800,
               letterSpacing: 3,
-              marginBottom: 10,
+              marginBottom: 12,
             }}
           >
             BUILT BY A STUDENT, FOR STUDENTS
           </p>
           <h2
             className="font-klee"
-            style={{ fontSize: 24, fontWeight: 600, marginBottom: 14, lineHeight: 1.4 }}
+            style={{ fontSize: "min(8vw, 36px)", fontWeight: 600, lineHeight: 1.3, letterSpacing: -0.4 }}
           >
-            開発者も、
-            <br />
-            28卒の現役上智大生。
+            開発者も、<span style={{ color: ACCENT }}>28卒の現役就活生。</span>
           </h2>
           <p
             style={{
-              fontSize: 13,
-              color: "rgba(255,255,255,.75)",
+              fontSize: 13.5,
+              color: "rgba(255,255,255,.7)",
               lineHeight: 1.9,
-              margin: 0,
+              maxWidth: 600,
+              margin: "16px auto 0",
             }}
           >
-            Careoは、開発者自身が就活で「もっとこうだったら」と感じたことから生まれました。
-            僕もユーザーのひとりとして、毎日カレオと就活してます。
+            上智大学 経済学部 / 28卒の就活生が、自分の就活で「こうあって欲しかった」を全部詰め込んだプロダクト。
+            <br className="hidden md:block" />
+            ユーザーのひとりとして、毎日カレオと就活し、毎日改良しています。
           </p>
+        </div>
+
+        {/* 数字 */}
+        <div
+          className="grid gap-3"
+          style={{ gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", marginBottom: 28 }}
+        >
+          {stats.map((s) => (
+            <div
+              key={s.label}
+              style={{
+                background: "rgba(255,255,255,.04)",
+                border: "1px solid rgba(255,255,255,.08)",
+                borderRadius: 16,
+                padding: "20px 18px",
+                textAlign: "center",
+              }}
+            >
+              <div
+                className="font-klee"
+                style={{ fontSize: 32, fontWeight: 700, color: ACCENT, lineHeight: 1 }}
+              >
+                {s.value}
+              </div>
+              <div style={{ fontSize: 12, fontWeight: 700, marginTop: 8, color: "white" }}>
+                {s.label}
+              </div>
+              <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.5)", marginTop: 4 }}>
+                {s.note}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* 技術スタック */}
+        <div
+          style={{
+            background: "rgba(255,255,255,.04)",
+            border: "1px solid rgba(255,255,255,.08)",
+            borderRadius: 16,
+            padding: "18px 20px",
+            marginBottom: 28,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 10,
+              fontWeight: 800,
+              letterSpacing: 2,
+              color: ACCENT,
+              marginBottom: 10,
+            }}
+          >
+            TECH STACK
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {stack.map((s) => (
+              <span
+                key={s}
+                style={{
+                  fontSize: 11.5,
+                  fontWeight: 600,
+                  background: "rgba(255,255,255,.06)",
+                  color: "rgba(255,255,255,.85)",
+                  padding: "5px 11px",
+                  borderRadius: 999,
+                  border: "1px solid rgba(255,255,255,.1)",
+                }}
+              >
+                {s}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* 3つの経験 */}
+        <div
+          style={{
+            fontSize: 10,
+            fontWeight: 800,
+            letterSpacing: 2,
+            color: ACCENT,
+            marginBottom: 12,
+            textAlign: "center",
+          }}
+        >
+          BACKED BY THREE EXPERIENCES
+        </div>
+        <div
+          className="grid gap-3"
+          style={{ gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}
+        >
+          {pillars.map((p) => (
+            <div
+              key={p.title}
+              style={{
+                background: "rgba(255,255,255,.04)",
+                border: "1px solid rgba(255,255,255,.08)",
+                borderRadius: 16,
+                padding: "18px 18px 20px",
+              }}
+            >
+              <div style={{ fontSize: 22, marginBottom: 6 }}>{p.icon}</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "white", marginBottom: 6 }}>
+                {p.title}
+              </div>
+              <div style={{ fontSize: 12, lineHeight: 1.7, color: "rgba(255,255,255,.65)" }}>
+                {p.desc}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* 採用担当者向け導線 */}
+        <div
+          style={{
+            marginTop: 32,
+            textAlign: "center",
+            fontSize: 12,
+            color: "rgba(255,255,255,.55)",
+          }}
+        >
+          採用担当者の方へ:{" "}
+          <a
+            href="mailto:hiroki.abe.career@gmail.com"
+            style={{ color: ACCENT, textDecoration: "underline", fontWeight: 600 }}
+          >
+            hiroki.abe.career@gmail.com
+          </a>{" "}
+          まで直接ご連絡ください。
         </div>
       </div>
     </section>
@@ -2046,6 +2573,14 @@ function FinalCTA() {
           <Link href="/glossary" style={{ color: "inherit" }}>
             就活用語辞典
           </Link>
+          <a
+            href="https://careo-tensyoku.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "inherit" }}
+          >
+            転職版（Careo for 転職）
+          </a>
           <a href="mailto:hiroki.abe.career@gmail.com" style={{ color: "inherit" }}>
             お問い合わせ
           </a>

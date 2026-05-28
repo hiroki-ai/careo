@@ -47,6 +47,51 @@ export interface SelectionSchedule {
   disclaimer: string;
 }
 
+/** 3圏: 安全/努力/挑戦 */
+export type CompanyTier = "safe" | "effort" | "challenge";
+
+/** 軸合致度: 🥇perfect / 🌟strong / 🟡neutral / ❌mismatch */
+export type AxisMatch = "perfect" | "strong" | "neutral" | "mismatch";
+
+/** 志望度の優先度（S/A/B/C） */
+export type CompanyPriority = "S" | "A" | "B" | "C";
+
+/** ビジョン適合度: ◎excellent / ○good / △conditional / ✕difficult */
+export type VisionFit = "excellent" | "good" | "conditional" | "difficult";
+
+export const COMPANY_TIER_LABELS: Record<CompanyTier, { emoji: string; label: string }> = {
+  safe:      { emoji: "🎯", label: "安全圏" },
+  effort:    { emoji: "🚀", label: "努力圏" },
+  challenge: { emoji: "⛰",  label: "挑戦圏" },
+};
+
+export const AXIS_MATCH_LABELS: Record<AxisMatch, { emoji: string; label: string }> = {
+  perfect:  { emoji: "🥇", label: "最有力" },
+  strong:   { emoji: "🌟", label: "強く合う" },
+  neutral:  { emoji: "🟡", label: "要確認" },
+  mismatch: { emoji: "❌", label: "合わない" },
+};
+
+export const VISION_FIT_LABELS: Record<VisionFit, { emoji: string; label: string }> = {
+  excellent:   { emoji: "◎", label: "超適" },
+  good:        { emoji: "○", label: "適" },
+  conditional: { emoji: "△", label: "条件次第" },
+  difficult:   { emoji: "✕", label: "難しい" },
+};
+
+/**
+ * 合格可能性スコア（0-100）の内訳。
+ * 学歴20 + ガクチカ25 + 軸20 + 競争15 + 英語10 + 特殊10 = 100
+ */
+export interface PassScoreBreakdown {
+  gakureki: number;     // 学歴フィット (max 20)
+  gakuchika: number;    // ガクチカ・実績適合度 (max 25)
+  axis: number;         // 軸の一貫性 (max 20)
+  competition: number;  // 競争激しさ (max 15)
+  english: number;      // 英語必要度 (max 10)
+  special: number;      // 特殊要因 (max 10)
+}
+
 export interface Company {
   id: string;
   name: string;
@@ -63,6 +108,57 @@ export interface Company {
   is_intern_offer?: boolean | null;
   createdAt: string;
   updatedAt: string;
+
+  // --- 戦略評価軸（shukatsu-site から移植・全て optional）---
+  /** 一行で表す企業の特徴 */
+  tagline?: string;
+  /** 業界内での立ち位置 */
+  positioning?: string;
+  /** 3圏分類: 安全/努力/挑戦 */
+  tier?: CompanyTier;
+  /** 軸合致度: 🥇/🌟/🟡/❌ */
+  axis_match?: AxisMatch;
+  /** 志望優先度: S/A/B/C */
+  priority?: CompanyPriority;
+  /** 合格可能性スコア 0-100（AI採点） */
+  pass_score?: number;
+  /** スコアメモ・状況補足 */
+  pass_score_note?: string;
+  /** 採点軸別の内訳 */
+  pass_score_breakdown?: PassScoreBreakdown;
+  /** 5年後ビジョン適合度 */
+  vision_fit_5y?: VisionFit;
+  vision_fit_5y_note?: string;
+  /** 10年後ビジョン適合度 */
+  vision_fit_10y?: VisionFit;
+  vision_fit_10y_note?: string;
+  /** 社員数（表記自由：「約17,000名」） */
+  employees?: string;
+  /** 売上（表記自由：「約8,290億円」） */
+  revenue?: string;
+  /** 平均年収 */
+  avg_salary?: string;
+  /** 株式コード（上場企業のみ） */
+  ticker_code?: string;
+  /** 株価推移メモ */
+  stock_trend?: string;
+  /** 事業展望・成長戦略 */
+  outlook?: string;
+  /** 締切（"2026-05-27 12:00" 等） */
+  deadline?: string;
+  /** おすすめの職種・コース */
+  recommended_roles?: string[];
+  /** 企業の強み（一般論） */
+  strengths?: string[];
+  /** なぜ自分に合うか（自分視点） */
+  why_for_me?: string[];
+  /** 懸念点 */
+  concerns?: string[];
+  /** お祈り企業の振り返り分析 */
+  rejection_analysis?: string;
+  /** ワンキャリア・Openwork等の参照URL */
+  one_career_url?: string;
+  openwork_url?: string;
 }
 
 export type EsResult = "passed" | "failed" | "pending" | "unknown";
@@ -218,6 +314,59 @@ export interface PdcaResult {
   act: { improvements: string[]; nextWeekFocus: string; encouragement: string };
 }
 
+/**
+ * 軸の3層構造（最深層→中間層→表層）
+ * shukatsu-site の軸.md から移植
+ */
+export interface AxisLayers {
+  /** 最深層: 人格の中核（例: 期待・信頼を背負って人を喜ばせたい本能） */
+  deepest?: string;
+  /** 中間層: 能力（例: 価値を届ける／場を設計する力） */
+  middle?: string;
+  /** 表層: 行動・経験（例: ガクチカ3本柱がここに対応） */
+  surface?: string;
+}
+
+/**
+ * 5年後・10年後など、未来のビジョン
+ */
+export interface FutureVision {
+  /** その時の年齢 */
+  age?: number;
+  /** キャリア・仕事面で実現したい状態 */
+  career?: string;
+  /** ライフスタイル・家庭面 */
+  lifestyle?: string;
+  /** 人脈・繋がり */
+  network?: string;
+  /** 収入の目安 */
+  income?: string;
+}
+
+/**
+ * 強みと、それを裏付けるエピソード
+ */
+export interface StrengthWithEvidence {
+  /** 強みの名前（例: 信頼を背負う力） */
+  name: string;
+  /** 説明 */
+  description?: string;
+  /** 裏付けエピソード（複数可） */
+  evidences: string[];
+}
+
+/**
+ * 職種の優先順位
+ */
+export interface JobRolePriority {
+  /** 1〜の優先度（1=最優先） */
+  rank: number;
+  /** 職種名（例: 戦略・企画型） */
+  role: string;
+  /** 選定理由（短く） */
+  reason?: string;
+}
+
 export interface UserProfile {
   id: string;
   username?: string;
@@ -256,6 +405,19 @@ export interface UserProfile {
   lastPdca?: PdcaResult | null;
   lastPdcaAt?: string | null;
   lastChatAt?: string | null;
+
+  // --- Identity 構造化（shukatsu-site から移植・全て optional）---
+  /** 軸の3層構造（最深層/中間層/表層） */
+  axisLayers?: AxisLayers;
+  /** 5年後ビジョン */
+  vision5y?: FutureVision;
+  /** 10年後ビジョン */
+  vision10y?: FutureVision;
+  /** 強み×証拠エピソード（面接の鉄板） */
+  strengthsWithEvidence?: StrengthWithEvidence[];
+  /** 職種の優先順位 */
+  jobRolePriorities?: JobRolePriority[];
+
   createdAt: string;
   updatedAt: string;
 }

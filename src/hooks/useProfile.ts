@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { UserProfile, JobSearchStage, UserPlan, CareerCenterVisibility, DEFAULT_CAREER_CENTER_VISIBILITY, PdcaResult } from "@/types";
+import { UserProfile, JobSearchStage, UserPlan, CareerCenterVisibility, DEFAULT_CAREER_CENTER_VISIBILITY, PdcaResult, AxisLayers, FutureVision, StrengthWithEvidence, JobRolePriority } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 
 function rowToProfile(row: Record<string, unknown>): UserProfile {
@@ -31,6 +31,11 @@ function rowToProfile(row: Record<string, unknown>): UserProfile {
     lastPdca: (row.last_pdca as PdcaResult) ?? null,
     lastPdcaAt: (row.last_pdca_at as string) ?? null,
     lastChatAt: (row.last_chat_at as string) ?? null,
+    axisLayers: (row.axis_layers as AxisLayers) ?? undefined,
+    vision5y: (row.vision_5y as FutureVision) ?? undefined,
+    vision10y: (row.vision_10y as FutureVision) ?? undefined,
+    strengthsWithEvidence: (row.strengths_with_evidence as StrengthWithEvidence[]) ?? undefined,
+    jobRolePriorities: (row.job_role_priorities as JobRolePriority[]) ?? undefined,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
   };
@@ -173,6 +178,34 @@ export function useProfile() {
     return !!saved;
   }, []);
 
+  /** Identity 構造（軸3層・ビジョン・強み×証拠・職種優先順位）を部分更新 */
+  const patchIdentity = useCallback(async (
+    fields: Partial<Pick<UserProfile, "axisLayers" | "vision5y" | "vision10y" | "strengthsWithEvidence" | "jobRolePriorities">>
+  ): Promise<boolean> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return false;
+    const fieldMap: Record<string, string> = {
+      axisLayers: "axis_layers",
+      vision5y: "vision_5y",
+      vision10y: "vision_10y",
+      strengthsWithEvidence: "strengths_with_evidence",
+      jobRolePriorities: "job_role_priorities",
+    };
+    const row: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(fields)) {
+      if (value !== undefined) row[fieldMap[key]] = value;
+    }
+    if (Object.keys(row).length === 0) return false;
+    const { data: saved } = await supabase
+      .from("user_profiles")
+      .update(row)
+      .eq("id", user.id)
+      .select()
+      .single();
+    if (saved) setProfile(rowToProfile(saved as Record<string, unknown>));
+    return !!saved;
+  }, []);
+
   const saveCareerCenterVisibility = useCallback(async (visibility: CareerCenterVisibility): Promise<boolean> => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return false;
@@ -258,5 +291,5 @@ export function useProfile() {
     return !!saved;
   }, []);
 
-  return { profile, loading, saveProfile, patchSelfAnalysis, patchProfileBasics, saveAiSelfAnalysis, saveCareerCenterVisibility, savePublicProfile, saveCoachId, saveUsername, saveLastPdca, saveLastChatAt, refetch: fetch };
+  return { profile, loading, saveProfile, patchSelfAnalysis, patchProfileBasics, patchIdentity, saveAiSelfAnalysis, saveCareerCenterVisibility, savePublicProfile, saveCoachId, saveUsername, saveLastPdca, saveLastChatAt, refetch: fetch };
 }

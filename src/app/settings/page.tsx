@@ -199,6 +199,25 @@ export default function SettingsPage() {
         </div>
       </section>
 
+      {/* Identity（軸・ビジョン・強み）への導線 */}
+      <Link
+        href="/identity"
+        className="block bg-gradient-to-br from-emerald-50 to-blue-50 dark:from-emerald-900/20 dark:to-blue-900/20 border border-emerald-100 dark:border-emerald-900/30 rounded-xl p-5 mb-6 hover:shadow-md transition-shadow"
+      >
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h2 className="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+              <span>🧬</span>
+              Identity（軸・ビジョン・強み）
+            </h2>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              軸の3層構造・5/10年ビジョン・強み×証拠を編集。AI採点と志望動機の精度がここで決まる
+            </p>
+          </div>
+          <span className="text-gray-300 text-xl">→</span>
+        </div>
+      </Link>
+
       {/* プロフィール */}
       <section className="bg-white dark:bg-[#1a1d27] rounded-xl border border-gray-100 dark:border-[#2a2d37] p-6 mb-6">
         <div className="flex items-center justify-between mb-5">

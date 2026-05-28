@@ -33,10 +33,47 @@ import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { SkeletonCard } from "@/components/ui/SkeletonCard";
 import { useToast } from "@/components/ui/Toast";
-import { Company, CompanyStatus, COMPANY_STATUS_LABELS, COMPANY_STATUS_ORDER } from "@/types";
+import { Company, CompanyStatus, COMPANY_STATUS_LABELS, COMPANY_STATUS_ORDER, COMPANY_TIER_LABELS, AXIS_MATCH_LABELS } from "@/types";
 import { KareoCharacter } from "@/components/kareo/KareoCharacter";
 import { daysUntil } from "@/lib/utils";
 import { PageTutorial, PAGE_TUTORIALS } from "@/components/PageTutorial";
+
+// 戦略評価バッジ（コンパクト・カード用）
+function CompanyEvalBadges({ company, size = "md" }: { company: Company; size?: "sm" | "md" }) {
+  const score = company.pass_score;
+  if (score == null && !company.tier && !company.axis_match) return null;
+
+  const scoreColor =
+    score == null ? "text-gray-400 bg-gray-50" :
+    score >= 80 ? "text-emerald-700 bg-emerald-50" :
+    score >= 65 ? "text-blue-700 bg-blue-50" :
+    score >= 50 ? "text-yellow-700 bg-yellow-50" :
+    score >= 35 ? "text-orange-700 bg-orange-50" :
+                  "text-red-700 bg-red-50";
+
+  const textSize = size === "sm" ? "text-[10px]" : "text-[11px]";
+  const padding = size === "sm" ? "px-1.5 py-0.5" : "px-2 py-0.5";
+
+  return (
+    <div className={`flex flex-wrap items-center gap-1 ${textSize}`}>
+      {score != null && (
+        <span className={`inline-flex items-center font-bold rounded ${padding} ${scoreColor}`} title="合格可能性スコア">
+          📊 {score}
+        </span>
+      )}
+      {company.tier && (
+        <span className={`inline-flex items-center font-medium rounded ${padding} bg-gray-100 text-gray-700`} title={COMPANY_TIER_LABELS[company.tier].label}>
+          {COMPANY_TIER_LABELS[company.tier].emoji}{size === "md" ? ` ${COMPANY_TIER_LABELS[company.tier].label}` : ""}
+        </span>
+      )}
+      {company.axis_match && (
+        <span className={`inline-flex items-center font-medium rounded ${padding} bg-amber-50 text-amber-700`} title={`軸: ${AXIS_MATCH_LABELS[company.axis_match].label}`}>
+          {AXIS_MATCH_LABELS[company.axis_match].emoji}
+        </span>
+      )}
+    </div>
+  );
+}
 
 // モバイル：左スワイプでクイックアクション
 function SwipeableCompanyCard({ company, onDelete, onStatusChange }: {
@@ -138,6 +175,7 @@ function SwipeableCompanyCard({ company, onDelete, onStatusChange }: {
               />
             </div>
             {company.industry && <p className="text-sm text-gray-500 mb-2">{company.industry}</p>}
+            <div className="mb-2"><CompanyEvalBadges company={company} /></div>
             {company.notes && <p className="text-sm text-gray-600 line-clamp-2">{company.notes}</p>}
           </div>
         </Link>
@@ -186,6 +224,7 @@ function SortableKanbanCard({ company, nextDeadline }: { company: Company; nextD
           {company.industry && (
             <p className="text-[11px] text-gray-400 mb-1.5 truncate">{company.industry}</p>
           )}
+          <div className="mb-1.5"><CompanyEvalBadges company={company} size="sm" /></div>
           {nextDeadline && (
             <div className="flex items-center gap-1 mt-1.5">
               <svg className="w-3 h-3 text-orange-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -207,7 +246,8 @@ function KanbanOverlayCard({ company }: { company: Company }) {
         <h4 className="text-sm font-semibold text-gray-900 leading-tight truncate flex-1">{company.name}</h4>
         <StatusBadge status={company.status} className="ml-1.5 shrink-0 text-[10px]" />
       </div>
-      {company.industry && <p className="text-[11px] text-gray-400 truncate">{company.industry}</p>}
+      {company.industry && <p className="text-[11px] text-gray-400 truncate mb-1">{company.industry}</p>}
+      <CompanyEvalBadges company={company} size="sm" />
     </div>
   );
 }
@@ -270,6 +310,18 @@ export default function CompaniesPage() {
   });
   const [activeId, setActiveId] = useState<string | null>(null);
   const [filterIndustry, setFilterIndustry] = useState<string | "ALL">("ALL");
+  const [filterTier, setFilterTier] = useState<"ALL" | "safe" | "effort" | "challenge">("ALL");
+  const [filterAxis, setFilterAxis] = useState<"ALL" | "perfect" | "strong" | "neutral" | "mismatch">("ALL");
+  const [sortBy, setSortBy] = useState<"updated" | "score_desc" | "score_asc">(() => {
+    if (typeof window !== "undefined") {
+      return ((localStorage.getItem("careo_companies_sort") as "updated" | "score_desc" | "score_asc") || "updated");
+    }
+    return "updated";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("careo_companies_sort", sortBy);
+  }, [sortBy]);
 
   // Persist view mode
   useEffect(() => {
@@ -488,15 +540,24 @@ export default function CompaniesPage() {
   const filtered = companies
     .filter((c) => filterStatus === "ALL" || c.status === filterStatus)
     .filter((c) => filterIndustry === "ALL" || c.industry === filterIndustry)
+    .filter((c) => filterTier === "ALL" || c.tier === filterTier)
+    .filter((c) => filterAxis === "ALL" || c.axis_match === filterAxis)
     .filter((c) => {
       if (!searchQuery.trim()) return true;
       const q = searchQuery.toLowerCase();
       return c.name.toLowerCase().includes(q) || (c.industry ?? "").toLowerCase().includes(q);
     });
 
-  const sorted = [...filtered].sort(
-    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-  );
+  const sorted = [...filtered].sort((a, b) => {
+    if (sortBy === "score_desc" || sortBy === "score_asc") {
+      const av = a.pass_score ?? -1;
+      const bv = b.pass_score ?? -1;
+      if (av !== bv) return sortBy === "score_desc" ? bv - av : av - bv;
+      // 同点・未採点同士は updated 順
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    }
+    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+  });
 
   const activeCompany = activeId ? companies.find(c => c.id === activeId) : null;
 
@@ -606,7 +667,7 @@ export default function CompaniesPage() {
 
       {/* Industry filter chips */}
       {presentIndustries.length > 1 && (
-        <div className="flex gap-1.5 flex-wrap mb-6">
+        <div className="flex gap-1.5 flex-wrap mb-3">
           <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider self-center mr-1">業界</span>
           <button
             onClick={() => setFilterIndustry("ALL")}
@@ -633,6 +694,78 @@ export default function CompaniesPage() {
           ))}
         </div>
       )}
+
+      {/* Tier / Axis / Sort filters */}
+      <div className="flex gap-3 flex-wrap mb-6 items-center">
+        {/* 3圏 */}
+        <div className="flex gap-1.5 flex-wrap items-center">
+          <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider mr-1">3圏</span>
+          {[
+            { v: "ALL" as const, label: "すべて" },
+            { v: "safe" as const, label: "🎯 安全" },
+            { v: "effort" as const, label: "🚀 努力" },
+            { v: "challenge" as const, label: "⛰ 挑戦" },
+          ].map(({ v, label }) => (
+            <button
+              key={v}
+              onClick={() => setFilterTier(v)}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all cursor-pointer ${
+                filterTier === v
+                  ? "bg-emerald-600 text-white"
+                  : "bg-gray-50 text-gray-500 hover:bg-gray-100"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* 軸合致度 */}
+        <div className="flex gap-1.5 flex-wrap items-center">
+          <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider mr-1">軸</span>
+          {[
+            { v: "ALL" as const, label: "すべて" },
+            { v: "perfect" as const, label: "🥇" },
+            { v: "strong" as const, label: "🌟" },
+            { v: "neutral" as const, label: "🟡" },
+            { v: "mismatch" as const, label: "❌" },
+          ].map(({ v, label }) => (
+            <button
+              key={v}
+              onClick={() => setFilterAxis(v)}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all cursor-pointer ${
+                filterAxis === v
+                  ? "bg-amber-600 text-white"
+                  : "bg-gray-50 text-gray-500 hover:bg-gray-100"
+              }`}
+              title={
+                v === "perfect" ? "最有力" :
+                v === "strong" ? "強く合う" :
+                v === "neutral" ? "要確認" :
+                v === "mismatch" ? "合わない" : "すべて"
+              }
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* ソート */}
+        <div className="flex items-center gap-1.5 ml-auto">
+          <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">並び順</span>
+          <select
+            aria-label="並び順"
+            title="並び順"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as "updated" | "score_desc" | "score_asc")}
+            className="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-white border border-gray-200 text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+          >
+            <option value="updated">更新順</option>
+            <option value="score_desc">📊 スコア高い順</option>
+            <option value="score_asc">📊 スコア低い順</option>
+          </select>
+        </div>
+      </div>
 
       {/* AI企業提案バナー */}
       {showSuggestBanner && (
@@ -955,6 +1088,7 @@ export default function CompaniesPage() {
                   />
                 </div>
                 {company.industry && <p className="text-sm text-gray-500 mb-2">{company.industry}</p>}
+                <div className="mb-2"><CompanyEvalBadges company={company} /></div>
                 {company.notes && <p className="text-sm text-gray-600 line-clamp-2">{company.notes}</p>}
                 {companyDeadlines[company.id] && (
                   <div className="flex items-center gap-1 mt-2 pt-2 border-t border-gray-50">
