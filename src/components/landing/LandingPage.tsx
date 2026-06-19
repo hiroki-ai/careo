@@ -226,7 +226,7 @@ function Hero({ userCount }: { userCount: number }) {
             <span style={{ color: ACCENT_DEEP }}>話してるだけ</span>
             で、
             <br />
-            就活シート、完成。
+            就活が、整う。
           </h1>
 
           <p className="text-[15px] md:text-base leading-[1.8] md:leading-[1.9]" style={{ color: "#4b5563", marginBottom: 22, maxWidth: 520 }}>
