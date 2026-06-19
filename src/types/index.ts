@@ -1,18 +1,28 @@
 export type CompanyStatus =
   | "WISHLIST"
+  | "MYPAGE_REGISTERED"
+  | "DM_CONTACT"
+  | "CASUAL_MEETING"
+  | "REFERRAL"
   | "INTERN_APPLYING"
   | "INTERN_DOCUMENT"
+  | "INTERN_WEB_TEST"
   | "INTERN_INTERVIEW_1"
   | "INTERN_INTERVIEW_2"
   | "INTERN_FINAL"
   | "INTERN"
   | "APPLIED"
   | "DOCUMENT"
+  | "WEB_TEST"
   | "INTERVIEW_1"
   | "INTERVIEW_2"
+  | "INTERVIEW_3"
   | "FINAL"
   | "OFFERED"
-  | "REJECTED";
+  | "REJECTED"
+  | "WITHDRAWN"
+  | "SUMMER_MISSED"
+  | "INTERNSHIP_REJECTED";
 
 export type EsStatus = "DRAFT" | "SUBMITTED";
 
@@ -78,6 +88,37 @@ export const VISION_FIT_LABELS: Record<VisionFit, { emoji: string; label: string
   conditional: { emoji: "△", label: "条件次第" },
   difficult:   { emoji: "✕", label: "難しい" },
 };
+
+/**
+ * Openwork 口コミの評価（8軸 + 残業/有休/総合）
+ * 1.0-5.0 の0.1刻みを想定。null は未入力扱い。
+ */
+export interface OpenworkRatings {
+  compensation?: number;   // 待遇面の満足度
+  morale?: number;         // 社員の士気
+  openness?: number;       // 風通しの良さ
+  respect?: number;        // 社員の相互尊重
+  growth20s?: number;      // 20代成長環境
+  development?: number;    // 人材の長期育成
+  compliance?: number;     // 法令順守意識
+  evaluation?: number;     // 人事評価の適正感
+  totalScore?: number;     // 総合評価
+  overtimeHours?: number;  // 月平均残業時間
+  paidLeaveRate?: number;  // 有休消化率 (%)
+  sourceUrl?: string;
+  memo?: string;
+}
+
+export const OPENWORK_AXIS_LABELS: Array<{ key: keyof Pick<OpenworkRatings, "compensation" | "morale" | "openness" | "respect" | "growth20s" | "development" | "compliance" | "evaluation">; label: string }> = [
+  { key: "compensation", label: "待遇面" },
+  { key: "morale",       label: "士気" },
+  { key: "openness",     label: "風通し" },
+  { key: "respect",      label: "相互尊重" },
+  { key: "growth20s",    label: "20代成長" },
+  { key: "development",  label: "人材育成" },
+  { key: "compliance",   label: "法令順守" },
+  { key: "evaluation",   label: "評価適正" },
+];
 
 /**
  * 合格可能性スコア（0-100）の内訳。
@@ -159,6 +200,8 @@ export interface Company {
   /** ワンキャリア・Openwork等の参照URL */
   one_career_url?: string;
   openwork_url?: string;
+  /** Openwork 口コミ評価（8軸 + 残業/有休/総合） */
+  openwork_ratings?: OpenworkRatings;
 }
 
 export type EsResult = "passed" | "failed" | "pending" | "unknown";
@@ -207,36 +250,56 @@ export interface Interview {
 
 export const COMPANY_STATUS_LABELS: Record<CompanyStatus, string> = {
   WISHLIST: "気になる",
+  MYPAGE_REGISTERED: "マイページ登録済",
+  DM_CONTACT: "DMコンタクト中",
+  CASUAL_MEETING: "カジュアル面談中",
+  REFERRAL: "リファラル選考中",
   INTERN_APPLYING: "インターン応募",
   INTERN_DOCUMENT: "インターン書類選考",
+  INTERN_WEB_TEST: "インターンWEBテスト",
   INTERN_INTERVIEW_1: "インターン1次面接",
   INTERN_INTERVIEW_2: "インターン2次面接",
   INTERN_FINAL: "インターン最終面接",
   INTERN: "インターン中",
   APPLIED: "応募済み",
   DOCUMENT: "書類選考中",
+  WEB_TEST: "WEBテスト",
   INTERVIEW_1: "1次面接",
   INTERVIEW_2: "2次面接",
+  INTERVIEW_3: "3次面接",
   FINAL: "最終面接",
   OFFERED: "内定",
   REJECTED: "不採用",
+  WITHDRAWN: "辞退",
+  SUMMER_MISSED: "サマー見逃し",
+  INTERNSHIP_REJECTED: "インターン不通過",
 };
 
 export const COMPANY_STATUS_ORDER: CompanyStatus[] = [
   "WISHLIST",
+  "MYPAGE_REGISTERED",
+  "DM_CONTACT",
+  "CASUAL_MEETING",
+  "REFERRAL",
   "INTERN_APPLYING",
   "INTERN_DOCUMENT",
+  "INTERN_WEB_TEST",
   "INTERN_INTERVIEW_1",
   "INTERN_INTERVIEW_2",
   "INTERN_FINAL",
   "INTERN",
   "APPLIED",
   "DOCUMENT",
+  "WEB_TEST",
   "INTERVIEW_1",
   "INTERVIEW_2",
+  "INTERVIEW_3",
   "FINAL",
   "OFFERED",
   "REJECTED",
+  "INTERNSHIP_REJECTED",
+  "SUMMER_MISSED",
+  "WITHDRAWN",
 ];
 
 export type JobSearchStage =
@@ -653,19 +716,29 @@ export const ALERT_TYPE_LABELS: Record<AlertType, string> = {
 
 export const COMPANY_STATUS_COLORS: Record<CompanyStatus, string> = {
   WISHLIST: "bg-gray-100 text-gray-700",
+  MYPAGE_REGISTERED: "bg-slate-100 text-slate-700",
+  DM_CONTACT: "bg-pink-50 text-pink-700",
+  CASUAL_MEETING: "bg-pink-100 text-pink-800",
+  REFERRAL: "bg-violet-100 text-violet-700",
   INTERN_APPLYING: "bg-teal-50 text-teal-600",
   INTERN_DOCUMENT: "bg-teal-100 text-teal-700",
+  INTERN_WEB_TEST: "bg-emerald-100 text-emerald-700",
   INTERN_INTERVIEW_1: "bg-teal-200 text-teal-800",
   INTERN_INTERVIEW_2: "bg-teal-300 text-teal-900",
   INTERN_FINAL: "bg-cyan-200 text-cyan-900",
   INTERN: "bg-cyan-100 text-cyan-800",
   APPLIED: "bg-blue-100 text-blue-700",
   DOCUMENT: "bg-yellow-100 text-yellow-700",
+  WEB_TEST: "bg-amber-100 text-amber-800",
   INTERVIEW_1: "bg-orange-100 text-orange-700",
   INTERVIEW_2: "bg-orange-200 text-orange-800",
+  INTERVIEW_3: "bg-orange-300 text-orange-900",
   FINAL: "bg-purple-100 text-purple-700",
   OFFERED: "bg-green-100 text-green-700",
   REJECTED: "bg-red-100 text-red-700",
+  WITHDRAWN: "bg-gray-200 text-gray-600",
+  SUMMER_MISSED: "bg-stone-200 text-stone-700",
+  INTERNSHIP_REJECTED: "bg-red-50 text-red-600",
 };
 
 // ── 説明会・インターン日程 ──────────────────────────────────────────────────

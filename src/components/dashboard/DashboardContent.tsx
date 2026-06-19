@@ -13,6 +13,7 @@ import { useToast } from "@/components/ui/Toast";
 import { useDeadlineNotifications } from "@/hooks/useDeadlineNotifications";
 import { Button } from "@/components/ui/Button";
 import { InsightsWidget } from "@/components/dashboard/InsightsWidget";
+import { QuickInput } from "@/components/quickinput/QuickInput";
 import { PostOfferWidget } from "@/components/dashboard/PostOfferWidget";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { UpgradeNudge } from "@/components/ads/UpgradeNudge";
@@ -486,6 +487,9 @@ export function DashboardContent() {
             </div>
           </div>
         </div>
+
+        {/* QuickInput - 自然言語で記録 */}
+        <QuickInput />
 
         {/* Stat tiles */}
         <div>

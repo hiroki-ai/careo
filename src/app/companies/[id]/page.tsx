@@ -9,6 +9,7 @@ import { useInterviews } from "@/hooks/useInterviews";
 import { useProfile } from "@/hooks/useProfile";
 import { CompanyForm } from "@/components/companies/CompanyForm";
 import { CompanyEvaluationCard } from "@/components/companies/CompanyEvaluationCard";
+import { OpenworkRadar } from "@/components/companies/OpenworkRadar";
 import { StatusBadge, LegacyBadge as Badge } from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
@@ -209,6 +210,12 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
           targetIndustries: profile.targetIndustries,
           targetJobs: profile.targetJobs,
         } : undefined}
+        onUpdate={(patch) => updateCompany(id, patch)}
+      />
+
+      {/* Openwork 口コミ評価レーダー */}
+      <OpenworkRadar
+        company={company}
         onUpdate={(patch) => updateCompany(id, patch)}
       />
 

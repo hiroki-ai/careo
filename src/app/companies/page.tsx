@@ -27,6 +27,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { useEs } from "@/hooks/useEs";
 import { useInterviews } from "@/hooks/useInterviews";
 import { CompanyForm } from "@/components/companies/CompanyForm";
+import { CompanySheet } from "@/components/companies/CompanySheet";
 import { CsvImportModal } from "@/components/companies/CsvImportModal";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/Button";
@@ -186,11 +187,12 @@ function SwipeableCompanyCard({ company, onDelete, onStatusChange }: {
 
 // Kanban column definitions
 const KANBAN_COLUMNS: { id: string; label: string; statuses: CompanyStatus[]; color: string }[] = [
-  { id: "wishlist", label: "気になる", statuses: ["WISHLIST"], color: "bg-gray-400" },
+  { id: "wishlist", label: "気になる", statuses: ["WISHLIST", "MYPAGE_REGISTERED"], color: "bg-gray-400" },
+  { id: "contact", label: "接触中", statuses: ["DM_CONTACT", "CASUAL_MEETING", "REFERRAL"], color: "bg-pink-500" },
   { id: "applying", label: "応募中", statuses: ["APPLIED", "INTERN_APPLYING"], color: "bg-blue-500" },
-  { id: "document", label: "書類選考", statuses: ["DOCUMENT", "INTERN_DOCUMENT"], color: "bg-yellow-500" },
-  { id: "interview", label: "面接中", statuses: ["INTERVIEW_1", "INTERVIEW_2", "FINAL", "INTERN_INTERVIEW_1", "INTERN_INTERVIEW_2", "INTERN_FINAL"], color: "bg-purple-500" },
-  { id: "result", label: "内定 / 不合格", statuses: ["OFFERED", "INTERN", "REJECTED"], color: "bg-green-500" },
+  { id: "document", label: "書類・テスト", statuses: ["DOCUMENT", "INTERN_DOCUMENT", "WEB_TEST", "INTERN_WEB_TEST"], color: "bg-yellow-500" },
+  { id: "interview", label: "面接中", statuses: ["INTERVIEW_1", "INTERVIEW_2", "INTERVIEW_3", "FINAL", "INTERN_INTERVIEW_1", "INTERN_INTERVIEW_2", "INTERN_FINAL"], color: "bg-purple-500" },
+  { id: "result", label: "結果", statuses: ["OFFERED", "INTERN", "REJECTED", "INTERNSHIP_REJECTED", "WITHDRAWN", "SUMMER_MISSED"], color: "bg-green-500" },
 ];
 
 function SortableKanbanCard({ company, nextDeadline }: { company: Company; nextDeadline?: string }) {
@@ -252,7 +254,7 @@ function KanbanOverlayCard({ company }: { company: Company }) {
   );
 }
 
-type ViewMode = "list" | "kanban";
+type ViewMode = "list" | "kanban" | "sheet";
 
 const SUGGEST_CACHE_KEY = "careo_company_suggestions";
 const SUGGEST_CACHE_TTL = 24 * 60 * 60 * 1000; // 24h
@@ -599,6 +601,18 @@ export default function CompaniesPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
               </svg>
               カンバン
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("sheet")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                viewMode === "sheet" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              <svg className="w-3.5 h-3.5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18M3 6h18M3 18h18" />
+              </svg>
+              シート
             </button>
           </div>
           <Button variant="secondary" onClick={() => setIsImportOpen(true)}>
@@ -985,13 +999,16 @@ export default function CompaniesPage() {
         </div>
       )}
 
-      {/* 企業一覧 / カンバンビュー */}
+      {/* 企業一覧 / カンバン / シート ビュー */}
       {sorted.length === 0 && viewMode === "list" ? (
         <div className="text-center py-12">
           <KareoCharacter expression="encouraging" size={100} className="mx-auto mb-3" />
           <p className="text-gray-400 font-medium">企業が登録されていません</p>
           <p className="text-sm text-gray-300 mt-1">まずは気になる企業を追加してみよう!</p>
         </div>
+      ) : viewMode === "sheet" ? (
+        /* ===== Sheet View ===== */
+        <CompanySheet companies={sorted} />
       ) : viewMode === "kanban" ? (
         /* ===== Kanban View ===== */
         <DndContext

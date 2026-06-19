@@ -53,6 +53,8 @@ export function LandingPage({ recentPosts, userCount, reviews }: Props) {
       <Hero userCount={userCount} />
       <SocialProofStrip />
       <WhatsNewSection />
+      <SpreadsheetUpgradeSection />
+      <QuickInputDemoSection />
       <PassScoreShowcase />
       <SummerInternTeaser />
       <BeforeAfterScenes />
@@ -220,18 +222,19 @@ function Hero({ userCount }: { userCount: number }) {
               marginBottom: 16,
             }}
           >
-            就活の
-            <span style={{ color: ACCENT_DEEP }}>勝ち方</span>
-            を、
+            AIと
+            <span style={{ color: ACCENT_DEEP }}>話してるだけ</span>
+            で、
             <br />
-            データで見える化。
+            就活シート、完成。
           </h1>
 
           <p className="text-[15px] md:text-base leading-[1.8] md:leading-[1.9]" style={{ color: "#4b5563", marginBottom: 22, maxWidth: 520 }}>
-            <b style={{ color: INK }}>ES・面接・OB訪問を全部ひとつに。</b>
-            通過率もボトルネックも自動で可視化。
+            就活管理を <b style={{ color: INK }}>Notion・スプシ</b> でやってた人へ。
             <br />
-            AIコーチ「カレオ」が君のデータから、<b style={{ color: INK }}>今週やるべきことTOP3</b>を提案する、就活専用のCRM。
+            シートは「ただ並べるだけ」。Careo は<b style={{ color: INK }}>AIが整理し、優先順位もPDCAも一緒に回す</b>、
+            <br className="hidden md:block" />
+            伴走型のキャリアOS。
           </p>
 
           <div className="flex flex-wrap gap-2.5" style={{ marginBottom: 24 }}>
@@ -1392,6 +1395,344 @@ function RecentPostsSection({ recentPosts }: { recentPosts: RecentPost[] }) {
                 📖 {p.reading_time_min}分で読める
               </div>
             </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SpreadsheetUpgradeSection() {
+  const rows = [
+    { name: "サイバーエージェント", industry: "メガベン", status: "二次面接", deadline: "6/20", score: 79, axis: "🥇", tier: "🚀" },
+    { name: "リクルート", industry: "メガベン", status: "応募済み", deadline: "6/25", score: 82, axis: "🥇", tier: "🎯" },
+    { name: "電通", industry: "広告", status: "ES提出", deadline: "6/30", score: 72, axis: "🌟", tier: "🚀" },
+    { name: "三菱商事", industry: "総合商社", status: "気になる", deadline: "-", score: 54, axis: "🟡", tier: "⛰" },
+  ];
+
+  return (
+    <section
+      className="relative overflow-hidden px-4 py-14 md:px-5 md:py-20"
+      style={{ background: BG }}
+    >
+      <HeroBackdrop />
+      <div className="relative" style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 36 }}>
+          <SectionEyebrow>SPREADSHEET, BUT SMARTER</SectionEyebrow>
+          <h2
+            className="font-klee"
+            style={{
+              fontSize: "min(8vw, 42px)",
+              fontWeight: 600,
+              lineHeight: 1.18,
+              letterSpacing: -0.6,
+              margin: 0,
+              color: INK,
+            }}
+          >
+            シートに<span style={{ color: "#94a3b8" }}>「まとめる」</span>から、<br className="md:hidden" />
+            AIが<span style={{ color: ACCENT_DEEP }}>「動く」</span>へ。
+          </h2>
+          <p
+            style={{
+              fontSize: 13.5,
+              color: "#6b7280",
+              lineHeight: 1.9,
+              maxWidth: 640,
+              margin: "16px auto 0",
+            }}
+          >
+            Notion・スプシは便利だけど、結局「<b>ただシートに並べて見やすくしただけ</b>」。
+            <br className="hidden md:block" />
+            Careo は就活ドメインの構造（軸合致度・スコア・3圏）と AI を最初から内蔵。
+            <br className="hidden md:block" />
+            あなたが入力するたび、<b style={{ color: INK }}>AIが軸と照合して PDCA を一緒に回す</b>。
+          </p>
+        </div>
+
+        {/* シート例 */}
+        <div
+          style={{
+            background: "white",
+            borderRadius: 24,
+            border: "1px solid rgba(0,0,0,.06)",
+            boxShadow: "0 10px 32px rgba(0,0,0,.06)",
+            overflow: "hidden",
+            margin: "0 auto",
+            maxWidth: 920,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "10px 16px",
+              background: "#f9fafb",
+              borderBottom: "1px solid rgba(0,0,0,.05)",
+              fontSize: 11,
+              color: "#6b7280",
+              fontWeight: 600,
+            }}
+          >
+            <span>📋 企業一覧 · シートビュー</span>
+            <span style={{ color: ACCENT_DEEP }}>列ヘッダーをクリックで並び替え →</span>
+          </div>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse", minWidth: 640 }}>
+              <thead style={{ background: "#fafafa" }}>
+                <tr>
+                  {["企業 ↕", "業界 ↕", "ステータス ↕", "締切 ↕", "📊スコア ▼", "軸 ↕", "3圏 ↕"].map((h, i) => (
+                    <th
+                      key={i}
+                      style={{
+                        textAlign: i >= 4 ? "center" : "left",
+                        padding: "10px 12px",
+                        fontSize: 11,
+                        fontWeight: 700,
+                        color: "#374151",
+                        whiteSpace: "nowrap",
+                        borderBottom: "1px solid rgba(0,0,0,.06)",
+                      }}
+                    >
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((r, i) => (
+                  <tr
+                    key={r.name}
+                    style={{
+                      background: i % 2 === 0 ? "white" : "#fafafa",
+                      borderBottom: "1px solid rgba(0,0,0,.04)",
+                    }}
+                  >
+                    <td style={{ padding: "10px 12px", fontWeight: 600, color: INK }}>{r.name}</td>
+                    <td style={{ padding: "10px 12px", color: "#6b7280", fontSize: 12 }}>{r.industry}</td>
+                    <td style={{ padding: "10px 12px", color: "#374151", fontSize: 12 }}>{r.status}</td>
+                    <td style={{ padding: "10px 12px", color: "#374151", fontSize: 12 }}>{r.deadline}</td>
+                    <td
+                      style={{
+                        padding: "10px 12px",
+                        textAlign: "center",
+                        fontWeight: 800,
+                        color: r.score >= 80 ? "#047857" : r.score >= 65 ? "#1d4ed8" : r.score >= 50 ? "#a16207" : "#9a3412",
+                      }}
+                    >
+                      {r.score}
+                      <span style={{ color: "#9ca3af", fontWeight: 400, fontSize: 10 }}>/100</span>
+                    </td>
+                    <td style={{ padding: "10px 12px", textAlign: "center", fontSize: 16 }}>{r.axis}</td>
+                    <td style={{ padding: "10px 12px", textAlign: "center", fontSize: 16 }}>{r.tier}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* 3つのキー機能 */}
+        <div
+          className="grid gap-3"
+          style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", maxWidth: 920, margin: "28px auto 0" }}
+        >
+          {[
+            {
+              icon: "🔀",
+              title: "3つのビュー",
+              desc: "リスト / カンバン / シート。場面に応じて即切替。",
+            },
+            {
+              icon: "🎚",
+              title: "意味のあるフィルタ",
+              desc: "3圏（安全/努力/挑戦）・軸合致度（🥇🌟🟡）・スコア順。就活のためだけの軸。",
+            },
+            {
+              icon: "🎯",
+              title: "選考ステータス24種",
+              desc: "「マイページ登録済」「DMコンタクト中」「カジュアル面談」「リファラル選考」も網羅。",
+            },
+          ].map((p) => (
+            <div
+              key={p.title}
+              style={{
+                background: "white",
+                borderRadius: 16,
+                padding: 18,
+                border: "1px solid rgba(0,0,0,.05)",
+                boxShadow: "0 4px 12px rgba(0,0,0,.03)",
+              }}
+            >
+              <div style={{ fontSize: 24, marginBottom: 8 }}>{p.icon}</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: INK, marginBottom: 4 }}>{p.title}</div>
+              <div style={{ fontSize: 12, lineHeight: 1.7, color: "#6b7280" }}>{p.desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function QuickInputDemoSection() {
+  return (
+    <section
+      className="relative overflow-hidden px-4 py-14 md:px-5 md:py-20"
+      style={{ background: SURFACE }}
+    >
+      <HeroBackdrop flip />
+      <div className="relative" style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 36 }}>
+          <SectionEyebrow>TALK, NOT TYPE</SectionEyebrow>
+          <h2
+            className="font-klee"
+            style={{
+              fontSize: "min(8vw, 42px)",
+              fontWeight: 600,
+              lineHeight: 1.18,
+              letterSpacing: -0.6,
+              margin: 0,
+              color: INK,
+            }}
+          >
+            話すだけで、<span style={{ color: ACCENT_DEEP }}>記録もPDCAも</span>。
+          </h2>
+          <p
+            style={{
+              fontSize: 13.5,
+              color: "#6b7280",
+              lineHeight: 1.9,
+              maxWidth: 640,
+              margin: "16px auto 0",
+            }}
+          >
+            ぽちぽちフォームを埋めるのは面倒。<b>ひとことで話せばAIが構造化して保存</b>。
+            <br className="hidden md:block" />
+            さらに、本人の<b>軸・ガクチカ・過去の選考プロセス</b>を踏まえて「次の一手」を返します。
+          </p>
+        </div>
+
+        <div
+          className="grid gap-4 items-start"
+          style={{ gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", maxWidth: 920, margin: "0 auto" }}
+        >
+          {/* 入力例 */}
+          <div
+            style={{
+              background: "white",
+              borderRadius: 20,
+              padding: 20,
+              border: `1px solid ${ACCENT}22`,
+              boxShadow: `0 6px 20px ${ACCENT}10`,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: 2,
+                color: ACCENT_DEEP,
+                marginBottom: 8,
+              }}
+            >
+              あなたの入力（ひとこと）
+            </div>
+            <div
+              style={{
+                background: "#f3f4f6",
+                borderRadius: 12,
+                padding: "12px 14px",
+                fontSize: 13,
+                color: INK,
+                lineHeight: 1.7,
+              }}
+            >
+              「サイバーの二次面接、6/20 14時に決まった。前回二次落ちした自己PR口頭が課題だった」
+            </div>
+            <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 8 }}>
+              ✓ Cmd/Ctrl + Enter で送信
+            </div>
+          </div>
+
+          {/* AIの結果 */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div
+              style={{
+                background: "#ecfdf5",
+                border: "1px solid #6ee7b7",
+                borderRadius: 12,
+                padding: "10px 14px",
+                fontSize: 12.5,
+                color: "#065f46",
+                lineHeight: 1.6,
+              }}
+            >
+              ✓ サイバーエージェントを <b>INTERVIEW_2</b> に更新、面接ログ（6/20 14:00）を作成
+            </div>
+            <div
+              style={{
+                background: "white",
+                border: "1px solid #d1fae5",
+                borderRadius: 12,
+                padding: "10px 14px",
+                fontSize: 12,
+                color: "#374151",
+              }}
+            >
+              <div style={{ fontSize: 10, fontWeight: 800, color: "#047857", marginBottom: 4 }}>
+                🎯 次の一手
+              </div>
+              <ul style={{ margin: 0, paddingLeft: 16, lineHeight: 1.7 }}>
+                <li>自己PRの口頭バージョン、今すぐ録音して聞き直しておこう</li>
+                <li>前回二次落ちの面接ログを見返して、課題のメモを更新</li>
+              </ul>
+            </div>
+            <div
+              style={{
+                background: "#eef2ff",
+                border: "1px solid #c7d2fe",
+                borderRadius: 12,
+                padding: "10px 14px",
+                fontSize: 12,
+                color: "#3730a3",
+                lineHeight: 1.7,
+              }}
+            >
+              <div style={{ fontSize: 10, fontWeight: 800, color: "#4338ca", marginBottom: 4 }}>
+                💡 PDCA インサイト
+              </div>
+              軸「埋もれた価値を届ける」が口頭で伝わる準備、まだ薄い。Identity の強み「翻訳して届ける力」を起点に再構成を。
+            </div>
+          </div>
+        </div>
+
+        {/* 4つの活用例 */}
+        <div
+          className="grid gap-2.5"
+          style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", maxWidth: 920, margin: "28px auto 0" }}
+        >
+          {[
+            "「リクルートが気になる企業に追加」",
+            "「ベイカレ ES通過した」",
+            "「今週はサイバーが本命。電通は一旦後回し」",
+            "「軸の最深層は『期待を背負うと火がつく』」",
+          ].map((s, i) => (
+            <div
+              key={i}
+              style={{
+                background: "white",
+                borderRadius: 12,
+                padding: "10px 14px",
+                fontSize: 12,
+                color: "#4b5563",
+                border: "1px solid rgba(0,0,0,.05)",
+                lineHeight: 1.6,
+              }}
+            >
+              💬 {s}
+            </div>
           ))}
         </div>
       </div>

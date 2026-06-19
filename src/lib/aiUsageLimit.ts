@@ -15,6 +15,7 @@ export type AiFeature =
   | "insights"
   | "company-suggest"
   | "company-score"
+  | "parse-input"
   | "weekly-coach"
   | "industry-analysis";
 
@@ -26,6 +27,7 @@ export const FREE_MONTHLY_LIMITS: Record<AiFeature, number> = {
   "insights": 1,
   "company-suggest": 3,
   "company-score": 3,
+  "parse-input": 10,       // 高頻度想定、無料10回/月
   "weekly-coach": 0,       // 完全ロック
   "industry-analysis": 0,  // 完全ロック
 };
